@@ -1,0 +1,42 @@
+{
+  "name": "mww",
+  "version": "1.0.0",
+  "description": "mww_on_demand",
+  "main": "mww.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "export AWS_PROFILE=mww && export AWS_SDK_LOAD_CONFIG=1 &&  nodemon mww.js"
+  },
+  "author": "chena_ram",
+  "license": "ISC",
+  "dependencies": {
+    "agora-access-token": "^2.0.4",
+    "aws-cli": "^0.0.2",
+    "aws-sdk": "^2.1341.0",
+    "axios": "^0.27.2",
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.1",
+    "fcm-node": "^1.6.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "jsonwebtoken": "^8.5.1",
+    "md5": "^2.3.0",
+    "moment": "^2.29.4",
+    "mongoose": "^6.4.7",
+    "multer": "^1.4.5-lts.1",
+    "multer-s3": "^3.0.1",
+    "node-cache": "^5.1.2",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.7.7",
+    "nodemon": "^3.0.1",
+    "path": "^0.12.7",
+    "pdfkit": "^0.13.0",
+    "razorpay": "^2.8.6",
+    "sharp": "^0.32.1",
+    "youtube-mp3-downloader": "^0.7.11",
+    "yt-get": "^1.1.2",
+    "ytdl-core": "^4.11.4"
+  }
+}
