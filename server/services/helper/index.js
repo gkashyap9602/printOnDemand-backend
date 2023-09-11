@@ -69,7 +69,7 @@ const validateParams = (request, feilds) => {
   }
   for (var i = 0; i < feilds.length; i++) {
     if (postKeys.indexOf(feilds[i]) >= 0) {
-      if (request.body[feilds[i]] == "") missingFeilds.push(feilds[i]);
+      if (request.body[feilds[i]] === "") missingFeilds.push(feilds[i]);
     } else {
       missingFeilds.push(feilds[i]);
     }

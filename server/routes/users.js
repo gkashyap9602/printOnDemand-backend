@@ -4,38 +4,38 @@ var AuthController = require('../controllers/Users');
 var middleware = require("../controllers/middleware");
 
 // Users Routes without token
-router.post('/check_username_exist', AuthController.checkUsernameExistance);
-router.post('/suggest_username', AuthController.suggestUsername);
-router.post('/send_registration_code', AuthController.sendRegistrationCode);
+// router.post('/check_username_exist', AuthController.checkUsernameExistance);
+// router.post('/suggest_username', AuthController.suggestUsername);
+// router.post('/send_registration_code', AuthController.sendRegistrationCode);
 router.post('/register', AuthController.register);
 router.post('/login', AuthController.login);
-router.post('/social_login', AuthController.socialLogin);
-router.post('/forgot', AuthController.forgotPassword);
-router.post('/reset_password', AuthController.resetPassword);
-router.post('/logout', AuthController.logout);
-router.post('/get', AuthController.getUserDetail);
-router.post('/search', AuthController.searchUser);
+// router.post('/social_login', AuthController.socialLogin);
+// router.post('/forgot', AuthController.forgotPassword);
+// router.post('/reset_password', AuthController.resetPassword);
+// router.post('/logout', AuthController.logout);
+// router.post('/get', AuthController.getUserDetail);
+// router.post('/search', AuthController.searchUser);
 
 // with token
-router.post('/update_details', middleware.checkToken, AuthController.updateUser);
-router.post('/follow', middleware.checkToken, AuthController.follow);
-router.post('/follower_list',  AuthController.followerList);
-router.post('/following_list',  AuthController.followingList);
-router.post('/like_comment', middleware.checkToken, AuthController.likeComment);
-router.post('/activate_frame', middleware.checkToken, AuthController.markFrameActive);
-router.post('/get_questions', middleware.checkToken, AuthController.getQuestions);
-router.post('/get_categories', middleware.checkToken, AuthController.getCategories);
-router.post('/report', middleware.checkToken, AuthController.reportUser);
+router.post('/update_profile', middleware.checkToken, AuthController.updateUser);
+// router.post('/follow', middleware.checkToken, AuthController.follow);
+// router.post('/follower_list',  AuthController.followerList);
+// router.post('/following_list',  AuthController.followingList);
+// router.post('/like_comment', middleware.checkToken, AuthController.likeComment);
+// router.post('/activate_frame', middleware.checkToken, AuthController.markFrameActive);
+// router.post('/get_questions', middleware.checkToken, AuthController.getQuestions);
+// router.post('/get_categories', middleware.checkToken, AuthController.getCategories);
+// router.post('/report', middleware.checkToken, AuthController.reportUser);
 
-router.post('/verify_user', middleware.checkToken, AuthController.verifyUser);
+// router.post('/verify_user', middleware.checkToken, AuthController.verifyUser);
 
 // admin token Route
-router.post('/get_detail', middleware.checkToken, AuthController.getDetailByAdmin);
-router.post('/get_all_users', middleware.checkToken, AuthController.getAllUsers);
-router.post('/update_user', middleware.checkToken, AuthController.updateUserByAdmin);
-router.post('/unlock_frame', middleware.checkToken, AuthController.markFrameUnlocked);
-router.post('/report_list', middleware.checkToken, AuthController.listReports);
-router.post('/verify_face', middleware.checkToken, AuthController.verifyUserInProgress);
+// router.post('/get_detail', middleware.checkToken, AuthController.getDetailByAdmin);
+// router.post('/get_all_users', middleware.checkToken, AuthController.getAllUsers);
+// router.post('/update_user', middleware.checkToken, AuthController.updateUserByAdmin);
+// router.post('/unlock_frame', middleware.checkToken, AuthController.markFrameUnlocked);
+// router.post('/report_list', middleware.checkToken, AuthController.listReports);
+// router.post('/verify_face', middleware.checkToken, AuthController.verifyUserInProgress);
 
 
 // Common Routes

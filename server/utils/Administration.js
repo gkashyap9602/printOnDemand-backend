@@ -7,7 +7,7 @@ let moment = require('moment');
 let md5 = require('md5');
 const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require('../constants/const');
-const Question = require('../models/Question');
+// const Question = require('../models/Question');
 const VerificationRequest = require('../models/VerificationRequest');
 const { default: mongoose } = require('mongoose');
 const CommonContent = require('../models/CommonContent');
@@ -152,22 +152,22 @@ const adminUtils = {
         }
         return helpers.showResponse(false, ResponseMessages?.admin?.admin_details_update_error, null, null, 200);
     },
-    addQuestion: async (data) => {
-        try {
-            const { question, answers, correct_answer } = data
-            let questionRef = new Question({ question, answers, correct_answer })
-            let data_ = questionRef.save()
-            if (data_) {
-                return helpers.showResponse(true, ResponseMessages?.admin?.question_added, data_, null, 200);
+    // addQuestion: async (data) => {
+    //     try {
+    //         const { question, answers, correct_answer } = data
+    //         let questionRef = new Question({ question, answers, correct_answer })
+    //         let data_ = questionRef.save()
+    //         if (data_) {
+    //             return helpers.showResponse(true, ResponseMessages?.admin?.question_added, data_, null, 200);
 
-            }
-        }
-        catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 200);
+    //         }
+    //     }
+    //     catch (err) {
+    //         return helpers.showResponse(false, err?.message, null, null, 200);
 
-        }
+    //     }
 
-    },
+    // },
     addCreatorCategories: async (data) => {
         try {
             const { name } = data
