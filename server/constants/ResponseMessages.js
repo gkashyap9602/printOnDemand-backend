@@ -30,6 +30,7 @@ module.exports = {
     users: {
         email_already: "Email address is already occupied",
         valid_email: "Valid email !!! Go ahead",
+        token_verification_sucess: "Valid token !!! Go ahead",
         phone_already: "Phone number is already occupied",
         valid_phone: "Valid phone number !!! Go ahead",
         username_already: "Username is already occupied",

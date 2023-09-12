@@ -17,7 +17,7 @@ const middleware = {
 				jwt.verify(token, API_SECRET, async (err, decoded) => {
 
 					if (err) {
-						return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired });
+						return helpers.showResponse(false, ResponseMessages?.middleware?.token_expired, null, null, 401);
 					}
 					// if (decoded?.type == "refresh") {
 					// 	return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token });
@@ -37,8 +37,7 @@ const middleware = {
 							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
 						}
 						decoded = { ...decoded, user_id: userData._id }
-						req.decoded = decoded;
-						req.token = token
+						return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, null, null, 200);
 					} else if (decoded?.user_type == "admin") {
 
 						let response = await getSingleData(Administration, { device_info: { $elemMatch: { access_token: token } } }, '');
@@ -54,6 +53,7 @@ const middleware = {
 							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
 						}
 						decoded = { ...decoded, admin_id: adminData._id }
+						return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, null, null, 200);
 					}
 				})
 			}
