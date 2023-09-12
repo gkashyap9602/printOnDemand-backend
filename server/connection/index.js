@@ -4,11 +4,11 @@ const path  = require('path')
  require('dotenv').config({path:path.resolve(__dirname, '../../server/.env')})
 //  helpers.changeEnv(process.env.ENV_MODE)
 
-// mongodb://127.0.0.1:27017/mww
-// mongodb://localhost:27017/blockbrew
+// mongodb://localhost:27017/mww
 helpers.getParameterFromAWS({ name: helpers.changeEnv(process.env.ENV_MODE)}).then((MONGODB_URI) => {
     console.log(MONGODB_URI,"mongoooo")
-    var mongoDB = MONGODB_URI
+    var mongoDB = 'mongodb://localhost:27017/mww'
+    // MONGODB_URI
     mongoose.Promise = global.Promise;
     mongoose.connect(mongoDB, {
         useNewUrlParser: true,

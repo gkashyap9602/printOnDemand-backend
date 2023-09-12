@@ -9,6 +9,60 @@ const moment = require("moment")
 let ObjectId = require('mongodb').ObjectID;
 
 const middleware = {
+	verifyToken: async (token) => {
+		try {
+			if (token) {
+				let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
+
+				jwt.verify(token, API_SECRET, async (err, decoded) => {
+
+					if (err) {
+						return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired });
+					}
+					// if (decoded?.type == "refresh") {
+					// 	return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token });
+					// }
+					if (decoded?.user_type == "user") {
+
+						let response = await getSingleData(Users,{ token: token }, 'status');
+
+						if (!response.status) {
+							return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.invalid_access_token });
+						}
+						let userData = response?.data
+						if (userData.status == 0) {
+							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account });
+						}
+						if (userData.status == 2) {
+							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
+						}
+						decoded = { ...decoded, user_id: userData._id }
+						req.decoded = decoded;
+						req.token = token
+					} else if (decoded?.user_type == "admin") {
+
+						let response = await getSingleData(Administration, { device_info: { $elemMatch: { access_token: token } } }, '');
+
+						if (!response.status) {
+							return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.invalid_access_token });
+						}
+						let adminData = response?.data
+						if (adminData.status == 0) {
+							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account });
+						}
+						if (adminData.status == 2) {
+							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
+						}
+						decoded = { ...decoded, admin_id: adminData._id }
+					}
+				})
+			}
+		} catch (error) {
+			console.log("in catch middleware check token error : ", err)
+			return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired });
+		}
+
+	},
 	checkToken: async (req, res, next) => {
 		try {
 			let token = req.headers['access_token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
@@ -31,9 +85,9 @@ const middleware = {
 						return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token });
 					}
 					if (decoded?.user_type == "user") {
-			
+
 						let response = await getSingleData(Users, { device_info: { $elemMatch: { access_token: token } } }, 'status');
-			
+
 						if (!response.status) {
 							return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.invalid_access_token });
 						}
@@ -49,9 +103,9 @@ const middleware = {
 						req.token = token
 						next();
 					} else if (decoded?.user_type == "admin") {
-					
+
 						let response = await getSingleData(Administration, { device_info: { $elemMatch: { access_token: token } } }, '');
-		
+
 						if (!response.status) {
 							return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.invalid_access_token });
 						}

@@ -39,7 +39,7 @@ const authController = {
     // },
 
     register: async (req, res) => {
-        let requiredFields = ['firstName', 'lastName', 'userName', 'password'];
+        let requiredFields = ['firstName', 'lastName', 'email', 'password'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
             return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
@@ -88,33 +88,26 @@ const authController = {
     //     return helpers.showOutput(res, result, result.code);
     // },
 
-    // forgotPassword: async (req, res) => {
-    //     let requiredFields = ['input_source'];
-    //     let validator = helpers.validateParams(req, requiredFields);
-    //     if (!validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
-    //     }
-    //     let input_source_validator = helpers.validateParams(req, [req.body.input_source]);
-    //     if (!input_source_validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, input_source_validator.message), 203);
-    //     }
-    //     let result = await Users.forgotPassword(req.body);
-    //     return helpers.showOutput(res, result, result.code);
-    // },
+    forgotPassword: async (req, res) => {
+        let requiredFields = ['email'];
+        let validator = helpers.validateParams(req, requiredFields);
+        if (!validator.status) {
+            return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
+        }
+        let result = await Users.forgotPassword(req.body);
+        return helpers.showOutput(res, result, result.code);
+    },
 
-    // resetPassword: async (req, res) => {
-    //     let requiredFields = ['otp', 'input_source', 'password'];
-    //     let validator = helpers.validateParams(req, requiredFields);
-    //     if (!validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
-    //     }
-    //     let input_source_validator = helpers.validateParams(req, [req.body.input_source]);
-    //     if (!input_source_validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, input_source_validator.message), 203);
-    //     }
-    //     let result = await Users.resetPassword(req.body);
-    //     return helpers.showOutput(res, result, result.code);
-    // },
+    resetPassword: async (req, res) => {
+        let requiredFields = ['resetPasswordToken', 'newPassword','emailId'];
+        let validator = helpers.validateParams(req, requiredFields);
+        if (!validator.status) {
+            return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
+        }
+        
+        let result = await Users.resetPassword(req.body);
+        return helpers.showOutput(res, result, result.code);
+    },
 
     // logout: async (req, res) => {
     //     let requiredFields = ['user_id'];

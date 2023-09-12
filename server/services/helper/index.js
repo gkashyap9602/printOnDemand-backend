@@ -1,5 +1,11 @@
 var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
+
+AWS.config.update({
+  region: "us-east-1",
+  credentials: new AWS.SharedIniFileCredentials({ profile: "mww" }),
+});
+
 const ssm = new AWS.SSM();
 const nodemailer = require("nodemailer");
 const ResponseMessages = require("../../constants/ResponseMessages");
@@ -39,13 +45,13 @@ const showOutput = (res, response, code) => {
 };
 
 const changeEnv = (env) => {
-  if(env==="PROD"){
-    return "MONGODB_URI"
-  }else if(env==="STAGING"){
-    return "STAGING_MONGODB_URI"
-       
-  }else{
-    return "DEV_MONGODB_URI"
+  if (env === "PROD") {
+    return "MONGODB_URI_PROD"
+  } else if (env === "STAG") {
+    return "MONGODB_URI_STAG"
+
+  } else {
+    return "MONGODB_URI_DEV"
   }
 };
 
@@ -129,10 +135,10 @@ const arraySort = (arr) => {
     a.index > b.index
       ? 1
       : a.index === b.index
-      ? a.index > b.index
-        ? 1
+        ? a.index > b.index
+          ? 1
+          : -1
         : -1
-      : -1
   );
   return arr;
 };
@@ -167,9 +173,9 @@ const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
   var a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(deg2rad(lat1)) *
-      Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   var d = R * c; // Distance in km
   return d;
@@ -339,24 +345,30 @@ const getSecretFromAWS = (secret_key_param) => {
 const sendEmailService = async (to, subject, body, attachments = null) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let ACCESSID = await getParameterFromAWS({ name: "ACCESSID" });
-      let SecretResponse = await getSecretFromAWS("rico-secret");
-      let SECRET = SecretResponse?.SecretString;
-      let region = await getParameterFromAWS({ name: "REGION" });
+      // let ACCESSID = await getParameterFromAWS({ name: "ACCESSID" });
+      // let SecretResponse = await getSecretFromAWS("rico-secret");
+      // let SECRET = SecretResponse?.SecretString;
+      // let region = await getParameterFromAWS({ name: "REGION" });
       let transporter = nodemailer.createTransport({
-        SES: new AWS.SES({
-          accessKeyId: ACCESSID,
-          secretAccessKey: SECRET,
-          region,
-          apiVersion: "2010-12-01",
-        }),
+        // SES: new AWS.SES({
+        //   accessKeyId: ACCESSID,
+        //   secretAccessKey: SECRET,
+        //   region,
+        //   apiVersion: "2010-12-01",
+        // }),
+        host: 'smtp.ethereal.email',
+        port: 587,
+        auth: {
+            user: 'hailie39@ethereal.email',
+            pass: 'xFtPQjBSYHE6qrqRUf'
+        }
       });
       let mailOptions = {
         from: await getParameterFromAWS({ name: "FROM_SES" }),
-        to,
+        to: 'stum@yopmail.com',
         subject,
         html: body,
-        attachments,
+        // attachments,
       };
       transporter.sendMail(mailOptions, (error, data) => {
         if (error) {

@@ -10,6 +10,7 @@ const consts = require("../constants/const");
 const { default: mongoose } = require('mongoose');
 // const Question = require('../models/Question');
 const VerificationRequest = require('../models/VerificationRequest');
+const middleware = require('../controllers/middleware');
 const UserUtils = {
 
     checkEmailExistance: async (email, user_id = null) => {
@@ -18,7 +19,7 @@ const UserUtils = {
             queryObject = { email, _id: { $ne: ObjectId(user_id) } }
         }
         let result = await getSingleData(Users, queryObject, '');
-        console.log(result,"result checkEmailExistance")
+        console.log(result, "result checkEmailExistance")
         if (result?.status) {
             return helpers.showResponse(false, ResponseMessages.users.email_already, result?.data, null, 200);
         }
@@ -141,64 +142,67 @@ const UserUtils = {
     // },
     register: async (data) => {
         try {
-            let { firstName, lastName, userName, password } = data;
+            let { firstName, lastName, email, password } = data;
 
-                let emailExistanceResponse = await UserUtils.checkEmailExistance(userName)
-                console.log(emailExistanceResponse,"emailExistanceResponse")
-                if (!emailExistanceResponse?.status) {
-                    // if email already and check for password
-                    let userData = emailExistanceResponse?.data;
-                    if (userData?.password != "") {
-                        delete emailExistanceResponse.data
-                        return emailExistanceResponse
-                    }
-                    // if password empty and update user ????
-                    let editObj = {
-                        profile_pic,
-                        password: md5(password),
-                        updated_on: moment().unix()
-                    }
-                    let result = await updateData(Users, editObj, ObjectId(userData?._id));
-
-                    if (result?.status) {
-                        userData = result?.data
-                        let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
-                        let access_token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
-                            expiresIn: consts.ACCESS_EXPIRY
-                        });
-                        let refresh_token = jwt.sign({ user_type: "user", type: "refresh" }, API_SECRET, {
-                            expiresIn: consts.REFRESH_EXPIRY
-                        });
-
-                        let response = { access_token, refresh_token, _id: userData?._id };
-                        
-                        
-                        await updateData(Users, editObj, ObjectId(userData?._id))
-                        return helpers.showResponse(true, ResponseMessages?.users?.register_success, response, null, 200);
-                    }
-                    return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 200);
+            let emailExistanceResponse = await UserUtils.checkEmailExistance(email)
+            console.log(emailExistanceResponse, "emailExistanceResponse")
+            if (!emailExistanceResponse?.status) {
+                // if email already and check for password
+                let userData = emailExistanceResponse?.data;
+                if (userData?.password != "") {
+                    delete emailExistanceResponse.data
+                    return emailExistanceResponse
                 }
-            
+                // if password empty and update user ????
+                let editObj = {
+                    // profile_pic,
+                    password: md5(password),
+                    updated_on: moment().unix()
+                }
+                let result = await updateData(Users, editObj, ObjectId(userData?._id));
+
+                if (result?.status) {
+                    userData = result?.data
+                    let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
+                    let access_token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
+                        expiresIn: consts.ACCESS_EXPIRY
+                    });
+                    let refresh_token = jwt.sign({ user_type: "user", type: "refresh" }, API_SECRET, {
+                        expiresIn: consts.REFRESH_EXPIRY
+                    });
+
+                    let response = { access_token, refresh_token, _id: userData?._id };
+
+
+                    await updateData(Users, editObj, ObjectId(userData?._id))
+                    return helpers.showResponse(true, ResponseMessages?.users?.register_success, response, null, 200);
+                }
+                return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 200);
+            }
+
             let newObj = {
                 firstName,
                 lastName,
-                userName:  userName ,
+                email: email,
+                userName: email,
                 password: md5(password),
                 created_on: moment().unix()
             }
             let userRef = new Users(newObj)
             let result = await postData(userRef);
+            // console.log(result,"result")
             if (result.status) {
-                let API_SECRET = helpers.getParameterFromAWS({ name: "API_SECRET" })
-                let access_token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
-                    expiresIn: consts.ACCESS_EXPIRY
-                });
-                let refresh_token = jwt.sign({ user_type: "user", type: "refresh" }, API_SECRET, {
-                    expiresIn: consts.REFRESH_EXPIRY
-                });
-                let data = { access_token, refresh_token, _id: result?.data?._id };
+                delete data.password
+                // let API_SECRET = helpers.getParameterFromAWS({ name: "API_SECRET" })
+                // let access_token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
+                //     expiresIn: consts.ACCESS_EXPIRY
+                // });
+                // let refresh_token = jwt.sign({ user_type: "user", type: "refresh" }, API_SECRET, {
+                //     expiresIn: consts.REFRESH_EXPIRY
+                // });
+                // let data = { access_token, refresh_token, _id: result?.data?._id };
                 // let device_info = result?.data?.device_info
-                
+
                 // let editObj = {
                 //     device_info,
                 //     updated_on: moment().unix()
@@ -216,7 +220,7 @@ const UserUtils = {
     login: async (data) => {
         try {
             let { isLoginFromShopify, password, userName } = data
-            let queryObject = { $or: [{ userName: userName }]}
+            let queryObject = { $or: [{ email: userName }] }
             let result = await getSingleData(Users, queryObject, '');
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 200);
@@ -230,6 +234,7 @@ const UserUtils = {
             }
             // let device_info = userData?.device_info
             let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
+            console.log(API_SECRET, 'API_SECRET,utils')
             let access_token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
                 expiresIn: consts.ACCESS_EXPIRY
             });
@@ -455,147 +460,92 @@ const UserUtils = {
     //         return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 200);
     //     }
     // },
-    // forgotPassword: async (data) => {
-    //     let { email, country_code, phone, input_source } = data;
-    //     let otp = helpers.randomStr(4, "901234567234567123456712345671234567")
-    //     if (input_source == "email") {
-    //         try {
-    //             let emailExistanceResponse = await UserUtils.checkEmailExistance(email)
-    //             if (emailExistanceResponse?.status) {
-    //                 return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 200);
-    //             }
-    //             let userData = emailExistanceResponse?.data
-    //             let editObj = {
-    //                 otp,
-    //                 updated_on: moment().unix()
-    //             }
-    //             let response = await updateData(Users, editObj, ObjectId(userData?._id))
-    //             if (!response?.status) {
-    //                 return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 200);
-    //             }
-    //             let to = email
-    //             let subject = `Password Reset Code (One Time Password)`
-    //             let attachments = [{
-    //                 filename: 'logo.png',
-    //                 path: "https://d3l2k2pgfexan.cloudfront.net/common/logo.png",
-    //                 cid: 'unique@mwwLogo'
-    //             }]
-    //             let body = `
-    //                 <div style="width:100%; max-width:600px">
-    //                     <div style="width:100%; text-align:center; padding:10px;">
-    //                         <img src="cid:unique@mwwLogo" alt="logo" style="max-height:75px" />
-    //                     </div>
-    //                     <p style="font-weight: bold; font-family: Arial; font-size: 18px">
-    //                         Welcome ${userData?.username}
-    //                     </p>
-    //                     <p>
-    //                         First off, we’re so excited to have you as part of our team! Below is your email verification code to get 
-    //                         verified your email with Mww.
-    //                     </p>
-    //                     <p style="font-weight: bold; text-align:center">
-    //                         Use below mentioned 4 Digit Code to reset your account password<br />
-    //                     </p>
-    //                     <p style="font-size:30px; text-align:center"> ${otp} </p>
-    //                     <p style="font-family: Arial; font-size: 13px;">
-    //                         If you have any questions about using our application and need help, please refer to the <br />
-    //                         Frequently Asked Questions section within the application.
-    //                     </p>
-    //                     <p style="margin-top:40px">
-    //                         We’re looking forward to being there every step of the way on your journey.
-    //                     </p>
-    //                     <p>
-    //                         Best,<br />
-    //                         Mww
-    //                     </p>
-    //                 </div>
-    //             `
-    //             let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
-    //             if (emailResponse?.status) {
-    //                 return helpers.showResponse(true, ResponseMessages.users.verification_email_sent, { otp }, null, 200);
-    //             }
-    //             return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, null, null, 200);
-    //         } catch (err) {
-    //             console.log("in catch err", err)
-    //             return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, err, null, 200);
-    //         }
-    //     } else if (input_source == "phone") {
-    //         if ("country_code" in data && data.country_code != "") {
-    //             // send code through SMS 
-    //             try {
-    //                 let phoneExistanceResponse = await UserUtils.checkPhoneExistance(phone)
-    //                 if (phoneExistanceResponse?.status) {
-    //                     return helpers.showResponse(false, ResponseMessages?.users?.invalid_phone, null, null, 200);
-    //                 }
-    //                 let userData = phoneExistanceResponse?.data
-    //                 let editObj = {
-    //                     otp,
-    //                     updated_on: moment().unix()
-    //                 }
-    //                 let response = await updateData(Users, editObj, ObjectId(userData?._id))
-    //                 if (!response?.status) {
-    //                     return helpers.showResponse(false, ResponseMessages?.users?.invalid_phone, null, null, 200);
-    //                 }
-    //                 let phone_number = country_code + phone
-    //                 let message = `Welcome ${userData?.username}, Your verification code to reset your account password is : ${otp}`
-    //                 let smsResponse = await helpers.sendSMSService(phone_number, message)
-    //                 if (smsResponse?.status) {
-    //                     return helpers.showResponse(true, ResponseMessages.users.verification_sms_sent, { otp }, null, 200);
-    //                 }
-    //                 return helpers.showResponse(false, ResponseMessages.users.verification_sms_error, null, null, 200);
-    //             } catch (err) {
-    //                 console.log("in catch err", err)
-    //                 return helpers.showResponse(false, ResponseMessages?.users?.verification_sms_error, err, null, 200);
-    //             }
-    //         }
-    //         return helpers.showResponse(false, ResponseMessages?.users?.missing_country_code, null, null, 203);
-    //     } else {
-    //         return helpers.showResponse(false, ResponseMessages?.users?.invalid_input_source, null, null, 200);
-    //     }
-    // },
-    // resetPassword: async (data) => {
-    //     let { email, phone, input_source, otp, password } = data;
-    //     if (input_source == "email") {
-    //         let queryObject = {
-    //             email, otp
-    //         }
-    //         let response = await getSingleData(Users, queryObject, '')
-    //         if (!response?.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.users?.invalid_otp, null, null, 200);
-    //         }
-    //         let userData = response?.data
-    //         editObj = {
-    //             otp: "",
-    //             password: md5(password),
-    //             updated_on: moment().unix()
-    //         }
-    //         let result = await updateData(Users, editObj, ObjectId(userData?._id))
-    //         if (!result?.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.users?.password_reset_error, null, null, 200);
-    //         }
-    //         return helpers.showResponse(true, ResponseMessages?.users?.password_reset_success, null, null, 200);
-    //     } else if (input_source == "phone") {
-    //         let queryObject = {
-    //             phone, otp
-    //         }
-    //         let response = await getSingleData(Users, queryObject, '')
-    //         if (!response?.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.users?.invalid_otp, null, null, 200);
-    //         }
-    //         let userData = response?.data
-    //         editObj = {
-    //             otp: "",
-    //             password: md5(password),
-    //             updated_on: moment().unix()
-    //         }
-    //         let result = await updateData(Users, editObj, ObjectId(userData?._id))
-    //         if (!result?.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.users?.password_reset_error, null, null, 200);
-    //         }
-    //         return helpers.showResponse(true, ResponseMessages?.users?.password_reset_success, null, null, 200);
-    //     } else {
-    //         return helpers.showResponse(false, ResponseMessages?.users?.invalid_input_source, null, null, 200);
-    //     }
-    // },
+    forgotPassword: async (data) => {
+        let { email } = data;
+        // let otp = helpers.randomStr(4, "901234567234567123456712345671234567")
+
+        try {
+            let emailExistanceResponse = await UserUtils.checkEmailExistance(email)
+            if (emailExistanceResponse?.status) {
+                return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 200);
+            }
+            let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
+            let token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
+                expiresIn: consts.ACCESS_EXPIRY
+            });
+            let userData = emailExistanceResponse?.data
+            let editObj = {
+                token,
+                updated_on: moment().unix()
+            }
+            let response = await updateData(Users, editObj, ObjectId(userData?._id))
+            if (!response?.status) {
+                return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 200);
+            }
+            let link = `${consts.BASE_URL}/users/reset_password?token=${token}`
+            let to = email
+            let subject = `Reset Your Password For MWW On Demand`
+            let attachments = [{
+                filename: 'logo.png',
+                path: `${consts.BASE_URL}/server/logo.png`,
+                cid: 'unique@mwwLogo'
+            }]
+            let body = `
+                    <div style="width:100%; max-width:600px">
+                    <div style="width:100%; text-align:center; padding:10px;">
+                        <img src="cid:unique@mwwLogo" alt="logo" style="max-height:75px" />
+                    </div>
+                    <p style="font-weight: bold; font-family: Arial; font-size: 18px">
+                        Hi ${userData?.firstName}
+                    </p>
+                    <p>
+                        Need a new Password for MWW On Demand? No Problem </br> </br>
+                        <a href="${link}" target="_blank">
+                            <button style="font-weight: bold; font-family: Arial; font-size: 18px;">Reset Your Password</button>
+                        </a> <br />
+                    </p>
+                
+                    <p>
+                        help mww,<br />
+                    </p>
+                </div>
+                `
+            let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
+            console.log(emailResponse, "emailResponse")
+            if (emailResponse?.status) {
+                return helpers.showResponse(true, ResponseMessages.users.verification_email_sent, {}, null, 200);
+            }
+            return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, null, null, 200);
+        } catch (err) {
+            console.log("in catch err", err)
+            return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, err, null, 200);
+        }
+    },
+    resetPassword: async (data) => {
+        let { emailId, resetPasswordToken, newPassword } = data;
+            let queryObject = {
+                email:emailId
+            }
+            let response = await getSingleData(Users, queryObject, '')
+            if (!response?.status) {
+                return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 200);
+            }
+            let userData = response?.data
+              
+            
+            
+
+            editObj = {
+                token: "",
+                password: md5(newPassword),
+                updated_on: moment().unix()
+            }
+            let result = await updateData(Users, editObj, ObjectId(userData?._id))
+            if (!result?.status) {
+                return helpers.showResponse(false, ResponseMessages?.users?.password_reset_error, null, null, 200);
+            }
+            return helpers.showResponse(true, ResponseMessages?.users?.password_reset_success, null, null, 200);
+    },
     // getBadgeCondition: async (user_id) => {
     //     return new Promise(async (resolve, reject) => {
 
@@ -665,7 +615,7 @@ const UserUtils = {
     //         }
     //     });
     // },
-   
+
     // // with token 
     // getUserDetail: async (data) => {
     //     let { user_id, _id } = data
@@ -844,9 +794,9 @@ const UserUtils = {
         // }
         data.updated_on = moment().unix();
 
-        let result = await updateData(Users,data,user_id)
+        let result = await updateData(Users, data, user_id)
         if (result) {
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result? result : {}, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
     },
@@ -1005,7 +955,7 @@ const UserUtils = {
     //     return helpers.showResponse(false, ResponseMessages?.users?.no_users, null, null, 200);
 
     // },
-   
+
     // searchUser: async (data) => {
     //     const { keyword, user_id, page, limit } = data
     //     const pages = page // Specify the page number you want to retrieve
