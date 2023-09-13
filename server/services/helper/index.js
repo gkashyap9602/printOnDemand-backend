@@ -46,10 +46,10 @@ const showOutput = (res, response, code) => {
 };
 const showOutputNew = (res, response, code) => {
   // delete response.code;
-  if(!response.status){
-    res.status(code).json({Response:response,StatusCode:response.code});
+  if (!response.status) {
+    res.status(code).json({ Response: response, StatusCode: response.code });
   }
-  res.status(code).json({response:response,statusCode:response.code});
+  res.status(code).json({ response: response, statusCode: response.code });
 };
 
 const changeEnv = (env) => {
@@ -366,11 +366,10 @@ const sendEmailService = async (to, subject, body, attachments = null) => {
         //   region,
         //   apiVersion: "2010-12-01",
         // }),
-      
         service: "gmail",
         host: "smtp.gmail.com",
         port: 587,
-        secure:false,
+        secure: false,
         auth: {
           user: "mwwdemand@gmail.com",
           pass: "mimy ifbn tdgj xswf",
@@ -381,11 +380,11 @@ const sendEmailService = async (to, subject, body, attachments = null) => {
         to,
         subject,
         html: body,
-        // attachments,
+        attachments,
       };
       transporter.sendMail(mailOptions, (error, data) => {
         if (error) {
-          console.log(error,"error sendmail");
+          console.log(error, "error sendmail");
           return resolve(
             showResponse(
               false,

@@ -5,6 +5,7 @@ let jwt = require('jsonwebtoken');
 let helpers = require('../services/helper');
 let moment = require('moment')
 const md5 = require('md5');
+const path = require('path')
 const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require("../constants/const");
 const { default: mongoose } = require('mongoose');
@@ -148,38 +149,36 @@ const UserUtils = {
             console.log(emailExistanceResponse, "emailExistanceResponse")
             if (!emailExistanceResponse?.status) {
                 // if email already and check for password
-                let userData = emailExistanceResponse?.data;
-                if (userData?.password != "") {
-                    delete emailExistanceResponse.data
-                    return emailExistanceResponse
-                }
-                // if password empty and update user ????
-                let editObj = {
-                    // profile_pic,
-                    password: md5(password),
-                    updated_on: moment().unix()
-                }
-                let result = await updateData(Users, editObj, ObjectId(userData?._id));
+                // let userData = emailExistanceResponse?.data;
+                // if (userData?.password != "") {
+                //     delete emailExistanceResponse.data
+                //     return emailExistanceResponse
+                // }
+                // // if password empty and update user ????
+                // let editObj = {
+                //     // profile_pic,
+                //     password: md5(password),
+                //     updated_on: moment().unix()
+                // }
+                // let result = await updateData(Users, editObj, ObjectId(userData?._id));
 
-                if (result?.status) {
-                    userData = result?.data
-                    let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
-                    let access_token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
-                        expiresIn: consts.ACCESS_EXPIRY
-                    });
-                    let refresh_token = jwt.sign({ user_type: "user", type: "refresh" }, API_SECRET, {
-                        expiresIn: consts.REFRESH_EXPIRY
-                    });
+                // if (result?.status) {
+                //     userData = result?.data
+                //     let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
+                //     let access_token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
+                //         expiresIn: consts.ACCESS_EXPIRY
+                //     });
+                //     let refresh_token = jwt.sign({ user_type: "user", type: "refresh" }, API_SECRET, {
+                //         expiresIn: consts.REFRESH_EXPIRY
+                //     });
 
-                    let response = { access_token, refresh_token, _id: userData?._id };
+                //     let response = { access_token, refresh_token, _id: userData?._id };
 
-
-                    await updateData(Users, editObj, ObjectId(userData?._id))
-                    let res = helpers.showResponse(true, ResponseMessages?.users?.register_success, response, null, 200);
-                    console.log(res, "ressss")
-                    return helpers.showResponse(true, ResponseMessages?.users?.register_success, response, null, 200);
-                }
-                return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 200);
+                //     await updateData(Users, editObj, ObjectId(userData?._id))
+                
+                //     return helpers.showResponse(true, ResponseMessages?.users?.register_success, response, null, 200);
+                // }
+                return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 400);
             }
 
             let newObj = {
@@ -222,8 +221,8 @@ const UserUtils = {
     login: async (data) => {
         try {
             let { isLoginFromShopify, password, userName } = data
-            let queryObject = { $or: [{ email: userName ,password:md5(password)}] }
-            let result = await getSingleData(Users, queryObject, {password:0});
+            let queryObject = { $or: [{ email: userName, password: md5(password) }] }
+            let result = await getSingleData(Users, queryObject, { password: 0 });
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 401);
             }
@@ -244,7 +243,7 @@ const UserUtils = {
             //     expiresIn: consts.REFRESH_EXPIRY
             // });
             userData.token = access_token
-            console.log(userData,"userDataaaa")
+            console.log(userData, "userDataaaa")
             // let responseData = { access_token, refresh_token, _id: userData?._id };
             // let dIndex = device_info.findIndex((it) => it.device_id == device_id)
             // if (dIndex < 0) {
@@ -466,8 +465,6 @@ const UserUtils = {
     // },
     forgotPassword: async (data) => {
         let { email } = data;
-        // let otp = helpers.randomStr(4, "901234567234567123456712345671234567")
-
         try {
             let emailExistanceResponse = await UserUtils.checkEmailExistance(email)
             if (emailExistanceResponse?.status) {
@@ -491,9 +488,12 @@ const UserUtils = {
             let link = `${consts.FRONTEND_URL}/resetPassword?resetPasswordToken=${token} && emailId=${email}`
             let to = email
             let subject = `Reset Your Password For MWW On Demand`
+            console.log(__dirname,"__dirname")
+            console.log(process.cwd(),"currentt")
+            const logoPath = path.join(__dirname, '../views', 'logo.png');
             let attachments = [{
                 filename: 'logo.png',
-                path: `${consts.BASE_URL}/server/logo.png`,
+                path: logoPath,
                 cid: 'unique@mwwLogo'
             }]
             let body = `

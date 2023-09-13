@@ -46,7 +46,7 @@ const authController = {
         }
 
         let result = await Users.register(req.body);
-        console.log(result, "esulll")
+        // console.log(result, "esulll")
         return helpers.showOutputNew(res, result, result.code);
     },
 
@@ -57,7 +57,7 @@ const authController = {
             return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
         }
         let result = await Users.login(req.body);
-        console.log(result, "esulll login")
+        // console.log(result, "esulll login")
 
         return helpers.showOutputNew(res, result, result.code);
     },
