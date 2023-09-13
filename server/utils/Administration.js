@@ -8,7 +8,6 @@ let md5 = require('md5');
 const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require('../constants/const');
 // const Question = require('../models/Question');
-const VerificationRequest = require('../models/VerificationRequest');
 const { default: mongoose } = require('mongoose');
 const CommonContent = require('../models/CommonContent');
 
@@ -184,30 +183,30 @@ const adminUtils = {
         }
 
     },
-    listRecords: async (data) => {
-        try {
-            const { page, limit } = data
-            const query = { status: { $ne: 2 } };
+    // listRecords: async (data) => {
+    //     try {
+    //         const { page, limit } = data
+    //         const query = { status: { $ne: 2 } };
 
-            // Count the total number of documents matching the filter
-            const totalCount = await VerificationRequest.countDocuments(query);
+    //         // Count the total number of documents matching the filter
+    //         const totalCount = await VerificationRequest.countDocuments(query);
 
-            // Calculate the number of documents to skip based on the pageNumber and pageSize
-            const skipCount = (page - 1) * limit;
+    //         // Calculate the number of documents to skip based on the pageNumber and pageSize
+    //         const skipCount = (page - 1) * limit;
 
-            // Fetch the filtered data with pagination using skip and limit
-            const filteredData = await VerificationRequest.find(query)
-                .skip(skipCount)
-                .limit(limit);
+    //         // Fetch the filtered data with pagination using skip and limit
+    //         const filteredData = await VerificationRequest.find(query)
+    //             .skip(skipCount)
+    //             .limit(limit);
 
-            return helpers.showResponse(true, ResponseMessages.common.record_list, filteredData, { totalCount }, 200);
+    //         return helpers.showResponse(true, ResponseMessages.common.record_list, filteredData, { totalCount }, 200);
 
-        } catch (error) {
+    //     } catch (error) {
 
-            return helpers.showResponse(false, error?.message, null, null, 200);
+    //         return helpers.showResponse(false, error?.message, null, null, 200);
 
-        }
-    },
+    //     }
+    // },
     getCreatorCategories: async (data) => {
         try {
             const { page, limit } = data

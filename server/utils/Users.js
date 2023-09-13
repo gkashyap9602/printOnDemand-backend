@@ -10,7 +10,6 @@ const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require("../constants/const");
 const { default: mongoose } = require('mongoose');
 // const Question = require('../models/Question');
-const VerificationRequest = require('../models/VerificationRequest');
 const middleware = require('../controllers/middleware');
 const UserUtils = {
 
@@ -497,25 +496,81 @@ const UserUtils = {
                 cid: 'unique@mwwLogo'
             }]
             let body = `
-                    <div style="width:100%; max-width:600px">
-                    <div style="width:100%; text-align:center; padding:10px;">
-                        <img src="cid:unique@mwwLogo" alt="logo" style="max-height:75px" />
-                    </div>
-                    <p style="font-weight: bold; font-family: Arial; font-size: 18px">
-                        Hi ${userData?.firstName}
-                    </p>
-                    <p>
-                        Need a new Password for MWW On Demand? No Problem </br> </br>
-                        <a href="${link}" target="_blank">
-                            <button style="font-weight: bold; font-family: Arial; font-size: 18px;">Reset Your Password</button>
-                        </a> <br />
-                    </p>
-                
-                    <p>
-                        help mww,<br />
-                    </p>
-                </div>
-                `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>Reset Your Password for MWW On Demand</title>
+              <style>
+                /* Set the email width to 600px and center it */
+                body {
+                  width: 600px;
+                  margin: 0 auto;
+                }
+            
+                /* Style the email header */
+                header {
+                  background-color: #3630a3;
+                  padding: 20px;
+                  text-align: center;
+                }
+            
+                /* Style the email title */
+                h1 {
+                  color: white;
+                  font-size: 24px;
+                  font-weight: bold;
+                }
+            
+                /* Style the email body */
+                p {
+                  font-size: 16px;
+                  line-height: 1.5;
+                  margin-bottom: 10px;
+                }
+            
+                /* Style the button */
+                .button {
+                  background-color: #3630a3;
+                  padding: 10px 22px;
+                  border-radius: 45px;
+                  text-decoration: none;
+                  font-size: 19px;
+                  font-weight: bold;
+                  color:#f1eee9 !important;
+                }
+            
+                /* Style the footer */
+                footer {
+                  background-color: #f5f5f5;
+                  padding: 20px;
+                  text-align: center;
+                }
+              </style>
+            </head>
+            <body>
+            
+            <header>
+              <img src="cid:unique@mwwLogo" alt="logo" style="max-height:75px" />
+              <h1>Reset Your Password for MWW On Demand</h1>
+            </header>
+            
+            <p>Welcome ${userData?.firstName},</p>
+            
+            <p>You requested to reset your password for MWW On Demand.</p>
+            
+            <p>To reset your password, click the button below.</p>
+            
+            <a href="${link}" target="_blank" class="button">Reset Your Password</a>
+            
+            <p>If you did not request to reset your password, please ignore this email.</p>
+            
+            <footer>
+              This email was sent to you by MWW On Demand.
+            </footer>
+            
+            </body>
+            </html>
+            `
             let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
             console.log(emailResponse, "emailResponse")
             if (emailResponse?.status) {
