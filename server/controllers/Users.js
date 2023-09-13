@@ -42,22 +42,24 @@ const authController = {
         let requiredFields = ['firstName', 'lastName', 'email', 'password'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
-            return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.message), 203);
         }
 
         let result = await Users.register(req.body);
         console.log(result, "esulll")
-        return helpers.showOutput(res, result, result.code);
+        return helpers.showOutputNew(res, result, result.code);
     },
 
     login: async (req, res) => {
         let requiredFields = ['isLoginFromShopify', 'password', 'userName'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
-            return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.message), 203);
         }
         let result = await Users.login(req.body);
-        return helpers.showOutput(res, result, result.code);
+        console.log(result, "esulll login")
+
+        return helpers.showOutputNew(res, result, result.code);
     },
 
     // socialLogin: async (req, res) => {
@@ -93,21 +95,21 @@ const authController = {
         let requiredFields = ['email'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
-            return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.message), 203);
         }
         let result = await Users.forgotPassword(req.body);
-        return helpers.showOutput(res, result, result.code);
+        return helpers.showOutputNew(res, result, result.code);
     },
 
     resetPassword: async (req, res) => {
         let requiredFields = ['resetPasswordToken', 'newPassword', 'emailId'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
-            return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.message), 203);
         }
 
         let result = await Users.resetPassword(req.body);
-        return helpers.showOutput(res, result, result.code);
+        return helpers.showOutputNew(res, result, result.code);
     },
 
     // logout: async (req, res) => {
@@ -123,10 +125,10 @@ const authController = {
     updateUser: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
         }
         let result = await Users.updateUser(req.body, user_id);
-        return helpers.showOutput(res, result, result.code);
+        return helpers.showOutputNew(res, result, result.code);
     },
     // follow: async (req, res) => {
     //     let requiredFields = ['user_id'];

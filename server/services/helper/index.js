@@ -44,6 +44,13 @@ const showOutput = (res, response, code) => {
   delete response.code;
   res.status(code).json(response);
 };
+const showOutputNew = (res, response, code) => {
+  // delete response.code;
+  if(!response.status){
+    res.status(code).json({Response:response,StatusCode:response.code});
+  }
+  res.status(code).json({response:response,StatusCode:response.code});
+};
 
 const changeEnv = (env) => {
   if (env === "PROD") {
@@ -1037,4 +1044,5 @@ module.exports = {
   sendFcmNotificationTopic,
   uploadVideoToS31,
   changeEnv,
+  showOutputNew,
 };
