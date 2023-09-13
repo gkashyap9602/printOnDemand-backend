@@ -47,12 +47,12 @@ const showOutput = (res, response, code) => {
 
 const changeEnv = (env) => {
   if (env === "PROD") {
-    return "MONGODB_URI_PROD"
+    return "mww"
   } else if (env === "STAG") {
-    return "MONGODB_URI_STAG"
+    return "mwwstag"
 
   } else {
-    return "MONGODB_URI_DEV"
+    return "mwwdev"
   }
 };
 
