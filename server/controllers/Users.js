@@ -54,7 +54,7 @@ const authController = {
         let requiredFields = ['isLoginFromShopify', 'password', 'userName'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, validator.message), 203);
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
         }
         let result = await Users.login(req.body);
         console.log(result, "esulll login")

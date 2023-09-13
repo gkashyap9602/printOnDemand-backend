@@ -222,15 +222,15 @@ const UserUtils = {
     login: async (data) => {
         try {
             let { isLoginFromShopify, password, userName } = data
-            let queryObject = { $or: [{ email: userName }] }
-            let result = await getSingleData(Users, queryObject, '');
+            let queryObject = { $or: [{ email: userName ,password:md5(password)}] }
+            let result = await getSingleData(Users, queryObject, {password:0});
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 401);
             }
             let userData = result?.data
-            if (userData?.password !== md5(password)) {
-                return helpers.showResponse(false, ResponseMessages?.users?.invalid_credentials, null, null, 401);
-            }
+            // if (userData?.password !== md5(password)) {
+            //     return helpers.showResponse(false, ResponseMessages?.users?.invalid_credentials, null, null, 401);
+            // }
             if (userData?.status == 0) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_disabled, null, null, 403);
             }
@@ -240,10 +240,12 @@ const UserUtils = {
             let access_token = jwt.sign({ user_type: "user", type: "access", _id: userData._id }, API_SECRET, {
                 expiresIn: consts.ACCESS_EXPIRY
             });
-            let refresh_token = jwt.sign({ user_type: "user", type: "refresh", _id: userData._id }, API_SECRET, {
-                expiresIn: consts.REFRESH_EXPIRY
-            });
-            let responseData = { access_token, refresh_token, _id: userData?._id };
+            // let refresh_token = jwt.sign({ user_type: "user", type: "refresh", _id: userData._id }, API_SECRET, {
+            //     expiresIn: consts.REFRESH_EXPIRY
+            // });
+            userData.token = access_token
+            console.log(userData,"userDataaaa")
+            // let responseData = { access_token, refresh_token, _id: userData?._id };
             // let dIndex = device_info.findIndex((it) => it.device_id == device_id)
             // if (dIndex < 0) {
             //     device_info.push({ fcm_token, device_id, os, access_token, refresh_token })
@@ -263,7 +265,7 @@ const UserUtils = {
             }
             let updateResponse = await updateData(Users, editObj, ObjectId(userData?._id))
             if (updateResponse.status) {
-                return helpers.showResponse(true, ResponseMessages?.users?.login_success, responseData, null, 200);
+                return helpers.showResponse(true, ResponseMessages?.users?.login_success, userData, null, 200);
             }
             return helpers.showResponse(false, ResponseMessages?.users?.login_error, null, null, 200);
         } catch (err) {

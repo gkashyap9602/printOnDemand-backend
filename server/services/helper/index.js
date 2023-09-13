@@ -26,7 +26,7 @@ const showResponse = (
 ) => {
   let response = {};
   response.status = status;
-  response.message = message;
+  response.Message = message;
   if (data !== null) {
     response.data = data;
   }
@@ -49,7 +49,7 @@ const showOutputNew = (res, response, code) => {
   if(!response.status){
     res.status(code).json({Response:response,StatusCode:response.code});
   }
-  res.status(code).json({response:response,StatusCode:response.code});
+  res.status(code).json({response:response,statusCode:response.code});
 };
 
 const changeEnv = (env) => {
