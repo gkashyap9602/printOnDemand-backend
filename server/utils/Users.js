@@ -176,7 +176,7 @@ const UserUtils = {
 
                     await updateData(Users, editObj, ObjectId(userData?._id))
                     let res = helpers.showResponse(true, ResponseMessages?.users?.register_success, response, null, 200);
-                    console.log(res,"ressss")
+                    console.log(res, "ressss")
                     return helpers.showResponse(true, ResponseMessages?.users?.register_success, response, null, 200);
                 }
                 return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 200);
@@ -237,10 +237,10 @@ const UserUtils = {
             // let device_info = userData?.device_info
             let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
             console.log(API_SECRET, 'API_SECRET,utils')
-            let access_token = jwt.sign({ user_type: "user", type: "access" ,_id:userData._id }, API_SECRET, {
+            let access_token = jwt.sign({ user_type: "user", type: "access", _id: userData._id }, API_SECRET, {
                 expiresIn: consts.ACCESS_EXPIRY
             });
-            let refresh_token = jwt.sign({ user_type: "user", type: "refresh" ,_id:userData._id }, API_SECRET, {
+            let refresh_token = jwt.sign({ user_type: "user", type: "refresh", _id: userData._id }, API_SECRET, {
                 expiresIn: consts.REFRESH_EXPIRY
             });
             let responseData = { access_token, refresh_token, _id: userData?._id };
@@ -474,7 +474,7 @@ const UserUtils = {
             let userData = emailExistanceResponse?.data
 
             let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
-            let token = jwt.sign({ user_type: "user", type: "access" ,_id:userData?._id}, API_SECRET, {
+            let token = jwt.sign({ user_type: "user", type: "access", _id: userData?._id }, API_SECRET, {
                 expiresIn: consts.ACCESS_EXPIRY
             });
             // console.log(userData,"userDatauserData")
@@ -528,30 +528,30 @@ const UserUtils = {
 
     resetPassword: async (data) => {
         let { emailId, resetPasswordToken, newPassword } = data;
-            let queryObject = {
-                email:emailId
-            }
-            let response = await getSingleData(Users, queryObject, '')
-            if (!response?.status) {
-                return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 200);
-            }
-            let userData = response?.data
-            let verifyResponse = await middleware.verifyToken(resetPasswordToken)
+        let queryObject = {
+            email: emailId
+        }
+        let response = await getSingleData(Users, queryObject, '')
+        if (!response?.status) {
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 200);
+        }
+        let userData = response?.data
+        let verifyResponse = await helpers.verifyToken(resetPasswordToken)
 
-            console.log(verifyResponse,"verifyResponse==============")
-            if(!verifyResponse?.status){
-                return verifyResponse
-            }
-            editObj = {
-                token: "",
-                password: md5(newPassword),
-                updated_on: moment().unix()
-            }
-            let result = await updateData(Users, editObj, ObjectId(userData?._id))
-            if (!result?.status) {
-                return helpers.showResponse(false, ResponseMessages?.users?.password_reset_error, null, null, 200);
-            }
-            return helpers.showResponse(true, ResponseMessages?.users?.password_reset_success, null, null, 200);
+        console.log(verifyResponse, "verifyResponse==============")
+        if (!verifyResponse?.status) {
+            return helpers.showResponse(false, "not verified", null, null, 401);
+        }
+        editObj = {
+            token: "",
+            password: md5(newPassword),
+            updated_on: moment().unix()
+        }
+        let result = await updateData(Users, editObj, ObjectId(userData?._id))
+        if (!result?.status) {
+            return helpers.showResponse(false, ResponseMessages?.users?.password_reset_error, null, null, 200);
+        }
+        return helpers.showResponse(true, ResponseMessages?.users?.password_reset_success, null, null, 200);
     },
     // getBadgeCondition: async (user_id) => {
     //     return new Promise(async (resolve, reject) => {

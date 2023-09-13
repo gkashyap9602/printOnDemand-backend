@@ -1,6 +1,5 @@
 var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
-
 AWS.config.update({
   region: "us-east-1",
   credentials: new AWS.SharedIniFileCredentials({ profile: "mww" }),
@@ -343,6 +342,7 @@ const getSecretFromAWS = (secret_key_param) => {
   });
 };
 
+
 const sendEmailService = async (to, subject, body, attachments = null) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -360,13 +360,21 @@ const sendEmailService = async (to, subject, body, attachments = null) => {
         host: 'smtp.ethereal.email',
         port: 587,
         auth: {
-            user: 'hailie39@ethereal.email',
-            pass: 'xFtPQjBSYHE6qrqRUf'
+          user: 'hailie39@ethereal.email',
+          pass: 'xFtPQjBSYHE6qrqRUf'
         }
+        // service: "gmail",
+        // host: "smtp.gmail.com",
+        // port: 587,
+        // auth: {
+        //   user: "mwwdemand@gmail.com",
+        //   password: "mimy ifbn tdgj xswf",
+        // },
+        // authMethod: 'mww',
       });
       let mailOptions = {
         from: await getParameterFromAWS({ name: "FROM_SES" }),
-        to: 'stum@yopmail.com',
+        to,
         subject,
         html: body,
         // attachments,
@@ -1025,5 +1033,5 @@ module.exports = {
   uploadAudioToS3,
   sendFcmNotificationTopic,
   uploadVideoToS31,
-  changeEnv
+  changeEnv,
 };

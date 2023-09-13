@@ -14,46 +14,45 @@ const middleware = {
 				let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
 				jwt.verify(token, API_SECRET, async (err, decoded) => {
 					if (err) {
+						console.log(err,"if errr")
 						return helpers.showResponse(false, ResponseMessages?.middleware?.token_expired, null, null, 401);
 					}
-					// if (decoded?.type == "refresh") {
-					// 	return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token });
-					// }
 					if (decoded?.user_type == "user") {
 						console.log(decoded,"decoded")
 						let response = await getSingleData(Users, {_id :decoded._id }, '');
+						console.log(response,"responsee")
 						if (!response.status) {
-							return helpers.showResponse(false, 'Something went wrong with token', null, null, 401);
+							return helpers.showResponse(false, ResponseMessages.users.invalid_user, null, null, 401);
 						}
 						let userData = response?.data
-						if (userData.status == 0) {
-							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account });
-						}
-						if (userData.status == 2) {
-							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
-						}
+						// if (userData.status == 0) {
+						// 	return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account });
+						// }
+						// if (userData.status == 2) {
+						// 	return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
+						// }
 						// decoded = { ...decoded, user_id: userData._id }
 						return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, null, null, 200);
 					} else if (decoded?.user_type == "admin") {
 
-						let response = await getSingleData(Administration, { device_info: { $elemMatch: { access_token: token } } }, '');
+						let response = await getSingleData(Administration, {_id :decoded._id }, '');
 
 						if (!response.status) {
-							return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.invalid_access_token });
+							return helpers.showResponse(false, ResponseMessages.users.invalid_user, null, null, 401);
 						}
 						let adminData = response?.data
-						if (adminData.status == 0) {
-							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account });
-						}
-						if (adminData.status == 2) {
-							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
-						}
-						decoded = { ...decoded, admin_id: adminData._id }
+						// if (adminData.status == 0) {
+						// 	return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account });
+						// }
+						// if (adminData.status == 2) {
+						// 	return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
+						// }
+						// decoded = { ...decoded, admin_id: adminData._id }
 						return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, null, null, 200);
 					}
 				})
 		} catch (error) {
-			console.log("in catch middleware check token error : ", err)
+			console.log("in catch middleware check token error : ", error)
 			return helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token, null, null, 401);
 		}
 

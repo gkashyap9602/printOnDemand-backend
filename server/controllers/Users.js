@@ -46,7 +46,7 @@ const authController = {
         }
 
         let result = await Users.register(req.body);
-        console.log(result,"esulll")
+        console.log(result, "esulll")
         return helpers.showOutput(res, result, result.code);
     },
 
@@ -100,7 +100,7 @@ const authController = {
     },
 
     resetPassword: async (req, res) => {
-        let requiredFields = ['resetPasswordToken', 'newPassword','emailId'];
+        let requiredFields = ['resetPasswordToken', 'newPassword', 'emailId'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
             return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
