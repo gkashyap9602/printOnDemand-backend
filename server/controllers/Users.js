@@ -46,6 +46,7 @@ const authController = {
         }
 
         let result = await Users.register(req.body);
+        console.log(result,"esulll")
         return helpers.showOutput(res, result, result.code);
     },
 
@@ -104,8 +105,6 @@ const authController = {
         if (!validator.status) {
             return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
         }
-
-        
 
         let result = await Users.resetPassword(req.body);
         return helpers.showOutput(res, result, result.code);

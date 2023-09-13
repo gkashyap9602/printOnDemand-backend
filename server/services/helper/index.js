@@ -40,6 +40,7 @@ const showResponse = (
 };
 
 const showOutput = (res, response, code) => {
+  response.statusCode = response.code
   delete response.code;
   res.status(code).json(response);
 };

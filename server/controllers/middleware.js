@@ -11,11 +11,8 @@ let ObjectId = require('mongodb').ObjectID;
 const middleware = {
 	verifyToken: async (token) => {
 		try {
-			if (token) {
 				let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
-
 				jwt.verify(token, API_SECRET, async (err, decoded) => {
-
 					if (err) {
 						return helpers.showResponse(false, ResponseMessages?.middleware?.token_expired, null, null, 401);
 					}
@@ -23,11 +20,10 @@ const middleware = {
 					// 	return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token });
 					// }
 					if (decoded?.user_type == "user") {
-
-						let response = await getSingleData(Users,{ token: token }, 'status');
-
+						console.log(decoded,"decoded")
+						let response = await getSingleData(Users, {_id :decoded._id }, '');
 						if (!response.status) {
-							return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.invalid_access_token });
+							return helpers.showResponse(false, 'Something went wrong with token', null, null, 401);
 						}
 						let userData = response?.data
 						if (userData.status == 0) {
@@ -36,7 +32,7 @@ const middleware = {
 						if (userData.status == 2) {
 							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
 						}
-						decoded = { ...decoded, user_id: userData._id }
+						// decoded = { ...decoded, user_id: userData._id }
 						return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, null, null, 200);
 					} else if (decoded?.user_type == "admin") {
 
@@ -56,10 +52,9 @@ const middleware = {
 						return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, null, null, 200);
 					}
 				})
-			}
 		} catch (error) {
 			console.log("in catch middleware check token error : ", err)
-			return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired });
+			return helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token, null, null, 401);
 		}
 
 	},

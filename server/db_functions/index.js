@@ -44,10 +44,11 @@ module.export = getSingleData = (Model, query, feilds, populate=null) =>{
         .populate(populate)
         .exec((err,data)=>{
             if(err || !data){
-                let response = helpers.showResponse(false,err);
+                console.log(err,"errr getSingleData")
+                let response = helpers.showResponse(false, 'retreive failed ', err);
                 return resolve(response);
             } 
-            let response = helpers.showResponse(true,"data found",data);
+            let response = helpers.showResponse(true,"data found", data);
             return resolve(response);
         });
     })
