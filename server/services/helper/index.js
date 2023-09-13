@@ -366,21 +366,15 @@ const sendEmailService = async (to, subject, body, attachments = null) => {
         //   region,
         //   apiVersion: "2010-12-01",
         // }),
-        // host: 'smtp.ethereal.email',
-        // port: 587,
-        // auth: {
-        //   user: 'hailie39@ethereal.email',
-        //   pass: 'xFtPQjBSYHE6qrqRUf'
-        // }
+      
         service: "gmail",
         host: "smtp.gmail.com",
         port: 587,
         secure:false,
         auth: {
           user: "mwwdemand@gmail.com",
-          password: "mimy ifbn tdgj xswf",
+          pass: "mimy ifbn tdgj xswf",
         },
-        // authMethod: 'mww',
       });
       let mailOptions = {
         from: await getParameterFromAWS({ name: "FROM_SES" }),
