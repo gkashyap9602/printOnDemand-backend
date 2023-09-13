@@ -225,7 +225,7 @@ const UserUtils = {
             let queryObject = { $or: [{ email: userName }] }
             let result = await getSingleData(Users, queryObject, '');
             if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 404);
+                return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 401);
             }
             let userData = result?.data
             if (userData?.password !== md5(password)) {
@@ -536,7 +536,7 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 200);
         }
         let userData = response?.data
-        let verifyResponse = await helpers.verifyToken(resetPasswordToken)
+        let verifyResponse = await middleware.verifyToken(resetPasswordToken)
 
         console.log(verifyResponse, "verifyResponse==============")
         if (!verifyResponse?.status) {

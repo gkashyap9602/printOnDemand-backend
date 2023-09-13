@@ -12,15 +12,12 @@ const middleware = {
 	verifyToken: async (token) => {
 		try {
 				let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
-				jwt.verify(token, API_SECRET, async (err, decoded) => {
+				return jwt.verify(token, API_SECRET, async (err, decoded) => {
 					if (err) {
-						console.log(err,"if errr")
 						return helpers.showResponse(false, ResponseMessages?.middleware?.token_expired, null, null, 401);
 					}
 					if (decoded?.user_type == "user") {
-						console.log(decoded,"decoded")
 						let response = await getSingleData(Users, {_id :decoded._id }, '');
-						console.log(response,"responsee")
 						if (!response.status) {
 							return helpers.showResponse(false, ResponseMessages.users.invalid_user, null, null, 401);
 						}

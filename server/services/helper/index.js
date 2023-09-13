@@ -1,5 +1,6 @@
 var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
+const jwt = require('jsonwebtoken')
 AWS.config.update({
   region: "us-east-1",
   credentials: new AWS.SharedIniFileCredentials({ profile: "mww" }),
@@ -39,7 +40,7 @@ const showResponse = (
 };
 
 const showOutput = (res, response, code) => {
-  response.statusCode = response.code
+  response.StatusCode = response.code
   delete response.code;
   res.status(code).json(response);
 };
@@ -54,6 +55,7 @@ const changeEnv = (env) => {
     return "mwwdev"
   }
 };
+
 
 const randomStr = (len, arr) => {
   var digits = arr;
@@ -357,19 +359,20 @@ const sendEmailService = async (to, subject, body, attachments = null) => {
         //   region,
         //   apiVersion: "2010-12-01",
         // }),
-        host: 'smtp.ethereal.email',
-        port: 587,
-        auth: {
-          user: 'hailie39@ethereal.email',
-          pass: 'xFtPQjBSYHE6qrqRUf'
-        }
-        // service: "gmail",
-        // host: "smtp.gmail.com",
+        // host: 'smtp.ethereal.email',
         // port: 587,
         // auth: {
-        //   user: "mwwdemand@gmail.com",
-        //   password: "mimy ifbn tdgj xswf",
-        // },
+        //   user: 'hailie39@ethereal.email',
+        //   pass: 'xFtPQjBSYHE6qrqRUf'
+        // }
+        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 587,
+        secure:false,
+        auth: {
+          user: "mwwdemand@gmail.com",
+          password: "mimy ifbn tdgj xswf",
+        },
         // authMethod: 'mww',
       });
       let mailOptions = {
@@ -381,7 +384,7 @@ const sendEmailService = async (to, subject, body, attachments = null) => {
       };
       transporter.sendMail(mailOptions, (error, data) => {
         if (error) {
-          console.log(error);
+          console.log(error,"error sendmail");
           return resolve(
             showResponse(
               false,
