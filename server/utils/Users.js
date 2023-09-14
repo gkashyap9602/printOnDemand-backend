@@ -185,6 +185,7 @@ const UserUtils = {
             }
             const usersCount = await getCount(Users,{userType:3})
             const idGenerated = helpers.generateIDs(usersCount?.data)
+
             let newObj = {
                 firstName,
                 lastName,
