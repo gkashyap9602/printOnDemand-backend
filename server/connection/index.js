@@ -5,6 +5,7 @@ const path  = require('path')
 
 helpers.getParameterFromAWS({ name: 'MONGODB_URI'}).then((MONGODB_URI) => {
     var mongoDB = `${MONGODB_URI}&authSource=${helpers.changeEnv(process.env.ENV_MODE)}`
+    console.log(mongoDB,"mongoDbb Url")
     // 'mongodb://localhost:27017/mww'
     mongoose.Promise = global.Promise;
     mongoose.connect(mongoDB, {
