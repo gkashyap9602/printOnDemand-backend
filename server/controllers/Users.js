@@ -42,7 +42,7 @@ const authController = {
         let requiredFields = ['firstName', 'lastName', 'email', 'password'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, validator.message), 203);
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
         }
 
         let result = await Users.register(req.body);
@@ -95,7 +95,7 @@ const authController = {
         let requiredFields = ['email'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, validator.message), 203);
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
         }
         let result = await Users.forgotPassword(req.body);
         return helpers.showOutputNew(res, result, result.code);
@@ -105,7 +105,7 @@ const authController = {
         let requiredFields = ['resetPasswordToken', 'newPassword', 'emailId'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, validator.message), 203);
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
         }
 
         let result = await Users.resetPassword(req.body);
