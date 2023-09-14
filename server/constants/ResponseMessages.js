@@ -140,7 +140,7 @@ module.exports = {
         invalid_access_token: "Invalid access token",
         disabled_account: "Your account login has been disabled by admin !!! contact support",
         deleted_account: "Your account is deleted permanentlt !!! contact support",
-        token_expired: "your token has been expired",
+        token_expired: "your token has been expired or not valid",
         access_refreshed: "Access token is refreshed"
     },
     order: {

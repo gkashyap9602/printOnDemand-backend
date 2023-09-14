@@ -10,6 +10,7 @@ const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require("../constants/const");
 const { default: mongoose } = require('mongoose');
 // const Question = require('../models/Question');
+const {randomUUID}  = require('crypto')
 const middleware = require('../controllers/middleware');
 const UserUtils = {
 
@@ -174,17 +175,25 @@ const UserUtils = {
                 //     let response = { access_token, refresh_token, _id: userData?._id };
 
                 //     await updateData(Users, editObj, ObjectId(userData?._id))
-                
+
                 //     return helpers.showResponse(true, ResponseMessages?.users?.register_success, response, null, 200);
                 // }
+                // const usersCount = await getCount(Users,{userType:3})
+                // const idd = helpers.generateIDs(usersCount?.data)
+                //   console.log(idd,"iddd")
                 return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 400);
             }
-
+            const usersCount = await getCount(Users,{userType:3})
+            const idGenerated = helpers.generateIDs(usersCount?.data)
             let newObj = {
                 firstName,
                 lastName,
                 email: email,
                 userName: email,
+                id:idGenerated.idNumber,
+                guid:randomUUID(),
+                customerId:idGenerated.customerID,
+                customerGuid:randomUUID(),
                 password: md5(password),
                 created_on: moment().unix()
             }
@@ -476,19 +485,17 @@ const UserUtils = {
                 expiresIn: consts.ACCESS_EXPIRY
             });
             // console.log(userData,"userDatauserData")
-            let editObj = {
-                token,
-                updated_on: moment().unix()
-            }
-            let response = await updateData(Users, editObj, ObjectId(userData?._id))
-            if (!response?.status) {
-                return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 401);
-            }
+            // let editObj = {
+            //     token,
+            //     updated_on: moment().unix()
+            // }
+            // let response = await updateData(Users, editObj, ObjectId(userData?._id))
+            // if (!response?.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 401);
+            // }
             let link = `${consts.FRONTEND_URL}/resetPassword?resetPasswordToken=${token} && emailId=${email}`
             let to = email
             let subject = `Reset Your Password For MWW On Demand`
-            console.log(__dirname,"__dirname")
-            console.log(process.cwd(),"currentt")
             const logoPath = path.join(__dirname, '../views', 'logo.png');
             let attachments = [{
                 filename: 'logo.png',
@@ -595,12 +602,10 @@ const UserUtils = {
         let userData = response?.data
         let verifyResponse = await middleware.verifyToken(resetPasswordToken)
 
-        console.log(verifyResponse, "verifyResponse==============")
         if (!verifyResponse?.status) {
-            return helpers.showResponse(false, "not verified", null, null, 401);
+            return verifyResponse
         }
         editObj = {
-            token: "",
             password: md5(newPassword),
             updated_on: moment().unix()
         }

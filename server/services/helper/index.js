@@ -1,6 +1,5 @@
 var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
-const jwt = require('jsonwebtoken')
 AWS.config.update({
   region: "us-east-1",
   credentials: new AWS.SharedIniFileCredentials({ profile: "mww" }),
@@ -75,6 +74,21 @@ const randomStr = (len, arr) => {
   }
   return OTP;
 };
+
+function generateIDs(customerIDCount) {
+   customerIDCount = 1000 + customerIDCount;
+  
+  // Generate the customer ID (4-digit number)
+  const customerID = customerIDCount.toString().padStart(4, '0');
+
+    // Increment the customer ID count
+    customerIDCount++;
+
+   // Generate the ID (4-digit number)
+   const idNumber = customerIDCount.toString().padStart(4, '0');
+  
+  return { idNumber, customerID };
+}
 
 const validateParams = (request, feilds) => {
   var postKeys = [];
@@ -1038,4 +1052,5 @@ module.exports = {
   uploadVideoToS31,
   changeEnv,
   showOutputNew,
+  generateIDs
 };

@@ -26,10 +26,10 @@ var Users = new Schema({
         type: String,
         default: null
     },
-    token:{
-        type: String,
-        default: ''
-    },
+    // token:{
+    //     type: String,
+    //     default: ''
+    // },
     // is_email_verified: {
     //     type: Number,
     //     default: 1
@@ -64,7 +64,7 @@ var Users = new Schema({
     },
     orderSubmissionDelay:{
         type: String,
-        default: null
+        default: '00:01:00'
     },
     isLoginFromShopify:{
         type: Boolean,

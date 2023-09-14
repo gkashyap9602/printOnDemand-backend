@@ -28,7 +28,7 @@ app.use(API_V1 + "administration", administration);
 app.use(API_V1 + "users", users);
 app.use(API_V1 + "common", common);
 
-app.listen(process.env.PORT, () => {
-  console.log(`https server running on port ${process.env.PORT}`);
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`https server running on port ${process.env.PORT || 3000}`);
 });
 
