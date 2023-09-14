@@ -183,9 +183,7 @@ const UserUtils = {
                 //   console.log(idd,"iddd")
                 return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 400);
             }
-            console.log("afterrr")
             const usersCount = await getCount(Users,{userType:3})
-            console.log(usersCount,"usersCount")
             if(!usersCount.status){
                 return  helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
             }
@@ -205,7 +203,6 @@ const UserUtils = {
             }
             let userRef = new Users(newObj)
             let result = await postData(userRef);
-            // console.log(result,"result")
             if (result.status) {
                 delete data.password
                 // let API_SECRET = helpers.getParameterFromAWS({ name: "API_SECRET" })

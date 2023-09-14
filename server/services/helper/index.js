@@ -2,7 +2,7 @@ var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
 AWS.config.update({
   region: "us-east-1",
-  // credentials: new AWS.SharedIniFileCredentials({ profile: "mww" }),
+  credentials: new AWS.SharedIniFileCredentials({profile:"default"}),
 });
 
 const ssm = new AWS.SSM();
