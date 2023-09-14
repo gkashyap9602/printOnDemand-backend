@@ -25,7 +25,8 @@ module.exports = {
         server_error:"server error",
         record_list:"record list",
         updated_sucessfully:"updated sucessfully",
-        data:"data fetched successfully"
+        data:"data fetched successfully",
+        database_error:"data fetch unsucessfull"
     },
     users: {
         email_already: "Email address is already occupied",

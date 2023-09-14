@@ -137,10 +137,10 @@ module.export = getCount = (Model, query) => {
     return new Promise((resolve,reject)=>{
         Model.countDocuments(query, (err, result) => {
             if(err){
-                let response = helpers.showResponse(false, 'failed', err);
+                let response = helpers.showResponse(false, 'failed', err,null,404);
                 return resolve(response);
             }
-            let response = helpers.showResponse(true, 'success' ,result);
+            let response = helpers.showResponse(true, 'success' ,result,null,200);
             return resolve(response);
         });
     }); 
