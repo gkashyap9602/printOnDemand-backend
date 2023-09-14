@@ -46,7 +46,7 @@ const authController = {
         }
 
         let result = await Users.register(req.body);
-        // console.log(result, "esulll")
+        console.log(result, "register esulll")
         return helpers.showOutputNew(res, result, result.code);
     },
 

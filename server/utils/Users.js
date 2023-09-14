@@ -183,6 +183,7 @@ const UserUtils = {
                 //   console.log(idd,"iddd")
                 return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 400);
             }
+            console.log("afterrr")
             const usersCount = await getCount(Users,{userType:3})
             const idGenerated = helpers.generateIDs(usersCount?.data)
 

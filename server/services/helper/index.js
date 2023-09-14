@@ -47,8 +47,10 @@ const showOutputNew = (res, response, code) => {
   // delete response.code;
   if (!response.status) {
     res.status(code).json({ Response: response, StatusCode: response.code });
+  }else{
+    res.status(code).json({ response: response, statusCode: response.code });
+
   }
-  res.status(code).json({ response: response, statusCode: response.code });
 };
 
 const changeEnv = (env) => {
