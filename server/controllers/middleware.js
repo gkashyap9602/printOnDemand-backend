@@ -76,11 +76,12 @@ const middleware = {
 						return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token });
 					}
 					if (decoded?.user_type == "user") {
+						// console.log(decoded,"decodeddd")
 
-						let response = await getSingleData(Users, { device_info: { $elemMatch: { access_token: token } } }, 'status');
-
+						let response = await getSingleData(Users, {_id:decoded._id }, {password:0});
+                            // console.log(response,"responseeee")
 						if (!response.status) {
-							return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.invalid_access_token });
+							return res.status(401).json({ status: false, message: ResponseMessages?.users?.invalid_user });
 						}
 						let userData = response?.data
 						if (userData.status == 0) {
@@ -95,10 +96,10 @@ const middleware = {
 						next();
 					} else if (decoded?.user_type == "admin") {
 
-						let response = await getSingleData(Administration, { device_info: { $elemMatch: { access_token: token } } }, '');
+						let response = await getSingleData(Administration, {_id:decoded._id }, {password:0});
 
 						if (!response.status) {
-							return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.invalid_access_token });
+							return res.status(401).json({ status: false, message: ResponseMessages?.users.invalid_user });
 						}
 						let adminData = response?.data
 						if (adminData.status == 0) {

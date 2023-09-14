@@ -17,7 +17,10 @@ router.post('/reset_password', AuthController.resetPassword);
 // router.post('/search', AuthController.searchUser);
 
 // with token
-router.post('/update_profile', middleware.checkToken, AuthController.updateUser);
+router.get('/:user_id', middleware.checkToken, AuthController.getUserDetail);
+router.post('/update_basic_details', middleware.checkToken, AuthController.updateUserBasicDetails);
+router.post('/update_shipping_details', middleware.checkToken, AuthController.updateShippingDetails);
+
 // router.post('/follow', middleware.checkToken, AuthController.follow);
 // router.post('/follower_list',  AuthController.followerList);
 // router.post('/following_list',  AuthController.followingList);

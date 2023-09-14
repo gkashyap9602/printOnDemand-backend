@@ -80,7 +80,7 @@ var Users = new Schema({
     },
     status: {
         type: Number,
-        default: 3
+        default: 1
     },
     traceId:{
         type: String,
@@ -119,4 +119,4 @@ var Users = new Schema({
     },
 });
 
-module.exports = mongoose.model('Users', Users, 'users');
+module.exports = mongoose.model('User', Users, 'users');

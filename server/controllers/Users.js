@@ -130,6 +130,32 @@ const authController = {
         let result = await Users.updateUser(req.body, user_id);
         return helpers.showOutputNew(res, result, result.code);
     },
+    updateUserBasicDetails: async (req, res) => {
+        let requiredFields = ['userGuid'];
+        let validator = helpers.validateParams(req, requiredFields);
+        if (!validator.status) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
+        }
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+        }
+        let result = await Users.updateUserBasicDetails(req.body, user_id);
+        return helpers.showOutputNew(res, result, result.code);
+    },
+    updateShippingDetails: async (req, res) => {
+        let requiredFields = ['userGuid'];
+        let validator = helpers.validateParams(req, requiredFields);
+        if (!validator.status) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
+        }
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+        }
+        let result = await Users.updateShippingDetails(req.body, user_id);
+        return helpers.showOutputNew(res, result, result.code);
+    },
     // follow: async (req, res) => {
     //     let requiredFields = ['user_id'];
     //     let validator = helpers.validateParams(req, requiredFields);
@@ -166,15 +192,16 @@ const authController = {
     //     let result = await Users.markFrameActive(req?.body);
     //     return helpers.showOutput(res, result, result.code);
     // },
-    // getUserDetail: async (req, res) => {
-    //     let requiredFields = ['user_id'];
-    //     let validator = helpers.validateParams(req, requiredFields);
-    //     if (!validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
-    //     }
-    //     let result = await Users.getUserDetail(req?.body);
-    //     return helpers.showOutput(res, result, result.code);
-    // },
+    getUserDetail: async (req, res) => {
+        // let requiredFields = ['user_id'];
+        console.log(req.params,"requess")
+        // let validator = helpers.validateParams(req, requiredFields);
+        // if (!validator.status) {
+        //     return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
+        // }
+        let result = await Users.getUserDetail(req?.params);
+        return helpers.showOutputNew(res, result, result.code);
+    },
     // getQuestions: async (req, res) => {
 
     //     let result = await Users.getQuestions(req?.body);

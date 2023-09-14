@@ -1,5 +1,6 @@
 require('../db_functions');
 let Users = require('../models/Users');
+let UserProfile = require('../models/UserProfile')
 let ObjectId = require('mongodb').ObjectID;
 let jwt = require('jsonwebtoken');
 let helpers = require('../services/helper');
@@ -10,7 +11,7 @@ const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require("../constants/const");
 const { default: mongoose } = require('mongoose');
 // const Question = require('../models/Question');
-const {randomUUID}  = require('crypto')
+const { randomUUID } = require('crypto')
 const middleware = require('../controllers/middleware');
 const UserUtils = {
 
@@ -25,6 +26,18 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages.users.email_already, result?.data, null, 200);
         }
         return helpers.showResponse(true, ResponseMessages?.users?.valid_email, null, null, 200);
+    },
+    checkUserExistance: async (user_id, guid = null) => {
+        let queryObject = { _id: user_id }
+        if (guid) {
+            queryObject = { user_id, guid }
+        }
+        let result = await getSingleData(Users, queryObject, '');
+        console.log(result, "result checkUserExistance")
+        if (result?.status) {
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, result?.data, null, 200);
+        }
+        return helpers.showResponse(true, ResponseMessages?.users?.valid_username, null, null, 200);
     },
     // checkPhoneExistance: async (phone, user_id = null) => {
     //     let queryObject = { phone, status: { $ne: 2 } }
@@ -183,9 +196,9 @@ const UserUtils = {
                 //   console.log(idd,"iddd")
                 return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 400);
             }
-            const usersCount = await getCount(Users,{userType:3})
-            if(!usersCount.status){
-                return  helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
+            const usersCount = await getCount(Users, { userType: 3 })
+            if (!usersCount.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
             }
             const idGenerated = helpers.generateIDs(usersCount?.data)
 
@@ -194,17 +207,30 @@ const UserUtils = {
                 lastName,
                 email: email,
                 userName: email,
-                id:idGenerated.idNumber,
-                guid:randomUUID(),
-                customerId:idGenerated.customerID,
-                customerGuid:randomUUID(),
+                id: idGenerated.idNumber,
+                guid: randomUUID(),
+                customerId: idGenerated.customerID,
+                customerGuid: randomUUID(),
                 password: md5(password),
                 created_on: moment().unix()
             }
+            
             let userRef = new Users(newObj)
             let result = await postData(userRef);
+            console.log(result,"resulttCreate")
             if (result.status) {
                 delete data.password
+                 console.log("under if check")
+                let ObjProfile = {
+                user_id:result.data._id,
+                created_on: moment().unix()
+            }
+            let userProfileRef = new UserProfile(ObjProfile)
+            let resultProfile = await postData(userProfileRef);
+             console.log(resultProfile,"resultProfile")
+            if(!resultProfile.status){
+                return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 402);
+            }
                 // let API_SECRET = helpers.getParameterFromAWS({ name: "API_SECRET" })
                 // let access_token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
                 //     expiresIn: consts.ACCESS_EXPIRY
@@ -232,7 +258,8 @@ const UserUtils = {
     login: async (data) => {
         try {
             let { isLoginFromShopify, password, userName } = data
-            let queryObject = { $or: [{ email: userName, password: md5(password) }] }
+            let queryObject = { email: userName, password: md5(password) }
+            //  { $or: [{ email: userName, password: md5(password) }] }
             let result = await getSingleData(Users, queryObject, { password: 0 });
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 401);
@@ -253,8 +280,14 @@ const UserUtils = {
             // let refresh_token = jwt.sign({ user_type: "user", type: "refresh", _id: userData._id }, API_SECRET, {
             //     expiresIn: consts.REFRESH_EXPIRY
             // });
-            userData.token = access_token
-            console.log(userData, "userDataaaa")
+            // userData.token = access_token
+            // userData = {token:access_token}
+            // console.log(userData.token,"usersdd")
+            // console.log({...userData},"fdfdfdfd")
+            userData = { ...userData._doc, token: access_token }
+            // console.log(access_token,"accessToken")
+            // userData.token = access_token
+            // console.log(userData, "userDataaaa")
             // let responseData = { access_token, refresh_token, _id: userData?._id };
             // let dIndex = device_info.findIndex((it) => it.device_id == device_id)
             // if (dIndex < 0) {
@@ -689,82 +722,49 @@ const UserUtils = {
     // },
 
     // // with token 
-    // getUserDetail: async (data) => {
-    //     let { user_id, _id } = data
-    //     console.log(_id)
-    //     await UserUtils.getBadgeCondition(user_id)
-    //     let result = await Users.aggregate([
-    //         { $match: { _id: mongoose.Types.ObjectId(user_id), status: 1 } },  // Match the specific user by _id and status
+    getUserDetail: async (data) => {
+        let { user_id, _id } = data
+        console.log(_id)
+        // await UserUtils.getBadgeCondition(user_id)
+        let result = await Users.aggregate([
+            { $match: { _id: mongoose.Types.ObjectId(user_id), status: 1 } },  // Match the specific user by _id and status
 
-    //         {
-    //             $lookup: {
-    //                 from: "videos",
-    //                 localField: "_id",
-    //                 foreignField: "user_id",
-    //                 as: "videos_"
-    //             }
-    //         },
-    //         {
-    //             $addFields: {
-    //                 videos: {
-    //                     $cond: {
-    //                         if: { $eq: ["$videos_", undefined] },
-    //                         then: [],
-    //                         else: "$videos_"
-    //                     }
-    //                 },
+            {
+                $lookup: {
+                    from: "userProfile",
+                    localField: "_id",
+                    foreignField: "user_id",
+                    as: "userProfileData"
+                }
+            },
+            // {
+            //     $unwind: "$userProfileData"  // Unwind the array created by $lookup (assuming there's a 1-to-1 relationship)
+            //   },
 
-    //             }
-    //         },
-    //         {
-    //             $project: {
-    //                 _id: 0,
-    //                 userDetails: {
-    //                     $mergeObjects: [
-    //                         "$$ROOT",
-    //                         {
-    //                             total_likes: { $sum: { $map: { input: "$videos.likes", as: "likes", in: { $size: "$$likes" } } } }
-    //                             , total_following: { $size: "$following" },
-    //                             total_followers: { $size: "$followers" }
-    //                         }
-    //                     ]
-    //                 }
-    //             }
-    //         },
-    //         {
-    //             $project: {
-    //                 "userDetails.videos": 0,
-    //                 "userDetails.password": 0,
-    //                 "userDetails.access_token": 0,
-    //                 "userDetails.device_info": 0,
-    //                 "userDetails.videos_": 0
-    //             }
-    //         },
-    //         { $replaceRoot: { newRoot: "$userDetails" } },
-    //         {
-    //             $addFields: {
-    //                 user_following_you: {
-    //                     $in: [mongoose.Types.ObjectId(_id), "$following"]
-    //                 }
-    //             }
-    //         },
-    //         {
-    //             $addFields: {
-    //                 you_following_user: {
-    //                     $in: [mongoose.Types.ObjectId(_id), "$followers"]
-    //                 }
-    //             }
-    //         },
-    //     ])
+            // {
+            //     $project: {
 
+            //     //   _id: 1,  // Include the _id field from the "users" collection
+            //     //   username: 1,  // Include the "username" field from the "users" collection
+            //     //   // Include specific fields from the "userProfile" document
+            //     //   "userProfileData.paymentdetails": 1,
+            //     //   "userProfileData.billingAddress": 1,
+            //     //   "userProfileData.shipingDetails": 1,
+            //     //   "userProfileData.field1": 1,  // Include additional fields as needed
+            //     //   "userProfileData.field2": 1,
+            //     //   "userProfileData.field3": 1
+            //     }
+            //   }
+        ])
 
+        console.log(result, "resulttt")
 
-    //     if (!result) {
-    //         return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
-    //     }
+        if (!result) {
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
+        }
 
-    //     return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
-    // },
+        return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
+    },
     // markFrameActive: async (data) => {
     //     try {
     //         let { frame_name, user_id } = data
@@ -872,6 +872,47 @@ const UserUtils = {
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
     },
+    updateUserBasicDetails: async (data, user_id) => {
+        const { userGuid } = data
+
+        let queryObject = { _id: user_id, guid: userGuid }
+
+        let checkUser = await getSingleData(Users, queryObject, '');
+        console.log(checkUser, "checkUser checkUserExistance")
+        if (!checkUser?.status) {
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
+        }
+
+        data.updated_on = moment().unix();
+
+        let result = await updateData(Users, data, user_id)
+        console.log(result, "resultUpdate")
+        if (result) {
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
+    },
+    updateShippingDetails: async (data, user_id) => {
+        const { userGuid } = data
+
+        let queryObject = { _id: user_id, guid: userGuid }
+
+        let checkUser = await getSingleData(Users, queryObject, '');
+        console.log(checkUser, "checkUser checkUserExistance")
+        if (!checkUser?.status) {
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
+        }
+
+        data.updated_on = moment().unix();
+
+        let result = await updateData(UserProfile, data, user_id)
+        console.log(result, "resultUpdate")
+        if (result) {
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
+    },
+
     // followerList: async (data) => {
     //     let { page, limit, _id, user_id } = data
     //     const pages = page // Specify the page number you want to retrieve
