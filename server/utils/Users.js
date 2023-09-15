@@ -214,23 +214,23 @@ const UserUtils = {
                 password: md5(password),
                 created_on: moment().unix()
             }
-            
+
             let userRef = new Users(newObj)
             let result = await postData(userRef);
-            console.log(result,"resulttCreate")
+            console.log(result, "resulttCreate")
             if (result.status) {
                 delete data.password
-                 console.log("under if check")
+                console.log("under if check")
                 let ObjProfile = {
-                user_id:result.data._id,
-                created_on: moment().unix()
-            }
-            let userProfileRef = new UserProfile(ObjProfile)
-            let resultProfile = await postData(userProfileRef);
-             console.log(resultProfile,"resultProfile")
-            if(!resultProfile.status){
-                return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 402);
-            }
+                    user_id: result.data._id,
+                    created_on: moment().unix()
+                }
+                let userProfileRef = new UserProfile(ObjProfile)
+                let resultProfile = await postData(userProfileRef);
+                console.log(resultProfile, "resultProfile")
+                if (!resultProfile.status) {
+                    return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 402);
+                }
                 // let API_SECRET = helpers.getParameterFromAWS({ name: "API_SECRET" })
                 // let access_token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
                 //     expiresIn: consts.ACCESS_EXPIRY
@@ -258,16 +258,16 @@ const UserUtils = {
     login: async (data) => {
         try {
             let { isLoginFromShopify, password, userName } = data
-            let queryObject = { email: userName, password: md5(password) }
+            let queryObject = { email: userName }
             //  { $or: [{ email: userName, password: md5(password) }] }
-            let result = await getSingleData(Users, queryObject, { password: 0 });
+            let result = await getSingleData(Users, queryObject, '');
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 401);
             }
             let userData = result?.data
-            // if (userData?.password !== md5(password)) {
-            //     return helpers.showResponse(false, ResponseMessages?.users?.invalid_credentials, null, null, 401);
-            // }
+            if (userData?.password !== md5(password)) {
+                return helpers.showResponse(false, ResponseMessages?.users?.invalid_credentials, null, null, 401);
+            }
             if (userData?.status == 0) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_disabled, null, null, 403);
             }
@@ -280,14 +280,11 @@ const UserUtils = {
             // let refresh_token = jwt.sign({ user_type: "user", type: "refresh", _id: userData._id }, API_SECRET, {
             //     expiresIn: consts.REFRESH_EXPIRY
             // });
-            // userData.token = access_token
-            // userData = {token:access_token}
-            // console.log(userData.token,"usersdd")
-            // console.log({...userData},"fdfdfdfd")
+
+            delete userData._doc.password
+            console.log(userData, "userdataa")
             userData = { ...userData._doc, token: access_token }
-            // console.log(access_token,"accessToken")
-            // userData.token = access_token
-            // console.log(userData, "userDataaaa")
+
             // let responseData = { access_token, refresh_token, _id: userData?._id };
             // let dIndex = device_info.findIndex((it) => it.device_id == device_id)
             // if (dIndex < 0) {
