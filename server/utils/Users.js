@@ -306,7 +306,7 @@ const UserUtils = {
             }
             let updateResponse = await updateData(Users, editObj, ObjectId(userData?._id))
             if (updateResponse.status) {
-                console.log(userData,"userDatauserData")
+                console.log(userData, "userDatauserData")
                 return helpers.showResponse(true, ResponseMessages?.users?.login_success, userData, null, 200);
             }
             return helpers.showResponse(false, ResponseMessages?.users?.login_error, null, null, 200);
@@ -315,15 +315,15 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages?.users?.login_error, null, null, 200);
         }
     },
-    logout: async (data,user_id) => {
+    logout: async (data, user_id) => {
         // let { access_token, device_id } = data;
-        let queryObject = { _id:user_id }
+        let queryObject = { _id: user_id }
         let result = await getSingleData(Users, queryObject, 'traceId');
         if (!result.status) {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
         }
         let userData = result?.data
-        console.log(userData,"userData")
+        console.log(userData, "userData")
         // let device_info = userData?.device_info
         // let dIndex = device_info.findIndex((it) => it.device_id == device_id)
         // if (dIndex >= 0) {
@@ -539,82 +539,40 @@ const UserUtils = {
                 path: logoPath,
                 cid: 'unique@mwwLogo'
             }]
+
             let body = `
             <!DOCTYPE html>
-            <html>
-            <head>
-              <title>Reset Your Password for MWW On Demand</title>
-              <style>
-                /* Set the email width to 600px and center it */
-                body {
-                  width: 600px;
-                  margin: 0 auto;
-                }
-            
-                /* Style the email header */
-                header {
-                  background-color: #3630a3;
-                  padding: 20px;
-                  text-align: center;
-                }
-            
-                /* Style the email title */
-                h1 {
-                  color: white;
-                  font-size: 24px;
-                  font-weight: bold;
-                }
-            
-                /* Style the email body */
-                p {
-                  font-size: 16px;
-                  line-height: 1.5;
-                  margin-bottom: 10px;
-                }
-            
-                /* Style the button */
-                button {
-                  background-color: #3630a3;
-                  padding: 10px 22px;
-                  border-radius: 45px;
-                  text-decoration: none;
-                  font-size: 19px;
-                  font-weight: bold;
-                  color:#f1eee9 !important;
-                }
-            
-                /* Style the footer */
-                footer {
-                  background-color: #f5f5f5;
-                  padding: 20px;
-                  text-align: center;
-                }
-              </style>
-            </head>
-            <body>
-            
-            <header>
-              <img src="cid:unique@mwwLogo" alt="logo" style="max-height:75px" />
-              <h1>Reset Your Password for MWW On Demand</h1>
-            </header>
-            
-            <p>Welcome ${userData?.firstName},</p>
-            
-            <p>You requested to reset your password for MWW On Demand.</p>
-            
-            <p>To reset your password, click the button below.</p>
-            
-            <a href="${link}" role="button" target="_blank" class="button"> <button> Reset Your Password </button></a>
-            
-            <p>If you did not request to reset your password, please ignore this email.</p>
-            
-            <footer>
-              This email was sent to you by MWW On Demand.
-            </footer>
-            
-            </body>
-            </html>
+                    <html>
+                    <head>
+                    </head>
+                    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+
+                        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+
+                            <div style="text-align: center; padding: 10px;">
+                                <img src="cid:unique@mwwLogo" alt="logo" style="max-height: 75px;" />
+                            </div>
+
+                            <span style="font-weight: 700; font-size: 22px; text-align: center; margin-top: 20px;">Reset Your Password For MWW On Demand</span>
+
+                            <p style="font-weight: bold; font-family: Arial; font-size: 16px; text-align: center; margin-top: 20px;">
+                                Welcome ${userData?.firstName},
+                            </p>
+
+                            <p style="font-family: Arial; font-size: 14px; text-align: center; margin-top: 20px;">
+                                Need a new password for MWW On Demand? No problem!<br/><br/>
+                                <a href="${link}" target="_blank">
+                                    <button style="padding: 10px 22px; border-radius: 45px; background: #3630a3; color: white; font-weight: 400; font-family: Arial; font-size: 14px; text-decoration: none; display: inline-block;">Reset Your Password</button>
+                                </a><br/>
+                            </p>
+                        
+                        </div>
+
+                    </body>
+                    </html>
+
             `
+
             let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
             console.log(emailResponse, "emailResponse")
             if (emailResponse?.status) {
@@ -740,22 +698,22 @@ const UserUtils = {
             },
             {
                 $unwind: "$userProfileData"
-              },
-              {
+            },
+            {
                 $addFields: {
-                  userProfileData: "$userProfileData", // Include the 'userProfileData' field
+                    userProfileData: "$userProfileData", // Include the 'userProfileData' field
                 }
-              },
-              {
+            },
+            {
                 $unset: "password" // Exclude the 'password' field
-              },
-              {
+            },
+            {
                 $replaceRoot: { newRoot: { $mergeObjects: ["$$ROOT", "$userProfileData"] } }
-              },
-              {
+            },
+            {
                 $unset: "userProfileData" // Exclude the 'password' field
-              },
-              //--
+            },
+            //--
             //   {
             //     $addFields: {
             //       mergedData: { $mergeObjects: ["$$ROOT", "$userProfileData"] },
@@ -767,7 +725,7 @@ const UserUtils = {
             //   {
             //     $unset: "password" // Exclude the 'password' field
             //   }
-              //--
+            //--
             //   {
             //     $addFields: {
             //       userProfileData: "$userProfileData", // Include the 'userProfileData' field
