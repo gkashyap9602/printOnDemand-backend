@@ -576,7 +576,7 @@ const UserUtils = {
             let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
             console.log(emailResponse, "emailResponse")
             if (emailResponse?.status) {
-                return helpers.showResponse(true, ResponseMessages.users.verification_email_sent, {}, null, 200);
+                return helpers.showResponse(true, ResponseMessages.users.verification_email_sent, true, null, 200);
             }
             return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, null, null, 200);
         } catch (err) {

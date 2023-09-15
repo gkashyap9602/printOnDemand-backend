@@ -45,10 +45,11 @@ const showOutput = (res, response, code) => {
 };
 const showOutputNew = (res, response, code) => {
   // delete response.code;
+  // console.log(response,"response new output")
   if (!response.status) {
-    res.status(code).json({ Response: response?.data, StatusCode: response.code });
+    res.status(code).json({ Message:response?.Message,Response: response?.data, StatusCode: response.code});
   }else{
-    res.status(code).json({ response: response?.data, statusCode: response.code });
+    res.status(code).json({ message:response?.Message,response: response?.data, statusCode: response.code});
 
   }
 };
