@@ -46,9 +46,9 @@ const showOutput = (res, response, code) => {
 const showOutputNew = (res, response, code) => {
   // delete response.code;
   if (!response.status) {
-    res.status(code).json({ Response: response, StatusCode: response.code });
+    res.status(code).json({ Response: response?.data, StatusCode: response.code });
   }else{
-    res.status(code).json({ response: response, statusCode: response.code });
+    res.status(code).json({ response: response?.data, statusCode: response.code });
 
   }
 };

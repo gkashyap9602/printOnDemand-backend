@@ -306,6 +306,7 @@ const UserUtils = {
             }
             let updateResponse = await updateData(Users, editObj, ObjectId(userData?._id))
             if (updateResponse.status) {
+                console.log(userData,"userDatauserData")
                 return helpers.showResponse(true, ResponseMessages?.users?.login_success, userData, null, 200);
             }
             return helpers.showResponse(false, ResponseMessages?.users?.login_error, null, null, 200);
