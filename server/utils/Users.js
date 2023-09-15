@@ -530,7 +530,7 @@ const UserUtils = {
             // if (!response?.status) {
             //     return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 401);
             // }
-            let link = `${consts.FRONTEND_URL}/resetPassword?resetPasswordToken=${token} && emailId=${email}`
+            let link = `${consts.FRONTEND_URL}/resetPassword?resetPasswordToken=${token}&&emailId=${email}`
             let to = email
             let subject = `Reset Your Password For MWW On Demand`
             const logoPath = path.join(__dirname, '../views', 'logo.png');
