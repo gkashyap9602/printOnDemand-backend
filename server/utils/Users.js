@@ -573,7 +573,7 @@ const UserUtils = {
                 }
             
                 /* Style the button */
-                .button {
+                button {
                   background-color: #3630a3;
                   padding: 10px 22px;
                   border-radius: 45px;
@@ -604,7 +604,7 @@ const UserUtils = {
             
             <p>To reset your password, click the button below.</p>
             
-            <a href="${link}" target="_blank" class="button">Reset Your Password</a>
+            <a href="${link}" role="button" target="_blank" class="button"> <button> Reset Your Password </button></a>
             
             <p>If you did not request to reset your password, please ignore this email.</p>
             
