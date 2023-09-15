@@ -112,15 +112,14 @@ const authController = {
         return helpers.showOutputNew(res, result, result.code);
     },
 
-    // logout: async (req, res) => {
-    //     let requiredFields = ['user_id'];
-    //     let validator = helpers.validateParams(req, requiredFields);
-    //     if (!validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
-    //     }
-    //     let result = await Users.logout(req.body);
-    //     return helpers.showOutput(res, result, result.code);
-    // },
+    logout: async (req, res) => {
+        let user_id = req.decoded?.user_id;
+        if (!user_id) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+        }
+        let result = await Users.logout(req.body,user_id);
+        return helpers.showOutputNew(res, result, result.code);
+    },
 
     updateUser: async (req, res) => {
         let user_id = req.decoded.user_id;

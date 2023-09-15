@@ -17,11 +17,13 @@ router.post('/reset_password', AuthController.resetPassword);
 // router.post('/search', AuthController.searchUser);
 
 // with token
+
 router.get('/:user_id', middleware.checkToken, AuthController.getUserDetail);
 router.post('/update_basic_details', middleware.checkToken, AuthController.updateUserBasicDetails);
 router.post('/update_shipping_details', middleware.checkToken, AuthController.updateShippingDetails);
 router.post('/update_billing_address', middleware.checkToken, AuthController.updateBillingAddress);
 router.post('/update_payment_details', middleware.checkToken, AuthController.updatePaymentDetails);
+router.post('/logout',middleware.checkToken, AuthController.logout);
 
 // router.post('/follow', middleware.checkToken, AuthController.follow);
 // router.post('/follower_list',  AuthController.followerList);

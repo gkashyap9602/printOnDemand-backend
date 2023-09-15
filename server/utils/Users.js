@@ -315,26 +315,28 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages?.users?.login_error, null, null, 200);
         }
     },
-    // logout: async (data) => {
-    //     let { access_token, device_id } = data;
-    //     let queryObject = { access_token }
-    //     let result = await getSingleData(Users, queryObject, '');
-    //     if (!result.status) {
-    //         return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
-    //     }
-    //     let userData = result?.data
-    //     let device_info = userData?.device_info
-    //     let dIndex = device_info.findIndex((it) => it.device_id == device_id)
-    //     if (dIndex >= 0) {
-    //         device_info.splice(dIndex, 1)
-    //     }
-    //     let editObj = {
-    //         device_info,
-    //         updated_on: moment().unix()
-    //     }
-    //     await updateData(Users, editObj, ObjectId(result?.data?._id))
-    //     return helpers.showResponse(true, ResponseMessages?.users?.logout_success, null, null, 200);
-    // },
+    logout: async (data,user_id) => {
+        // let { access_token, device_id } = data;
+        let queryObject = { _id:user_id }
+        let result = await getSingleData(Users, queryObject, 'traceId');
+        if (!result.status) {
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
+        }
+        let userData = result?.data
+        console.log(userData,"userData")
+        // let device_info = userData?.device_info
+        // let dIndex = device_info.findIndex((it) => it.device_id == device_id)
+        // if (dIndex >= 0) {
+        //     device_info.splice(dIndex, 1)
+        // }
+        // let editObj = {
+        //     device_info,
+        //     updated_on: moment().unix()
+        // }
+        // await updateData(Users, editObj, ObjectId(result?.data?._id))
+        return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
+    },
+
     // socialLogin: async (data) => {
     //     try {
     //         let { login_source, device_id, fcm_token, os } = data;

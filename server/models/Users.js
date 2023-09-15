@@ -92,7 +92,7 @@ var Users = new Schema({
     },
     traceId:{
         type: String,
-        default: ''
+        default: '0HMRHAOHIAHIS:0004003'
     }
     // device_info: [{
     //     fcm_token: {
