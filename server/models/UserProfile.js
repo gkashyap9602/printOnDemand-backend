@@ -130,6 +130,7 @@ var UserProfile = new Schema({
       stateCode: {
         type: String,
         default: "",
+        // max:2,
       },
       city: {
         type: String,

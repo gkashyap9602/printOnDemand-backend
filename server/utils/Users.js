@@ -701,6 +701,13 @@ const UserUtils = {
             },
             {
                 $addFields: {
+                    fullName:{
+                        $concat:['$firstName' ,' ', '$lastName']
+                    }, // Include the 'userProfileData' field
+                    ncResaleInfo:{
+                        isExemptionEligible:"$userProfileData.billingAddress.isExemptionEligible",
+                        ncResaleCertificate:"$userProfileData.billingAddress.ncResaleCertificate"
+                    },
                     userProfileData: "$userProfileData", // Include the 'userProfileData' field
                 }
             },
@@ -713,6 +720,17 @@ const UserUtils = {
             {
                 $unset: "userProfileData" // Exclude the 'password' field
             },
+            // {
+            //     $addFields: {
+            //         fullName:{
+            //             $concat:['$firstName' ,' ', '$lastName']
+            //         }, // Include the 'userProfileData' field
+            //         ncResaleInfo:{
+            //             isExemptionEligible:"$billingAddress.isExemptionEligible",
+            //             ncResaleCertificate:"$billingAddress.ncResaleCertificate"
+            //         }
+            //     }
+            // },
             //--
             //   {
             //     $addFields: {
