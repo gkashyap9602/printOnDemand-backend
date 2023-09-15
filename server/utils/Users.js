@@ -232,6 +232,8 @@ const UserUtils = {
                 if (!resultProfile.status) {
                     return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 402);
                 }
+
+                console.log(resultProfile,"resultProfile")
                 // let API_SECRET = helpers.getParameterFromAWS({ name: "API_SECRET" })
                 // let access_token = jwt.sign({ user_type: "user", type: "access" }, API_SECRET, {
                 //     expiresIn: consts.ACCESS_EXPIRY
@@ -247,6 +249,54 @@ const UserUtils = {
                 //     updated_on: moment().unix()
                 // }
                 // await updateData(Users, editObj, ObjectId(result?.data?._id))
+                 //------------
+                 let link = `${consts.FRONTEND_URL}/login`
+                 let to = email
+                 let subject = `Welcome to the MWW on Demand Merch Maker!`
+                 const logoPath = path.join(__dirname, '../views', 'logo.png');
+                 let attachments = [{
+                     filename: 'logo.png',
+                     path: logoPath,
+                     cid: 'unique@mwwLogo'
+                 }]
+     
+                 let body = `
+                 <!DOCTYPE html>
+                         <html>
+                         <head>
+                         </head>
+                         <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+     
+                             <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+     
+                                 <div style="text-align: center; padding: 10px;">
+                                     <img src="cid:unique@mwwLogo" alt="logo" style="max-height: 75px;" />
+                                 </div>
+     
+                                 <span style="font-weight: 700; font-size: 22px; text-align: center; margin-top: 20px;">Welcome to the MWW on Demand Merch Maker!</span>
+     
+                                 <p style="font-weight: bold; font-family: Arial; font-size: 16px; text-align: center; margin-top: 20px;">
+                                     Welcome ${firstName},
+                                 </p>
+     
+                                 <p style="font-family: Arial; font-size: 14px; text-align: center; margin-top: 20px;">
+                                 Thanks for signing up! To complete your account setup, please go to<br/><br/>
+                                     <a style="color: blue;" href="${link}" target="_blank">
+                                      ${link} > My Profile
+                                     </a><br/>
+                                 </p>
+                             
+                             </div>
+     
+                         </body>
+                         </html>
+     
+                 `
+                 let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
+                 console.log(emailResponse,"emailResponseregister")
+
+
+                //-----------
                 return helpers.showResponse(true, ResponseMessages?.users?.register_success, data, null, 200);
             }
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 200);
