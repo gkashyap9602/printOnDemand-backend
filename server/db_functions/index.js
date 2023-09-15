@@ -93,6 +93,19 @@ module.export = updateData = (Model, DataObject, _id) =>{
         });
     });
 }
+module.export = updateSingleData = (Model, DataObject, matchObj) =>{
+    return new Promise((resolve,reject)=>{
+        console.log(matchObj,"lklk")
+        Model.findOneAndUpdate(matchObj, { $set : DataObject },{new:true},(err,updatedData) => {
+            if(err){
+                let response = helpers.showResponse(false, err);
+                return resolve(response);
+            } 
+            let response = helpers.showResponse(true, 'success', updatedData);
+            return resolve(response);
+        });
+    });
+}
 
 module.export = updateByQuery = (Model, DataObject, filter) =>{
     return new Promise((resolve,reject)=>{

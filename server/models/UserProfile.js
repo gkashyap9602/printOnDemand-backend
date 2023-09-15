@@ -32,7 +32,7 @@ var UserProfile = new Schema({
       type: String,
       default: "",
     },
-    taxId:{
+    taxId: {
       type: Number,
       default: null,
     },
@@ -48,62 +48,70 @@ var UserProfile = new Schema({
       type: String,
       default: "",
     },
-  
+
     companyPhone: {
       type: String,
       default: "",
     },
-    
+
   },
   billingAddress: {
-    b_company_name: {
+    companyName: {
       type: String,
       default: "",
     },
-    b_contact_name: {
+    contactName: {
       type: String,
       default: "",
     },
-    b_address_1: {
+    address1: {
       type: String,
       default: "",
     },
-    b_address_2: {
+    address2: {
       type: String,
       default: "",
     },
-    b_country: {
+    country: {
       type: String,
       default: "",
     },
-    b_state: {
+    stateName: {
       type: String,
       default: "",
     },
-    b_city: {
-      type: String,
-      default: "",
-    },
-    b_zip: {
+    taxId: {
       type: Number,
       default: null,
     },
-    b_nc_tax_reg: {
-      type: Number,
-      default: null,
-    },
-    b_email: {
+    city: {
       type: String,
       default: "",
     },
-    b_country_code: {
+    zipCode: {
+      type: Number,
+      default: 1,
+    },
+    companyEmail: {
       type: String,
       default: "",
     },
-    b_phone: {
-      type: Number,
-      default: null,
+
+    companyPhone: {
+      type: String,
+      default: "",
     },
+    // ncResaleInfo:{
+
+    // },
+    isExemptionEligible: {
+      type: Boolean,
+      default: false,
+    },
+    ncResaleCertificate: {
+      type: String,
+      default: "",
+    }
   },
   paymentDetails: {
     billingAddressData: {
@@ -131,21 +139,7 @@ var UserProfile = new Schema({
         type: Number,
         default: null,
       },
-      creditCardData: {
-        ccNumber: {
-          type: String,
-          default: "",
-        },
-        expirationMonth: {
-          type: String,
-          default: "",
-        },
-        expirationYear: {
-          type: String,
-          default: "",
-        },
 
-      },
       phone: {
         type: String,
         default: "",
@@ -155,45 +149,50 @@ var UserProfile = new Schema({
         default: "",
       },
     },
-    completionStaus: {
-      basicInfo: {
-        type: Boolean,
-        default: false,
-      },
-      billingInfo: {
-        type: Boolean,
-        default: false,
-      },
-      paymentInfo: {
-        type: Boolean,
-        default: false,
-      },
-      shippingInfo: {
-        type: Boolean,
-        default: false,
-      },
-
-    },
-
-    ncResaleInfo: {
-      isExemptionEligible: {
-        type: Boolean,
-        default: false,
-      },
-      ncResaleCertificate: {
+    creditCardData: {
+      ccNumber: {
         type: String,
-        default: null,
-      }
+        default: "",
+      },
+      expirationMonth: {
+        type: String,
+        default: "",
+      },
+      expirationYear: {
+        type: String,
+        default: "",
+      },
+
     },
-    created_on: {
-      type: Number,
-      default: 0,
+
+  },
+  completionStaus: {
+    basicInfo: {
+      type: Boolean,
+      default: false,
     },
-    updated_on: {
-      type: Number,
-      default: 0,
+    billingInfo: {
+      type: Boolean,
+      default: false,
     },
-  }
+    paymentInfo: {
+      type: Boolean,
+      default: false,
+    },
+    shippingInfo: {
+      type: Boolean,
+      default: false,
+    },
+
+  },
+  created_on: {
+    type: Number,
+    default: 0,
+  },
+  updated_on: {
+    type: Number,
+    default: 0,
+  },
 });
 
-module.exports = mongoose.model("UserProfile", UserProfile, "usersProfile");
+module.exports = mongoose.model("UserProfile", UserProfile, "userProfile");

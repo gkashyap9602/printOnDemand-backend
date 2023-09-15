@@ -82,9 +82,17 @@ var Users = new Schema({
         type: Number,
         default: 1
     },
-    traceId:{
+    payTraceId:{
         type: String,
         default: null
+    },
+    phoneNumber:{
+        type: String,
+        default: null
+    },
+    traceId:{
+        type: String,
+        default: ''
     }
     // device_info: [{
     //     fcm_token: {

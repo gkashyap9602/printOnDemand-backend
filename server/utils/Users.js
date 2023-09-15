@@ -217,17 +217,18 @@ const UserUtils = {
 
             let userRef = new Users(newObj)
             let result = await postData(userRef);
-            console.log(result, "resulttCreate")
             if (result.status) {
                 delete data.password
-                console.log("under if check")
                 let ObjProfile = {
                     user_id: result.data._id,
+                    completionStaus: {
+                        basicInfo: true
+                    },
+
                     created_on: moment().unix()
                 }
                 let userProfileRef = new UserProfile(ObjProfile)
                 let resultProfile = await postData(userProfileRef);
-                console.log(resultProfile, "resultProfile")
                 if (!resultProfile.status) {
                     return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 402);
                 }
@@ -273,7 +274,7 @@ const UserUtils = {
             }
             // let device_info = userData?.device_info
             let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
-            console.log(API_SECRET, 'API_SECRET,utils')
+            console.log(userData._id, 'userData._id')
             let access_token = jwt.sign({ user_type: "user", type: "access", _id: userData._id }, API_SECRET, {
                 expiresIn: consts.ACCESS_EXPIRY
             });
@@ -734,23 +735,43 @@ const UserUtils = {
                     as: "userProfileData"
                 }
             },
-            // {
-            //     $unwind: "$userProfileData"  // Unwind the array created by $lookup (assuming there's a 1-to-1 relationship)
-            //   },
-
-            // {
-            //     $project: {
-
-            //     //   _id: 1,  // Include the _id field from the "users" collection
-            //     //   username: 1,  // Include the "username" field from the "users" collection
-            //     //   // Include specific fields from the "userProfile" document
-            //     //   "userProfileData.paymentdetails": 1,
-            //     //   "userProfileData.billingAddress": 1,
-            //     //   "userProfileData.shipingDetails": 1,
-            //     //   "userProfileData.field1": 1,  // Include additional fields as needed
-            //     //   "userProfileData.field2": 1,
-            //     //   "userProfileData.field3": 1
+            {
+                $unwind: "$userProfileData"
+              },
+              {
+                $addFields: {
+                  userProfileData: "$userProfileData", // Include the 'userProfileData' field
+                }
+              },
+              {
+                $unset: "password" // Exclude the 'password' field
+              },
+              {
+                $replaceRoot: { newRoot: { $mergeObjects: ["$$ROOT", "$userProfileData"] } }
+              },
+              {
+                $unset: "userProfileData" // Exclude the 'password' field
+              },
+              //--
+            //   {
+            //     $addFields: {
+            //       mergedData: { $mergeObjects: ["$$ROOT", "$userProfileData"] },
             //     }
+            //   },
+            //   {
+            //     $unset: "userProfileData" // Exclude the 'userProfileData' field
+            //   },
+            //   {
+            //     $unset: "password" // Exclude the 'password' field
+            //   }
+              //--
+            //   {
+            //     $addFields: {
+            //       userProfileData: "$userProfileData", // Include the 'userProfileData' field
+            //     }
+            //   },
+            //   {
+            //     $unset: "password" // Exclude the 'password' field
             //   }
         ])
 
@@ -895,16 +916,63 @@ const UserUtils = {
         let queryObject = { _id: user_id, guid: userGuid }
 
         let checkUser = await getSingleData(Users, queryObject, '');
-        console.log(checkUser, "checkUser checkUserExistance")
+        console.log(checkUser, "checkUser")
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
         }
 
         data.updated_on = moment().unix();
 
-        let result = await updateData(UserProfile, data, user_id)
+        let result = await updateSingleData(UserProfile, data, { user_id })
+
         console.log(result, "resultUpdate")
-        if (result) {
+        if (result.status) {
+            let updateRes = await updateSingleData(UserProfile, { 'completionStaus.shippingInfo': true }, { user_id })
+            console.log(updateRes, "updateRes")
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
+    },
+    updateBillingAddress: async (data, user_id) => {
+        const { userGuid } = data
+
+        let queryObject = { _id: user_id, guid: userGuid }
+
+        let checkUser = await getSingleData(Users, queryObject, '');
+        console.log(checkUser, "checkUser")
+        if (!checkUser?.status) {
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
+        }
+
+        data.updated_on = moment().unix();
+
+        let result = await updateSingleData(UserProfile, data, { user_id })
+
+        console.log(result, "resultUpdate")
+        if (result.status) {
+            await updateSingleData(UserProfile, { 'completionStaus.billingInfo': true }, { user_id })
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
+    },
+    updatePaymentDetails: async (data, user_id) => {
+        const { userGuid } = data
+
+        let queryObject = { _id: user_id, guid: userGuid }
+
+        let checkUser = await getSingleData(Users, queryObject, '');
+        console.log(checkUser, "checkUser")
+        if (!checkUser?.status) {
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
+        }
+
+        data.updated_on = moment().unix();
+
+        let result = await updateSingleData(UserProfile, data, { user_id })
+
+        console.log(result, "resultUpdate")
+        if (result.status) {
+            await updateSingleData(UserProfile, { 'completionStaus.paymentInfo': true }, { user_id })
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);

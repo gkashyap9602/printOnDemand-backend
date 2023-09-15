@@ -20,6 +20,8 @@ router.post('/reset_password', AuthController.resetPassword);
 router.get('/:user_id', middleware.checkToken, AuthController.getUserDetail);
 router.post('/update_basic_details', middleware.checkToken, AuthController.updateUserBasicDetails);
 router.post('/update_shipping_details', middleware.checkToken, AuthController.updateShippingDetails);
+router.post('/update_billing_address', middleware.checkToken, AuthController.updateBillingAddress);
+router.post('/update_payment_details', middleware.checkToken, AuthController.updatePaymentDetails);
 
 // router.post('/follow', middleware.checkToken, AuthController.follow);
 // router.post('/follower_list',  AuthController.followerList);

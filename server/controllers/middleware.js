@@ -76,10 +76,10 @@ const middleware = {
 						return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token });
 					}
 					if (decoded?.user_type == "user") {
-						// console.log(decoded,"decodeddd")
-
+						console.log(decoded,"decodeddd")
+                             console.log("under user")
 						let response = await getSingleData(Users, {_id:decoded._id }, {password:0});
-                            // console.log(response,"responseeee")
+                            console.log(response,"responseeee check token")
 						if (!response.status) {
 							return res.status(401).json({ status: false, message: ResponseMessages?.users?.invalid_user });
 						}

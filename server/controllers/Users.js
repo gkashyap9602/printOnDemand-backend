@@ -156,6 +156,33 @@ const authController = {
         let result = await Users.updateShippingDetails(req.body, user_id);
         return helpers.showOutputNew(res, result, result.code);
     },
+
+    updateBillingAddress: async (req, res) => {
+        let requiredFields = ['userGuid'];
+        let validator = helpers.validateParams(req, requiredFields);
+        if (!validator.status) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
+        }
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+        }
+        let result = await Users.updateBillingAddress(req.body, user_id);
+        return helpers.showOutputNew(res, result, result.code);
+    },
+    updatePaymentDetails: async (req, res) => {
+        let requiredFields = ['userGuid'];
+        let validator = helpers.validateParams(req, requiredFields);
+        if (!validator.status) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
+        }
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+        }
+        let result = await Users.updatePaymentDetails(req.body, user_id);
+        return helpers.showOutputNew(res, result, result.code);
+    },
     // follow: async (req, res) => {
     //     let requiredFields = ['user_id'];
     //     let validator = helpers.validateParams(req, requiredFields);
