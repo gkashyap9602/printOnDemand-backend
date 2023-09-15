@@ -5,6 +5,7 @@ AWS.config.update({
   credentials: new AWS.SharedIniFileCredentials({profile:"default"}),
 });
 
+const moment = require('moment')
 const ssm = new AWS.SSM();
 const nodemailer = require("nodemailer");
 const ResponseMessages = require("../../constants/ResponseMessages");
@@ -117,6 +118,11 @@ const validateParams = (request, feilds) => {
   return response;
 };
 
+const getCurrentDate = ()=>{
+  return  moment().format('YYYY-MM-DDTHH:mm:ss.SSSSSS')
+}
+
+//
 const validateParamsArray = (data, feilds) => {
   var postKeys = [];
   var missingFeilds = [];
@@ -1055,5 +1061,6 @@ module.exports = {
   uploadVideoToS31,
   changeEnv,
   showOutputNew,
-  generateIDs
+  generateIDs,
+  getCurrentDate
 };
