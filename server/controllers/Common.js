@@ -196,9 +196,18 @@ const commonController = {
         let requiredFields = ['name', 'value'];
         let validator = helpers.validateParams(req, requiredFields);
         if (!validator.status) {
-            return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
+            return helpers.showOutput(res, helpers.showResponse(false, validator.Message), 203);
         }
         let result = await Common.storeParameterToAWS(req.body);
+        return helpers.showOutput(res, result, result.code);
+    },
+    fetchParameterFromAWS: async (req, res) => {
+        let requiredFields = ['name'];
+        let validator = helpers.validateParams(req, requiredFields);
+        if (!validator.status) {
+            return helpers.showOutput(res, helpers.showResponse(false, validator.Message), 203);
+        }
+        let result = await Common.fetchParameterFromAWS(req.body);
         return helpers.showOutput(res, result, result.code);
     },
 

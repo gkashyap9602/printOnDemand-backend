@@ -10,6 +10,7 @@ router.post('/get_privacy_policy', commonController.getPrivacyContent);
 router.post('/get_about', commonController.getAbout);
 router.post('/get_questions', commonController.getQuestions);
 router.post('/store_param', commonController.storeParameterToAWS);
+// router.get('/get_param', commonController.fetchParameterFromAWS);
 router.post('/upload_video_to_s3', commonController.uploadVideoToS3);
 router.post('/upload_file_to_s3', commonController.uploadFileToS3);
 router.post('/add_text_on_video', commonController.addTextOnVideo);

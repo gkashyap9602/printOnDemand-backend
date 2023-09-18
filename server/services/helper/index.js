@@ -40,11 +40,11 @@ const showResponse = (
   return response;
 };
 
-// const showOutput = (res, response, code) => {
-//   response.StatusCode = response.code
-//   delete response.code;
-//   res.status(code).json(response);
-// };
+const showOutput = (res, response, code) => {
+  response.StatusCode = response.code
+  delete response.code;
+  res.status(code).json(response);
+};
 const showOutputNew = (res, response, code) => {
   // console.log(response,"response new output")
   if (!response.status) {
@@ -103,7 +103,8 @@ const decryptUsingAES = (encryptedValue, secretKey="KPMO456EHA90G007") => {
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7,
     });
-    return decrypted.toString(CryptoJS.enc.Utf8);
+    console.log("checkk")
+    return decrypted.toString(CryptoJS.enc.Utf8)?decrypted.toString(CryptoJS.enc.Utf8):encryptedValue;
   } catch (error) {
     console.error('Decryption Error:', error);
     return showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400) // Handle decryption errors
@@ -1087,7 +1088,7 @@ const uploadVideoToS31 = async (files) => {
 
 module.exports = {
   showResponse,
-  // showOutput,
+  showOutput,
   randomStr,
   validateParams,
   validateParamsArray,
