@@ -149,7 +149,6 @@ var UserProfile = new Schema({
       expirationMonth: {
         type: String,
         default: "",
-        enum:[1,2,3,4,5,6,7,8,9,10,11,12]
       },
       expirationYear: {
         type: String,

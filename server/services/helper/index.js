@@ -56,7 +56,6 @@ const showOutputNew = (res, response, code) => {
       }, StatusCode: response.code
     });
 
-    // res.status(code).json({ Message:response?.Message,Response: response?.data, StatusCode: response.code});
   } else {
     res.status(code).json({ message: response?.Message, response: response?.data, statusCode: response.code });
 
@@ -65,8 +64,7 @@ const showOutputNew = (res, response, code) => {
 
 const validationError = async (res, error) => {
   const code = 400;
-  // statusCode.UNPROCESSABLE_ENTITY;
-  const validationErrors = error.details.map((error) => error.message);
+  const validationErrors = error.details.map((error) => error.message.replace(new RegExp('\\"', "g"), ""));
 
   return res.status(code).json({
     StatusCode: code,
@@ -75,7 +73,6 @@ const validationError = async (res, error) => {
       ValidationErrors: validationErrors,
       ValidationFailed: true
     },
-    // error.message.replace(new RegExp('\\"', "g"), ""),
   });
 };
 

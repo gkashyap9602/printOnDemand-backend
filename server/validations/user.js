@@ -1,8 +1,9 @@
-const joi = require('joi')
+const joi = require("joi");
 
-module.exports.userProfileSchema = {
-
+module.exports.profileSchema = {
     body: joi.object({
+        firstName: joi.string(),
+        lastName: joi.string(),
         paymentDetails: {
             billingAddressData: {
                 city: joi.string(),
@@ -10,17 +11,77 @@ module.exports.userProfileSchema = {
                 stateCode: joi.string().max(2).message("State Code Length Must be 2"),
                 name: joi.string(),
                 streetAddress: joi.string(),
-                zip: joi.number().max(5).message("Zip Code Length Must be 5")
+                zip: joi.string().max(5).message("Zip Code Length Must be 5"),
             },
             creditCardData: {
                 ccNumber: joi.string(),
-                expirationMonth: joi.string().valid(1,2,3,4,5,6,7,8,9,10,11,12),
-                expirationYear: joi.string()
+                expirationMonth: joi.string(),
+                expirationYear: joi.string(),
             },
-            customerId: joi.string(),
-            phone: joi.string().max(10)
+            customerId: joi.string().allow(''),
+            phone: joi.string().max(10).message("Phone length must be 10"),
         },
-        userGuid:joi.string().required()
+        billingAddress: {
+            address1: joi.string(),
+            address2: joi.string().allow(''),
+            city: joi.string(),
+            companyEmail: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+            companyName: joi.string(),
+            companyPhone: joi.string().max(10).message("Phone length must be 10"),
+            contactName: joi.string(),
+            country: joi.string(),
+            stateName: joi.string(),
+            taxId: joi.string(),
+            zipCode: joi.string().max(5).message("Zip Code Length Must be 5"),
+        },
+        isExemptionEligible: joi.boolean(),
+        ncResaleCertificate: joi.string().allow(''),
+
+        shippingAddress: {
+            address1: joi.string(),
+            address2: joi.string().allow(''),
+            city: joi.string(),
+            companyEmail: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+            companyName: joi.string(),
+            companyPhone: joi.string().max(10).message("Phone length must be 10"),
+            contactName: joi.string(),
+            country: joi.string(),
+            stateName: joi.string(),
+            taxId: joi.string(),
+            zipCode: joi.string().max(5).message("Zip Code Length Must be 5"),
+        },
+        userGuid: joi.string().required(),
+    }),
+};
+
+
+module.exports.registrationSchema = {
+    body: joi.object({
+        firstName: joi.string().required(),
+        lastName: joi.string().required(),
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+        password: joi.string().min(6).required(),
 
     })
-}
+};
+
+module.exports.loginSchema = {
+    body: joi.object({
+        isLoginFromShopify: joi.boolean().required(),
+        userName: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+        password: joi.string().required()
+    })
+
+};
+module.exports.forgotSchema = {
+    body: joi.object({
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+    })
+};
+module.exports.resetPasswordSchema = {
+    body: joi.object({
+        emailId: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+        resetPasswordToken: joi.string().required(),
+        newPassword: joi.string().required()
+    })
+};
