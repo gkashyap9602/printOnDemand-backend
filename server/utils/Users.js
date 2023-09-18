@@ -41,6 +41,12 @@ const UserUtils = {
         try {
             let { firstName, lastName, email, password } = data;
 
+            let dycryption =  helpers.decryptUsingAES(password)
+             if(!dycryption.status){
+                return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
+             }
+            password = helpers.decryptUsingAES(password)
+
             let emailExistanceResponse = await UserUtils.checkEmailExistance(email)
             console.log(emailExistanceResponse, "emailExistanceResponse")
             if (!emailExistanceResponse?.status) {
@@ -143,6 +149,13 @@ const UserUtils = {
         try {
             let { isLoginFromShopify, password, userName } = data
             let queryObject = { email: userName }
+
+            let dycryption =  helpers.decryptUsingAES(password)
+             if(!dycryption.status){
+                return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
+             }
+            password = helpers.decryptUsingAES(password)
+
             let result = await getSingleData(Users, queryObject, '');
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 401);
@@ -188,7 +201,6 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
         }
         let userData = result?.data
-        console.log(userData, "userData")
         return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
     },
 
@@ -264,6 +276,11 @@ const UserUtils = {
 
     resetPassword: async (data) => {
         let { emailId, resetPasswordToken, newPassword } = data;
+        let dycryption =  helpers.decryptUsingAES(newPassword)
+             if(!dycryption.status){
+                return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
+             }
+        newPassword = helpers.decryptUsingAES(newPassword)
         let queryObject = {
             email: emailId
         }
@@ -290,6 +307,15 @@ const UserUtils = {
 
     changePasswordWithOld: async (data, user_id) => {
         let { oldPassword, newPassword ,userId} = data;
+        let dycryption_new =  helpers.decryptUsingAES(newPassword)
+        let dycryption_old =  helpers.decryptUsingAES(oldPassword)
+
+        if(!dycryption_old.status || !dycryption_new.status){
+           return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
+        }
+        newPassword = helpers.decryptUsingAES(newPassword)
+        oldPassword = helpers.decryptUsingAES(oldPassword)
+
         let result = await getSingleData(Users, { password: { $eq: md5(oldPassword) }, _id: ObjectId(user_id) });
         if (!result.status) {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_old_password, null, null, 200);

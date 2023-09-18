@@ -10,12 +10,12 @@
   "author": "chena_ram",
   "license": "ISC",
   "dependencies": {
-    "agora-access-token": "^2.0.4",
     "aws-cli": "^0.0.2",
     "aws-sdk": "^2.1341.0",
     "axios": "^0.27.2",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
     "express": "^4.18.1",
@@ -36,7 +36,6 @@
     "pdfkit": "^0.13.0",
     "razorpay": "^2.8.6",
     "sharp": "^0.32.1",
-    "youtube-mp3-downloader": "^0.7.11",
     "yt-get": "^1.1.2",
     "ytdl-core": "^4.11.4"
   }

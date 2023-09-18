@@ -26,7 +26,9 @@ module.exports = {
         record_list:"record list",
         updated_sucessfully:"updated sucessfully",
         data:"data fetched successfully",
-        database_error:"data fetch unsucessfull"
+        database_error:"data fetch unsucessfull",
+        dycryption_error:"dycryption unsucessfull",
+
     },
     users: {
         email_already: "Email address is already occupied",

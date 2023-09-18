@@ -1,5 +1,6 @@
 var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
+const CryptoJS = require('crypto-js')
 AWS.config.update({
   region: "us-east-1",
   credentials: new AWS.SharedIniFileCredentials({ profile: "default" }),
@@ -45,7 +46,6 @@ const showResponse = (
 //   res.status(code).json(response);
 // };
 const showOutputNew = (res, response, code) => {
-  // delete response.code;
   // console.log(response,"response new output")
   if (!response.status) {
     res.status(code).json({
@@ -75,6 +75,41 @@ const validationError = async (res, error) => {
     },
   });
 };
+
+const encryptUsingAES = (value) => {
+  const AESKey = 'KPMO456EHA90G007'
+  const encryptkey = CryptoJS.enc.Utf8.parse(AESKey)
+  const iv = CryptoJS.enc.Utf8.parse(AESKey)
+  const encrypted = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(value), encryptkey, {
+    keySize: 128 / 8,
+    iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7
+  })
+  return encrypted.toString()
+}
+
+const decryptUsingAES = (encryptedValue, secretKey="KPMO456EHA90G007") => {
+  try {
+
+    if(!secretKey){
+     return showResponse(false, ResponseMessages?.common?.parameter_data_not_found, null, null, 400)
+    }
+    const iv = CryptoJS.enc.Utf8.parse(secretKey)
+    const decryptkey = CryptoJS.enc.Utf8.parse(secretKey);
+    const decrypted = CryptoJS.AES.decrypt(encryptedValue, decryptkey, {
+      keySize: 128 / 8,
+      iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+    return decrypted.toString(CryptoJS.enc.Utf8);
+  } catch (error) {
+    console.error('Decryption Error:', error);
+    return showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400) // Handle decryption errors
+  }
+};
+
 
 const changeEnv = (env) => {
   if (env === "PROD") {
@@ -1084,5 +1119,7 @@ module.exports = {
   showOutputNew,
   generateIDs,
   getCurrentDate,
-  validationError
+  validationError,
+  encryptUsingAES,
+  decryptUsingAES
 };

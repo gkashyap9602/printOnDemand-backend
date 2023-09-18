@@ -36,14 +36,6 @@ var Users = new Schema({
     //     type: Number,
     //     default: 1
     // },
-    // country_code: {
-    //     type: String,
-    //     default: ''
-    // },
-    // otp: {
-    //     type: String,
-    //     default: ''
-    // },
     // is_blocked: {
     //     type: Number,
     //     default: 0
@@ -99,28 +91,6 @@ var Users = new Schema({
         type: String,
         default: '0HMRHAOHIAHIS:0004003'
     }
-    // device_info: [{
-    //     fcm_token: {
-    //         type: String,
-    //         default: ""
-    //     },
-    //     device_id: {
-    //         type: String,
-    //         default: ""
-    //     },
-    //     os: {
-    //         type: String,
-    //         default: ""
-    //     },
-    //     access_token: {
-    //         type: String,
-    //         default: ""
-    //     },
-    //     refresh_token: {
-    //         type: String,
-    //         default: ""
-    //     }
-    // }],
     ,
     createdOn: {
         type: String,
