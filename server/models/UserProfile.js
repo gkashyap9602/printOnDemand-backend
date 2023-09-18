@@ -187,13 +187,13 @@ var UserProfile = new Schema({
     },
 
   },
-  created_on: {
-    type: Number,
-    default: 0,
+  createdOn: {
+    type: String,
+    default: null,
   },
-  updated_on: {
-    type: Number,
-    default: 0,
+  updatedOn: {
+    type: String,
+    default: null,
   },
 });
 

@@ -5,42 +5,21 @@ const ResponseMessages = require('../constants/ResponseMessages');
 const authController = {
 
     register: async (req, res) => {
-        // let requiredFields = ['firstName', 'lastName', 'email', 'password'];
-        // let validator = helpers.validateParams(req, requiredFields);
-        // if (!validator.status) {
-        //     return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
-        // }
         let result = await Users.register(req.body);
-        console.log(result, "register esulll")
         return helpers.showOutputNew(res, result, result.code);
     },
 
     login: async (req, res) => {
-        // let requiredFields = ['isLoginFromShopify', 'password', 'userName'];
-        // let validator = helpers.validateParams(req, requiredFields);
-        // if (!validator.status) {
-        //     return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
-        // }
         let result = await Users.login(req.body);
         return helpers.showOutputNew(res, result, result.code);
     },
 
     forgotPassword: async (req, res) => {
-        // let requiredFields = ['email'];
-        // let validator = helpers.validateParams(req, requiredFields);
-        // if (!validator.status) {
-        //     return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
-        // }
         let result = await Users.forgotPassword(req.body);
         return helpers.showOutputNew(res, result, result.code);
     },
 
     resetPassword: async (req, res) => {
-        // let requiredFields = ['resetPasswordToken', 'newPassword', 'emailId'];
-        // let validator = helpers.validateParams(req, requiredFields);
-        // if (!validator.status) {
-        //     return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
-        // }
         let result = await Users.resetPassword(req.body);
         return helpers.showOutputNew(res, result, result.code);
     },
@@ -63,11 +42,6 @@ const authController = {
         return helpers.showOutputNew(res, result, result.code);
     },
     updateUserBasicDetails: async (req, res) => {
-        let requiredFields = ['userGuid'];
-        let validator = helpers.validateParams(req, requiredFields);
-        if (!validator.status) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
-        }
         let user_id = req.decoded.user_id;
         if (!user_id) {
             return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
