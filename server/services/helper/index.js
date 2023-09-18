@@ -39,11 +39,11 @@ const showResponse = (
   return response;
 };
 
-const showOutput = (res, response, code) => {
-  response.StatusCode = response.code
-  delete response.code;
-  res.status(code).json(response);
-};
+// const showOutput = (res, response, code) => {
+//   response.StatusCode = response.code
+//   delete response.code;
+//   res.status(code).json(response);
+// };
 const showOutputNew = (res, response, code) => {
   // delete response.code;
   // console.log(response,"response new output")
@@ -1052,7 +1052,7 @@ const uploadVideoToS31 = async (files) => {
 
 module.exports = {
   showResponse,
-  showOutput,
+  // showOutput,
   randomStr,
   validateParams,
   validateParamsArray,

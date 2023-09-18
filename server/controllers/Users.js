@@ -23,6 +23,15 @@ const authController = {
         let result = await Users.resetPassword(req.body);
         return helpers.showOutputNew(res, result, result.code);
     },
+    
+    changePasswordWithOld: async (req, res) => {
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages.users.invalid_user), 403);
+        }
+        let result = await Users.changePasswordWithOld(req.body, user_id);
+        return helpers.showOutputNew(res, result, result.code);
+    },
 
     logout: async (req, res) => {
         let user_id = req.decoded?.user_id;

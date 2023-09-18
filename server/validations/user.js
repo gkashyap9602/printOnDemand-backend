@@ -85,3 +85,10 @@ module.exports.resetPasswordSchema = {
         newPassword: joi.string().required()
     })
 };
+module.exports.changePasswordSchema = {
+    body: joi.object({
+        oldPassword: joi.string().required(),
+        newPassword: joi.string().required(),
+        userId:joi.string()
+    })
+};

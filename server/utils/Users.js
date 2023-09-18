@@ -288,6 +288,24 @@ const UserUtils = {
         return helpers.showResponse(true, ResponseMessages?.users?.password_reset_success, null, null, 200);
     },
 
+    changePasswordWithOld: async (data, user_id) => {
+        let { oldPassword, newPassword ,userId} = data;
+        let result = await getSingleData(Users, { password: { $eq: md5(oldPassword) }, _id: ObjectId(user_id) });
+        if (!result.status) {
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_old_password, null, null, 200);
+        }
+        let updatedData = {
+            password: md5(newPassword),
+            updatedOn: helpers.getCurrentDate()
+        }
+        let response = await updateByQuery(Users, updatedData, { password: { $eq: md5(oldPassword) }, _id: ObjectId(user_id) });
+        if (response.status) {
+            return helpers.showResponse(true, ResponseMessages.users.password_change_successfull, null, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages.users.password_change_failed, null, null, 200);
+    },
+
+
     // // with token 
     getUserDetail: async (data) => {
         let { user_id, _id } = data
@@ -339,6 +357,8 @@ const UserUtils = {
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
     },
 
+
+    //?????????
     updateUser: async (data, user_id) => {
         if ("userName" in data && data.userName !== "") {
             let checkEmailExistance = await UserUtils.checkEmailExistance(data.email, user_id)

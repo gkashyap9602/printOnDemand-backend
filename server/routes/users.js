@@ -17,7 +17,10 @@ router.post('/update_basic_details', middleware.checkToken,validate(userValidati
 router.post('/update_shipping_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateShippingDetails);
 router.post('/update_billing_address', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateBillingAddress);
 router.post('/update_payment_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updatePaymentDetails);
+router.post('/change_password',middleware.checkToken,validate(userValidation.changePasswordSchema), AuthController.changePasswordWithOld);
+
 router.post('/logout',middleware.checkToken, AuthController.logout);
+
 
 // admin token Route
 
