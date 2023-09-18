@@ -42,7 +42,9 @@ const UserUtils = {
             let { firstName, lastName, email, password } = data;
 
             let dycryption =  helpers.decryptUsingAES(password)
-             if(!dycryption.status){
+            console.log(dycryption,"dycrptionnn")
+             if(!dycryption){
+                console.log("underr")
                 return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
              }
             password = helpers.decryptUsingAES(password)
@@ -151,7 +153,7 @@ const UserUtils = {
             let queryObject = { email: userName }
 
             let dycryption =  helpers.decryptUsingAES(password)
-             if(!dycryption.status){
+             if(!dycryption){
                 return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
              }
             password = helpers.decryptUsingAES(password)
@@ -201,7 +203,10 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
         }
         let userData = result?.data
-       
+
+        let password = await helpers.decryptUsingAES('a7KhgKWFZugvt2laKNOl+A==')
+        console.log(password,"passwordd")
+
         return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
     },
 
@@ -278,7 +283,7 @@ const UserUtils = {
     resetPassword: async (data) => {
         let { emailId, resetPasswordToken, newPassword } = data;
         let dycryption =  helpers.decryptUsingAES(newPassword)
-             if(!dycryption.status){
+             if(!dycryption){
                 return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
              }
         newPassword = helpers.decryptUsingAES(newPassword)
