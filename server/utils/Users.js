@@ -734,7 +734,6 @@ const UserUtils = {
     getUserDetail: async (data) => {
         let { user_id, _id } = data
         console.log(_id)
-        // await UserUtils.getBadgeCondition(user_id)
         let result = await Users.aggregate([
             { $match: { _id: mongoose.Types.ObjectId(user_id), status: 1 } },  // Match the specific user by _id and status
 
@@ -770,38 +769,7 @@ const UserUtils = {
             {
                 $unset: "userProfileData" // Exclude the 'password' field
             },
-            // {
-            //     $addFields: {
-            //         fullName:{
-            //             $concat:['$firstName' ,' ', '$lastName']
-            //         }, // Include the 'userProfileData' field
-            //         ncResaleInfo:{
-            //             isExemptionEligible:"$billingAddress.isExemptionEligible",
-            //             ncResaleCertificate:"$billingAddress.ncResaleCertificate"
-            //         }
-            //     }
-            // },
-            //--
-            //   {
-            //     $addFields: {
-            //       mergedData: { $mergeObjects: ["$$ROOT", "$userProfileData"] },
-            //     }
-            //   },
-            //   {
-            //     $unset: "userProfileData" // Exclude the 'userProfileData' field
-            //   },
-            //   {
-            //     $unset: "password" // Exclude the 'password' field
-            //   }
-            //--
-            //   {
-            //     $addFields: {
-            //       userProfileData: "$userProfileData", // Include the 'userProfileData' field
-            //     }
-            //   },
-            //   {
-            //     $unset: "password" // Exclude the 'password' field
-            //   }
+            
         ])
 
         console.log(result, "resulttt")
