@@ -12,7 +12,9 @@ var Users = new Schema({
     },
     email: {
         type: String,
-        default: ''
+        unique:true,
+        default: '',
+        // required:true
     },
     userName: {
         type: String,
@@ -76,11 +78,14 @@ var Users = new Schema({
     },
     userType:{
         type: Number,
-        default: 3
+        default: 3,
+        enum:[1,2,3]
+        
     },
     status: {
         type: Number,
-        default: 1
+        default: 1,
+        enum:[1,2,3]
     },
     payTraceId:{
         type: String,
@@ -88,7 +93,7 @@ var Users = new Schema({
     },
     phoneNumber:{
         type: String,
-        default: null
+        default: null,
     },
     traceId:{
         type: String,
@@ -117,13 +122,13 @@ var Users = new Schema({
     //     }
     // }],
     ,
-    created_on: {
-        type: Number,
-        default: 0
+    createdOn: {
+        type: String,
+        default: null
     },
-    updated_on: {
-        type: Number,
-        default: 0
+    updatedOn: {
+        type: String,
+        default: null
     },
 });
 

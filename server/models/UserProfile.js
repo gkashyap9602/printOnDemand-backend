@@ -130,7 +130,6 @@ var UserProfile = new Schema({
       stateCode: {
         type: String,
         default: "",
-        // max:2,
       },
       city: {
         type: String,
@@ -140,15 +139,7 @@ var UserProfile = new Schema({
         type: Number,
         default: null,
       },
-
-      phone: {
-        type: String,
-        default: "",
-      },
-      customerId: {
-        type: String,
-        default: "",
-      },
+    
     },
     creditCardData: {
       ccNumber: {
@@ -158,12 +149,23 @@ var UserProfile = new Schema({
       expirationMonth: {
         type: String,
         default: "",
+        enum:[1,2,3,4,5,6,7,8,9,10,11,12]
       },
       expirationYear: {
         type: String,
         default: "",
       },
 
+    },
+    phone: {
+      type: String,
+      default: "",
+      maxLength:10,
+      // validate:''
+    },
+    customerId: {
+      type: String,
+      default: "",
     },
 
   },

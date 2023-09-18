@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var AuthController = require('../controllers/Users');
 var middleware = require("../controllers/middleware");
+var validate = require('../controllers/validationMiddleware')
+const {userProfileSchema}  = require('../validations/user')
 
 // Users Routes without token
 // router.post('/check_username_exist', AuthController.checkUsernameExistance);
@@ -22,7 +24,7 @@ router.get('/:user_id', middleware.checkToken, AuthController.getUserDetail);
 router.post('/update_basic_details', middleware.checkToken, AuthController.updateUserBasicDetails);
 router.post('/update_shipping_details', middleware.checkToken, AuthController.updateShippingDetails);
 router.post('/update_billing_address', middleware.checkToken, AuthController.updateBillingAddress);
-router.post('/update_payment_details', middleware.checkToken, AuthController.updatePaymentDetails);
+router.post('/update_payment_details', middleware.checkToken,validate(userProfileSchema), AuthController.updatePaymentDetails);
 router.post('/logout',middleware.checkToken, AuthController.logout);
 
 // router.post('/follow', middleware.checkToken, AuthController.follow);

@@ -1,6 +1,8 @@
 var Users = require('../utils/Users');
 var helpers = require('../services/helper')
 const ResponseMessages = require('../constants/ResponseMessages');
+const UserProfile = require('../models/UserProfile');
+const validate = require('../validations/user')
 
 const authController = {
 
@@ -169,12 +171,15 @@ const authController = {
         let result = await Users.updateBillingAddress(req.body, user_id);
         return helpers.showOutputNew(res, result, result.code);
     },
+
     updatePaymentDetails: async (req, res) => {
-        let requiredFields = ['userGuid'];
-        let validator = helpers.validateParams(req, requiredFields);
-        if (!validator.status) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
-        }
+        // let requiredFields = ['userGuid'];
+       
+        // let validator = validate.userProfileSchema(req);
+        // console.log(validator,"validaotrrr")
+        // if (!validator.status) {
+        //     return helpers.showOutputNew(res, helpers.showResponse(false, validator.Message), 203);
+        // }
         let user_id = req.decoded.user_id;
         if (!user_id) {
             return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);

@@ -2,7 +2,7 @@ var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
 AWS.config.update({
   region: "us-east-1",
-  credentials: new AWS.SharedIniFileCredentials({profile:"default"}),
+  credentials: new AWS.SharedIniFileCredentials({ profile: "default" }),
 });
 
 const moment = require('moment')
@@ -48,11 +48,35 @@ const showOutputNew = (res, response, code) => {
   // delete response.code;
   // console.log(response,"response new output")
   if (!response.status) {
-    res.status(code).json({ Message:response?.Message,Response: response?.data, StatusCode: response.code});
-  }else{
-    res.status(code).json({ message:response?.Message,response: response?.data, statusCode: response.code});
+    res.status(code).json({
+      Response: {
+        Message: response?.Message,
+        ValidationErrors: null,
+        ValidationFailed: false,
+      }, StatusCode: response.code
+    });
+
+    // res.status(code).json({ Message:response?.Message,Response: response?.data, StatusCode: response.code});
+  } else {
+    res.status(code).json({ message: response?.Message, response: response?.data, statusCode: response.code });
 
   }
+};
+
+const validationError = async (res, error) => {
+  const code = 400;
+  // statusCode.UNPROCESSABLE_ENTITY;
+  const validationErrors = error.details.map((error) => error.message);
+
+  return res.status(code).json({
+    StatusCode: code,
+    Response: {
+      Message: null,
+      ValidationErrors: validationErrors,
+      ValidationFailed: true
+    },
+    // error.message.replace(new RegExp('\\"', "g"), ""),
+  });
 };
 
 const changeEnv = (env) => {
@@ -80,17 +104,17 @@ const randomStr = (len, arr) => {
 };
 
 function generateIDs(customerIDCount) {
-   customerIDCount = 1000 + customerIDCount + 1 ;
-  
+  customerIDCount = 1000 + customerIDCount + 1;
+
   // Generate the customer ID (4-digit number)
   const customerID = customerIDCount.toString().padStart(4, '0');
 
-    // Increment the customer ID count
-    customerIDCount++;
+  // Increment the customer ID count
+  customerIDCount++;
 
-   // Generate the ID (4-digit number)
-   const idNumber = customerIDCount.toString().padStart(4, '0');
-  
+  // Generate the ID (4-digit number)
+  const idNumber = customerIDCount.toString().padStart(4, '0');
+
   return { idNumber, customerID };
 }
 
@@ -118,8 +142,8 @@ const validateParams = (request, feilds) => {
   return response;
 };
 
-const getCurrentDate = ()=>{
-  return  moment().format('YYYY-MM-DDTHH:mm:ss.SSSSSS')
+const getCurrentDate = () => {
+  return moment().format('YYYY-MM-DDTHH:mm:ss.SSSSSS')
 }
 
 //
@@ -1062,5 +1086,6 @@ module.exports = {
   changeEnv,
   showOutputNew,
   generateIDs,
-  getCurrentDate
+  getCurrentDate,
+  validationError
 };

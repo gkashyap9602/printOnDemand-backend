@@ -212,7 +212,7 @@ const UserUtils = {
                 customerId: idGenerated.customerID,
                 customerGuid: randomUUID(),
                 password: md5(password),
-                created_on: moment().unix()
+                createdOn: helpers.getCurrentDate()
             }
 
             let userRef = new Users(newObj)
@@ -225,7 +225,7 @@ const UserUtils = {
                         basicInfo: true
                     },
 
-                    created_on: moment().unix()
+                    createdOn: helpers.getCurrentDate()
                 }
                 let userProfileRef = new UserProfile(ObjProfile)
                 let resultProfile = await postData(userProfileRef);
@@ -352,7 +352,7 @@ const UserUtils = {
             // }
             let editObj = {
                 // device_info,
-                updated_on: moment().unix()
+                updatedOn: helpers.getCurrentDate()
             }
             let updateResponse = await updateData(Users, editObj, ObjectId(userData?._id))
             if (updateResponse.status) {
@@ -652,7 +652,7 @@ const UserUtils = {
         }
         editObj = {
             password: md5(newPassword),
-            updated_on: moment().unix()
+            updatedOn: helpers.getCurrentDate()
         }
         let result = await updateData(Users, editObj, ObjectId(userData?._id))
         if (!result?.status) {
@@ -746,7 +746,7 @@ const UserUtils = {
                 }
             },
             {
-                $unwind: "$userProfileData"
+                $unwind: "$userProfgit ileData"
             },
             {
                 $addFields: {
@@ -879,7 +879,7 @@ const UserUtils = {
         // if ("bank_account" in data && data?.bank_account != "") {
         //     data.bank_account = data?.bank_account ? typeof data?.bank_account == 'string' ? JSON.parse(data?.bank_account) : data?.bank_account : {}
         // }
-        data.updated_on = moment().unix();
+        data.updatedOn = helpers.getCurrentDate();
 
         let result = await updateData(Users, data, user_id)
         if (result) {
@@ -898,7 +898,7 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
         }
 
-        data.updated_on = moment().unix();
+        data.updatedOn = helpers.getCurrentDate();
 
         let result = await updateData(Users, data, user_id)
         console.log(result, "resultUpdate")
@@ -918,7 +918,7 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
         }
 
-        data.updated_on = moment().unix();
+        data.updatedOn = helpers.getCurrentDate();
 
         let result = await updateSingleData(UserProfile, data, { user_id })
 
@@ -941,7 +941,7 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
         }
 
-        data.updated_on = moment().unix();
+        data.updatedOn = helpers.getCurrentDate();
 
         let result = await updateSingleData(UserProfile, data, { user_id })
 
@@ -963,7 +963,7 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
         }
 
-        data.updated_on = moment().unix();
+        data.updatedOn = helpers.getCurrentDate();
 
         let result = await updateSingleData(UserProfile, data, { user_id })
 
