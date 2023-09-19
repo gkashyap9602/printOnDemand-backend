@@ -8,7 +8,7 @@ const app = express();
 require('dotenv').config({path:path.resolve(__dirname, './server/.env')})
 
 app.use(bodyParser.json());
-
+app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // webhook.use(bodyParser.urlencoded({ extended: true }));

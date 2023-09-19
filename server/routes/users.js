@@ -13,6 +13,8 @@ router.post('/reset_password',validate(userValidation.resetPasswordSchema), Auth
 
 // with token
 router.get('/:user_id', middleware.checkToken, AuthController.getUserDetail);
+router.get('/get_user_status/:user_id', middleware.checkToken, AuthController.getUserStatus);
+
 router.post('/update_basic_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateUserBasicDetails);
 router.post('/update_shipping_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateShippingDetails);
 router.post('/update_billing_address', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateBillingAddress);

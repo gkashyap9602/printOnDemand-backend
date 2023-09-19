@@ -5,6 +5,7 @@ module.exports = function (schema) {
     return function (req, res, next) {
         try {
             if (schema.body) {
+                console.log(req.body,"reqbody")
                 const { error, value } = schema.body.validate(req.body);
                 if (error) throw error;
                 req.body = value;

@@ -136,6 +136,35 @@ const decryptUsingAES = (encryptedValue, secretKey="KPMO456EHA90G007") => {
   }
 };
 
+function generateRandomAlphanumeric(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+  return result;
+}
+
+function generateRandomNumeric(length) {
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += Math.floor(Math.random() * 10).toString();
+  }
+  return result;
+}
+function generateUniquePayTraceID() {
+  // Generate an alphanumeric part (e.g., using random characters)
+  const alphanumericPart = generateRandomAlphanumeric(14); // 14 characters long
+
+  // Generate a numeric counter (e.g., using random numbers)
+  const numericCounter = generateRandomNumeric(8); // 8 digits long
+
+  // Combine the alphanumeric and numeric parts to create the unique ID
+  const uniqueID = `${alphanumericPart}:${numericCounter}`;
+
+  return uniqueID;
+}
 
 const changeEnv = (env) => {
   if (env === "PROD") {
@@ -1147,5 +1176,6 @@ module.exports = {
   getCurrentDate,
   validationError,
   encryptUsingAES,
-  decryptUsingAES
+  decryptUsingAES,
+  generateUniquePayTraceID
 };

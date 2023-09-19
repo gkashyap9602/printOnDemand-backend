@@ -21,6 +21,7 @@
     "express": "^4.18.1",
     "fcm-node": "^1.6.1",
     "fluent-ffmpeg": "^2.1.2",
+    "fs.promises": "^0.1.2",
     "joi": "^17.10.2",
     "jsonwebtoken": "^8.5.1",
     "md5": "^2.3.0",

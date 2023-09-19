@@ -28,6 +28,7 @@ module.exports = {
         data:"data fetched successfully",
         database_error:"data fetch unsucessfull",
         dycryption_error:"dycryption unsucessfull",
+        file_upload_err :"file upload unsucessfull",
 
     },
     users: {
@@ -139,7 +140,12 @@ module.exports = {
         admin_details_update_error: "Error while updating details",
         email_already: "Email address is already occupied",
         question_added:"question added",
-        category_added:"category added"
+        category_added:"category added",
+        subcategory_added:"subcategory added",
+        category_save_failed:"category creation failed",
+
+
+
     },
     middleware: {
         use_access_token: "Please use access token for identification not refresh token",

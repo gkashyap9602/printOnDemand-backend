@@ -6,7 +6,6 @@ var UserProfile = new Schema({
     type: mongoose.Types.ObjectId,
     ref: "users"
   },
-
   shippingAddress: {
     companyName: {
       type: String,
@@ -139,7 +138,7 @@ var UserProfile = new Schema({
         type: Number,
         default: null,
       },
-    
+
     },
     creditCardData: {
       ccNumber: {
@@ -159,7 +158,7 @@ var UserProfile = new Schema({
     phone: {
       type: String,
       default: "",
-      maxLength:10,
+      maxLength: 10,
       // validate:''
     },
     customerId: {

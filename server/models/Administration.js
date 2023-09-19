@@ -1,7 +1,11 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var AdministratorSchema = new Schema({
-    full_name: {
+    firstName: {
+        type: String,
+        required: true
+    },
+    lastName: {
         type: String,
         required: true
     },
@@ -13,47 +17,49 @@ var AdministratorSchema = new Schema({
         type: String,
         default: ''
     },
-    profile_pic: {
+    profileImagePath: {
         type: String,
-        default: ''
+        default: null
     },
     status: {
         type: Number,
         default: 1
     },
-    device_info: [{
-        fcm_token: {
-            type: String,
-            default: ""
-        },
-        device_id: {
-            type: String,
-            default: ""
-        },
-        os: {
-            type: String,
-            default: ""
-        },
-        access_token: {
-            type: String,
-            default: ""
-        },
-        refresh_token: {
-            type: String,
-            default: ""
-        }
-    }],
-    otp: {
+    userType: {
+        type: Number,
+        default: 1,
+
+    },
+    // device_info: [{
+    //     fcm_token: {
+    //         type: String,
+    //         default: ""
+    //     },
+    //     device_id: {
+    //         type: String,
+    //         default: ""
+    //     },
+    //     os: {
+    //         type: String,
+    //         default: ""
+    //     },
+    //     access_token: {
+    //         type: String,
+    //         default: ""
+    //     },
+    //     refresh_token: {
+    //         type: String,
+    //         default: ""
+    //     }
+    // }],
+
+    createdOn: {
         type: String,
-        default: ""
+        default: null
     },
-    created_on: {
-        type: Number,
-        default: 0
-    },
-    updated_on: {
-        type: Number,
-        default: 0
+    updatedOn: {
+        type: String,
+        default: null
     }
 });
 module.exports = mongoose.model('Administrator', AdministratorSchema, 'administrator');

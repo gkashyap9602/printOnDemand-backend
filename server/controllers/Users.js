@@ -23,7 +23,7 @@ const authController = {
         let result = await Users.resetPassword(req.body);
         return helpers.showOutputNew(res, result, result.code);
     },
-    
+
     changePasswordWithOld: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
@@ -87,6 +87,10 @@ const authController = {
 
     getUserDetail: async (req, res) => {
         let result = await Users.getUserDetail(req?.params);
+        return helpers.showOutputNew(res, result, result.code);
+    },
+    getUserStatus: async (req, res) => {
+        let result = await Users.getUserStatus(req?.params);
         return helpers.showOutputNew(res, result, result.code);
     },
     // // admin panel
