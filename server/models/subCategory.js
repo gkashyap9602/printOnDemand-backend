@@ -5,7 +5,8 @@ var SubCategory = new Schema({
 
     category_id: {
         type: mongoose.Types.ObjectId,
-        ref: "category"
+        ref: "Category",
+        index:true
     },
     name: {
         type: String,
@@ -38,5 +39,6 @@ var SubCategory = new Schema({
         default: null,
     },
 });
+
 
 module.exports = mongoose.model("SubCategory", SubCategory, "subCategory");

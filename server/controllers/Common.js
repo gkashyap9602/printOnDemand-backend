@@ -54,7 +54,8 @@ const commonController = {
         // if (!admin_id) {
         //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
         // }
-        let result = await Common.getCategories();
+        
+        let result = await Common.getCategories(req.query);
         return helpers.showOutputNew(res, result, result.code);
     },
 

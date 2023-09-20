@@ -5,6 +5,7 @@ var Category = new Schema({
     name: {
         type: String,
         required: true,
+        index:true
     },
     description: {
         type: String,
@@ -19,6 +20,7 @@ var Category = new Schema({
     guid: {
         type: String,
         default: null,
+        index:true
     },
     status: {
         type: Number,
@@ -34,4 +36,13 @@ var Category = new Schema({
     },
 });
 
+
+
 module.exports = mongoose.model("Category", Category, "category");
+
+// Category.virtual('subCategories', {
+//     ref: 'SubCategory',
+//     localField: '_id',
+//     foreignField: 'category_id',
+//     justOne: false,
+//   });

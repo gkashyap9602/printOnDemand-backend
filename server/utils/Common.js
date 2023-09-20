@@ -7,19 +7,53 @@ let ObjectId = require("mongodb").ObjectId
 const ResponseMessages = require("../constants/ResponseMessages")
 const commonUtil = {
 
-    getCategories: async () => {
-        let result = await Category.aggregate([
-            // { $match: { _id: mongoose.Types.ObjectId(user_id), status: 1 } },  // Match the specific user by _id and status
-            {
-                $lookup: {
-                    from: "subCategory",
-                    localField: "_id",
-                    foreignField: "category_id",
-                    as: "subCategories"
-                }
-            },
+    getCategories: async (data) => {
+        const { includeSubCategory = false, searchKey = '' } = data
 
-        ])
+        console.log(includeSubCategory, "includeSubCategory")
+        console.log(searchKey, "searchKey")
+        const aggregationPipeline = [
+            {
+              $match: {
+                $or: [
+                  { name: { $regex: searchKey, $options: 'i' } },
+                //   { 'subCategories.name': { $regex: searchKey, $options: 'i' } },
+                ],
+              },
+            },
+          ];
+          
+          //check if includeSubCategory is string or boolean both
+          console.log(includeSubCategory == true,"checkck")
+          if (includeSubCategory == true) {
+            console.log(includeSubCategory,"under if ")
+            // Add the $lookup stage for subCategories if includeSubCategory is true
+            aggregationPipeline.push({
+              $lookup: {
+                from: 'subCategory',
+                localField: '_id',
+                foreignField: 'category_id',
+                as: 'subCategories',
+              },
+            });
+          }
+
+
+        const result = await Category.aggregate(aggregationPipeline);
+        // let result = await Category.aggregate([
+        //     // { $match: { _id: mongoose.Types.ObjectId(user_id), status: 1 } },  // Match the specific user by _id and status
+        //     {
+        //         $lookup: {
+        //             from: "subCategory",
+        //             localField: "_id",
+        //             foreignField: "category_id",
+        //             as: "subCategories"
+        //         }
+        //     },
+
+        // ])
+
+        // let result = await Category.find({}).populate({path:'subCategories',model:'SubCategory'})
 
 
         console.log(result, "resultt")

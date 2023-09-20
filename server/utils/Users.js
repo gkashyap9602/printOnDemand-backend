@@ -11,6 +11,7 @@ const consts = require("../constants/const");
 const { default: mongoose } = require('mongoose');
 const { randomUUID } = require('crypto')
 const middleware = require('../controllers/middleware');
+const Orders  = require('../models/Orders')
 const UserUtils = {
 
     checkEmailExistance: async (email, user_id = null) => {
@@ -333,8 +334,9 @@ const UserUtils = {
 
     // // with token 
     getUserDetail: async (data) => {
-        let { user_id, _id } = data
-        console.log(_id)
+        let { user_id } = data
+        console.log(user_id,"user_id under api get")
+
         let result = await Users.aggregate([
             { $match: { _id: mongoose.Types.ObjectId(user_id), status: 1 } },  // Match the specific user by _id and status
 
@@ -347,7 +349,7 @@ const UserUtils = {
                 }
             },
             {
-                $unwind: "$userProfgit ileData"
+                $unwind: "$userProfileData"
             },
             {
                 $addFields: {
@@ -381,6 +383,92 @@ const UserUtils = {
 
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
     },
+
+     // // with token 
+     getAllOrders: async (data) => {
+        let { customerId,pageIndex,pageSize,sortColumn,sortDirection,status,storeIds } = data
+
+        // console.log(customerId,"customerId")
+        //    const result = await getDataArray(Orders,{customerGuid:customerId})
+
+           let obj = {
+            orders:[],
+            statusSummary:{
+                cancelled:0,
+                error:0,
+                inProduction:0,
+                new:0,
+                received:0,
+                shipped:0
+            },
+            totalCount:0
+           }
+
+           console.log(obj,"objjjjj")
+        
+
+        return helpers.showResponse(true, ResponseMessages?.users?.user_detail, obj, null, 200);
+    },
+    // createOrder: async (data,user_id) => {
+    //     let { customerId,customerName,orderAmount,productName } = data
+
+    //     console.log(customerId,"customerId")
+    //     let obj = {
+    //         customerGuid:customerId,
+    //         user_id:user_id,
+    //         customerName,
+    //         orderAmount,
+    //         productName,
+    //         orderDate:helpers.getCurrentDate()
+    //     }
+    //        const result = await postData(Orders,obj)
+    //     // let result = "ff"
+    //     // let result = await Orders.aggregate([
+    //     //     { $match: { customerGuid: mongoose.Types.ObjectId(customerId), status: 1 } },  // Match the specific user by _id and status
+
+    //     //     {
+    //     //         $lookup: {
+    //     //             from: "users",
+    //     //             localField: "_id",
+    //     //             foreignField: "user_id",
+    //     //             as: "userProfileData"
+    //     //         }
+    //     //     },
+    //     //     {
+    //     //         $unwind: "$userProfgit ileData"
+    //     //     },
+    //     //     {
+    //     //         $addFields: {
+    //     //             fullName: {
+    //     //                 $concat: ['$firstName', ' ', '$lastName']
+    //     //             }, // Include the 'userProfileData' field
+    //     //             ncResaleInfo: {
+    //     //                 isExemptionEligible: "$userProfileData.billingAddress.isExemptionEligible",
+    //     //                 ncResaleCertificate: "$userProfileData.billingAddress.ncResaleCertificate"
+    //     //             },
+    //     //             userProfileData: "$userProfileData", // Include the 'userProfileData' field
+    //     //         }
+    //     //     },
+    //     //     {
+    //     //         $unset: "password" // Exclude the 'password' field
+    //     //     },
+    //     //     {
+    //     //         $replaceRoot: { newRoot: { $mergeObjects: ["$$ROOT", "$userProfileData"] } }
+    //     //     },
+    //     //     {
+    //     //         $unset: "userProfileData" // Exclude the 'password' field
+    //     //     },
+
+    //     // ])
+
+    //     console.log(result, "resulttt")
+
+    //     if (!result) {
+    //         return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
+    //     }
+
+    //     return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result, null, 200);
+    // },
     getUserStatus: async (data) => {
         let { user_id } = data
         let result = await getSingleData(Users, { _id: user_id }, 'status guid');

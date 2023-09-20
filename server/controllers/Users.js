@@ -86,9 +86,23 @@ const authController = {
     },
 
     getUserDetail: async (req, res) => {
+        console.log("contr")
         let result = await Users.getUserDetail(req?.params);
         return helpers.showOutputNew(res, result, result.code);
     },
+    getAllOrders: async (req, res) => {
+        console.log("controllerr")
+        let result = await Users.getAllOrders(req?.query);
+        return helpers.showOutputNew(res, result, result.code);
+    },
+// createOrder: async (req, res) => {
+//     let user_id = req.decoded.user_id;
+//     if (!user_id) {
+//         return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+//     }
+//     let result = await Users.createOrder(req?.body,user_id);
+//     return helpers.showOutputNew(res, result, result.code);
+// },
     getUserStatus: async (req, res) => {
         let result = await Users.getUserStatus(req?.params);
         return helpers.showOutputNew(res, result, result.code);

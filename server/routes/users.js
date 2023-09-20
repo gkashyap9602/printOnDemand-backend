@@ -12,8 +12,11 @@ router.post('/forgot',validate(userValidation.forgotSchema), AuthController.forg
 router.post('/reset_password',validate(userValidation.resetPasswordSchema), AuthController.resetPassword);
 
 // with token
-router.get('/:user_id', middleware.checkToken, AuthController.getUserDetail);
+router.get('/getUser/:user_id', middleware.checkToken, AuthController.getUserDetail);
 router.get('/get_user_status/:user_id', middleware.checkToken, AuthController.getUserStatus);
+// router.post('/createOrder', middleware.checkToken, AuthController.allOrders);
+router.get('/getAllOrders', middleware.checkToken, AuthController.getAllOrders);
+
 
 router.post('/update_basic_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateUserBasicDetails);
 router.post('/update_shipping_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateShippingDetails);
