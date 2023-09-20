@@ -15,7 +15,8 @@ router.post('/reset_password',validate(userValidation.resetPasswordSchema), Auth
 router.get('/getUser/:user_id', middleware.checkToken, AuthController.getUserDetail);
 router.get('/get_user_status/:user_id', middleware.checkToken, AuthController.getUserStatus);
 // router.post('/createOrder', middleware.checkToken, AuthController.allOrders);
-router.get('/getAllOrders', middleware.checkToken, AuthController.getAllOrders);
+router.post('/getAllOrders', middleware.checkToken, AuthController.getAllOrders);
+router.get('/getBulkImport', middleware.checkToken, AuthController.getBulkImport);
 
 
 router.post('/update_basic_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateUserBasicDetails);

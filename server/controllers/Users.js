@@ -95,6 +95,11 @@ const authController = {
         let result = await Users.getAllOrders(req?.query);
         return helpers.showOutputNew(res, result, result.code);
     },
+    getBulkImport: async (req, res) => {
+        console.log("controllerr")
+        let result = await Users.getBulkImport(req?.query);
+        return helpers.showOutputNew(res, result, result.code);
+    },
 // createOrder: async (req, res) => {
 //     let user_id = req.decoded.user_id;
 //     if (!user_id) {
