@@ -554,7 +554,7 @@ const UserUtils = {
         if (result.status) {
             let updateRes = await updateSingleData(UserProfile, { 'completionStaus.shippingInfo': true }, { user_id })
             console.log(updateRes, "updateRes")
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? true : {}, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
     },
@@ -576,7 +576,7 @@ const UserUtils = {
         console.log(result, "resultUpdate")
         if (result.status) {
             await updateSingleData(UserProfile, { 'completionStaus.billingInfo': true }, { user_id })
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? true : {}, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
     },
@@ -598,7 +598,7 @@ const UserUtils = {
         console.log(result, "resultUpdate")
         if (result.status) {
             await updateSingleData(UserProfile, { 'completionStaus.paymentInfo': true }, { user_id })
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? true : {}, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
     },

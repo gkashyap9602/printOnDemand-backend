@@ -57,7 +57,7 @@ const showOutputNew = (res, response, code) => {
     });
 
   } else {
-    // console.log(response?.data,"else shownew")
+    console.log(response?.data,"else shownew")
     res.status(code).json({ message: response?.Message, response: response?.data, statusCode: response.code });
 
   }
