@@ -11,7 +11,7 @@ module.exports.profileSchema = {
                 stateCode: joi.string().max(2).message("State Code Length Must be 2"),
                 name: joi.string(),
                 streetAddress: joi.string(),
-                zip: joi.string().max(5).message("Zip Code Length Must be 5"),
+                zip: joi.number().max(5).message("Zip Code Length Must be 5"),
             },
             creditCardData: {
                 ccNumber: joi.string(),
