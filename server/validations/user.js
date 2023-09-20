@@ -47,7 +47,7 @@ module.exports.profileSchema = {
             contactName: joi.string(),
             country: joi.string(),
             stateName: joi.string(),
-            taxId: joi.string(),
+            taxId: joi.any(),
             zipCode: joi.any(),
         },
         userGuid: joi.string().required(),
