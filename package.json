@@ -5,7 +5,7 @@
   "main": "mww.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "set AWS_PROFILE=mww && set AWS_SDK_LOAD_CONFIG=1 &&  nodemon mww.js"
+    "dev": "export AWS_PROFILE=mww && export AWS_SDK_LOAD_CONFIG=1 &&  nodemon mww.js"
   },
   "author": "chena_ram",
   "license": "ISC",
