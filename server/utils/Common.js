@@ -71,15 +71,15 @@ const commonUtil = {
 
     // const chunkedData = await Countries.find({}).lean(); // Use lean() for performance
 
-    // const chunkedData =  CSC.default.getAllCountries(); // Use lean() for performance
-    const countries = CSC2.Country.getAllCountries(); // Use lean() for performance
+    const countries =  CSC.default.getAllCountries(); // Use lean() for performance
+    // const countries = CSC2.Country.getAllCountries(); // Use lean() for performance
 
     const formattedCountries = countries.map((country,index) => (
         //  console.log(country,"countryyy")
       ({
-        id: index+1,
-        name: `${country.isoCode} - ${country.name}`,
-        code: country.isoCode,
+        id: country.id,
+        name: `${country.iso2} - ${country.name}`,
+        code: country.iso2,
       })
     ));
     const chunkedData = formattedCountries
@@ -91,12 +91,25 @@ const commonUtil = {
   },
   getAllStates: async (data) => {
     let { countryCode } = data
-    const states = CSC.default.getStatesOfCountry
+    // const states = CSC.default.getStatesOfCountry
     // const chunkedData = await Countries.find({}).lean(); // Use lean() for performance
 
-    const chunkedData = CSC2.State.getStatesOfCountry(countryCode); // Use lean() for performance
-    // const chunkedData = CSC.default.getStatesOfCountry(countryCode); // Use lean() for performance
+    // const chunkedData = CSC2.State.getStatesOfCountry(countryCode); // Use lean() for performance
+    console.log(countryCode,"countryCode")
+     let  states= CSC.default.getStatesOfCountry(Number(countryCode)); // Use lean() for performance
 
+     
+    const formattedStates = states.map((states,index) => (
+      //  console.log(country,"countryyy")
+    ({
+      id: states.id,
+      countryId:states.country_id,
+      name: `${states.name}`,
+      code: states.state_code,
+    })
+  ));
+    
+     const chunkedData = formattedStates
     console.log(chunkedData, "chunkedData")
     if (chunkedData.length < 0) {
       return helpers.showResponse(false, 'No Content Found', null, null, 200);
