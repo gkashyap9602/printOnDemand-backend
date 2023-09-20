@@ -309,8 +309,11 @@ const UserUtils = {
         let { oldPassword, newPassword, userId } = data;
         let dycryption_new = helpers.decryptUsingAES(newPassword)
         let dycryption_old = helpers.decryptUsingAES(oldPassword)
+          
+        console.log(dycryption_new,"dycryption_new")
+        console.log(dycryption_old,"dycryption_old")
 
-        if (!dycryption_old.status || !dycryption_new.status) {
+        if (!dycryption_old || !dycryption_new) {
             return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
         }
         newPassword = helpers.decryptUsingAES(newPassword)

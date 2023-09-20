@@ -46,7 +46,7 @@ const showOutput = (res, response, code) => {
   res.status(code).json(response);
 };
 const showOutputNew = (res, response, code) => {
-  console.log(response,"response new output")
+  // console.log(response,"response new output")
   if (!response.status) {
     res.status(code).json({
       Response: {
@@ -57,7 +57,7 @@ const showOutputNew = (res, response, code) => {
     });
 
   } else {
-    console.log(response?.data,"else shownew")
+    // console.log(response?.data,"else shownew")
     res.status(code).json({ message: response?.Message, response: response?.data, statusCode: response.code });
 
   }
@@ -133,7 +133,8 @@ const decryptUsingAES = (encryptedValue, secretKey="KPMO456EHA90G007") => {
     return decrypted.toString(CryptoJS.enc.Utf8)?decrypted.toString(CryptoJS.enc.Utf8):encryptedValue;
   } catch (error) {
     console.error('Decryption Error:', error);
-    return showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400) // Handle decryption errors
+    return null
+    // return showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400) // Handle decryption errors
   }
 };
 

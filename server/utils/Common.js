@@ -23,9 +23,10 @@ const commonUtil = {
             },
           ];
           
+          let ff = Boolean(includeSubCategory)
+          console.log(ff,"Ffff")
           //check if includeSubCategory is string or boolean both
-          console.log(includeSubCategory == true,"checkck")
-          if (includeSubCategory == true) {
+          if (ff == true) {
             console.log(includeSubCategory,"under if ")
             // Add the $lookup stage for subCategories if includeSubCategory is true
             aggregationPipeline.push({
