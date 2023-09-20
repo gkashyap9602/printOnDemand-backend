@@ -48,7 +48,7 @@ module.exports.profileSchema = {
             country: joi.string(),
             stateName: joi.string(),
             taxId: joi.string(),
-            zipCode: joi.string().max(5).message("Zip Code Length Must be 5"),
+            zipCode: joi.any(),
         },
         userGuid: joi.string().required(),
     }),
