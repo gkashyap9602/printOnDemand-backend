@@ -82,7 +82,7 @@ const commonUtil = {
         code: country.isoCode,
       })
     ));
-    const chunkedData = countries
+    const chunkedData = formattedCountries
     console.log(chunkedData, "chunkedData")
     if (chunkedData.length < 0) {
       return helpers.showResponse(false, 'No Content Found', null, null, 200);
