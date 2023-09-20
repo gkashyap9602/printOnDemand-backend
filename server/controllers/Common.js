@@ -62,6 +62,10 @@ const commonController = {
         let result = await Common.getAllCountries();
         return helpers.showOutputNew(res, result, result.code);
     },
+    getAllStates: async (req, res) => {
+        let result = await Common.getAllStates(req.query);
+        return helpers.showOutputNew(res, result, result.code);
+    },
 
     // getTermsContent: async (req, res) => {
     //     let result = await Common.getTermsContent();

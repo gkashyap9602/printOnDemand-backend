@@ -2623,6 +2623,16 @@
     "object-assign" "^4"
     "vary" "^1"
 
+"countries-states-cities@^1.0.6":
+  "integrity" "sha512-cQAQRfaI/jaxC0bdDUCXDAaO6DRpyKcDo/5jOsKByg01Oo7JPksqEfTblwYtKJJAelB3pVv2I5xepdzyVs+YEA=="
+  "resolved" "https://registry.npmjs.org/countries-states-cities/-/countries-states-cities-1.0.6.tgz"
+  "version" "1.0.6"
+
+"country-state-city@^3.2.1":
+  "integrity" "sha512-kxbanqMc6izjhc/EHkGPCTabSPZ2G6eG4/97akAYHJUN4stzzFEvQPZoF8oXDQ+10gM/O/yUmISCR1ZVxyb6EA=="
+  "resolved" "https://registry.npmjs.org/country-state-city/-/country-state-city-3.2.1.tgz"
+  "version" "3.2.1"
+
 "crypt@0.0.2":
   "integrity" "sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow=="
   "resolved" "https://registry.npmjs.org/crypt/-/crypt-0.0.2.tgz"
