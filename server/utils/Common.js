@@ -5,6 +5,7 @@ let moment = require('moment');
 let Category = require('../models/Category')
 let ObjectId = require("mongodb").ObjectId
 const ResponseMessages = require("../constants/ResponseMessages")
+const Countries = require('../models/countries')
 const commonUtil = {
 
     getCategories: async (data) => {
@@ -64,6 +65,27 @@ const commonUtil = {
         }
         return helpers.showResponse(true, "Here is all Categories", result.length > 0 ? result[0] : {}, null, 200);
     },
+    getAllCountries: async () => {
+
+            // Query the MongoDB collection to retrieve all entries
+            const allData = await Countries.find({}).lean(); // Use lean() for performance
+
+            // Split the data into chunks of 100 items each
+            const chunkedData = [];
+            const chunkSize = 100;
+
+            for (let i = 0; i < allData.length; i += chunkSize) {
+              chunkedData.push(allData.slice(i, i + chunkSize));
+            }
+             
+            // Send each chunk as a separate array in the response
+            // res.json(chunkedData);
+            console.log(chunkedData,"chunkedData")
+      if (chunkedData.length < 0) {
+          return helpers.showResponse(false, 'No Content Found', null, null, 200);
+      }
+      return helpers.showResponse(true, "Here is all Categories", chunkedData.length > 0 ? chunkedData : {}, null, 200);
+  },
     // getPrivacyContent: async () => {
     //     let response = await getSingleData(Common, {}, 'privacy_policy -_id');
     //     if (response.status) {

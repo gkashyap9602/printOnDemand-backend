@@ -17,6 +17,7 @@ router.post('/upload_video_to_s3', commonController.uploadVideoToS3);
 
 // with admin token routes
 router.get('/get_categories', middleware.checkToken, commonController.getCategories);
+router.get('/getAllCountries', commonController.getAllCountries);
 
 // router.post('/get_common_data', middleware.checkToken, commonController.getCommonData);
 // router.post('/update_common_data', middleware.checkToken, commonController.updateCommonData);

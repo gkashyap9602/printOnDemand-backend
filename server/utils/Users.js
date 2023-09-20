@@ -340,6 +340,7 @@ const UserUtils = {
         let { user_id } = data
         console.log(user_id, "user_id under api get")
 
+        //check if userprofile nor register than it shows empty object??
         let result = await Users.aggregate([
             { $match: { _id: mongoose.Types.ObjectId(user_id), status: 1 } },  // Match the specific user by _id and status
 
