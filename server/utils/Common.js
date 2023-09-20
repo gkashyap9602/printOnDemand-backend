@@ -68,15 +68,17 @@ const commonUtil = {
     getAllCountries: async () => {
 
             // Query the MongoDB collection to retrieve all entries
-            const allData = await Countries.find({}).lean(); // Use lean() for performance
+            const chunkedData = await Countries.find({}).lean(); // Use lean() for performance
 
-            // Split the data into chunks of 100 items each
-            const chunkedData = [];
-            const chunkSize = 100;
+            // const allData = await Countries.find({}).lean(); // Use lean() for performance
 
-            for (let i = 0; i < allData.length; i += chunkSize) {
-              chunkedData.push(allData.slice(i, i + chunkSize));
-            }
+            // // Split the data into chunks of 100 items each
+            // const chunkedData = [];
+            // const chunkSize = 100;
+
+            // for (let i = 0; i < allData.length; i += chunkSize) {
+            //   chunkedData.push(allData.slice(i, i + chunkSize));
+            // }
              
             // Send each chunk as a separate array in the response
             // res.json(chunkedData);
