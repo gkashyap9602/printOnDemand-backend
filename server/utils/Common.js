@@ -72,9 +72,17 @@ const commonUtil = {
     // const chunkedData = await Countries.find({}).lean(); // Use lean() for performance
 
     // const chunkedData =  CSC.default.getAllCountries(); // Use lean() for performance
-    const chunkedData =  CSC2.Country.getAllCountries(); // Use lean() for performance
+    const countries = CSC2.Country.getAllCountries(); // Use lean() for performance
 
-    
+    const formattedCountries = countries.map((country,index) => (
+        //  console.log(country,"countryyy")
+      ({
+        id: index+1,
+        name: `${country.isoCode} - ${country.name}`,
+        code: country.isoCode,
+      })
+    ));
+    const chunkedData = formattedCountries
     console.log(chunkedData, "chunkedData")
     if (chunkedData.length < 0) {
       return helpers.showResponse(false, 'No Content Found', null, null, 200);
@@ -82,11 +90,12 @@ const commonUtil = {
     return helpers.showResponse(true, "Here is all Categories", chunkedData.length > 0 ? chunkedData : {}, null, 200);
   },
   getAllStates: async (data) => {
-    let {countryCode} = data
+    let { countryCode } = data
     const states = CSC.default.getStatesOfCountry
     // const chunkedData = await Countries.find({}).lean(); // Use lean() for performance
 
     const chunkedData = CSC2.State.getStatesOfCountry(countryCode); // Use lean() for performance
+    // const chunkedData = CSC.default.getStatesOfCountry(countryCode); // Use lean() for performance
 
     console.log(chunkedData, "chunkedData")
     if (chunkedData.length < 0) {
