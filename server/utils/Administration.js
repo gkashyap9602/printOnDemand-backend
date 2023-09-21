@@ -40,15 +40,26 @@ const adminUtils = {
     addCategories: async (data, file) => {
         try {
             const { name, description } = data
-            const uploadedFileName = file.filename;
-            const imagePath = (`category/${uploadedFileName}`);
-            const imageServerPath = `/files/${imagePath}`;
 
+            const s3Upload = await helpers.uploadFileToS3([file])
+            if (!s3Upload.status) {
+                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
+                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
+            }
+            console.log(s3Upload, "s3Upload")
+
+            const findCategory = await getSingleData(Category, { name: name })
+            if (findCategory.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.category_already_existed, {}, null, 403);
+            }
+            // const uploadedFileName = file.filename;
+            // const imagePath = (`category/${uploadedFileName}`);
+            // const imageServerPath = `/files/${imagePath}`;
 
             let obj = {
                 name,
                 description,
-                imageUrl: imageServerPath,
+                imageUrl: s3Upload?.data[0],
                 createdOn: helpers.getCurrentDate(),
                 guid: randomUUID(),
 
@@ -57,9 +68,10 @@ const adminUtils = {
             let result = await postData(categoryRef)
 
             if (!result.status) {
-                await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
-                return helpers.showResponse(false, ResponseMessages?.admin?.category_save_failed, result?.data, null, 200);
+                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
+                return helpers.showResponse(false, ResponseMessages?.admin?.category_save_failed, result?.data, null, 400);
             }
+
             return helpers.showResponse(true, ResponseMessages?.admin?.category_added, result?.data, null, 200);
         }
         catch (err) {
@@ -72,15 +84,33 @@ const adminUtils = {
     addSubCategories: async (data, file) => {
         try {
             const { name, description, category_id } = data
-            const uploadedFileName = file.filename;
-            const imagePath = (`subCategory/${uploadedFileName}`);
-            const imageServerPath = `/files/${imagePath}`;
+
+            const s3Upload = await helpers.uploadFileToS3([file])
+            if (!s3Upload.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
+            }
+            console.log(s3Upload, "s3Upload")
+            // const uploadedFileName = file.filename;
+
+            const findCategory = await getSingleData(Category, { _id: category_id })
+            if (!findCategory.status) {
+                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
+                return helpers.showResponse(false, ResponseMessages?.admin?.category_not_exist, {}, null, 404);
+            }
+            const findSubCategory = await getSingleData(SubCategory, { name: name })
+            if (findSubCategory.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.subcategory_already_existed, {}, null, 403);
+            }
+            // await FS.makeDirectory(`${process.cwd()}/server/uploads/subCategory/${findCategory.name}`);
+
+            // const imagePath = (`subCategory/${findCategory.name}/${uploadedFileName}`);
+            // const imageServerPath = `/files/${imagePath}`;
 
             let obj = {
                 name,
                 category_id,
                 description,
-                imageUrl: imageServerPath,
+                imageUrl: s3Upload.data[0],
                 createdOn: helpers.getCurrentDate(),
                 guid: randomUUID(),
 
@@ -88,8 +118,8 @@ const adminUtils = {
             let subCategoryRef = new SubCategory(obj)
             let result = await postData(subCategoryRef)
             if (!result.status) {
-                await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
-                return helpers.showResponse(false, ResponseMessages?.admin?.category_save_failed, result?.data, null, 200);
+                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
+                return helpers.showResponse(false, ResponseMessages?.admin?.subcategory_save_failed, result?.data, null, 400);
             }
             return helpers.showResponse(true, ResponseMessages?.admin?.subcategory_added, result?.data, null, 200);
         }
@@ -100,7 +130,7 @@ const adminUtils = {
         }
 
     },
-   
+
     // forgotPasswordMail: async (data) => {
     //     try {
     //         let { email } = data;

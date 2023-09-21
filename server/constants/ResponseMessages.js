@@ -28,7 +28,9 @@ module.exports = {
         data:"data fetched successfully",
         database_error:"data fetch unsucessfull",
         dycryption_error:"dycryption unsucessfull",
-        file_upload_err :"file upload unsucessfull",
+        data_retreive_sucess:"data retrieve successfully",
+        data_not_found:"data not found"
+
 
     },
     users: {
@@ -143,6 +145,12 @@ module.exports = {
         category_added:"category added",
         subcategory_added:"subcategory added",
         category_save_failed:"category creation failed",
+        subcategory_save_failed:"subcategory creation failed",
+        category_not_exist:"category not exist",
+        category_already_existed:"category already existed",
+        subcategory_already_existed:"subcategory already existed",
+
+
 
 
 

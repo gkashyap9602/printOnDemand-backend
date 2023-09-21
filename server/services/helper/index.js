@@ -5,7 +5,6 @@ AWS.config.update({
   region: "us-east-1",
   credentials: new AWS.SharedIniFileCredentials({ profile: "default" }),
 });
-
 const moment = require('moment')
 const ssm = new AWS.SSM();
 const nodemailer = require("nodemailer");
@@ -57,7 +56,7 @@ const showOutputNew = (res, response, code) => {
     });
 
   } else {
-    console.log(response?.data,"else shownew")
+    // console.log(response?.data,"else shownew")
     res.status(code).json({ message: response?.Message, response: response?.data, statusCode: response.code });
 
   }
@@ -170,12 +169,12 @@ function generateUniquePayTraceID() {
 
 const changeEnv = (env) => {
   if (env === "PROD") {
-    return "mww"
+    return {db:"mww",bucket:""}
   } else if (env === "STAG") {
-    return "mwwstag"
+    return {db:"mwwstag",bucket:"-stag"}
 
   } else {
-    return "mwwdev"
+    return {db:"mwwdev",bucket:"-dev"}
   }
 };
 
@@ -471,7 +470,7 @@ const getSecretFromAWS = (secret_key_param) => {
   return new Promise((resolve, reject) => {
     try {
       const client = new AWS.SecretsManager({
-        region: "ap-south-1",
+        region: "us-east-1",
       });
       client.getSecretValue({ SecretId: secret_key_param }, (err, data) => {
         if (err) {
@@ -603,22 +602,28 @@ const sendSMSService = async (to, Message) => {
 const addToMulter = multer({
   storage: multer.memoryStorage(),
   fileFilter: (req, file, callback) => {
-    if (file.fieldname == "rico_video") {
-      if (
-        file.mimetype.toString().indexOf("video") < 0 &&
-        file.mimetype.toString().indexOf("image") < 0
-      ) {
-        callback("Invalid file type", false);
-        return;
-      }
       callback(null, true);
-    } else if (file.fieldname == "rico_file") {
-      callback(null, true);
-    } else {
-      callback(null, false);
-    }
-  },
-});
+  }
+})
+// const addToMulter = multer({
+//   storage: multer.memoryStorage(),
+//   fileFilter: (req, file, callback) => {
+//     if (file.fieldname == "rico_video") {
+//       if (
+//         file.mimetype.toString().indexOf("video") < 0 &&
+//         file.mimetype.toString().indexOf("image") < 0
+//       ) {
+//         callback("Invalid file type", false);
+//         return;
+//       }
+//       callback(null, true);
+//     } else if (file.fieldname == "rico_file") {
+//       callback(null, true);
+//     } else {
+//       callback(null, false);
+//     }
+//   },
+// });
 
 const uploadVideoToS3 = async (files) => {
   try {
@@ -860,6 +865,7 @@ const createVideoThumbnail = async (videoFileName, fileExt) => {
   });
 };
 
+
 const convertImageToWebp = async (imageInBuffer) => {
   return new Promise((resolve, reject) => {
     sharp(imageInBuffer)
@@ -889,6 +895,7 @@ const uploadAudioToS3 = async (files) => {
   });
 };
 const uploadFileToS3 = async (files) => {
+  console.log(files,"filess")
   return new Promise(async (resolve, reject) => {
     try {
       let webpFilesArray = [];
@@ -913,6 +920,7 @@ const uploadFileToS3 = async (files) => {
       }
       if (webpFilesArray?.length > 0) {
         let filesResponse = await uploadToS3(webpFilesArray);
+        console.log(filesResponse,"fileresponse")
         return resolve(
           showResponse(
             true,
@@ -923,6 +931,7 @@ const uploadFileToS3 = async (files) => {
           )
         );
       }
+      console.log(webpFilesArray,"webpFiles")
       return resolve(
         showResponse(
           false,
@@ -948,18 +957,33 @@ const uploadFileToS3 = async (files) => {
 };
 
 const uploadToS3 = async (files, key) => {
-  console.log(files, "filessss");
-  let SecretResponse = await getSecretFromAWS("rico-secret");
+
+  try {
+    
+ 
+  console.log(files, "filessss uploadToS3 side");
+  let SecretResponse = await getSecretFromAWS("mww-secret");
   let region = await getParameterFromAWS({ name: "REGION" });
+  console.log(SecretResponse,"SecretResponse")
+  console.log(region,"regionn")
+
+  console.log(JSON.parse(SecretResponse?.SecretString)['mww-secret'],"secretMww")
   const s3 = new AWS.S3({
     accessKeyId: await getParameterFromAWS({ name: "ACCESSID" }),
-    secretAccessKey: SecretResponse?.SecretString,
+    secretAccessKey: JSON.parse(SecretResponse?.SecretString)['mww-secret'],
     region,
   });
-  let bucketName = await getParameterFromAWS({ name: "FilesBucket" });
+  
+  let bucketName = await getParameterFromAWS({ name: `MWW-BUCKET` });
+  console.log(bucketName,"bucketName")
+  bucketName = bucketName + `${changeEnv(process.env.ENV_MODE).bucket}`
+  console.log(bucketName,"bucketNameAFTER")
+
   const s3UploadPromises = files.map(async (file) => {
+    console.log(file,"filee")
     return new Promise((resolve, reject) => {
       const bufferImage = key ? file : file.buffer;
+      console.log(bufferImage,"bufferImage")
 
       const ext = path.extname(
         file?.originalname,
@@ -977,10 +1001,10 @@ const uploadToS3 = async (files, key) => {
         Bucket: bucketName,
         ContentType:
           file?.mimetype?.indexOf("image") >= 0 ? "image/webp" : file?.mimetype,
-        Key: fileName,
+        Key: `${file.fieldname}/${fileName}`,
         Body: bufferImage,
       };
-      console.log(params);
+      console.log(params,"params");
       s3.upload(params, (error, data) => {
         if (error) {
           console.log("bucketerror", error);
@@ -995,6 +1019,11 @@ const uploadToS3 = async (files, key) => {
   });
   const s3UploadResults = await Promise.all(s3UploadPromises);
   return s3UploadResults;
+
+} catch (error) {
+  console.log(error,"errorrr s3upload")
+    return error
+}
 };
 
 const generateUsernames = (name, count, all_usernames = null) => {

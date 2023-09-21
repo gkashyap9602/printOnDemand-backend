@@ -44,7 +44,7 @@ module.export = getSingleData = (Model, query, feilds, populate=null) =>{
         .populate(populate)
         .exec((err,data)=>{
             if(err || !data){
-                console.log(err,"errr getSingleData")
+                // console.log(err,"errr getSingleData")
                 let response = helpers.showResponse(false, 'retreive failed ', err);
                 return resolve(response);
             } 

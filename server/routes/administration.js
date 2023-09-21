@@ -5,14 +5,17 @@ var middleware = require("../controllers/middleware");
 var validate = require('../controllers/validationMiddleware')
 const adminValidation  = require('../validations/administration')
 const upload  = require('../services/upload')
+const helpers = require('../services/helper/index')
+
 // without token
 router.post('/login', AdministratorController.login);
 // router.post('/forgot', AdministratorController.forgotPasswordMail);
 // router.post('/reset_password', AdministratorController.forgotChangePassword);
 
 // Admin Routes with Token
-router.post('/add_category', middleware.checkToken,upload.single('category_image'),validate(adminValidation.addCategorySchema), AdministratorController.addCategories);
-router.post('/add_subcategory', middleware.checkToken,upload.single('subcategory_image'),validate(adminValidation.addSubCategorySchema), AdministratorController.addSubCategories);
+router.post('/add_category', middleware.checkToken,helpers.addToMulter.single('category'),validate(adminValidation.addCategorySchema), AdministratorController.addCategories);
+
+router.post('/add_subcategory', middleware.checkToken,helpers.addToMulter.single('subcategory'),validate(adminValidation.addSubCategorySchema), AdministratorController.addSubCategories);
 
 // router.post('/change_password', middleware.checkToken, AdministratorController.changePasswordWithOld);
 // router.post('/get', middleware.checkToken, AdministratorController.getDetails);

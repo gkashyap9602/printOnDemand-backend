@@ -2,24 +2,32 @@ var Administration = require('../utils/Administration');
 const helpers = require('../services/helper');
 const path = require('path');
 const ResponseMessages = require('../constants/ResponseMessages');
+const multerRef = helpers.addToMulter.single('category_image');
 const adminController = {
+
+    // `uploadMedia: async (req, res) => {
+    //     multerRef(req, res, async (err) => {
+    //         if (err || !req.files) {
+    //             return helpers.showOutput(res, helpers.showResponse(false, "no files selected"), 203);
+    //         }
+    //         let result = await helpers.uploadFileToS3(req.files)
+    //         return helpers.showOutput(res, result, result.code);
+    //     })
+    // },`
 
     login: async (req, res) => {
         let result = await Administration.login(req.body);
         return helpers.showOutputNew(res, result, result.code);
     },
-
+    
     addCategories: async (req, res) => {
-
         if (!req.file) {
             return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages.common.file_upload_error), 203);
         }
-       
         let result = await Administration.addCategories(req.body, req.file);
         return helpers.showOutputNew(res, result, result.code);
     },
     addSubCategories: async (req, res) => {
-        console.log(req.body,"reqbodyy")
         if (!req.file) {
             return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages.common.file_upload_error), 203);
         }

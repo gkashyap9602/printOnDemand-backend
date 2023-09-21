@@ -5,7 +5,7 @@
   "main": "mww.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "export AWS_PROFILE=mww && export AWS_SDK_LOAD_CONFIG=1 &&  nodemon mww.js"
+    "dev": "set AWS_PROFILE=mww && set AWS_SDK_LOAD_CONFIG=1 &&  nodemon mww.js"
   },
   "author": "chena_ram",
   "license": "ISC",
@@ -15,7 +15,6 @@
     "axios": "^0.27.2",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
-    "countries-states-cities": "^1.0.6",
     "country-state-city": "^3.2.1",
     "crypto-js": "^4.1.1",
     "dotenv": "^16.3.1",

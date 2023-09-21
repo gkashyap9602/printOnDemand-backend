@@ -1,36 +1,27 @@
 require('../db_functions');
-let Common = require('../models/CommonContent');
 let helpers = require('../services/helper')
-let moment = require('moment');
 let Category = require('../models/Category')
-let ObjectId = require("mongodb").ObjectId
 const ResponseMessages = require("../constants/ResponseMessages")
-const Countries = require('../models/countries')
-const CSC = require('countries-states-cities')
 const CSC2 = require('country-state-city')
 const commonUtil = {
 
   getCategories: async (data) => {
     const { includeSubCategory = false, searchKey = '' } = data
-
-    console.log(includeSubCategory, "includeSubCategory")
-    console.log(searchKey, "searchKey")
+    // console.log(includeSubCategory, "includeSubCategory")
+    // console.log(searchKey, "searchKey")
     const aggregationPipeline = [
       {
         $match: {
           $or: [
             { name: { $regex: searchKey, $options: 'i' } },
-            //   { 'subCategories.name': { $regex: searchKey, $options: 'i' } },
           ],
         },
       },
+
+
     ];
 
-    let ff = Boolean(includeSubCategory)
-    console.log(ff, "Ffff")
-    //check if includeSubCategory is string or boolean both
-    if (ff == true) {
-      console.log(includeSubCategory, "under if ")
+    if (includeSubCategory === 'true' || includeSubCategory === true) {
       // Add the $lookup stage for subCategories if includeSubCategory is true
       aggregationPipeline.push({
         $lookup: {
@@ -42,79 +33,46 @@ const commonUtil = {
       });
     }
 
-
     const result = await Category.aggregate(aggregationPipeline);
-    // let result = await Category.aggregate([
-    //     // { $match: { _id: mongoose.Types.ObjectId(user_id), status: 1 } },  // Match the specific user by _id and status
-    //     {
-    //         $lookup: {
-    //             from: "subCategory",
-    //             localField: "_id",
-    //             foreignField: "category_id",
-    //             as: "subCategories"
-    //         }
-    //     },
-
-    // ])
-
-    // let result = await Category.find({}).populate({path:'subCategories',model:'SubCategory'})
-
 
     console.log(result, "resultt")
 
     if (result.length < 0) {
-      return helpers.showResponse(false, 'No Content Found', null, null, 200);
+      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 200);
     }
-    return helpers.showResponse(true, "Here is all Categories", result.length > 0 ? result[0] : {}, null, 200);
+    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? {categories:result} : {}, null, 200);
   },
   getAllCountries: async () => {
 
-    // const chunkedData = await Countries.find({}).lean(); // Use lean() for performance
-
-    // const countries =  CSC.default.getAllCountries(); // Use lean() for performance
     const countries = CSC2.Country.getAllCountries(); // Use lean() for performance
 
-    const formattedCountries = countries.map((country,index) => (
-        //  console.log(country,"countryyy")
-      ({
-        id: index+1,
-        name: `${country.isoCode} - ${country.name}`,
-        code: country.isoCode,
-      })
-    ));
-    const chunkedData = formattedCountries
-    console.log(chunkedData, "chunkedData")
-    if (chunkedData.length < 0) {
-      return helpers.showResponse(false, 'No Content Found', null, null, 200);
+    const formattedCountries = countries.map((country, index) => ({
+      id: index + 1,
+      name: `${country.isoCode} - ${country.name}`,
+      code: country.isoCode,
     }
-    return helpers.showResponse(true, "Here is all Categories", chunkedData.length > 0 ? chunkedData : {}, null, 200);
+    ));
+    if (formattedCountries.length < 0) {
+      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 200);
+    }
+    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, formattedCountries.length > 0 ? formattedCountries : {}, null, 200);
   },
   getAllStates: async (data) => {
     let { countryCode } = data
-    // const states = CSC.default.getStatesOfCountry
-    // const chunkedData = await Countries.find({}).lean(); // Use lean() for performance
+    let states = CSC2.State.getStatesOfCountry(countryCode);
 
-    let states = CSC2.State.getStatesOfCountry(countryCode); // Use lean() for performance
-    console.log(countryCode,"countryCode")
-    //  let  states= CSC.default.getStatesOfCountry((countryCode)); // Use lean() for performance
-
-     
-    const formattedStates = states.map((states,index) => (
-      //  console.log(country,"countryyy")
-    ({
-      id: index+1,
-      countryId:index+1,
+    const formattedStates = states.map((states, index) => ({
+      id: index + 1,
+      countryId: index + 1,
       name: `${states.name}`,
       code: states.isoCode,
-    })
-  ));
-    
-     const chunkedData = formattedStates
-    console.log(chunkedData, "chunkedData")
-    if (chunkedData.length < 0) {
-      return helpers.showResponse(false, 'No Content Found', null, null, 200);
     }
-    return helpers.showResponse(true, "Here is all Categories", chunkedData.length > 0 ? chunkedData : {}, null, 200);
+    ));
+
+    if (formattedStates.length < 0) {
+      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 200);
+    }
+    return helpers.showResponse(true,ResponseMessages.common.data_retreive_sucess, formattedStates.length > 0 ? formattedStates : {}, null, 200);
   },
   // getPrivacyContent: async () => {
   //     let response = await getSingleData(Common, {}, 'privacy_policy -_id');
