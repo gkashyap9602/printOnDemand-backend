@@ -40,7 +40,7 @@ const adminUtils = {
     addCategories: async (data, file) => {
         try {
             const { name, description } = data
-
+              //upload image to aws s3 bucket
             const s3Upload = await helpers.uploadFileToS3([file])
             if (!s3Upload.status) {
                 // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
@@ -85,6 +85,7 @@ const adminUtils = {
         try {
             const { name, description, category_id } = data
 
+            //upload image to aws s3 bucket
             const s3Upload = await helpers.uploadFileToS3([file])
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
