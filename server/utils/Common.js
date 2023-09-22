@@ -80,7 +80,7 @@ const commonUtil = {
     if (result.length < 0) {
       return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 404);
     }
-    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? { categories: result, parentCategoryInfo: parentCategoryInfo?.data } : {}, null, 200);
+    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? { categories: result, parentCategoryInfo: parentCategoryInfo?.data?parentCategoryInfo?.data:null } : {}, null, 200);
   },
   getAllCountries: async () => {
 
