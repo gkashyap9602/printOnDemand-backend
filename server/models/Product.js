@@ -7,6 +7,7 @@ var Product = new Schema({
         ref: "subcategory",
         index: true
     },
+
     guid: {
         type: String,
         index: true
@@ -21,6 +22,29 @@ var Product = new Schema({
     priceStartsFrom: {
         type: String,
     },
+    materialId: {
+        type: mongoose.Types.ObjectId,
+        ref:"material"
+    },
+    construction: {
+        type: String,
+    },
+    materialName: {
+        type: String,
+    },
+    features: {
+        type: String,
+    },
+    Process: {
+        type: String,
+    },
+    parentCategoryName: {
+        type: String,
+    },
+    parentCategoryId: {
+        type: String,
+    },
+
     productImages: [{
         _id: {
             type: mongoose.Types.ObjectId,

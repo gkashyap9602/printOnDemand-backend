@@ -12,6 +12,7 @@ const { default: mongoose } = require('mongoose');
 const { randomUUID } = require('crypto')
 const middleware = require('../controllers/middleware');
 const Orders = require('../models/Orders')
+const Material = require("../models/Material")
 const UserUtils = {
 
     checkEmailExistance: async (email, user_id = null) => {
@@ -386,6 +387,18 @@ const UserUtils = {
         }
 
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
+    },
+    getMaterials: async (data) => {
+        // let { user_id } = data
+        
+        const result = await getDataArray(Material, {})
+        if (!result.status) {
+            return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
+        }
+
+        console.log(result,"findmm")
+
+        return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess,result?.data?.length>0?result?.data:{}, null, 200);
     },
 
     // // with token 

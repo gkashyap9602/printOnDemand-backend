@@ -17,6 +17,7 @@ router.get('/get_user_status/:user_id', middleware.checkToken, AuthController.ge
 // router.post('/createOrder', middleware.checkToken, AuthController.allOrders);
 router.post('/getAllOrders', middleware.checkToken, AuthController.getAllOrders);
 router.get('/getBulkImport', middleware.checkToken, AuthController.getBulkImport);
+router.get('/get_materials', middleware.checkToken, AuthController.getMaterials);
 
 
 router.post('/update_basic_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateUserBasicDetails);

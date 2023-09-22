@@ -16,6 +16,12 @@ module.exports.addCategorySchema = {
     })
 
 };
+module.exports.addMaterialSchema = {
+    body: joi.object({
+        name: joi.string().required(),
+    })
+
+};
 module.exports.addSubCategorySchema = {
     body: joi.object({
         name: joi.string().required(),

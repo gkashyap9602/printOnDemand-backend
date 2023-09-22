@@ -27,6 +27,17 @@ const adminController = {
         let result = await Administration.addCategories(req.body, req.file);
         return helpers.showOutputNew(res, result, result.code);
     },
+     addMaterial: async (req, res) => {
+        let result = await Administration.addMaterial(req.body);
+        return helpers.showOutputNew(res, result, result.code);
+    },
+    addProduct: async (req, res) => {
+        // if (!req.file) {
+        //     return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages.common.file_upload_error), 203);
+        // }
+        let result = await Administration.addProduct(req.body, req.file);
+        return helpers.showOutputNew(res, result, result.code);
+    },
     addSubCategories: async (req, res) => {
         if (!req.file) {
             return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages.common.file_upload_error), 203);

@@ -86,18 +86,19 @@ const authController = {
     },
 
     getUserDetail: async (req, res) => {
-        console.log("contr")
         let result = await Users.getUserDetail(req?.params);
         return helpers.showOutputNew(res, result, result.code);
     },
     getAllOrders: async (req, res) => {
-        console.log("controllerr")
         let result = await Users.getAllOrders(req?.query);
         return helpers.showOutputNew(res, result, result.code);
     },
     getBulkImport: async (req, res) => {
-        console.log("controllerr")
         let result = await Users.getBulkImport(req?.query);
+        return helpers.showOutputNew(res, result, result.code);
+    },
+    getMaterials: async (req, res) => {
+        let result = await Users.getMaterials(req?.query);
         return helpers.showOutputNew(res, result, result.code);
     },
 // createOrder: async (req, res) => {

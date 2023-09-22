@@ -143,11 +143,19 @@ module.exports = {
         email_already: "Email address is already occupied",
         question_added:"question added",
         category_added:"category added",
+        created_successfully:"created Successfully",
         subcategory_added:"subcategory added",
         category_save_failed:"category creation failed",
         subcategory_save_failed:"subcategory creation failed",
+        save_failed:"creation failed",
         category_not_exist:"category not exist",
         category_already_existed:"category already existed",
+        already_existed:"already existed",
+        not_exist:"not existed",
+        invalid_subcategory:"invalid subcategory",
+        invalid_id:"invalid id",
+
+        invalid_category:"invalid category",
         subcategory_already_existed:"subcategory already existed",
 
 

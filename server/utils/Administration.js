@@ -11,6 +11,8 @@ let md5 = require('md5');
 const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require('../constants/const');
 const { default: mongoose } = require('mongoose');
+const Material = require('../models/Material')
+const Product = require('../models/Product')
 const { randomUUID } = require('crypto')
 const adminUtils = {
     login: async (data) => {
@@ -40,7 +42,7 @@ const adminUtils = {
     addCategories: async (data, file) => {
         try {
             const { name, description } = data
-              //upload image to aws s3 bucket
+            //upload image to aws s3 bucket
             const s3Upload = await helpers.uploadFileToS3([file])
             if (!s3Upload.status) {
                 // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
@@ -123,6 +125,105 @@ const adminUtils = {
                 return helpers.showResponse(false, ResponseMessages?.admin?.subcategory_save_failed, result?.data, null, 400);
             }
             return helpers.showResponse(true, ResponseMessages?.admin?.subcategory_added, result?.data, null, 200);
+        }
+        catch (err) {
+            console.log(err, "errCatch")
+            return helpers.showResponse(false, err?.message, null, null, 403);
+
+        }
+
+    },
+    addMaterial: async (data) => {
+        try {
+            const { name } = data
+            console.log(name, "nameee")
+            const findMaterial = await getSingleData(Material, { name: name })
+            if (findMaterial.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
+            }
+
+            let obj = {
+                name,
+                createdOn: helpers.getCurrentDate(),
+                guid: randomUUID(),
+
+            }
+            let materialRef = new Material(obj)
+            let result = await postData(materialRef)
+
+            if (!result.status) {
+                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
+                return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
+        }
+        catch (err) {
+            console.log(err, "errCatch")
+            return helpers.showResponse(false, err?.message, null, null, 403);
+
+        }
+
+    },
+
+    addProduct: async (data, file) => {
+        try {
+            const { careInstructions, longDescription, subCategory_id, priceStartsFrom,
+                 materialId, construction, materialName, features, parentCategoryName, 
+                 parentCategoryId, productionDuration, shortDescription, sizeChart, title } = data
+            //upload image to aws s3 bucket
+            // const s3Upload = await helpers.uploadFileToS3([file])
+            // if (!s3Upload.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
+            // }
+            // console.log(s3Upload, "s3Upload")
+
+            const findProduct = await getSingleData(Product, { title: title })
+            if (findProduct.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
+            }
+            const findSubCategory = await getSingleData(SubCategory, { _id: subCategory_id })
+            if (!findSubCategory.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.invalid_subcategory, {}, null, 403);
+            }
+            const findCategory = await getSingleData(Category, { _id: parentCategoryId,name:parentCategoryName })
+
+            if (!findCategory.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.invalid_category, {}, null, 403);
+            }
+            const findMaterial= await getSingleData(Material, { _id: materialId ,name:materialName})
+
+            if (!findMaterial.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.invalid_id, {}, null, 403);
+            }
+
+            let obj = {
+                careInstructions,
+                longDescription,
+                subCategory_id,
+                // imageUrl: s3Upload?.data[0],
+                priceStartsFrom,
+                materialId,
+                materialName,
+                features,
+                parentCategoryName,
+                parentCategoryId,
+                productionDuration,
+                shortDescription,
+                sizeChart,
+                title,
+                createdOn: helpers.getCurrentDate(),
+                guid: randomUUID(),
+
+            }
+            let productRef = new Product(obj)
+            let result = await postData(productRef)
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
         }
         catch (err) {
             console.log(err, "errCatch")
