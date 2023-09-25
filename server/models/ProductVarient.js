@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
-var ProductVariant = new Schema({
+var ProductVarient = new Schema({
     product_id: {
         type: mongoose.Types.ObjectId,
         ref: "product",
@@ -9,7 +9,7 @@ var ProductVariant = new Schema({
     },
     product_design_id: {
         type: mongoose.Types.ObjectId,
-        ref: "product",
+        ref: "productDesign",
         index: true
     },
     guid: {
@@ -36,16 +36,20 @@ var ProductVariant = new Schema({
         type: String,
         required: true
     },
-    Price: {
+    price: {
         type: String,
     },
-    MSRP: {
+    msrp: {
         type: String,
     },
-    DesignPanels: {
+    design_panels: {
         type: String,
     },
     status: {
+        type: Number,
+        default: 0,
+    },
+    exentaItemNumber: {
         type: Number,
         default: 0,
     },
@@ -62,19 +66,15 @@ var ProductVariant = new Schema({
             type: String,
 
         },
-        ImageType:{
+        imageType:{
             type: String,
 
         },
-        ImagePath:{
+        thumbnailPath:{
             type: String,
 
         },
-        ThumbnailPath:{
-            type: String,
-
-        },
-        DisplayOrder:{
+        displayOrder:{
             type: String,
 
         }
@@ -103,4 +103,4 @@ var ProductVariant = new Schema({
 });
 
 
-module.exports = mongoose.model("ProductVariant", ProductVariant, "productVariant");
+module.exports = mongoose.model("ProductVarient", ProductVarient, "productVarient");

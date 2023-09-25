@@ -70,22 +70,22 @@ const middleware = {
 				jwt.verify(token, API_SECRET, async (err, decoded) => {
 
 					if (err) {
-						return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired });
+						return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired ,StatusCode:401});
 					}
 					if (decoded?.type == "refresh") {
-						return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token });
+						return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token,StatusCode:401 });
 					}
 					if (decoded?.user_type == "user") {
 						let response = await getSingleData(Users, {_id:decoded._id }, {password:0});
 						if (!response.status) {
-							return res.status(401).json({ status: false, message: ResponseMessages?.users?.invalid_user });
+							return res.status(401).json({ status: false, message: ResponseMessages?.users?.invalid_user,StatusCode:401 });
 						}
 						let userData = response?.data
 						if (userData.status == 0) {
-							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account });
+							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account,StatusCode:423 });
 						}
 						if (userData.status == 2) {
-							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
+							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account ,StatusCode:451});
 						}
 						decoded = { ...decoded, user_id: userData._id }
 						req.decoded = decoded;
@@ -96,14 +96,14 @@ const middleware = {
 						let response = await getSingleData(Administration, {_id:decoded._id }, {password:0});
 
 						if (!response.status) {
-							return res.status(401).json({ status: false, message: ResponseMessages?.users.invalid_user });
+							return res.status(401).json({ status: false, message: ResponseMessages?.users.invalid_user ,StatusCode:401});
 						}
 						let adminData = response?.data
 						if (adminData.status == 0) {
-							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account });
+							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account,StatusCode:423 });
 						}
 						if (adminData.status == 2) {
-							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
+							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account ,StatusCode:451});
 						}
 						decoded = { ...decoded, admin_id: adminData._id }
 						req.decoded = decoded;
@@ -112,11 +112,11 @@ const middleware = {
 					}
 				})
 			} else {
-				return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired });
+				return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired ,StatusCode:401});
 			}
 		} catch (err) {
 			console.log("in catch middleware check token error : ", err)
-			return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired });
+			return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired,StatusCode:401 });
 		}
 	},
 

@@ -169,8 +169,8 @@ const adminUtils = {
     addProduct: async (data, file) => {
         try {
             const { careInstructions, longDescription, subCategory_id, priceStartsFrom,
-                 materialId, construction, materialName, features, parentCategoryName, 
-                 parentCategoryId, productionDuration, shortDescription, sizeChart, title } = data
+                materialId, construction, materialName,
+                features, productionDuration, shortDescription, sizeChart, title } = data
             //upload image to aws s3 bucket
             // const s3Upload = await helpers.uploadFileToS3([file])
             // if (!s3Upload.status) {
@@ -186,12 +186,12 @@ const adminUtils = {
             if (!findSubCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.invalid_subcategory, {}, null, 403);
             }
-            const findCategory = await getSingleData(Category, { _id: parentCategoryId,name:parentCategoryName })
+            const findCategory = await getSingleData(Category, { _id: parentCategoryId, name: parentCategoryName })
 
             if (!findCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.invalid_category, {}, null, 403);
             }
-            const findMaterial= await getSingleData(Material, { _id: materialId ,name:materialName})
+            const findMaterial = await getSingleData(Material, { _id: materialId, name: materialName })
 
             if (!findMaterial.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.invalid_id, {}, null, 403);

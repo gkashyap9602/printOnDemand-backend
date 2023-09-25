@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var ProductLibrary = new Schema({
     user_id: {
         type: mongoose.Types.ObjectId,
-        ref: "subcategory",
+        ref: "users",
         index: true
     },
     guid: {
@@ -27,6 +27,10 @@ var ProductLibrary = new Schema({
             default: mongoose.Types.ObjectId()
         },
         image_url: {
+            type: String,
+
+        },
+        display_order: {
             type: String,
 
         },
