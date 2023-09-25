@@ -38,11 +38,30 @@ const adminController = {
         let result = await Administration.addProduct(req.body, req.file);
         return helpers.showOutputNew(res, result, result.code);
     },
+    saveProductImage: async (req, res) => {
+        if (!req.file) {
+            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages.common.file_upload_error), 203);
+        }
+        let result = await Administration.saveProductImage(req.body, req.file);
+        return helpers.showOutputNew(res, result, result.code);
+    },
     addSubCategories: async (req, res) => {
         if (!req.file) {
             return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages.common.file_upload_error), 203);
         }
         let result = await Administration.addSubCategories(req.body, req.file);
+        return helpers.showOutputNew(res, result, result.code);
+    },
+    addVariableTypes: async (req, res) => {
+        let result = await Administration.addVariableTypes(req.body,);
+        return helpers.showOutputNew(res, result, result.code);
+    },
+    addVariableOptions: async (req, res) => {
+        let result = await Administration.addVariableOptions(req.body);
+        return helpers.showOutputNew(res, result, result.code);
+    },
+    getAllVariableTypes: async (req, res) => {
+        let result = await Administration.getAllVariableTypes();
         return helpers.showOutputNew(res, result, result.code);
     },
     // forgotPasswordMail: async (req, res) => {

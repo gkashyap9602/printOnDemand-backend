@@ -17,7 +17,11 @@ router.post('/add_category', middleware.checkToken,helpers.addToMulter.single('c
 
 router.post('/add_subcategory', middleware.checkToken,helpers.addToMulter.single('subcategory'),validate(adminValidation.addSubCategorySchema), AdministratorController.addSubCategories);
 router.post('/add_material', middleware.checkToken,validate(adminValidation.addMaterialSchema), AdministratorController.addMaterial);
-router.post('/add_product', middleware.checkToken,helpers.addToMulter.single('product'), AdministratorController.addProduct);
+router.post('/add_product', middleware.checkToken, AdministratorController.addProduct);
+router.post('/add_variable_type', middleware.checkToken, AdministratorController.addVariableTypes);
+router.post('/add_variable_options', middleware.checkToken, AdministratorController.addVariableOptions);
+router.get('/get_all_variable_types', middleware.checkToken, AdministratorController.getAllVariableTypes);
+router.post('/saveProductImage', middleware.checkToken,helpers.addToMulter.single('productImage'), AdministratorController.saveProductImage);
 
 // router.post('/change_password', middleware.checkToken, AdministratorController.changePasswordWithOld);
 // router.post('/get', middleware.checkToken, AdministratorController.getDetails);

@@ -40,6 +40,10 @@ var ProductLibrary = new Schema({
         type: Boolean,
         default: false,
     },
+    isProductDeleted: {
+        type: Boolean,
+        default: false,
+    },
     deletedOn: {
         type: String,
         default: null,

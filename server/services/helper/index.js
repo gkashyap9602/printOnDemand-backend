@@ -901,7 +901,7 @@ const uploadFileToS3 = async (files) => {
       }
       if (webpFilesArray?.length > 0) {
         let filesResponse = await uploadToS3(webpFilesArray);
-        console.log(filesResponse, "fileresponse")
+        // console.log(filesResponse, "fileresponse")
         return resolve(
           showResponse(
             true,
@@ -939,7 +939,7 @@ const uploadFileToS3 = async (files) => {
 
 const uploadToS3 = async (files, key) => {
   try {
-    console.log(files, "filessss uploadToS3 side");
+    // console.log(files, "filessss uploadToS3 side");
     let SecretResponse = await getSecretFromAWS("mww-secret");
     let region = await getParameterFromAWS({ name: "REGION" });
 
@@ -979,7 +979,7 @@ const uploadToS3 = async (files, key) => {
             console.log("bucketerror", error);
             resolve(null);
           } else {
-            console.log("bucketdata", data);
+            // console.log("bucketdata", data);
 
             resolve(data.Key || data.key);
           }

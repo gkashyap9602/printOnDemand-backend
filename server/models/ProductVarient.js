@@ -80,7 +80,7 @@ var ProductVarient = new Schema({
         }
 
     }],
-    isDeleted: {
+    isProductVariantDeleted: {
         type: Boolean,
         default: false,
     },

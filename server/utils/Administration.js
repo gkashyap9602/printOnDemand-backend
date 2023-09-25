@@ -14,6 +14,15 @@ const { default: mongoose } = require('mongoose');
 const Material = require('../models/Material')
 const Product = require('../models/Product')
 const { randomUUID } = require('crypto')
+const VariableTypes = require('../models/VariableTypes')
+const VariableOptions = require('../models/VariableOptions')
+const ProductVarient = require('../models/ProductVarient')
+const ProductVarientOptions = require('../models/ProductVarientOptions')
+const ProductVarientTypes = require('../models/ProductVariableTypes')
+
+
+
+
 const adminUtils = {
     login: async (data) => {
         let { email, password } = data;
@@ -168,55 +177,134 @@ const adminUtils = {
 
     addProduct: async (data, file) => {
         try {
-            const { careInstructions, longDescription, subCategory_id, priceStartsFrom,
-                materialId, construction, materialName,
-                features, productionDuration, shortDescription, sizeChart, title } = data
-            //upload image to aws s3 bucket
-            // const s3Upload = await helpers.uploadFileToS3([file])
-            // if (!s3Upload.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
-            // }
-            // console.log(s3Upload, "s3Upload")
+            let { careInstructions, longDescription, categoryIds,materialId,
+                 construction,features, productionDuration, shortDescription, title } = data
+                 console.log(categoryIds,"categoryId")
+                     
+                //  categoryIds = JSON.parse(categoryIds)
+                //  console.log(categoryIds,"categoryId2")
+
+                 categoryIds = categoryIds.map((id)=>mongoose.Types.ObjectId(id))
+
+                 console.log(categoryIds,"categoryIdsf")
 
             const findProduct = await getSingleData(Product, { title: title })
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
             }
-            const findSubCategory = await getSingleData(SubCategory, { _id: subCategory_id })
+            const findSubCategory = await getDataArray(SubCategory, { _id: {$in:categoryIds} })
+            console.log(findSubCategory,"findSubcategory")
             if (!findSubCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.invalid_subcategory, {}, null, 403);
             }
-            const findCategory = await getSingleData(Category, { _id: parentCategoryId, name: parentCategoryName })
+            // const findCategory = await getSingleData(Category, { _id: parentCategoryId, name: parentCategoryName })
 
-            if (!findCategory.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.invalid_category, {}, null, 403);
-            }
-            const findMaterial = await getSingleData(Material, { _id: materialId, name: materialName })
+            // if (!findCategory.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.admin?.invalid_category, {}, null, 403);
+            // }
+            const findMaterial = await getSingleData(Material, { _id: materialId })
 
             if (!findMaterial.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.invalid_id, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.admin?.invalid_Material_id, {}, null, 403);
             }
 
             let obj = {
                 careInstructions,
                 longDescription,
-                subCategory_id,
+                // subCategory_id,?
                 // imageUrl: s3Upload?.data[0],
-                priceStartsFrom,
+                // priceStartsFrom,
                 materialId,
-                materialName,
+                // materialName,
                 features,
-                parentCategoryName,
-                parentCategoryId,
+                // parentCategoryName,
+                // parentCategoryId,
                 productionDuration,
                 shortDescription,
-                sizeChart,
+                // sizeChart,
                 title,
                 createdOn: helpers.getCurrentDate(),
                 guid: randomUUID(),
+            }
+            const savedProducts = await Promise.all(categoryIds.map(async (categoryId) => {
+                let newObj = obj
+                newObj.subCategory_id= categoryId
+                const newProduct = new Product(newObj);
+                // let resultpostData(newProduct);
+                return await postData(newProduct);
+              }));
+              console.log(savedProducts,"savedProducts")
+            // let productRef = new Product(obj)
+            // let result = await postData(productRef)
+
+            if (savedProducts.length<=0) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, savedProducts, null, 200);
+        }
+        catch (err) {
+            console.log(err, "errCatch")
+            return helpers.showResponse(false, err?.message, null, null, 403);
+
+        }
+
+    },
+    saveProductImage: async (data, file) => {
+        try {
+            let {displayOrder,imageType,productGuid,image} = data
+                   image = JSON.parse(image)
+                 const s3Upload = await helpers.uploadFileToS3([file])
+                 if (!s3Upload.status) {
+                     // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
+                     return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
+                 }
+                 console.log(s3Upload, "s3Upload")
+
+
+            const findProduct = await getSingleData(Product, { _id: productGuid })
+            if (!findProduct.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
+            }
+           
+            let obj = {
+                fileName:image.fileName,
+                imageUrl:s3Upload.data[0],
+                imageType,
+                thumbnailPath:"",
+                display_order:displayOrder,
+            }
+
+            let result = await Product.findByIdAndUpdate(productGuid,{$push:{productImages:obj}},{new:true})
+                  console.log(result,"resultt")
+            if (!result) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.update_failed, {}, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.admin?.update_successfully, result, null, 200);
+        }
+        catch (err) {
+            console.log(err, "errCatch")
+            return helpers.showResponse(false, err?.message, null, null, 403);
+
+        }
+
+    },
+    addVariableTypes: async (data) => {
+        try {
+            const { typeName } = data
+
+            const findProduct = await getSingleData(VariableTypes, { typeName })
+            if (findProduct.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
+            }
+
+            let obj = {
+                typeName,
+                createdOn: helpers.getCurrentDate(),
 
             }
-            let productRef = new Product(obj)
+            let productRef = new VariableTypes(obj)
             let result = await postData(productRef)
 
             if (!result.status) {
@@ -224,6 +312,76 @@ const adminUtils = {
             }
 
             return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
+        }
+        catch (err) {
+            console.log(err, "errCatch")
+            return helpers.showResponse(false, err?.message, null, null, 403);
+
+        }
+
+    },
+    addVariableOptions: async (data) => {
+        try {
+            const { value, variableTypeId } = data
+
+            const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId })
+            if (!findVariableType.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
+            }
+            const find = await getSingleData(VariableOptions, { value })
+            if (find.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
+            }
+
+
+            let obj = {
+                variableTypeId,
+                value,
+                createdOn: helpers.getCurrentDate(),
+
+            }
+            let productRef = new VariableOptions(obj)
+            let result = await postData(productRef)
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
+        }
+        catch (err) {
+            console.log(err, "errCatch")
+            return helpers.showResponse(false, err?.message, null, null, 403);
+
+        }
+
+    },
+    getAllVariableTypes: async () => {
+        try {
+            const result = await VariableTypes.aggregate(
+                [{
+                    $lookup: {
+                        from: 'variableOptions',
+                        localField: '_id',
+                        foreignField: 'variableTypeId',
+                        as: 'variableOptions',
+                    },
+                },]
+            )
+
+
+            console.log(result, "result")
+
+            if (result.length <= 0) {
+                return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 403);
+            }
+
+
+            // if (!result.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
+            // }
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
         }
         catch (err) {
             console.log(err, "errCatch")

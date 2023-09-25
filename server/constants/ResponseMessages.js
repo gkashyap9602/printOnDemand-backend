@@ -154,9 +154,11 @@ module.exports = {
         not_exist:"not existed",
         invalid_subcategory:"invalid subcategory",
         invalid_id:"invalid id",
-
+        invalid_Material_id:"invalid material id",
+        update_failed:"update failed",
         invalid_category:"invalid category",
         subcategory_already_existed:"subcategory already existed",
+        update_successfully:"update sucessfully"
 
 
 
