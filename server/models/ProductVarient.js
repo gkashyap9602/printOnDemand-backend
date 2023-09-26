@@ -22,38 +22,43 @@ var ProductVarient = new Schema({
     },
     dpi: {
         type: String,
-        required: true
+        default:null
     },
-    itemName: {
-        type: String,
-        required: true
-    },
-    size: {
-        type: String,
-        required: true
-    },
-    sizeInCm: {
-        type: String,
-        required: true
-    },
+    // itemName: {
+    //     type: String,
+    //     required: true
+    // },
+    // size: {
+    //     type: String,
+    //     required: true
+    // },
+    // sizeInCm: {
+    //     type: String,
+    //     required: true
+    // },
     price: {
         type: String,
     },
     msrp: {
         type: String,
+        default:null
     },
-    design_panels: {
+    designPanels: {
         type: String,
+    },
+    designerAvailable: {
+        type: Boolean,
+        default:false
     },
     status: {
         type: Number,
         default: 0,
     },
-    exentaItemNumber: {
-        type: Number,
-        default: 0,
-    },
-    product_varient_images: [{
+    // exentaItemNumber: {
+    //     type: Number,
+    //     default: 0,
+    // },
+    productVarientImages: [{
         _id: {
             type: mongoose.Types.ObjectId,
             default: mongoose.Types.ObjectId()
@@ -80,6 +85,10 @@ var ProductVarient = new Schema({
         }
 
     }],
+    isDefaultTemplate: {
+        type: Boolean,
+        default: false,
+    },
     isProductVariantDeleted: {
         type: Boolean,
         default: false,

@@ -3,19 +3,15 @@ var Schema = mongoose.Schema;
 
 var ProductVariableTypes = new Schema({
     productId: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         index: true,
         ref:"product"
     },
     variableTypeId: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         index: true,
         ref:"variableTypes"
 
-    },
-    guid: {
-        type: String,
-        index: true
     },
     isDesignerVariable: {
         type: Boolean,

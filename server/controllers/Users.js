@@ -97,18 +97,14 @@ const authController = {
         let result = await Users.getBulkImport(req?.query);
         return helpers.showOutputNew(res, result, result.code);
     },
-    getMaterials: async (req, res) => {
-        let result = await Users.getMaterials(req?.query);
-        return helpers.showOutputNew(res, result, result.code);
-    },
-// createOrder: async (req, res) => {
-//     let user_id = req.decoded.user_id;
-//     if (!user_id) {
-//         return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
-//     }
-//     let result = await Users.createOrder(req?.body,user_id);
-//     return helpers.showOutputNew(res, result, result.code);
-// },
+    // createOrder: async (req, res) => {
+    //     let user_id = req.decoded.user_id;
+    //     if (!user_id) {
+    //         return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+    //     }
+    //     let result = await Users.createOrder(req?.body,user_id);
+    //     return helpers.showOutputNew(res, result, result.code);
+    // },
     getUserStatus: async (req, res) => {
         let result = await Users.getUserStatus(req?.params);
         return helpers.showOutputNew(res, result, result.code);
@@ -153,35 +149,6 @@ const authController = {
     //         return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
     //     }
     //     let result = await Users.updateUserAdmin(req.body, req.body.user_id);
-    //     return helpers.showOutput(res, result, result.code);
-    // },
-    // markFrameUnlocked: async (req, res) => {
-
-    //     let requiredFields = ['frame_name', "user_id"];
-    //     let validator = helpers.validateParams(req, requiredFields);
-    //     if (!validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
-    //     }
-
-    //     let result = await Users.markFrameUnlocked(req?.body);
-    //     return helpers.showOutput(res, result, result.code);
-    // },
-    // listReports: async (req, res) => {
-    //     let requiredFields = ["page", "limit"];
-    //     let validator = helpers.validateParams(req, requiredFields);
-    //     if (!validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
-    //     }
-    //     let result = await Users.listReports(req?.body);
-    //     return helpers.showOutput(res, result, result.code);
-    // },
-    // verifyUserInProgress: async (req, res) => {
-    //     let requiredFields = ["user_id", "image"];
-    //     let validator = helpers.validateParams(req, requiredFields);
-    //     if (!validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
-    //     }
-    //     let result = await Users.verifyUserInProgress(req?.body);
     //     return helpers.showOutput(res, result, result.code);
     // },
 }

@@ -40,8 +40,23 @@ var Product = new Schema({
 
     },
     sizeChart: {
-        type: String,
-        default: null,
+        fileName:{
+            type: String,
+            default: null,
+        },
+        id:{
+            type: Number,
+            default: null,
+        },
+        imageType:{
+            type: Number,
+            default: null,
+        },
+        imageUrl:{
+            type: String,
+            default: null,
+        },
+
 
     },
     status: {

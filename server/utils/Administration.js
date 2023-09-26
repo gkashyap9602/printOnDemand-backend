@@ -6,7 +6,6 @@ let SubCategory = require('../models/subCategory')
 let helpers = require('../services/helper');
 let jwt = require('jsonwebtoken');
 // let moment = require('moment');
-const FS = require('../services/fileSystem')
 let md5 = require('md5');
 const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require('../constants/const');
@@ -18,12 +17,13 @@ const VariableTypes = require('../models/VariableTypes')
 const VariableOptions = require('../models/VariableOptions')
 const ProductVarient = require('../models/ProductVarient')
 const ProductVarientOptions = require('../models/ProductVarientOptions')
-const ProductVarientTypes = require('../models/ProductVariableTypes')
-
-
+const ProductVariableTypes = require('../models/ProductVariableTypes')
+const ProductTemplate = require('../models/ProductTemplates')
+const ProductCategory = require('../models/ProductCategory')
 
 
 const adminUtils = {
+
     login: async (data) => {
         let { email, password } = data;
         let where = {
@@ -54,7 +54,6 @@ const adminUtils = {
             //upload image to aws s3 bucket
             const s3Upload = await helpers.uploadFileToS3([file])
             if (!s3Upload.status) {
-                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
             }
             console.log(s3Upload, "s3Upload")
@@ -63,9 +62,6 @@ const adminUtils = {
             if (findCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.category_already_existed, {}, null, 403);
             }
-            // const uploadedFileName = file.filename;
-            // const imagePath = (`category/${uploadedFileName}`);
-            // const imageServerPath = `/files/${imagePath}`;
 
             let obj = {
                 name,
@@ -79,7 +75,6 @@ const adminUtils = {
             let result = await postData(categoryRef)
 
             if (!result.status) {
-                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
                 return helpers.showResponse(false, ResponseMessages?.admin?.category_save_failed, result?.data, null, 400);
             }
 
@@ -102,21 +97,15 @@ const adminUtils = {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
             }
             console.log(s3Upload, "s3Upload")
-            // const uploadedFileName = file.filename;
 
             const findCategory = await getSingleData(Category, { _id: category_id })
             if (!findCategory.status) {
-                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
                 return helpers.showResponse(false, ResponseMessages?.admin?.category_not_exist, {}, null, 404);
             }
             const findSubCategory = await getSingleData(SubCategory, { name: name })
             if (findSubCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.subcategory_already_existed, {}, null, 403);
             }
-            // await FS.makeDirectory(`${process.cwd()}/server/uploads/subCategory/${findCategory.name}`);
-
-            // const imagePath = (`subCategory/${findCategory.name}/${uploadedFileName}`);
-            // const imageServerPath = `/files/${imagePath}`;
 
             let obj = {
                 name,
@@ -130,7 +119,6 @@ const adminUtils = {
             let subCategoryRef = new SubCategory(obj)
             let result = await postData(subCategoryRef)
             if (!result.status) {
-                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
                 return helpers.showResponse(false, ResponseMessages?.admin?.subcategory_save_failed, result?.data, null, 400);
             }
             return helpers.showResponse(true, ResponseMessages?.admin?.subcategory_added, result?.data, null, 200);
@@ -161,7 +149,6 @@ const adminUtils = {
             let result = await postData(materialRef)
 
             if (!result.status) {
-                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
                 return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
             }
 
@@ -175,26 +162,24 @@ const adminUtils = {
 
     },
 
-    addProduct: async (data, file) => {
+    addProduct: async (data) => {
         try {
-            let { careInstructions, longDescription, categoryIds,materialId,
-                 construction,features, productionDuration, shortDescription, title } = data
-                 console.log(categoryIds,"categoryId")
-                     
-                //  categoryIds = JSON.parse(categoryIds)
-                //  console.log(categoryIds,"categoryId2")
+            let { careInstructions, longDescription, categoryIds, materialId,
+                construction, features, productionDuration, shortDescription, title } = data
+            console.log(categoryIds, "categoryId")
 
-                 categoryIds = categoryIds.map((id)=>mongoose.Types.ObjectId(id))
+            categoryIds = categoryIds.map((id) => mongoose.Types.ObjectId(id))
 
-                 console.log(categoryIds,"categoryIdsf")
+            console.log(categoryIds, "categoryIdsf")
 
             const findProduct = await getSingleData(Product, { title: title })
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
             }
-            const findSubCategory = await getDataArray(SubCategory, { _id: {$in:categoryIds} })
-            console.log(findSubCategory,"findSubcategory")
-            if (!findSubCategory.status) {
+            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: categoryIds } })
+            console.log(findSubCategory, "findSubcategory")
+            console.log(categoryIds.length, "length")
+            if (findSubCategory?.data.length !== categoryIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.invalid_subcategory, {}, null, 403);
             }
             // const findCategory = await getSingleData(Category, { _id: parentCategoryId, name: parentCategoryName })
@@ -226,22 +211,148 @@ const adminUtils = {
                 createdOn: helpers.getCurrentDate(),
                 guid: randomUUID(),
             }
-            const savedProducts = await Promise.all(categoryIds.map(async (categoryId) => {
-                let newObj = obj
-                newObj.subCategory_id= categoryId
-                const newProduct = new Product(newObj);
-                // let resultpostData(newProduct);
-                return await postData(newProduct);
-              }));
-              console.log(savedProducts,"savedProducts")
-            // let productRef = new Product(obj)
-            // let result = await postData(productRef)
 
-            if (savedProducts.length<=0) {
+            const prodRef = new Product(obj)
+            const saveProducts = await postData(prodRef)
+            console.log(saveProducts, "saveProducts")
+
+            if (!saveProducts.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
+
             }
 
-            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, savedProducts, null, 200);
+            let prodCategory = categoryIds.map((categoryId) => {
+                let item = {}
+                item.subcategoryId = categoryId
+                item.productId = saveProducts?.data._id
+                return item
+            })
+            console.log(prodCategory, "prodCategory")
+
+            const saveProdCategory = await insertMany(ProductCategory, prodCategory)
+
+            console.log(saveProdCategory, "saveProdCategory")
+
+            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, saveProducts, null, 200);
+        }
+        catch (err) {
+            console.log(err, "errCatch")
+            return helpers.showResponse(false, err?.message, null, null, 403);
+
+        }
+
+    },
+    getProductDetails: async (data) => {
+        try {
+            const { product_id } = data
+
+            const result = await Product.aggregate([
+                {
+                    $match: { _id: product_id },
+                },
+                {
+                    $lookup: {
+                        from: 'variableOptions',
+                        localField: '_id',
+                        foreignField: 'variableTypeId',
+                        as: 'variableOptions',
+                    },
+                },
+            ])
+
+
+            console.log(result, "result")
+
+            if (result.length <= 0) {
+                return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 403);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
+        }
+        catch (err) {
+            console.log(err, "errCatch")
+            return helpers.showResponse(false, err?.message, null, null, 403);
+
+        }
+
+    },
+    addProductVarient: async (data) => {
+        try {
+            let { productCode, price, product_id, productVarientTemplates, varientOptions } = data
+
+            const findProduct = await getSingleData(Product, { _id: product_id })
+            if (!findProduct.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
+            }
+
+            let newObj = {
+                productCode,
+                price,
+                product_id
+            }
+            const newProduct = new ProductVarient(newObj);
+            const productVarient = await postData(newProduct)
+
+            console.log(productVarient, "productVarient")
+            if (productVarient.status) {
+                productVarientTemplates = productVarientTemplates.map((value) => {
+                    let item = { ...value?.productTemplate, ...value }
+                    item.productVarientId = newProduct._id
+                    return item
+                })
+                console.log(productVarientTemplates, "productVarientTemplates")
+
+                const saveProductTemplate = await insertMany(ProductTemplate, productVarientTemplates)
+                console.log(saveProductTemplate, "saveProductTemplatee")
+
+                let variableTypesIds = varientOptions.map((id) => mongoose.Types.ObjectId(id.variableTypeId))
+                const findVariableTypes = await VariableTypes.find({ _id: { $in: variableTypesIds } })
+
+                console.log(findVariableTypes, "findVariableTypes")
+
+                if (findVariableTypes.length !== variableTypesIds.length) {
+                    return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
+
+                }
+                let pVariableType = varientOptions.map((value) => {
+                    let item = { ...value }
+                    item.productId = product_id
+                    return item
+                })
+                console.log(pVariableType, "pVariableType")
+                const saveProductVariableType = await insertMany(ProductVariableTypes, pVariableType)
+                console.log(saveProductVariableType, "saveProductVariableType")
+
+                let VariableOptionsData = varientOptions.map((value) => {
+                    let item = { ...value }
+                    item.value = value.variableOptionValue
+                    return item
+                })
+                console.log(VariableOptionsData, "VariableOptionsData")
+
+                const saveVariableOptions = await insertMany(VariableOptions, VariableOptionsData)
+                console.log(saveVariableOptions, "saveVariableOptions")
+
+                if (!saveVariableOptions.status) {
+                    return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, {}, null, 403);
+
+                }
+                let pVarientOptions = saveVariableOptions?.data.map((value) => {
+                    let item = {}
+                    item.variableOptionId = value._id
+                    item.productVarientId = newProduct._id
+                    return item
+                })
+                console.log(pVarientOptions, "pVarientOptions")
+
+                const saveProductVarientOptions = await insertMany(ProductVarientOptions, pVarientOptions)
+                console.log(saveProductVarientOptions, "saveProductVarientOptions")
+
+                return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, productVarient, null, 200);
+            }
+
+            return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, {}, null, 403);
+
         }
         catch (err) {
             console.log(err, "errCatch")
@@ -252,31 +363,29 @@ const adminUtils = {
     },
     saveProductImage: async (data, file) => {
         try {
-            let {displayOrder,imageType,productGuid,image} = data
-                   image = JSON.parse(image)
-                 const s3Upload = await helpers.uploadFileToS3([file])
-                 if (!s3Upload.status) {
-                     // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
-                     return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
-                 }
-                 console.log(s3Upload, "s3Upload")
-
-
+            let { displayOrder, imageType, productGuid, image } = data
+            image = JSON.parse(image)
+            const s3Upload = await helpers.uploadFileToS3([file])
+            if (!s3Upload.status) {
+                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
+                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
+            }
+            console.log(s3Upload, "s3Upload")
             const findProduct = await getSingleData(Product, { _id: productGuid })
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
             }
-           
+
             let obj = {
-                fileName:image.fileName,
-                imageUrl:s3Upload.data[0],
+                fileName: image.fileName,
+                imageUrl: s3Upload.data[0],
                 imageType,
-                thumbnailPath:"",
-                display_order:displayOrder,
+                thumbnailPath: "",
+                display_order: displayOrder,
             }
 
-            let result = await Product.findByIdAndUpdate(productGuid,{$push:{productImages:obj}},{new:true})
-                  console.log(result,"resultt")
+            let result = await Product.findByIdAndUpdate(productGuid, { $push: { productImages: obj } }, { new: true })
+            console.log(result, "resultt")
             if (!result) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.update_failed, {}, null, 400);
             }
@@ -333,7 +442,6 @@ const adminUtils = {
                 return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
             }
 
-
             let obj = {
                 variableTypeId,
                 value,
@@ -352,7 +460,6 @@ const adminUtils = {
         catch (err) {
             console.log(err, "errCatch")
             return helpers.showResponse(false, err?.message, null, null, 403);
-
         }
 
     },
@@ -375,11 +482,6 @@ const adminUtils = {
             if (result.length <= 0) {
                 return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 403);
             }
-
-
-            // if (!result.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
-            // }
 
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
         }
@@ -489,45 +591,6 @@ const adminUtils = {
     //     }
     //     return helpers.showResponse(false, ResponseMessages?.admin?.admin_details_update_error, null, null, 200);
     // },
-
-    // listRecords: async (data) => {
-    //     try {
-    //         const { page, limit } = data
-    //         const query = { status: { $ne: 2 } };
-
-    //         // Count the total number of documents matching the filter
-    //         const totalCount = await VerificationRequest.countDocuments(query);
-
-    //         // Calculate the number of documents to skip based on the pageNumber and pageSize
-    //         const skipCount = (page - 1) * limit;
-
-    //         // Fetch the filtered data with pagination using skip and limit
-    //         const filteredData = await VerificationRequest.find(query)
-    //             .skip(skipCount)
-    //             .limit(limit);
-
-    //         return helpers.showResponse(true, ResponseMessages.common.record_list, filteredData, { totalCount }, 200);
-
-    //     } catch (error) {
-
-    //         return helpers.showResponse(false, error?.message, null, null, 200);
-
-    //     }
-    // },
-    // updateCreatorCategories: async (data) => {
-    //     try {
-    //         let { _id } = data
-    //         let result = await CreatorCategories.updateOne({ _id: mongoose.Types.ObjectId(_id) }, { $set: data })
-
-    //         if (result) {
-    //             return helpers.showResponse(true, ResponseMessages.common.updated_sucessfully, null, null, 200);
-
-    //         }
-    //     } catch (error) {
-    //         return helpers.showResponse(false, error?.message, null, null, 200);
-
-    //     }
-    // },
     // getAdminData: async (data) => {
     //     try {
     //         let result = await CommonContent.findOne({})
@@ -540,21 +603,7 @@ const adminUtils = {
     //         return helpers.showResponse(false, error?.message, null, null, 200);
     //     }
     // },
-    // deleteReport: async (data) => {
-    //     try {
-    //         const { _id } = data
-    //         let result = await Reports.findOneAndDelete({ _id: mongoose.Types.ObjectId(_id) })
-    //         if (result) {
-    //             return helpers.showResponse(true, ResponseMessages?.report?.report_updated, null, null, 200);
 
-    //         }
-    //         return helpers.showResponse(true, ResponseMessages.report.not_found, null, null, 200);
-
-    //     } catch (error) {
-    //         return helpers.showResponse(false, error?.message, null, null, 200);
-
-    //     }
-    // }
 }
 
 module.exports = {

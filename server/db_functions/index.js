@@ -71,9 +71,16 @@ module.export = postData = (modalRefrence) =>{
 module.export = insertMany = (Model, dataArray) =>{
     return new Promise((resolve,reject)=>{
         try{
-            Model.insertMany(dataArray);
-            let response = helpers.showResponse(true, 'success');
-            return resolve(response);
+            Model.insertMany(dataArray,(err,data)=>{
+                if(err){
+                    let response = helpers.showResponse(false, err);
+                    return resolve(response);
+                } 
+                let response = helpers.showResponse(true, 'success', data);
+                return resolve(response);
+            })
+            // let response = helpers.showResponse(true, 'success');
+            // return resolve(response);
         } catch(err){
             let response = helpers.showResponse(false,err);
             return resolve(response);

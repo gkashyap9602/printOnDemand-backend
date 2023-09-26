@@ -3,9 +3,17 @@ let helpers = require('../services/helper')
 let Category = require('../models/Category')
 const ResponseMessages = require("../constants/ResponseMessages")
 const CSC2 = require('country-state-city');
+const Material = require('../models/Material')
 const { default: mongoose } = require('mongoose');
 const commonUtil = {
 
+  getMaterials: async (data) => {
+    const result = await getDataArray(Material, {})
+    if (!result.status) {
+      return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
+    }
+    return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result?.data?.length > 0 ? result?.data : {}, null, 200);
+  },
   getCategories: async (data) => {
     const { includeSubCategory = false, searchKey = '', parentCategoryGuid } = data
     let parentCategoryInfo = null
@@ -80,11 +88,11 @@ const commonUtil = {
     if (result.length < 0) {
       return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 404);
     }
-    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? { categories: result, parentCategoryInfo: parentCategoryInfo?.data?parentCategoryInfo?.data:null } : {}, null, 200);
+    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? { categories: result, parentCategoryInfo: parentCategoryInfo?.data ? parentCategoryInfo?.data : null } : {}, null, 200);
   },
   getAllCountries: async () => {
 
-    const countries = CSC2.Country.getAllCountries(); // Use lean() for performance
+    const countries = CSC2.Country.getAllCountries()
 
     //change response of countries 
     const formattedCountries = countries.map((country, index) => ({
@@ -116,65 +124,6 @@ const commonUtil = {
     }
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, formattedStates.length > 0 ? formattedStates : {}, null, 200);
   },
-  // getPrivacyContent: async () => {
-  //     let response = await getSingleData(Common, {}, 'privacy_policy -_id');
-  //     if (response.status) {
-  //         return helpers.showResponse(true, "Here is a Privacy Policy Content", response.data, null, 200);
-  //     }
-  //     return helpers.showResponse(false, 'No Content Found', null, null, 200);
-  // },
-  // getAbout: async () => {
-  //     let response = await getSingleData(Common, {}, 'about -_id');
-  //     if (response.status) {
-  //         return helpers.showResponse(true, "Here is a About Content", response.data, null, 200);
-  //     }
-  //     return helpers.showResponse(false, 'No Content Found', null, null, 200);
-  // },
-  // getQuestions: async () => {
-  //     let response = await getDataArray(FAQ, { status: { $ne: 2 } }, '', null, { created_on: -1 });
-  //     if (response.status) {
-  //         return helpers.showResponse(true, "Here is a list of questions", response.data, null, 200);
-  //     }
-  //     return helpers.showResponse(false, 'No data found', null, null, 200);
-  // },
-  // getCommonData: async () => {
-  //     let response = await getSingleData(Common, {}, '');
-  //     if (response.status) {
-  //         return helpers.showResponse(true, "Here is a Data", response.data, null, 200);
-  //     }
-  //     return helpers.showResponse(false, 'No Content Found', null, null, 200);
-  // },
-  // updateCommonData: async (data) => {
-  //     data.updated_on = moment().unix();
-  //     let response = await updateByQuery(Common, data);
-  //     if (response.status) {
-  //         return helpers.showResponse(true, "Common details has been updated", null, null, 200);
-  //     }
-  //     return helpers.showResponse(false, "Update failed", response, null, 200);
-  // },
-  // addNewQuestion: async (data) => {
-  //     let { question, answer } = data
-  //     let newObj = {
-  //         question,
-  //         answer,
-  //         status: 1,
-  //         created_on: moment().unix()
-  //     }
-  //     let quesRef = new FAQ(newObj)
-  //     let response = await postData(quesRef);
-  //     if (response.status) {
-  //         return helpers.showResponse(true, "New Question Added Successfully", null, null, 200);
-  //     }
-  //     return helpers.showResponse(false, "Unable to add new question at the moment", response, null, 200);
-  // },
-  // updateQuestion: async (data, ques_id) => {
-  //     data.updated_on = moment().unix();
-  //     let response = await updateData(FAQ, data, ObjectId(ques_id));
-  //     if (response.status) {
-  //         return helpers.showResponse(true, "Question has been updated", null, null, 200);
-  //     }
-  //     return helpers.showResponse(false, "Update failed", null, null, 200);
-  // },
   storeParameterToAWS: async (data) => {
     let response = await helpers.postParameterToAWS({
       name: data.name,

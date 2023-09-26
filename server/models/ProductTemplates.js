@@ -2,9 +2,9 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var ProductTemplates = new Schema({
-    guid: {
-        type: String,
-        index: true
+    productVarientId: {
+        type: mongoose.Types.ObjectId,
+        ref:"productVarient"
     },
     fileName: {
         type: String,
@@ -12,7 +12,7 @@ var ProductTemplates = new Schema({
     },
     filePath: {
         type: String,
-        required: true
+        // required: true
     },
     productTemplateId: {
         type: String,

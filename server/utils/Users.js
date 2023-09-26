@@ -310,9 +310,9 @@ const UserUtils = {
         let { oldPassword, newPassword, userId } = data;
         let dycryption_new = helpers.decryptUsingAES(newPassword)
         let dycryption_old = helpers.decryptUsingAES(oldPassword)
-          
-        console.log(dycryption_new,"dycryption_new")
-        console.log(dycryption_old,"dycryption_old")
+
+        console.log(dycryption_new, "dycryption_new")
+        console.log(dycryption_old, "dycryption_old")
 
         if (!dycryption_old || !dycryption_new) {
             return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
@@ -388,23 +388,10 @@ const UserUtils = {
 
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
     },
-    getMaterials: async (data) => {
-        // let { user_id } = data
-        
-        const result = await getDataArray(Material, {})
-        if (!result.status) {
-            return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
-        }
-
-        console.log(result,"findmm")
-
-        return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess,result?.data?.length>0?result?.data:{}, null, 200);
-    },
 
     // // with token 
     getAllOrders: async (data) => {
         let { customerId, pageIndex, pageSize, sortColumn, sortDirection, status, storeIds } = data
-
         // console.log(customerId,"customerId")
         //    const result = await getDataArray(Orders,{customerGuid:customerId})
 
@@ -502,33 +489,6 @@ const UserUtils = {
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result?.data, null, 200);
     },
 
-
-    //?????????
-    updateUser: async (data, user_id) => {
-        if ("userName" in data && data.userName !== "") {
-            let checkEmailExistance = await UserUtils.checkEmailExistance(data.email, user_id)
-            if (!checkEmailExistance.status) {
-                return {
-                    ...checkEmailExistance,
-                    data: null
-                }
-            }
-        }
-
-        // if ("access_token" in data) {
-        //     return helpers.showResponse(false, ResponseMessages?.users?.beyond_the_limit, updateResponse?.data, null, 200);
-        // }
-        // if ("refresh_token" in data) {
-        //     return helpers.showResponse(false, ResponseMessages?.users?.beyond_the_limit, updateResponse?.data, null, 200);
-        // }
-        data.updatedOn = helpers.getCurrentDate();
-
-        let result = await updateData(Users, data, user_id)
-        if (result) {
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
-        }
-        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
-    },
     updateUserBasicDetails: async (data, user_id) => {
         const { userGuid } = data
 

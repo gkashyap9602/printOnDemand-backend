@@ -3,15 +3,14 @@ var Schema = mongoose.Schema;
 
 var ProductVarientOptions = new Schema({
     productVarientId: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         index: true,
-        ref:"productVarient"
+        ref: "productVarient"
     },
     variableOptionId: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         index: true,
-        ref:"variableOptions"
-
+        ref: "variableOptions"
     },
     guid: {
         type: String,

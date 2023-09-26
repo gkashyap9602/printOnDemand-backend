@@ -17,19 +17,13 @@ router.get('/get_user_status/:user_id', middleware.checkToken, AuthController.ge
 // router.post('/createOrder', middleware.checkToken, AuthController.allOrders);
 router.post('/getAllOrders', middleware.checkToken, AuthController.getAllOrders);
 router.get('/getBulkImport', middleware.checkToken, AuthController.getBulkImport);
-router.get('/get_materials', middleware.checkToken, AuthController.getMaterials);
-
-
+router.post('/logout',middleware.checkToken, AuthController.logout);
 router.post('/update_basic_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateUserBasicDetails);
 router.post('/update_shipping_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateShippingDetails);
 router.post('/update_billing_address', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateBillingAddress);
 router.post('/update_payment_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updatePaymentDetails);
 router.post('/change_password',middleware.checkToken,validate(userValidation.changePasswordSchema), AuthController.changePasswordWithOld);
 
-router.post('/logout',middleware.checkToken, AuthController.logout);
-
-
-// admin token Route
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
