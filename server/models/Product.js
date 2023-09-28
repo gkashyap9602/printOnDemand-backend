@@ -2,18 +2,14 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var Product = new Schema({
-    subCategory_id: {
+    subCategoryId: [{
         type: mongoose.Types.ObjectId,
         ref: "subcategory",
         index: true
-    },
+    }],
     materialId: {
         type: mongoose.Types.ObjectId,
         ref: "material"
-    },
-    guid: {
-        type: String,
-        index: true
     },
     careInstructions: {
         type: String,
@@ -26,9 +22,9 @@ var Product = new Schema({
     longDescription: {
         type: String,
     },
-    priceStartsFrom: {
-        type: String,
-    },
+    // priceStartsFrom: {
+    //     type: String,
+    // },
     productionDuration: {
         type: String,
         default: null,
@@ -40,23 +36,22 @@ var Product = new Schema({
 
     },
     sizeChart: {
-        fileName:{
+        fileName: {
             type: String,
             default: null,
         },
-        id:{
-            type: Number,
-            default: null,
-        },
-        imageType:{
-            type: Number,
-            default: null,
-        },
-        imageUrl:{
+        // id:{
+        //     type: Number,
+        //     default: null,
+        // },
+        // imageType: {
+        //     type: Number,
+        //     default: null,
+        // },
+        imageUrl: {
             type: String,
             default: null,
         },
-
 
     },
     status: {
@@ -67,22 +62,15 @@ var Product = new Schema({
     construction: {
         type: String,
     },
-    ConstructionCallout: {
+    constructionCallout: {
         type: String,
     },
     features: {
         type: String,
     },
-    Process: {
+    process: {
         type: String,
     },
-    // parentCategoryName: {
-    //     type: String,
-    // },
-    // parentCategoryId: {
-    //     type: String,
-    // },
-
     productImages: [{
         _id: {
             type: mongoose.Types.ObjectId,
@@ -101,7 +89,7 @@ var Product = new Schema({
         thumbnailPath: {
             type: String
         },
-        display_order: {
+        displayOrder: {
             type: String
         }
     }],
@@ -114,6 +102,12 @@ var Product = new Schema({
         type: String,
         default: null,
     },
+    // parentCategoryName: {
+    //     type: String,
+    // },
+    // parentCategoryId: {
+    //     type: String,
+    // },
     createdOn: {
         type: String,
         default: null,

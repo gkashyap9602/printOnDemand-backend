@@ -44,18 +44,18 @@ var Users = new Schema({
         type: Number,
         default: 0
     },
-    guid:{
-        type: String,
-        default: null
-    },
+    // guid:{
+    //     type: String,
+    //     default: null
+    // },
     customerId:{
         type: Number,
         default: 0
     },
-    customerGuid:{
-        type: String,
-        default: null
-    },
+    // customerGuid:{
+    //     type: String,
+    //     default: null
+    // },
     orderSubmissionDelay:{
         type: String,
         default: '00:01:00'

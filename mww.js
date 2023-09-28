@@ -26,7 +26,7 @@ let users = require("./server/routes/users");
 let common = require("./server/routes/common");
 
 app.use(API_V1 + "administration", administration);
-app.use(API_V1 + "users", users);
+app.use(API_V1 + "user", users);
 app.use(API_V1 + "common", common);
 
 app.listen(process.env.PORT || 3000, () => {

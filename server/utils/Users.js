@@ -13,6 +13,7 @@ const { randomUUID } = require('crypto')
 const middleware = require('../controllers/middleware');
 const Orders = require('../models/Orders')
 const Material = require("../models/Material")
+
 const UserUtils = {
 
     checkEmailExistance: async (email, user_id = null) => {
@@ -23,7 +24,7 @@ const UserUtils = {
         let result = await getSingleData(Users, queryObject, '');
         console.log(result, "result checkEmailExistance")
         if (result?.status) {
-            return helpers.showResponse(false, ResponseMessages.users.email_already, result?.data, null, 200);
+            return helpers.showResponse(false, ResponseMessages.users.email_already, result?.data, null, 403);
         }
         return helpers.showResponse(true, ResponseMessages?.users?.valid_email, null, null, 200);
     },
@@ -43,18 +44,10 @@ const UserUtils = {
         try {
             let { firstName, lastName, email, password } = data;
 
-            let dycryption = helpers.decryptUsingAES(password)
-            console.log(dycryption, "dycrptionnn")
-            if (!dycryption) {
-                console.log("underr")
-                return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
-            }
-            password = helpers.decryptUsingAES(password)
-
             let emailExistanceResponse = await UserUtils.checkEmailExistance(email)
             console.log(emailExistanceResponse, "emailExistanceResponse")
             if (!emailExistanceResponse?.status) {
-                return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 400);
+                return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 403);
             }
             const usersCount = await getCount(Users, { userType: 3 })
             if (!usersCount.status) {
@@ -68,9 +61,9 @@ const UserUtils = {
                 email: email,
                 userName: email,
                 id: idGenerated.idNumber,
-                guid: randomUUID(),
+                // guid: randomUUID(),
                 customerId: idGenerated.customerID,
-                customerGuid: randomUUID(),
+                // customerGuid: randomUUID(),
                 password: md5(password),
                 createdOn: helpers.getCurrentDate()
             }
@@ -80,7 +73,7 @@ const UserUtils = {
             if (result.status) {
                 delete data.password
                 let ObjProfile = {
-                    user_id: result.data._id,
+                    userId: result.data._id,
                     completionStaus: {
                         basicInfo: true
                     },
@@ -90,7 +83,6 @@ const UserUtils = {
                 let userProfileRef = new UserProfile(ObjProfile)
                 let resultProfile = await postData(userProfileRef);
                 if (!resultProfile.status) {
-                    // console.log(resultProfile, "resultProfile")
                     await deleteData(Users, { _id: userRef._id })
                     return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 402);
                 }
@@ -138,27 +130,20 @@ const UserUtils = {
      
                  `
                 let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
-                console.log(emailResponse, "emailResponseregister")
                 return helpers.showResponse(true, ResponseMessages?.users?.register_success, data, null, 200);
             }
 
-            return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
         } catch (err) {
             console.log("in catch err", err)
-            return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
         }
 
     },
     login: async (data) => {
         try {
-            let { isLoginFromShopify, password, userName } = data
-            let queryObject = { email: userName }
-
-            let dycryption = helpers.decryptUsingAES(password)
-            if (!dycryption) {
-                return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
-            }
-            password = helpers.decryptUsingAES(password)
+            let { isLoginFromShopify, password, email } = data
+            let queryObject = { email: email }
 
             let result = await getSingleData(Users, queryObject, '');
             if (!result.status) {
@@ -187,21 +172,17 @@ const UserUtils = {
 
             return helpers.showResponse(true, ResponseMessages?.users?.login_success, userData, null, 200);
         } catch (err) {
-            console.log("in login catch err", err)
             return helpers.showResponse(false, ResponseMessages?.users?.login_error, null, null, 401);
         }
     },
-    logout: async (data, user_id) => {
-        let queryObject = { _id: user_id }
+
+    logout: async (data, userId) => {
+        let queryObject = { _id: userId }
         let result = await getSingleData(Users, queryObject, 'traceId');
         if (!result.status) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 401);
         }
         let userData = result?.data
-
-        let password = await helpers.decryptUsingAES('a7KhgKWFZugvt2laKNOl+A==')
-        console.log(password, "passwordd")
-
         return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
     },
 
@@ -220,7 +201,7 @@ const UserUtils = {
                 expiresIn: consts.ACCESS_EXPIRY
             });
 
-            let link = `${consts.FRONTEND_URL}/resetPassword?resetPasswordToken=${token}&&emailId=${email}`
+            let link = `${consts.FRONTEND_URL}/resetPassword?resetPasswordToken=${token}&&email=${email}`
             let to = email
             let subject = `Reset Your Password For MWW On Demand`
             const logoPath = path.join(__dirname, '../views', 'logo.png');
@@ -260,34 +241,24 @@ const UserUtils = {
 
                     </body>
                     </html>
-
             `
-
             let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
             console.log(emailResponse, "emailResponse")
             if (emailResponse?.status) {
                 return helpers.showResponse(true, ResponseMessages.users.verification_email_sent, true, null, 200);
             }
-            return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, null, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, null, null, 401);
         } catch (err) {
-            console.log("in catch err", err)
-            return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, err, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, err, null, 401);
         }
     },
 
     resetPassword: async (data) => {
-        let { emailId, resetPasswordToken, newPassword } = data;
-        let dycryption = helpers.decryptUsingAES(newPassword)
-        if (!dycryption) {
-            return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
-        }
-        newPassword = helpers.decryptUsingAES(newPassword)
-        let queryObject = {
-            email: emailId
-        }
+        let { email, resetPasswordToken, newPassword } = data;
+        let queryObject = {email: email}
         let response = await getSingleData(Users, queryObject, '')
         if (!response?.status) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 401);
         }
         let userData = response?.data
         let verifyResponse = await middleware.verifyToken(resetPasswordToken)
@@ -301,28 +272,17 @@ const UserUtils = {
         }
         let result = await updateData(Users, editObj, ObjectId(userData?._id))
         if (!result?.status) {
-            return helpers.showResponse(false, ResponseMessages?.users?.password_reset_error, null, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.users?.password_reset_error, null, null, 400);
         }
         return helpers.showResponse(true, ResponseMessages?.users?.password_reset_success, null, null, 200);
     },
 
     changePasswordWithOld: async (data, user_id) => {
         let { oldPassword, newPassword, userId } = data;
-        let dycryption_new = helpers.decryptUsingAES(newPassword)
-        let dycryption_old = helpers.decryptUsingAES(oldPassword)
-
-        console.log(dycryption_new, "dycryption_new")
-        console.log(dycryption_old, "dycryption_old")
-
-        if (!dycryption_old || !dycryption_new) {
-            return helpers.showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400)
-        }
-        newPassword = helpers.decryptUsingAES(newPassword)
-        oldPassword = helpers.decryptUsingAES(oldPassword)
-
+        
         let result = await getSingleData(Users, { password: { $eq: md5(oldPassword) }, _id: ObjectId(user_id) });
         if (!result.status) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_old_password, null, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_old_password, null, null, 401);
         }
         let updatedData = {
             password: md5(newPassword),
@@ -332,7 +292,7 @@ const UserUtils = {
         if (response.status) {
             return helpers.showResponse(true, ResponseMessages.users.password_change_successfull, null, null, 200);
         }
-        return helpers.showResponse(false, ResponseMessages.users.password_change_failed, null, null, 200);
+        return helpers.showResponse(false, ResponseMessages.users.password_change_failed, null, null, 400);
     },
 
 

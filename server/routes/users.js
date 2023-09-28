@@ -8,10 +8,11 @@ const userValidation  = require('../validations/user')
 // Users Routes without token
 router.post('/register',validate(userValidation.registrationSchema), AuthController.register);
 router.post('/login',validate(userValidation.loginSchema), AuthController.login);
-router.post('/forgot',validate(userValidation.forgotSchema), AuthController.forgotPassword);
-router.post('/reset_password',validate(userValidation.resetPasswordSchema), AuthController.resetPassword);
+router.post('/forgotPassword',validate(userValidation.forgotSchema), AuthController.forgotPassword);
+router.post('/resetPassword',validate(userValidation.resetPasswordSchema), AuthController.resetPassword);
 
 // with token
+router.post('/changePassword',middleware.checkToken,validate(userValidation.changePasswordSchema), AuthController.changePasswordWithOld);
 router.get('/getUser/:user_id', middleware.checkToken, AuthController.getUserDetail);
 router.get('/get_user_status/:user_id', middleware.checkToken, AuthController.getUserStatus);
 // router.post('/createOrder', middleware.checkToken, AuthController.allOrders);
@@ -22,7 +23,6 @@ router.post('/update_basic_details', middleware.checkToken,validate(userValidati
 router.post('/update_shipping_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateShippingDetails);
 router.post('/update_billing_address', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updateBillingAddress);
 router.post('/update_payment_details', middleware.checkToken,validate(userValidation.profileSchema), AuthController.updatePaymentDetails);
-router.post('/change_password',middleware.checkToken,validate(userValidation.changePasswordSchema), AuthController.changePasswordWithOld);
 
 
 // Common Routes

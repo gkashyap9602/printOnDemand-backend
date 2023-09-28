@@ -6,40 +6,40 @@ const authController = {
 
     register: async (req, res) => {
         let result = await Users.register(req.body);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
 
     login: async (req, res) => {
         let result = await Users.login(req.body);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
 
     forgotPassword: async (req, res) => {
         let result = await Users.forgotPassword(req.body);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
 
     resetPassword: async (req, res) => {
         let result = await Users.resetPassword(req.body);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
 
     changePasswordWithOld: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages.users.invalid_user), 403);
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.users.invalid_user), 403);
         }
         let result = await Users.changePasswordWithOld(req.body, user_id);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
 
     logout: async (req, res) => {
-        let user_id = req.decoded?.user_id;
-        if (!user_id) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+        let userId = req.decoded?.user_id;
+        if (!userId) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
         }
-        let result = await Users.logout(req.body, user_id);
-        return helpers.showOutputNew(res, result, result.code);
+        let result = await Users.logout(req.body, userId);
+        return helpers.showOutput(res, result, result.statusCode);
     },
 
     updateUser: async (req, res) => {

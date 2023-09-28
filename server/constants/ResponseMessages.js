@@ -1,10 +1,4 @@
 module.exports = {
-    report:{
-        report:"report submitted",
-        report_list:"report list",
-        report_updated:"report updated",
-        not_found:"not found"
-    },
     common: {
         parameter_store_post_success: "Parameter Stored to AWS Successfully",
         parameter_store_post_error: "Error while Parameter Store to AWS",
@@ -23,14 +17,17 @@ module.exports = {
         thumbnail_error: "Unable to create thumbnail at the moment",
         thumbnail_generated: "Thumbnail generated",
         server_error:"server error",
-        record_list:"record list",
         updated_sucessfully:"updated sucessfully",
-        data:"data fetched successfully",
-        database_error:"data fetch unsucessfull",
-        dycryption_error:"dycryption unsucessfull",
-        data_retreive_sucess:"data retrieve successfully",
-        data_not_found:"data not found"
-
+        data:"Data fetched successfully",
+        database_error:"Data fetch unsucessfull",
+        data_retreive_sucess:"Data retrieve successfully",
+        data_not_found:"Data not found",
+        data_save:"Data Saved Successfully",
+        save_failed:"Error Occured while saving Data",
+        already_existed:"Data already existed",
+        not_exist:"Data not existed",
+        invalid_id:"invalid id",
+        created_successfully:"created Successfully",
 
     },
     users: {
@@ -61,7 +58,7 @@ module.exports = {
         invalid_credentials: "Invalid Password",
         account_disabled: "your account is disabled by administrator !!! contact to support",
         login_error: "Unable to login to your account",
-        // invalid_user: "Unauthorised user",
+        unauthorised_user: "Unauthorised user",
         invalid_user: "Invalid user",
         logout_success: "Logout Success",
         user_detail: "Here is a user details",
@@ -83,44 +80,35 @@ module.exports = {
         comment_liked_failed: "comment liked failed",
         comment_unliked_failed: "comment unliked failed",
         error_following: "error while following this user",
-        payout: "Payout in process",
-        not_enough_points:"not enough balance",
-        amount_gifted:"amount gifted",
-        angels_list:"angels list",
-        planAdded:"plan added",
-        plans:"plans list",
-        frame_active:"frame activated",
-        questions:"questions list",
-        no_questions:"no questions found",
-        user_verified:"user verified",
-        categories_list:'categories list',
-        categories_list_not:'categories list not found',
-        frame_removed:"frame removed",
-        frame_unlocked:"frame unlocked"
+        user_verified:"user verified successfully",
 
     },
-    family:{
-        family_created:"family created",
-        family_updated:"family updated",
-        family_details:"family details",
-        family_members:"family members",
-        member_added:"family member added",
-        member_removed:"family member removed",
-        already_part_family:"already a member of family",
-        already_a_member_of_another:"already a member of another family",
-        not_found:"family not found",
-        join_request_sent:"join request sent",
-        request_list:"request list",
-        no_requests:"no requests",
-        not_enough_points:"not enough points",
-        families_list:"families list"
+    product:{
+        product_already_existed:"Product already existed",
+        product_not_exist:"Product does not exist",
+        product_created:"Product Created Successfully",
+        product_save_failed:"Error occured while adding new Product",
+        invalid_product_id:"Invalid Product Id",
 
     },
-    comment: {
-        comment_added: "comment added",
-        error: "error while adding comment",
-        comments_list: 'comment_list',
-        no_comments: 'no comments found'
+    category:{
+        subcategory_already_existed:"Subcategory already existed",
+        category_already_existed:"Category already existed",
+        category_not_exist:"Category does not exist",
+        subcategory_added:"subcategory added Successfully",
+        category_save_failed:"Error occured while adding new category",
+        subcategory_save_failed:"Error occured while adding new Subcategory",
+        category_added:"category added Sucessfully",
+        subcategory_added:"Subcategory added Sucessfully",
+        invalid_category_id:"Invalid Category Id",
+        invalid_subcategory_id:"Invalid Subcategory Id",
+
+
+
+    },
+    material:{
+        invalid_material_id:"Invalid Material Id",
+
     },
     admin: {
         forgot_password_email_sent: "Forgot Password Email has been sent to your registered email address",
@@ -141,29 +129,7 @@ module.exports = {
         admin_details_updated: "Administrator details updated",
         admin_details_update_error: "Error while updating details",
         email_already: "Email address is already occupied",
-        question_added:"question added",
-        category_added:"category added",
-        created_successfully:"created Successfully",
-        subcategory_added:"subcategory added",
-        category_save_failed:"category creation failed",
-        subcategory_save_failed:"subcategory creation failed",
-        save_failed:"creation failed",
-        category_not_exist:"category not exist",
-        category_already_existed:"category already existed",
-        already_existed:"already existed",
-        not_exist:"not existed",
-        invalid_subcategory:"invalid subcategory",
-        invalid_id:"invalid id",
-        invalid_Material_id:"invalid material id",
-        update_failed:"update failed",
-        invalid_category:"invalid category",
-        subcategory_already_existed:"subcategory already existed",
-        update_successfully:"update sucessfully"
-
-
-
-
-
+        
     },
     middleware: {
         use_access_token: "Please use access token for identification not refresh token",
@@ -175,49 +141,8 @@ module.exports = {
         access_refreshed: "Access token is refreshed"
     },
     order: {
-        order_created: "order created",
+        order_created: "order created Successfully",
         transactions: "transaction list",
         no_transaction: "no transaction"
     },
-    videos: {
-        invalid_path: "video path is not correct",
-        video_add_success: "video has been added successfully",
-        video_add_error: "Unable to add new video at the moment",
-        video_update_success: "video has been updated",
-        video_update_error: "Unable to update video at the moment",
-        videos_list: "here is a list of videos",
-        no_more_videos: "No more videos",
-        invalid_video: "invalid video identification",
-        like_success: "video likes successfully",
-        unlike_success: "video removed from liked videos",
-        like_error: "unable to like video at the moment",
-        unlike_error: "unable to remove video from liked videos at the moment",
-        video_details: "video details",
-        unable_to_get_video_details: "unable to get video details",
-        mark_as_seen:"video marked as seen"
-    },
-    live: {
-        live_feed_added: "live feed added",
-        error_while_going_live: "error while going live",
-        live_list: "live listing",
-        error_live_list: "error in live listing",
-        updated: "live updated",
-        error_live_updating: "error while updating live"
-    },
-    audios: {
-        invalid_path: "audio path is not correct",
-        audio_add_success: "audio has been added successfully",
-        audio_found_success: "audio found successfully",
-        audio_add_error: "Unable to add new audio at the moment",
-        audio_update_success: "audio has been updated",
-        audio_update_error: "Unable to update audio at the moment",
-        audio_list: "here is a list of audio",
-        no_more_audio: "No more audio",
-        no_audio_found: "No audio found",
-        invalid_audio: "invalid audio identification",
-        like_success: "audio likes successfully",
-        unlike_success: "audio removed from liked videos",
-        like_error: "unable to like audio at the moment",
-        unlike_error: "unable to remove audio from liked audio at the moment"
-    }
 }

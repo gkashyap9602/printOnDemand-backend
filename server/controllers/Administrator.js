@@ -21,7 +21,7 @@ const adminController = {
     },
     addProduct: async (req, res) => {
         let result = await Administration.addProduct(req.body);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
     getProductDetails: async (req, res) => {
         let result = await Administration.getProductDetails(req.query);
@@ -33,10 +33,10 @@ const adminController = {
     },
     saveProductImage: async (req, res) => {
         if (!req.file) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages.common.file_upload_error), 203);
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.file_upload_error), 203);
         }
         let result = await Administration.saveProductImage(req.body, req.file);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
     addSubCategories: async (req, res) => {
         if (!req.file) {

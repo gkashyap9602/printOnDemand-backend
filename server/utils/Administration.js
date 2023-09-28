@@ -164,83 +164,55 @@ const adminUtils = {
 
     addProduct: async (data) => {
         try {
-            let { careInstructions, longDescription, categoryIds, materialId,
+            let { careInstructions, longDescription, subCategoryIds, materialId,
                 construction, features, productionDuration, shortDescription, title } = data
-            console.log(categoryIds, "categoryId")
 
-            categoryIds = categoryIds.map((id) => mongoose.Types.ObjectId(id))
-
-            console.log(categoryIds, "categoryIdsf")
+            subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
 
             const findProduct = await getSingleData(Product, { title: title })
             if (findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 403);
             }
-            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: categoryIds } })
-            console.log(findSubCategory, "findSubcategory")
-            console.log(categoryIds.length, "length")
-            if (findSubCategory?.data.length !== categoryIds.length) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.invalid_subcategory, {}, null, 403);
-            }
-            // const findCategory = await getSingleData(Category, { _id: parentCategoryId, name: parentCategoryName })
+            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } })
 
-            // if (!findCategory.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.admin?.invalid_category, {}, null, 403);
-            // }
+            if (findSubCategory?.data.length !== subCategoryIds.length) {
+                return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
+            }
             const findMaterial = await getSingleData(Material, { _id: materialId })
 
             if (!findMaterial.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.invalid_Material_id, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 403);
             }
-
             let obj = {
                 careInstructions,
                 longDescription,
-                // subCategory_id,?
-                // imageUrl: s3Upload?.data[0],
-                // priceStartsFrom,
                 materialId,
-                // materialName,
                 features,
-                // parentCategoryName,
-                // parentCategoryId,
-                productionDuration,
-                shortDescription,
-                // sizeChart,
                 title,
                 createdOn: helpers.getCurrentDate(),
-                guid: randomUUID(),
+                subCategoryId: subCategoryIds,
+                // imageUrl: s3Upload?.data[0],
+                // priceStartsFrom,
+                // materialName,
+                // parentCategoryName,
+                // parentCategoryId,
+                // productionDuration,
+                // shortDescription,
+                // sizeChart,
             }
-
             const prodRef = new Product(obj)
-            const saveProducts = await postData(prodRef)
-            console.log(saveProducts, "saveProducts")
+            const saveProduct = await postData(prodRef)
+            console.log(saveProduct, "saveProduct")
 
-            if (!saveProducts.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
-
+            if (!saveProduct.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
             }
-
-            let prodCategory = categoryIds.map((categoryId) => {
-                let item = {}
-                item.subcategoryId = categoryId
-                item.productId = saveProducts?.data._id
-                return item
-            })
-            console.log(prodCategory, "prodCategory")
-
-            const saveProdCategory = await insertMany(ProductCategory, prodCategory)
-
-            console.log(saveProdCategory, "saveProdCategory")
-
-            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, saveProducts, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.product.product_created, saveProduct?.data, null, 200);
         }
         catch (err) {
             console.log(err, "errCatch")
             return helpers.showResponse(false, err?.message, null, null, 403);
-
         }
-
     },
     getProductDetails: async (data) => {
         try {
@@ -363,15 +335,14 @@ const adminUtils = {
     },
     saveProductImage: async (data, file) => {
         try {
-            let { displayOrder, imageType, productGuid, image } = data
-            image = JSON.parse(image)
+            let { displayOrder, imageType, productId } = data
+            // image = JSON.parse(image)
             const s3Upload = await helpers.uploadFileToS3([file])
             if (!s3Upload.status) {
-                // await FS.deleteFile(`${process.cwd()}/server/uploads/${imagePath}`);
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 400);
             }
             console.log(s3Upload, "s3Upload")
-            const findProduct = await getSingleData(Product, { _id: productGuid })
+            const findProduct = await getSingleData(Product, { _id: productId })
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
             }

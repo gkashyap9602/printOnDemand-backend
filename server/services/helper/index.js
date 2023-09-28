@@ -22,57 +22,54 @@ const showResponse = (
   message,
   data = null,
   other = null,
-  code = null
+  statusCode = null
 ) => {
   let response = {};
   response.status = status;
-  response.Message = message;
+  response.message = message;
+  if (statusCode !== null) {
+    response.statusCode = statusCode;
+  }
   if (data !== null) {
     response.data = data;
   }
   if (other !== null) {
     response.other = other;
   }
-  if (code !== null) {
-    response.code = code;
-  }
   return response;
 };
 
 const showOutput = (res, response, code) => {
-  response.StatusCode = response.code
-  delete response.code;
+  // delete response.code;
   res.status(code).json(response);
 };
-const showOutputNew = (res, response, code) => {
-  // console.log(response,"response new output")
-  if (!response.status) {
-    res.status(code).json({
-      Response: {
-        Message: response?.Message,
-        ValidationErrors: null,
-        ValidationFailed: false,
-      }, StatusCode: response.code
-    });
+// const showOutputNew = (res, response, code) => {
+//   // console.log(response,"response new output")
+//   if (!response.status) {
+//     res.status(code).json({
+//       Response: {
+//         Message: response?.Message,
+//         ValidationErrors: null,
+//         ValidationFailed: false,
+//       }, StatusCode: response.code
+//     });
 
-  } else {
-    // console.log(response?.data,"else shownew")
-    res.status(code).json({ message: response?.Message, response: response?.data, statusCode: response.code });
+//   } else {
+//     // console.log(response?.data,"else shownew")
+//     res.status(code).json({ message: response?.Message, response: response?.data, statusCode: response.code });
 
-  }
-};
+//   }
+// };
 
 const validationError = async (res, error) => {
-  const code = 400;
-  const validationErrors = error.details.map((error) => error.message.replace(new RegExp('\\"', "g"), ""));
-
+  const code = 403;
+  const validationErrors = error.message.replace(new RegExp('\\"', "g"), "");
+  // const validationErrors = error.details.map((error) => error.message.replace(new RegExp('\\"', "g"), ""));
   return res.status(code).json({
-    StatusCode: code,
-    Response: {
-      Message: null,
-      ValidationErrors: validationErrors,
-      ValidationFailed: true
-    },
+    status:false,
+    statusCode: code,
+    validationFailed: true,
+    message:validationErrors,
   });
 };
 
@@ -1134,7 +1131,7 @@ module.exports = {
   sendFcmNotificationTopic,
   // uploadVideoToS31,
   changeEnv,
-  showOutputNew,
+  // showOutputNew,
   generateIDs,
   getCurrentDate,
   validationError,

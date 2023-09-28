@@ -67,7 +67,7 @@ module.exports.registrationSchema = {
 module.exports.loginSchema = {
     body: joi.object({
         isLoginFromShopify: joi.boolean().required(),
-        userName: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
         password: joi.string().required()
     })
 
