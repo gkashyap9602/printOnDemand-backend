@@ -209,29 +209,81 @@ const adminUtils = {
     },
     getProductDetails: async (data) => {
         try {
-            const { product_id } = data
-
-            const result = await Product.aggregate([
-                {
-                    $match: { _id: product_id },
-                },
-                {
-                    $lookup: {
-                        from: 'variableOptions',
-                        localField: '_id',
-                        foreignField: 'variableTypeId',
-                        as: 'variableOptions',
+            const { productId } = data
+                console.log(productId,"product id")
+                const result = await Product.aggregate([
+                    {
+                      $match: {
+                        _id: mongoose.Types.ObjectId(productId)
+                      }
                     },
-                },
-            ])
+                    {
+                      $lookup: {
+                        from: "material",
+                        localField: "materialId",
+                        foreignField: "_id",
+                        as: "material"
+                      }
+                    },
+                
+                    // {
+                    //   $addFields: {
+                    //     parentCategoryId: "$parentCategory.categoryId",
+                    //     parentCategoryName: "$parentCategory.categoryName",
+                    //     materialName: "$material.name"
+                    //   }
+                    // },
+                    // {
+                    //   $project: {
+                    //     _id: 0,
+                    //     guid: 1,
+                    //     title: 1,
+                    //     parentCategoryId: 1,
+                    //     parentCategoryName: 1,
+                    //     shortDescription: 1,
+                    //     materialName: 1,
+                    //     materialId: 1,
+                    //     longDescription: 1,
+                    //     careInstructions: 1,
+                    //     status: 1,
+                    //     productionDuration: 1,
+                    //     process: 1,
+                    //     construction: 1,
+                    //     features: 1,
+                    //     productImages: 1,
+                    //     sizeChart: 1,
+                    //     productVariableTypes: 1,
+                    //     "productVarients.id": "$productVarients._id",
+                    //     "productVarients.productId": "$productVarients.productId",
+                    //     "productVarients.guid": "$productVarients.guid",
+                    //     "productVarients.productCode": "$productVarients.productCode",
+                    //     "productVarients.price": "$productVarients.price",
+                    //     "productVarients.msrp": "$productVarients.msrp",
+                    //     "productVarients.designPanels": "$productVarients.designPanels",
+                    //     "productVarients.designerAvailable": "$productVarients.designerAvailable",
+                    //     "productVarients.dpi": "$productVarients.dpi",
+                    //     "productVarients.isDefaultTemplate": "$productVarients.isDefaultTemplate",
+                    //     "productVarients.varientOptions": "$productVarients.varientOptions",
+                    //     "productVarients.productVarientImages": "$productVarients.productVarientImages",
+                    //     "productVarients.productVarientTemplates": "$productVarients.productVarientTemplates"
+                    //   }
+                    // }
+                  ]);
+                  
+                  console.log(result);
+                  
+                  
+                  console.log(result);
+                  
+          
+              console.log(result,"resultt")
 
-            if (result.length <= 0) {
-                return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 403);
+            if (result.length === 0) {
+                return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
             }
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
         }
         catch (err) {
-            console.log(err, "errCatch")
             return helpers.showResponse(false, err?.message, null, null, 403);
 
         }
@@ -252,22 +304,22 @@ const adminUtils = {
             if (!saveVariableOptions.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
             }
-            productVarientTemplates =  productVarientTemplates.map((value)=>{
-                let item = {...value}
+            productVarientTemplates = productVarientTemplates.map((value) => {
+                let item = { ...value }
                 item._id = mongoose.Types.ObjectId()
                 return item
-              })
-              let variableOptions = saveVariableOptions?.data.map((value)=>{
-                let item = {...value}
-                item.variableOptionId =value._id
+            })
+            let variableOptions = saveVariableOptions?.data.map((value) => {
+                let item = { ...value }
+                item.variableOptionId = value._id
                 return item
-              })
+            })
             let newObj = {
                 productCode,
                 price,
                 productId,
                 productVarientTemplates,
-                varientOptions:variableOptions
+                varientOptions: variableOptions
 
             }
             const newProductVareint = new ProductVarient(newObj);
@@ -289,7 +341,7 @@ const adminUtils = {
     saveProductImage: async (data, file) => {
         try {
             let { displayOrder, imageType, productId } = data
-              
+
             const findProduct = await getSingleData(Product, { _id: productId })
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
@@ -318,7 +370,7 @@ const adminUtils = {
                     imageUrl: s3Upload.data[0],
                     imageType,
                 }
-                result = await Product.findByIdAndUpdate(productId, { sizeChart: obj  }, { new: true })
+                result = await Product.findByIdAndUpdate(productId, { sizeChart: obj }, { new: true })
 
             }
             if (!result) {
