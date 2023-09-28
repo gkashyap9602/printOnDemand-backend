@@ -42,72 +42,64 @@ const authController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
 
-    updateUser: async (req, res) => {
+    updateBasicDetails: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
-        let result = await Users.updateUser(req.body, user_id);
-        return helpers.showOutputNew(res, result, result.code);
-    },
-    updateUserBasicDetails: async (req, res) => {
-        let user_id = req.decoded.user_id;
-        if (!user_id) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
-        }
-        let result = await Users.updateUserBasicDetails(req.body, user_id);
-        return helpers.showOutputNew(res, result, result.code);
+        let result = await Users.updateBasicDetails(req.body, user_id);
+        return helpers.showOutput(res, result, result.statusCode);
     },
     updateShippingDetails: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
         let result = await Users.updateShippingDetails(req.body, user_id);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
 
     updateBillingAddress: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
         let result = await Users.updateBillingAddress(req.body, user_id);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
 
     updatePaymentDetails: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
-            return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
         }
         let result = await Users.updatePaymentDetails(req.body, user_id);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
 
     getUserDetail: async (req, res) => {
         let result = await Users.getUserDetail(req?.params);
-        return helpers.showOutputNew(res, result, result.code);
+        return helpers.showOutput(res, result, result.statusCode);
     },
-    getAllOrders: async (req, res) => {
-        let result = await Users.getAllOrders(req?.query);
-        return helpers.showOutputNew(res, result, result.code);
-    },
-    getBulkImport: async (req, res) => {
-        let result = await Users.getBulkImport(req?.query);
-        return helpers.showOutputNew(res, result, result.code);
+    getUserStatus: async (req, res) => {
+        let result = await Users.getUserStatus(req?.params);
+        return helpers.showOutput(res, result, result.statusCode);
     },
     // createOrder: async (req, res) => {
-    //     let user_id = req.decoded.user_id;
+        //     let user_id = req.decoded.user_id;
     //     if (!user_id) {
     //         return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
     //     }
     //     let result = await Users.createOrder(req?.body,user_id);
     //     return helpers.showOutputNew(res, result, result.code);
     // },
-    getUserStatus: async (req, res) => {
-        let result = await Users.getUserStatus(req?.params);
-        return helpers.showOutputNew(res, result, result.code);
+    getAllOrders: async (req, res) => {
+        let result = await Users.getAllOrders(req?.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    getBulkImport: async (req, res) => {
+        let result = await Users.getBulkImport(req?.query);
+        return helpers.showOutput(res, result, result.statusCode);
     },
     // // admin panel
     // getAllUsers: async (req, res) => {

@@ -872,7 +872,7 @@ const uploadFileToS3 = async (files) => {
           )
         );
       }
-      console.log(webpFilesArray, "webpFiles")
+      // console.log(webpFilesArray, "webpFiles")
       return resolve(
         showResponse(
           false,

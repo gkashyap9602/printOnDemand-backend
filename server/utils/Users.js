@@ -255,7 +255,7 @@ const UserUtils = {
 
     resetPassword: async (data) => {
         let { email, resetPasswordToken, newPassword } = data;
-        let queryObject = {email: email}
+        let queryObject = { email: email }
         let response = await getSingleData(Users, queryObject, '')
         if (!response?.status) {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 401);
@@ -279,7 +279,7 @@ const UserUtils = {
 
     changePasswordWithOld: async (data, user_id) => {
         let { oldPassword, newPassword, userId } = data;
-        
+
         let result = await getSingleData(Users, { password: { $eq: md5(oldPassword) }, _id: ObjectId(user_id) });
         if (!result.status) {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_old_password, null, null, 401);
@@ -309,7 +309,7 @@ const UserUtils = {
                 $lookup: {
                     from: "userProfile",
                     localField: "_id",
-                    foreignField: "user_id",
+                    foreignField: "userId",
                     as: "userProfileData"
                 }
             },
@@ -342,8 +342,8 @@ const UserUtils = {
 
         console.log(result, "resulttt")
 
-        if (!result) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
+        if (result.length === 0) {
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 401);
         }
 
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
@@ -440,101 +440,80 @@ const UserUtils = {
     // },
     getUserStatus: async (data) => {
         let { user_id } = data
-        let result = await getSingleData(Users, { _id: user_id }, 'status guid');
+        let result = await getSingleData(Users, { _id: user_id }, 'status');
 
         if (!result) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 401);
         }
 
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result?.data, null, 200);
     },
 
-    updateUserBasicDetails: async (data, user_id) => {
-        const { userGuid } = data
-
-        let queryObject = { _id: user_id, guid: userGuid }
+    updateBasicDetails: async (data, user_id) => {
+        let queryObject = { _id: user_id }
 
         let checkUser = await getSingleData(Users, queryObject, '');
-        console.log(checkUser, "checkUser checkUserExistance")
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
         }
-
         data.updatedOn = helpers.getCurrentDate();
 
         let result = await updateData(Users, data, user_id)
-        console.log(result, "resultUpdate")
         if (result) {
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? result : {}, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
         }
-        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
     },
-    updateShippingDetails: async (data, user_id) => {
-        const { userGuid } = data
-
-        let queryObject = { _id: user_id, guid: userGuid }
+    updateShippingDetails: async (data, userId) => {
+        let queryObject = { _id: userId }
 
         let checkUser = await getSingleData(Users, queryObject, '');
-        console.log(checkUser, "checkUser")
+        if (!checkUser?.status) {
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
+        }
+        data.updatedOn = helpers.getCurrentDate();
+
+        let result = await updateSingleData(UserProfile, data, { userId })
+
+        if (result.status) {
+            let updateRes = await updateSingleData(UserProfile, { 'completionStaus.shippingInfo': true }, { userId })
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+    },
+
+    updateBillingAddress: async (data, userId) => {
+        let queryObject = { _id: userId }
+
+        let checkUser = await getSingleData(Users, queryObject, '');
+        if (!checkUser?.status) {
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
+        }
+        data.updatedOn = helpers.getCurrentDate();
+
+        let result = await updateSingleData(UserProfile, data, { userId })
+        if (result.status) {
+            await updateSingleData(UserProfile, { 'completionStaus.billingInfo': true }, { userId })
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+    },
+    updatePaymentDetails: async (data, userId) => {
+        let queryObject = { _id: userId }
+
+        let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
         }
 
         data.updatedOn = helpers.getCurrentDate();
 
-        let result = await updateSingleData(UserProfile, data, { user_id })
-
-        console.log(result, "resultUpdate")
+        let result = await updateSingleData(UserProfile, data, { userId })
         if (result.status) {
-            let updateRes = await updateSingleData(UserProfile, { 'completionStaus.shippingInfo': true }, { user_id })
-            console.log(updateRes, "updateRes")
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? true : {}, null, 200);
+            await updateSingleData(UserProfile, { 'completionStaus.paymentInfo': true }, { userId })
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
         }
-        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
-    },
-    updateBillingAddress: async (data, user_id) => {
-        const { userGuid } = data
-
-        let queryObject = { _id: user_id, guid: userGuid }
-
-        let checkUser = await getSingleData(Users, queryObject, '');
-        console.log(checkUser, "checkUser")
-        if (!checkUser?.status) {
-            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
-        }
-
-        data.updatedOn = helpers.getCurrentDate();
-
-        let result = await updateSingleData(UserProfile, data, { user_id })
-
-        console.log(result, "resultUpdate")
-        if (result.status) {
-            await updateSingleData(UserProfile, { 'completionStaus.billingInfo': true }, { user_id })
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? true : {}, null, 200);
-        }
-        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
-    },
-    updatePaymentDetails: async (data, user_id) => {
-        const { userGuid } = data
-
-        let queryObject = { _id: user_id, guid: userGuid }
-
-        let checkUser = await getSingleData(Users, queryObject, '');
-        console.log(checkUser, "checkUser")
-        if (!checkUser?.status) {
-            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
-        }
-
-        data.updatedOn = helpers.getCurrentDate();
-
-        let result = await updateSingleData(UserProfile, data, { user_id })
-
-        console.log(result, "resultUpdate")
-        if (result.status) {
-            await updateSingleData(UserProfile, { 'completionStaus.paymentInfo': true }, { user_id })
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result ? true : {}, null, 200);
-        }
-        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 200);
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
     },
 
 }

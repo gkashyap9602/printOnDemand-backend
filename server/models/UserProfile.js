@@ -79,10 +79,6 @@ var UserProfile = new Schema({
       type: String,
       default: "",
     },
-    taxId: {
-      type: Number,
-      default: null,
-    },
     city: {
       type: String,
       default: "",

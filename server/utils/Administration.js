@@ -60,7 +60,7 @@ const adminUtils = {
 
             const findCategory = await getSingleData(Category, { name: name })
             if (findCategory.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.category_already_existed, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.category.category_already_existed, {}, null, 403);
             }
 
             let obj = {

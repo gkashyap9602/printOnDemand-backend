@@ -12,7 +12,7 @@ router.post('/login', AdministratorController.login);
 // router.post('/reset_password', AdministratorController.forgotChangePassword);
 
 // Admin Routes with Token
-router.post('/add_category', middleware.checkToken, helpers.addToMulter.single('category'), validate(adminValidation.addCategorySchema), AdministratorController.addCategories);
+router.post('/addCategory', middleware.checkToken, helpers.addToMulter.single('category'), validate(adminValidation.addCategorySchema), AdministratorController.addCategories);
 router.post('/add_subcategory', middleware.checkToken, helpers.addToMulter.single('subcategory'), validate(adminValidation.addSubCategorySchema), AdministratorController.addSubCategories);
 router.post('/add_material', middleware.checkToken, validate(adminValidation.addMaterialSchema), AdministratorController.addMaterial);
 router.post('/addProduct', middleware.checkToken, AdministratorController.addProduct);
