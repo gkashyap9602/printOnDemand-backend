@@ -9,24 +9,11 @@ module.exports.loginSchema = {
 };
 
 
-module.exports.addCategorySchema = {
-    body: joi.object({
-        name: joi.string().required(),
-        description: joi.string().allow(''),
-    })
 
-};
 module.exports.addMaterialSchema = {
     body: joi.object({
         name: joi.string().required(),
     })
 
 };
-module.exports.addSubCategorySchema = {
-    body: joi.object({
-        name: joi.string().required(),
-        description: joi.string().allow(''),
-        category_id:joi.string().required()
-    })
 
-};

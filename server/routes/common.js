@@ -9,7 +9,7 @@ router.post('/store_param', commonController.storeParameterToAWS);
 // router.post('/upload_video_to_s3', commonController.uploadVideoToS3);
 
 // with admin token routes
-router.get('/get_categories', middleware.checkToken, commonController.getCategories);
+router.get('/getCategories', middleware.checkToken, commonController.getCategories);
 router.get('/getAllCountries', commonController.getAllCountries);
 router.get('/getAllStates', commonController.getAllStates);
 router.get('/get_materials', middleware.checkToken, commonController.getMaterials);

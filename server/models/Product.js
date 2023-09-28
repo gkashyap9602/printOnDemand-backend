@@ -44,10 +44,10 @@ var Product = new Schema({
         //     type: Number,
         //     default: null,
         // },
-        // imageType: {
-        //     type: Number,
-        //     default: null,
-        // },
+        imageType: {
+            type: Number,
+            default: 3,
+        },
         imageUrl: {
             type: String,
             default: null,
@@ -74,20 +74,24 @@ var Product = new Schema({
     productImages: [{
         _id: {
             type: mongoose.Types.ObjectId,
-            default: mongoose.Types.ObjectId()
+            // default: mongoose.Types.ObjectId()
         },
         fileName: {
             type: String,
+            default: null,
 
         },
         imageUrl: {
-            type: String
+            type: String,
+            default: null,
         },
         imageType: {
-            type: String
+            type: Number,
+            default: 1,
         },
         thumbnailPath: {
-            type: String
+            type: String,
+            default: null,
         },
         displayOrder: {
             type: String

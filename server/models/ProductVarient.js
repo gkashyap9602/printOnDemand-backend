@@ -2,18 +2,14 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var ProductVarient = new Schema({
-    product_id: {
+    productId: {
         type: mongoose.Types.ObjectId,
         ref: "product",
         index: true
     },
-    product_design_id: {
+    productDesignId: {
         type: mongoose.Types.ObjectId,
         ref: "productDesign",
-        index: true
-    },
-    guid: {
-        type: String,
         index: true
     },
     productCode: {
@@ -24,6 +20,37 @@ var ProductVarient = new Schema({
         type: String,
         default:null
     },
+    varientOptions: [{
+        variableTypeId:{
+            type: mongoose.Types.ObjectId,
+            index: true,
+            ref: "variableTypes"
+        },
+        variableOptionId:{
+            type: mongoose.Types.ObjectId,
+            index: true,
+            ref: "variableOptions"
+        },
+       
+       
+    }],
+    productVarientTemplates:[{
+        _id:{
+           type:mongoose.Types.ObjectId,
+        },
+        fileName: {
+            type: String,
+            default:null
+        },
+        filePath: {
+            type: String,
+            default:null
+        },
+        templateType: {
+            type: Number,
+            default:1
+        },
+    }],
     // itemName: {
     //     type: String,
     //     required: true
@@ -61,7 +88,7 @@ var ProductVarient = new Schema({
     productVarientImages: [{
         _id: {
             type: mongoose.Types.ObjectId,
-            default: mongoose.Types.ObjectId()
+            // default: mongoose.Types.ObjectId()
         },
         image_url: {
             type: String,

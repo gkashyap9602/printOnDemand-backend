@@ -87,8 +87,13 @@ module.exports = {
         product_already_existed:"Product already existed",
         product_not_exist:"Product does not exist",
         product_created:"Product Created Successfully",
+        product_varient_save_fail:"Error occured while adding new Product Varient",
         product_save_failed:"Error occured while adding new Product",
         invalid_product_id:"Invalid Product Id",
+        product_image_save_err:"Error while saving product image",
+        product_image_saved:"Product Image Uploaded Successfully",
+
+
 
     },
     category:{
@@ -108,6 +113,10 @@ module.exports = {
     },
     material:{
         invalid_material_id:"Invalid Material Id",
+
+    },
+    variable:{
+        variable_option_save_fail:"error while saving variable option",
 
     },
     admin: {

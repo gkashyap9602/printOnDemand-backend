@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var SubCategory = new Schema({
 
-    category_id: {
+    categoryId: {
         type: mongoose.Types.ObjectId,
         ref: "Category",
         index:true
@@ -18,11 +18,6 @@ var SubCategory = new Schema({
     },
 
     imageUrl: {
-        type: String,
-        default: null,
-    },
-
-    guid: {
         type: String,
         default: null,
     },
