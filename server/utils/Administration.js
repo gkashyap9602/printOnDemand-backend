@@ -68,20 +68,18 @@ const adminUtils = {
                 description,
                 imageUrl: s3Upload?.data[0],
                 createdOn: helpers.getCurrentDate(),
-                guid: randomUUID(),
 
             }
             let categoryRef = new Category(obj)
             let result = await postData(categoryRef)
 
             if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.category_save_failed, result?.data, null, 400);
+                return helpers.showResponse(false, ResponseMessages?.category.category_save_failed, result?.data, null, 400);
             }
 
-            return helpers.showResponse(true, ResponseMessages?.admin?.category_added, result?.data, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.category.category_added, result?.data, null, 200);
         }
         catch (err) {
-            console.log(err, "errCatch")
             return helpers.showResponse(false, err?.message, null, null, 403);
 
         }
@@ -100,11 +98,11 @@ const adminUtils = {
 
             const findCategory = await getSingleData(Category, { _id: category_id })
             if (!findCategory.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.category_not_exist, {}, null, 404);
+                return helpers.showResponse(false, ResponseMessages?.category.category_not_exist, {}, null, 404);
             }
             const findSubCategory = await getSingleData(SubCategory, { name: name })
             if (findSubCategory.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.subcategory_already_existed, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.cate, {}, null, 403);
             }
 
             let obj = {

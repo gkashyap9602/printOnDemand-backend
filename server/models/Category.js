@@ -16,12 +16,6 @@ var Category = new Schema({
         type: String,
         default: null,
     },
-
-    guid: {
-        type: String,
-        default: null,
-        index:true
-    },
     status: {
         type: Number,
         default: 0,

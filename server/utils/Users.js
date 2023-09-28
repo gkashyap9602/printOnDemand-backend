@@ -84,7 +84,7 @@ const UserUtils = {
                 let resultProfile = await postData(userProfileRef);
                 if (!resultProfile.status) {
                     await deleteData(Users, { _id: userRef._id })
-                    return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 402);
+                    return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
                 }
 
                 let link = `${consts.FRONTEND_URL}/login`
@@ -135,7 +135,6 @@ const UserUtils = {
 
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
         } catch (err) {
-            console.log("in catch err", err)
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
         }
 
@@ -147,7 +146,7 @@ const UserUtils = {
 
             let result = await getSingleData(Users, queryObject, '');
             if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 401);
+                return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
             }
             let userData = result?.data
             if (userData?.password !== md5(password)) {
@@ -172,7 +171,7 @@ const UserUtils = {
 
             return helpers.showResponse(true, ResponseMessages?.users?.login_success, userData, null, 200);
         } catch (err) {
-            return helpers.showResponse(false, ResponseMessages?.users?.login_error, null, null, 401);
+            return helpers.showResponse(false, ResponseMessages?.users?.login_error, null, null, 400);
         }
     },
 
@@ -180,7 +179,7 @@ const UserUtils = {
         let queryObject = { _id: userId }
         let result = await getSingleData(Users, queryObject, 'traceId');
         if (!result.status) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 401);
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
         }
         let userData = result?.data
         return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
@@ -192,7 +191,7 @@ const UserUtils = {
         try {
             let emailExistanceResponse = await UserUtils.checkEmailExistance(email)
             if (emailExistanceResponse?.status) {
-                return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 401);
+                return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 400);
             }
             let userData = emailExistanceResponse?.data
 
@@ -247,9 +246,9 @@ const UserUtils = {
             if (emailResponse?.status) {
                 return helpers.showResponse(true, ResponseMessages.users.verification_email_sent, true, null, 200);
             }
-            return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, null, null, 401);
+            return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, null, null, 400);
         } catch (err) {
-            return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, err, null, 401);
+            return helpers.showResponse(false, ResponseMessages?.users?.verification_email_error, err, null, 400);
         }
     },
 
@@ -258,7 +257,7 @@ const UserUtils = {
         let queryObject = { email: email }
         let response = await getSingleData(Users, queryObject, '')
         if (!response?.status) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 401);
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_email, null, null, 400);
         }
         let userData = response?.data
         let verifyResponse = await middleware.verifyToken(resetPasswordToken)
@@ -282,7 +281,7 @@ const UserUtils = {
 
         let result = await getSingleData(Users, { password: { $eq: md5(oldPassword) }, _id: ObjectId(user_id) });
         if (!result.status) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_old_password, null, null, 401);
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_old_password, null, null, 400);
         }
         let updatedData = {
             password: md5(newPassword),
@@ -343,7 +342,7 @@ const UserUtils = {
         console.log(result, "resulttt")
 
         if (result.length === 0) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 401);
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
         }
 
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
@@ -443,7 +442,7 @@ const UserUtils = {
         let result = await getSingleData(Users, { _id: user_id }, 'status');
 
         if (!result) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 401);
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
         }
 
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result?.data, null, 200);
@@ -454,7 +453,7 @@ const UserUtils = {
 
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
-            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
         }
         data.updatedOn = helpers.getCurrentDate();
 
@@ -469,7 +468,7 @@ const UserUtils = {
 
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
-            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
         }
         data.updatedOn = helpers.getCurrentDate();
 
@@ -487,7 +486,7 @@ const UserUtils = {
 
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
-            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
         }
         data.updatedOn = helpers.getCurrentDate();
 
@@ -503,7 +502,7 @@ const UserUtils = {
 
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
-            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 401);
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
         }
 
         data.updatedOn = helpers.getCurrentDate();

@@ -10,7 +10,7 @@ const commonUtil = {
   getMaterials: async (data) => {
     const result = await getDataArray(Material, {})
     if (!result.status) {
-      return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
+      return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 400);
     }
     return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result?.data?.length > 0 ? result?.data : {}, null, 200);
   },
@@ -59,7 +59,7 @@ const commonUtil = {
         parentCategoryInfo = await getSingleData(Category, { _id: parentCategoryGuid })
 
         if (!parentCategoryInfo.status) {
-          return helpers.showResponse(false, ResponseMessages.admin.category_not_exist, null, null, 404);
+          return helpers.showResponse(false, ResponseMessages.admin.category_not_exist, null, null, 400);
         }
 
         aggregationPipeline.push(
@@ -86,7 +86,7 @@ const commonUtil = {
 
 
     if (result.length < 0) {
-      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 404);
+      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 400);
     }
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? { categories: result, parentCategoryInfo: parentCategoryInfo?.data ? parentCategoryInfo?.data : null } : {}, null, 200);
   },
@@ -102,7 +102,7 @@ const commonUtil = {
     }
     ));
     if (formattedCountries.length < 0) {
-      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 200);
+      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 400);
     }
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, formattedCountries.length > 0 ? formattedCountries : {}, null, 200);
   },
@@ -120,7 +120,7 @@ const commonUtil = {
     ));
 
     if (formattedStates.length < 0) {
-      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 200);
+      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 400);
     }
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, formattedStates.length > 0 ? formattedStates : {}, null, 200);
   },
@@ -132,7 +132,7 @@ const commonUtil = {
     if (response) {
       return helpers.showResponse(true, ResponseMessages?.common.parameter_store_post_success, null, null, 200);
     }
-    return helpers.showResponse(false, ResponseMessages?.common.parameter_store_post_error, null, null, 200);
+    return helpers.showResponse(false, ResponseMessages?.common.parameter_store_post_error, null, null, 400);
   },
   fetchParameterFromAWS: async (data) => {
     let response = await helpers.getParameterFromAWS({
@@ -141,7 +141,7 @@ const commonUtil = {
     if (response) {
       return helpers.showResponse(true, ResponseMessages?.common.parameter_data_found, response, null, 200);
     }
-    return helpers.showResponse(false, ResponseMessages?.common.parameter_data_not_found, null, null, 200);
+    return helpers.showResponse(false, ResponseMessages?.common.parameter_data_not_found, null, null, 400);
   }
 }
 
