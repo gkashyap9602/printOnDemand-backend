@@ -217,14 +217,43 @@ const adminUtils = {
                         _id: mongoose.Types.ObjectId(productId)
                       }
                     },
+                    
                     {
-                      $lookup: {
-                        from: "material",
-                        localField: "materialId",
-                        foreignField: "_id",
-                        as: "material"
-                      }
+                        $unwind: "$subCategoryId"
                     },
+                    {
+                        $lookup:{
+                            from:"subCategory",
+                            localField:"subCategoryId",
+                            foreignField:"_id",
+                            as:"subCategoryData"
+                        }
+                    },
+                    // {
+                    //     $group: {
+                    //       _id: "$subCategoryData", // Group by the subcategory data
+                    //       products: {
+                    //         $push: "$$ROOT" // Add the original product documents to the "products" array
+                    //       }
+                    //     }
+                    //   }
+                      
+                    // {
+                        //   $lookup: {
+                    //     from: "material",
+                    //     localField: "materialId",
+                    //     foreignField: "_id",
+                    //     as: "material"
+                    //   } 
+                    // },
+                    // {
+                    // $lookup:{
+                    //     from:"productVarient",
+                    //     localField:"_id",
+                    //     foreignField:"productId",
+                    //     as:"productVarient"
+                    //    }
+                    // },
                 
                     // {
                     //   $addFields: {

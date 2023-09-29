@@ -79,7 +79,7 @@ module.exports.forgotSchema = {
 };
 module.exports.resetPasswordSchema = {
     body: joi.object({
-        emailId: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
         resetPasswordToken: joi.string().required(),
         newPassword: joi.string().required()
     })
