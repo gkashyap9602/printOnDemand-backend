@@ -535,11 +535,21 @@ const sendSMSService = async (to, Message) => {
   });
 };
 
+// const addToMulter = multer({
+//   storage: multer.memoryStorage(),
+//   fileFilter: (req, file, callback) => {
+//     callback(null, true);
+//   },
+  
+  
+// })
+
+
 const addToMulter = multer({
   storage: multer.memoryStorage(),
   fileFilter: (req, file, callback) => {
     callback(null, true);
-  }
+  },
 })
 
 // const uploadVideoToS3 = async (files) => {

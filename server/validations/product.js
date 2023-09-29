@@ -3,27 +3,37 @@ const joi = require("joi");
 
 module.exports.addProductSchema = {
     body: joi.object({
-        subCategoryId: joi.string().required(),
-        variableTypesId: joi.string().allow(''),
-        materialId:"",
-        careInstructions:"",
-        title:"",
-        longDescription:"",
-        productionDuration:"",
-        shortDescription:"",
-        sizeChart:"",
-        construction:"",
-        constructionCallout:"",
-        features:"",
-        process:"",
+        subCategoryIds: joi.array().required(),
+        variableTypesIds: joi.array().required(),
+        materialId:joi.string().required(),
+        title:joi.string().required(),
+        longDescription:joi.string().required(),
+        careInstructions:joi.string(),
+        productionDuration:joi.string(),
+        shortDescription:joi.string(),
+        construction:joi.string(),
+        features:joi.string(),
+        process:joi.string(),
     })
 
 };
-module.exports.addSubCategorySchema = {
+module.exports.addProductVarientSchema = {
     body: joi.object({
-        name: joi.string().required(),
-        description: joi.string().allow(''),
-        categoryId:joi.string().required()
+        productCode: joi.string().required(),
+        price: joi.string().required(),
+        productId:joi.string().required(),
+        productVarientTemplates:joi.array().required(),
+        varientOptions:joi.array().required(),
+        dpi:joi.string(),
+        msrp:joi.string(),
+    })
+
+};
+module.exports.addProductImageSchema = {
+    body: joi.object({
+        displayOrder: joi.number().required(),
+        imageType: joi.number().required().valid(1,2,3),
+        productId:joi.string().required(),
     })
 
 };
