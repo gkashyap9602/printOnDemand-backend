@@ -6,10 +6,6 @@ var Material = new Schema({
         type: String,
         required:true
     },
-    guid:{
-     type:String,
-     index:true
-    },
     isDeleted: {
         type: Boolean,
         default: false,

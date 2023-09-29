@@ -18,7 +18,7 @@ var Product = new Schema({
     },
     careInstructions: {
         type: String,
-        required: true
+        default:""
     },
     title: {
         type: String,
@@ -26,6 +26,7 @@ var Product = new Schema({
     },
     longDescription: {
         type: String,
+        required:true
     },
     // priceStartsFrom: {
     //     type: String,
@@ -45,10 +46,6 @@ var Product = new Schema({
             type: String,
             default: null,
         },
-        // id:{
-        //     type: Number,
-        //     default: null,
-        // },
         imageType: {
             type: Number,
             default: 3,
@@ -66,20 +63,23 @@ var Product = new Schema({
     },
     construction: {
         type: String,
+        default:null
     },
     constructionCallout: {
         type: String,
+        default:null
     },
     features: {
         type: String,
+        default:null
     },
     process: {
         type: String,
+        default:null
     },
     productImages: [{
         _id: {
             type: mongoose.Types.ObjectId,
-            // default: mongoose.Types.ObjectId()
         },
         fileName: {
             type: String,
@@ -111,12 +111,6 @@ var Product = new Schema({
         type: String,
         default: null,
     },
-    // parentCategoryName: {
-    //     type: String,
-    // },
-    // parentCategoryId: {
-    //     type: String,
-    // },
     createdOn: {
         type: String,
         default: null,

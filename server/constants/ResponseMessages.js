@@ -113,11 +113,20 @@ module.exports = {
     },
     material:{
         invalid_material_id:"Invalid Material Id",
+        material_already:"material already exist",
+        material_created:"material added Successfully",
+        material_save_failed:"Error occured while adding new material",
 
     },
     variable:{
         variable_option_save_fail:"error while saving variable option",
         invalid_variable_type:"invalid Variable Type Id",
+        variable_option_already:"Variable Option Already Exist",
+        variable_type_already:"Variable Type Already Exist",
+        variable_type_save_failed:"Error occured while adding new variable type",
+        variable_type_created:"variable type added Successfully",
+        variable_option_created:"variable option added Successfully",
+
 
     },
     admin: {

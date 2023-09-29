@@ -123,23 +123,21 @@ const adminUtils = {
             const { name } = data
             const findMaterial = await getSingleData(Material, { name: name })
             if (findMaterial.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.material.material_already, {}, null, 403);
             }
 
             let obj = {
                 name,
                 createdOn: helpers.getCurrentDate(),
-                guid: randomUUID(),
-
             }
             let materialRef = new Material(obj)
             let result = await postData(materialRef)
 
             if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
+                return helpers.showResponse(false, ResponseMessages?.material.material_save_failed, result?.data, null, 400);
             }
 
-            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.material.material_created, result?.data, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
@@ -394,7 +392,7 @@ const adminUtils = {
 
             const findProduct = await getSingleData(VariableTypes, { typeName })
             if (findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.variable.variable_type_already, {}, null, 403);
             }
 
             let obj = {
@@ -406,13 +404,13 @@ const adminUtils = {
             let result = await postData(productRef)
 
             if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
+                return helpers.showResponse(false, ResponseMessages?.variable.variable_type_save_failed, result?.data, null, 400);
             }
 
-            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.variable.variable_type_created, result?.data, null, 200);
         }
         catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 403);
+            return helpers.showResponse(false, err?.message, null, null, 400);
 
         }
 
@@ -423,11 +421,11 @@ const adminUtils = {
 
             const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId })
             if (!findVariableType.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
             }
             const find = await getSingleData(VariableOptions, { value })
             if (find.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.already_existed, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.variable.variable_option_already, {}, null, 403);
             }
 
             let obj = {
