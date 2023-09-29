@@ -117,6 +117,7 @@ module.exports = {
     },
     variable:{
         variable_option_save_fail:"error while saving variable option",
+        invalid_variable_type:"invalid Variable Type Id",
 
     },
     admin: {

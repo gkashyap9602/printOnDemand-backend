@@ -72,6 +72,7 @@ var ProductVarient = new Schema({
     },
     designPanels: {
         type: String,
+        default:null
     },
     designerAvailable: {
         type: Boolean,

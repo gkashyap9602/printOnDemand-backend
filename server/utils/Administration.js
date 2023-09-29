@@ -16,11 +16,6 @@ const { randomUUID } = require('crypto')
 const VariableTypes = require('../models/VariableTypes')
 const VariableOptions = require('../models/VariableOptions')
 const ProductVarient = require('../models/ProductVarient')
-// const ProductVarientOptions = require('../models/ProductVarientOptions')
-// const ProductVariableTypes = require('../models/ProductVariableTypes')
-// const ProductTemplate = require('../models/ProductTemplates')
-// const ProductCategory = require('../models/ProductCategory')
-
 
 const adminUtils = {
 
@@ -61,8 +56,6 @@ const adminUtils = {
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
             }
-            console.log(s3Upload, "s3Upload")
-
 
             let obj = {
                 name,
@@ -103,8 +96,6 @@ const adminUtils = {
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
             }
-            console.log(s3Upload, "s3Upload")
-
 
             let obj = {
                 name,
@@ -159,14 +150,20 @@ const adminUtils = {
 
     addProduct: async (data) => {
         try {
-            let { careInstructions, longDescription, subCategoryIds, materialId,
+            let { careInstructions, longDescription, subCategoryIds, materialId, variableTypesIds,
                 construction, features, productionDuration, shortDescription, title } = data
 
             subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
+            variableTypesIds = variableTypesIds.map((id) => mongoose.Types.ObjectId(id))
 
             const findProduct = await getSingleData(Product, { title: title })
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 403);
+            }
+            const findVariableTypes = await getDataArray(VariableTypes, { _id: { $in: variableTypesIds } })
+
+            if (findVariableTypes?.data.length !== variableTypesIds.length) {
+                return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
             }
             const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } })
 
@@ -186,6 +183,8 @@ const adminUtils = {
                 title,
                 createdOn: helpers.getCurrentDate(),
                 subCategoryId: subCategoryIds,
+                variableTypes: variableTypesIds
+                // categoryId:categoryIds
                 // imageUrl: s3Upload?.data[0],
                 // priceStartsFrom,
                 // materialName,
@@ -210,102 +209,78 @@ const adminUtils = {
     getProductDetails: async (data) => {
         try {
             const { productId } = data
-                console.log(productId,"product id")
-                const result = await Product.aggregate([
-                    {
-                      $match: {
+            const result = await Product.aggregate([
+                {
+                    $match: {
                         _id: mongoose.Types.ObjectId(productId)
-                      }
-                    },
-                    
-                    {
-                        $unwind: "$subCategoryId"
-                    },
-                    {
-                        $lookup:{
-                            from:"subCategory",
-                            localField:"subCategoryId",
-                            foreignField:"_id",
-                            as:"subCategoryData"
-                        }
-                    },
-                    // {
-                    //     $group: {
-                    //       _id: "$subCategoryData", // Group by the subcategory data
-                    //       products: {
-                    //         $push: "$$ROOT" // Add the original product documents to the "products" array
-                    //       }
-                    //     }
-                    //   }
-                      
-                    // {
-                        //   $lookup: {
-                    //     from: "material",
-                    //     localField: "materialId",
-                    //     foreignField: "_id",
-                    //     as: "material"
-                    //   } 
-                    // },
-                    // {
-                    // $lookup:{
-                    //     from:"productVarient",
-                    //     localField:"_id",
-                    //     foreignField:"productId",
-                    //     as:"productVarient"
-                    //    }
-                    // },
-                
-                    // {
-                    //   $addFields: {
-                    //     parentCategoryId: "$parentCategory.categoryId",
-                    //     parentCategoryName: "$parentCategory.categoryName",
-                    //     materialName: "$material.name"
-                    //   }
-                    // },
-                    // {
-                    //   $project: {
-                    //     _id: 0,
-                    //     guid: 1,
-                    //     title: 1,
-                    //     parentCategoryId: 1,
-                    //     parentCategoryName: 1,
-                    //     shortDescription: 1,
-                    //     materialName: 1,
-                    //     materialId: 1,
-                    //     longDescription: 1,
-                    //     careInstructions: 1,
-                    //     status: 1,
-                    //     productionDuration: 1,
-                    //     process: 1,
-                    //     construction: 1,
-                    //     features: 1,
-                    //     productImages: 1,
-                    //     sizeChart: 1,
-                    //     productVariableTypes: 1,
-                    //     "productVarients.id": "$productVarients._id",
-                    //     "productVarients.productId": "$productVarients.productId",
-                    //     "productVarients.guid": "$productVarients.guid",
-                    //     "productVarients.productCode": "$productVarients.productCode",
-                    //     "productVarients.price": "$productVarients.price",
-                    //     "productVarients.msrp": "$productVarients.msrp",
-                    //     "productVarients.designPanels": "$productVarients.designPanels",
-                    //     "productVarients.designerAvailable": "$productVarients.designerAvailable",
-                    //     "productVarients.dpi": "$productVarients.dpi",
-                    //     "productVarients.isDefaultTemplate": "$productVarients.isDefaultTemplate",
-                    //     "productVarients.varientOptions": "$productVarients.varientOptions",
-                    //     "productVarients.productVarientImages": "$productVarients.productVarientImages",
-                    //     "productVarients.productVarientTemplates": "$productVarients.productVarientTemplates"
-                    //   }
-                    // }
-                  ]);
-                  
-                  console.log(result);
-                  
-                  
-                  console.log(result);
-                  
-          
-              console.log(result,"resultt")
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "subCategory",
+                        localField: "subCategoryId",
+                        foreignField: "_id",
+                        as: "productSubCategories",
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "category",
+                        localField: "productSubCategories.categoryId",
+                        foreignField: "_id",
+                        as: "productCategories"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "variableTypes",
+                        localField: "variableTypesId",
+                        foreignField: "_id",
+                        as: "productVariableTypes"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "material",
+                        localField: "materialId",
+                        foreignField: "_id",
+                        as: "material"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "productVarient",
+                        localField: "_id",
+                        foreignField: "productId",
+                        as: "productVarient",
+                        pipeline: [
+                            {
+                                $lookup: {
+                                    from: "variableOptions",
+                                    localField: "varientOptions.variableOptionId",
+                                    foreignField: "_id",
+                                    as: "varientOptions"
+                                }
+                            },
+                            //  {
+                            //     $project:{
+                            //         _id:0,
+                            //         varientOptions:0
+                            //     }
+                            //   }
+
+                        ]
+                    }
+                },
+                {
+                    $project: {
+                        subCategoryId: 0,
+                        variableTypesId: 0
+                    }
+                }
+
+            ]);
+            console.log(result, "resultt get product")
 
             if (result.length === 0) {
                 return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
@@ -437,7 +412,6 @@ const adminUtils = {
             return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
         }
         catch (err) {
-            console.log(err, "errCatch")
             return helpers.showResponse(false, err?.message, null, null, 403);
 
         }
@@ -472,7 +446,6 @@ const adminUtils = {
             return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
         }
         catch (err) {
-            console.log(err, "errCatch")
             return helpers.showResponse(false, err?.message, null, null, 403);
         }
 
@@ -490,17 +463,13 @@ const adminUtils = {
                 },]
             )
 
-
-            console.log(result, "result")
-
-            if (result.length <= 0) {
+            if (result.length === 0) {
                 return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 403);
             }
 
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
         }
         catch (err) {
-            console.log(err, "errCatch")
             return helpers.showResponse(false, err?.message, null, null, 403);
 
         }

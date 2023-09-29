@@ -7,6 +7,11 @@ var Product = new Schema({
         ref: "subcategory",
         index: true
     }],
+    variableTypesId: [{
+        type: mongoose.Types.ObjectId,
+        ref: "variableTypes",
+        index: true
+    }],
     materialId: {
         type: mongoose.Types.ObjectId,
         ref: "material"

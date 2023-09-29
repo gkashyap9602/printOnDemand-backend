@@ -73,30 +73,6 @@ const validationError = async (res, error) => {
   });
 };
 
-
-const decryptUsingAES = (encryptedValue, secretKey = "KPMO456EHA90G007") => {
-  try {
-
-    if (!secretKey) {
-      return showResponse(false, ResponseMessages?.common?.parameter_data_not_found, null, null, 400)
-    }
-    const iv = CryptoJS.enc.Utf8.parse(secretKey)
-    const decryptkey = CryptoJS.enc.Utf8.parse(secretKey);
-    const decrypted = CryptoJS.AES.decrypt(encryptedValue, decryptkey, {
-      keySize: 128 / 8,
-      iv,
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7,
-    });
-    console.log("checkk")
-    return decrypted.toString(CryptoJS.enc.Utf8) ? decrypted.toString(CryptoJS.enc.Utf8) : encryptedValue;
-  } catch (error) {
-    console.error('Decryption Error:', error);
-    return null
-    // return showResponse(false, ResponseMessages?.common?.dycryption_error, null, null, 400) // Handle decryption errors
-  }
-};
-
 function generateRandomAlphanumeric(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
@@ -1135,6 +1111,5 @@ module.exports = {
   generateIDs,
   getCurrentDate,
   validationError,
-  decryptUsingAES,
   generateUniquePayTraceID
 };

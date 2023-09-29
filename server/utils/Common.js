@@ -14,82 +14,7 @@ const commonUtil = {
     }
     return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result?.data?.length > 0 ? result?.data : {}, null, 200);
   },
-  // getCategories: async (data) => {
-  //   const { includeSubCategory = false, searchKey = '', parentCategoryId } = data
-  //   let parentCategoryInfo = null
-  //   const aggregationPipeline = [
-  //     {
-  //       $match: {
-  //         name: { $regex: searchKey, $options: 'i' },
-  //       },
-  //     },
-  //   ];
-
-  //   if (includeSubCategory === 'true' || includeSubCategory === true) {
-
-  //     aggregationPipeline.push(
-  //       {
-  //         $lookup: {
-  //           from: 'subCategory',
-  //           localField: '_id',
-  //           foreignField: 'categoryId',
-  //           as: 'subCategories',
-  //         },
-  //       },
-  //       {
-  //         $addFields: {
-  //           subCategories: {
-  //             $filter: {
-  //               input: '$subCategories',
-  //               as: 'subCategory',
-  //               cond: {
-  //                 $or: [
-  //                   { $regexMatch: { input: '$$subCategory.name', regex: searchKey, options: 'i' } },
-  //                 ],
-  //               },
-  //             },
-  //           },
-  //         },
-  //       },
-  //     )
-
-
-  //     if (parentCategoryId) {
-
-  //       parentCategoryInfo = await getSingleData(Category, { _id: parentCategoryId })
-  //            console.log(parentCategoryInfo,"parentCategoryInfo")
-  //       if (!parentCategoryInfo.status) {
-  //         return helpers.showResponse(false, ResponseMessages.category.category_not_exist, null, null, 400);
-  //       }
-
-  //       aggregationPipeline.push(
-  //         {
-  //           $match: {
-  //             _id: mongoose.Types.ObjectId(parentCategoryId),
-
-  //           },
-  //         },
-
-  //         {
-  //           $unwind: '$subCategories', // Unwind the filtered subCategories array
-  //         },
-  //         {
-  //           $replaceRoot: {
-  //             newRoot: '$subCategories', // Replace the root with subCategories
-  //           },
-  //         }
-  //       );
-  //     }
-  //   }
-
-  //   const result = await Category.aggregate(aggregationPipeline);
-
-  //   console.log(result,"resulst")
-  //   if (result.length === 0) {
-  //     return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 400);
-  //   }
-  //   return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? { categories: result, parentCategoryInfo: parentCategoryInfo?.data ? parentCategoryInfo?.data : null } : {}, null, 200);
-  // },
+  
   getCategories: async (data) => {
     const { includeSubCategory = false, searchKey = '', parentCategoryId } = data
     let parentCategoryInfo = null
@@ -146,7 +71,7 @@ const commonUtil = {
     }
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result : {}, null, 200);
   },
-  
+
   getAllCountries: async () => {
 
     const countries = CSC2.Country.getAllCountries()
@@ -167,20 +92,9 @@ const commonUtil = {
     let { countryCode } = data
     let states = CSC2.State.getStatesOfCountry(countryCode);
 
-    //change response of States 
-    const formattedStates = states.map((states, index) => ({
-      id: index + 1,
-      countryId: index + 1,
-      name: `${states.name}`,
-      code: states.isoCode,
-    }
-    ));
-
-    if (formattedStates.length < 0) {
-      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 400);
-    }
-    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, formattedStates.length > 0 ? formattedStates : {}, null, 200);
+    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, states.length > 0 ? states : {}, null, 200);
   },
+
   storeParameterToAWS: async (data) => {
     let response = await helpers.postParameterToAWS({
       name: data.name,

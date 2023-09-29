@@ -22,7 +22,6 @@ const UserUtils = {
             queryObject = { email, _id: { $ne: ObjectId(user_id) } }
         }
         let result = await getSingleData(Users, queryObject, '');
-        console.log(result, "result checkEmailExistance")
         if (result?.status) {
             return helpers.showResponse(false, ResponseMessages.users.email_already, result?.data, null, 403);
         }
@@ -34,7 +33,6 @@ const UserUtils = {
             queryObject = { user_id, guid }
         }
         let result = await getSingleData(Users, queryObject, '');
-        console.log(result, "result checkUserExistance")
         if (result?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, result?.data, null, 200);
         }
@@ -45,7 +43,6 @@ const UserUtils = {
             let { firstName, lastName, email, password } = data;
 
             let emailExistanceResponse = await UserUtils.checkEmailExistance(email)
-            console.log(emailExistanceResponse, "emailExistanceResponse")
             if (!emailExistanceResponse?.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 403);
             }
@@ -157,7 +154,6 @@ const UserUtils = {
             }
             // let device_info = userData?.device_info
             let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
-            console.log(userData._id, 'userData._id')
             let access_token = jwt.sign({ user_type: "user", type: "access", _id: userData._id }, API_SECRET, {
                 expiresIn: consts.ACCESS_EXPIRY
             });
@@ -166,7 +162,6 @@ const UserUtils = {
             // });
 
             delete userData._doc.password
-            console.log(userData, "userdataa")
             userData = { ...userData._doc, token: access_token }
 
             return helpers.showResponse(true, ResponseMessages?.users?.login_success, userData, null, 200);
@@ -242,7 +237,6 @@ const UserUtils = {
                     </html>
             `
             let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
-            console.log(emailResponse, "emailResponse")
             if (emailResponse?.status) {
                 return helpers.showResponse(true, ResponseMessages.users.verification_email_sent, true, null, 200);
             }
@@ -298,8 +292,6 @@ const UserUtils = {
     // // with token 
     getUserDetail: async (data) => {
         let { user_id } = data
-        console.log(user_id, "user_id under api get")
-
         //check if userprofile nor register than it shows empty object??
         let result = await Users.aggregate([
             { $match: { _id: mongoose.Types.ObjectId(user_id), status: 1 } },  // Match the specific user by _id and status
@@ -339,10 +331,9 @@ const UserUtils = {
 
         ])
 
-        console.log(result, "resulttt")
 
         if (result.length === 0) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
+            return helpers.showResponse(false, ResponseMessages?.common.data_not_found, null, null, 400);
         }
 
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
@@ -352,8 +343,6 @@ const UserUtils = {
     getAllOrders: async (data) => {
         let { customerId, pageIndex, pageSize, sortColumn, sortDirection, status, storeIds } = data
         // console.log(customerId,"customerId")
-        //    const result = await getDataArray(Orders,{customerGuid:customerId})
-
         let obj = {
             orders: [],
             statusSummary: {
@@ -366,9 +355,6 @@ const UserUtils = {
             },
             totalCount: 0
         }
-
-        console.log(obj, "objjjjj")
-
 
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, obj, null, 200);
     },
@@ -457,9 +443,9 @@ const UserUtils = {
         }
         data.updatedOn = helpers.getCurrentDate();
 
-        let result = await updateData(Users, data, user_id)
-        if (result) {
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
+        let result = await updateSingleData(Users, data, { _id: user_id })
+        if (result.status) {
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result?.data, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
     },

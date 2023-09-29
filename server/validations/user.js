@@ -88,6 +88,6 @@ module.exports.changePasswordSchema = {
     body: joi.object({
         oldPassword: joi.string().required(),
         newPassword: joi.string().required(),
-        userId:joi.string()
+        userId:joi.string().allow('')
     })
 };
