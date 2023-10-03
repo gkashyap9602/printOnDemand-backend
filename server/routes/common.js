@@ -1,18 +1,15 @@
 var express = require('express');
 var commonController = require('../controllers/Common');
 var router = express.Router();
-var middleware = require("../controllers/middleware");
+var middleware = require("../middleware/authentication");
 
 // without Token routes
 router.post('/store_param', commonController.storeParameterToAWS);
-// router.post('/upload_file_to_s3', commonController.uploadFileToS3);
-// router.post('/upload_video_to_s3', commonController.uploadVideoToS3);
 
 // with admin token routes
-router.get('/getCategories', middleware.checkToken, commonController.getCategories);
-router.get('/getAllCountries', commonController.getAllCountries);
-router.get('/getAllStates', commonController.getAllStates);
-router.get('/getMaterials', middleware.checkToken, commonController.getMaterials);
+router.get('/getAllCountries',middleware.verifyTokenBoth, commonController.getAllCountries);
+router.get('/getAllStates', middleware.verifyTokenBoth,commonController.getAllStates);
+router.get('/getMaterials', middleware.verifyTokenBoth, commonController.getMaterials);
 
 
 

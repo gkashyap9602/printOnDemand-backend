@@ -1,6 +1,5 @@
 require('../db_functions');
 let helpers = require('../services/helper')
-let Category = require('../models/Category')
 const ResponseMessages = require("../constants/ResponseMessages")
 const CSC2 = require('country-state-city');
 const Material = require('../models/Material')
@@ -10,68 +9,10 @@ const commonUtil = {
   getMaterials: async (data) => {
     const result = await getDataArray(Material, {})
     if (!result.status) {
-      return helpers.showResponse(false, ResponseMessages?.admin?.not_exist, {}, null, 400);
+      return helpers.showResponse(false, ResponseMessages?.material.not_exist, {}, null, 400);
     }
     return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result?.data?.length > 0 ? result?.data : {}, null, 200);
   },
-  
-  getCategories: async (data) => {
-    const { includeSubCategory = false, searchKey = '', parentCategoryId } = data
-    let parentCategoryInfo = null
-    const aggregationPipeline = [
-      {
-        $match: {
-          name: { $regex: searchKey, $options: 'i' },
-        },
-      },
-    ];
-
-    if (includeSubCategory === 'true' || includeSubCategory === true) {
-
-      if (parentCategoryId) {
-        aggregationPipeline.push(
-          {
-            $match: { _id: mongoose.Types.ObjectId(parentCategoryId) },
-          },
-        );
-      }
-      aggregationPipeline.push(
-        {
-          $lookup: {
-            from: 'subCategory',
-            localField: '_id',
-            foreignField: 'categoryId',
-            as: 'subCategories',
-          },
-        },
-        {
-          $addFields: {
-            subCategories: {
-              $filter: {
-                input: '$subCategories',
-                as: 'subCategory',
-                cond: {
-                  $or: [
-                    { $regexMatch: { input: '$$subCategory.name', regex: searchKey, options: 'i' } },
-                  ],
-                },
-              },
-            },
-          },
-        },
-      )
-      //ends if
-    }
-    //ends if
-
-    const result = await Category.aggregate(aggregationPipeline);
-
-    if (result.length === 0) {
-      return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 400);
-    }
-    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result : {}, null, 200);
-  },
-
   getAllCountries: async () => {
 
     const countries = CSC2.Country.getAllCountries()
@@ -105,6 +46,7 @@ const commonUtil = {
     }
     return helpers.showResponse(false, ResponseMessages?.common.parameter_store_post_error, null, null, 400);
   },
+  
   fetchParameterFromAWS: async (data) => {
     let response = await helpers.getParameterFromAWS({
       name: data?.name

@@ -1,8 +1,5 @@
 var Common = require('../utils/Common');
 var helpers = require('../services/helper')
-const ResponseMessages = require("../constants/ResponseMessages")
-// const videoMulterRef = helpers.addToMulter.array('rico_video')
-// const fileMulterRef = helpers.addToMulter.array('rico_file')
 
 const commonController = {
 
@@ -24,10 +21,6 @@ const commonController = {
         let result = await Common.fetchParameterFromAWS(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    getCategories: async (req, res) => {
-        let result = await Common.getCategories(req.query);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
     getAllCountries: async (req, res) => {
         let result = await Common.getAllCountries();
         return helpers.showOutput(res, result, result.statusCode);
@@ -40,25 +33,7 @@ const commonController = {
         let result = await Common.getAllStates(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    // uploadVideoToS3: async (req, res) => {
-    //     videoMulterRef(req, res, async (err) => {
-    //         if (err || !req.files) {
-    //             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.common?.no_video_file), 203);
-    //         }
-    //         let result = await helpers.uploadVideoToS3(req.files)
-    //         return helpers.showOutput(res, result, result.statuscode);
-    //     })
-    // },
-    
-    // uploadFileToS3: async (req, res) => {
-    //     fileMulterRef(req, res, async (err) => {
-    //         if (err || !req.files) {
-    //             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.common?.no_file), 203);
-    //         }
-    //         let result = await helpers.uploadFileToS3(req.files)
-    //         return helpers.showOutput(res, result, result.statuscode);
-    //     })
-    // },
+
 }
 
 module.exports = {

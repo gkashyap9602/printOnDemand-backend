@@ -10,7 +10,7 @@ const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require("../constants/const");
 const { default: mongoose } = require('mongoose');
 const { randomUUID } = require('crypto')
-const middleware = require('../controllers/middleware');
+const middleware = require('../middleware/authentication');
 const Orders = require('../models/Orders')
 const Material = require("../models/Material")
 

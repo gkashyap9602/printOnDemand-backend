@@ -24,10 +24,18 @@ app.get("/", (req, res) => {
 let administration = require("./server/routes/administration");
 let users = require("./server/routes/users");
 let common = require("./server/routes/common");
+let category = require("./server/routes/category");
+let product = require("./server/routes/product");
+
+
 
 app.use(API_V1 + "administration", administration);
 app.use(API_V1 + "user", users);
 app.use(API_V1 + "common", common);
+app.use(API_V1 + "category", category);
+app.use(API_V1 + "product", product);
+
+
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`https server running on port ${process.env.PORT || 3000}`);

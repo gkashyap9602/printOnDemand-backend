@@ -100,6 +100,7 @@ module.exports = {
         subcategory_already_existed:"Subcategory already existed",
         category_already_existed:"Category already existed",
         category_not_exist:"Category does not exist",
+        subcategory_not_exist:"Subcategory does not exist",
         subcategory_added:"subcategory added Successfully",
         category_save_failed:"Error occured while adding new category",
         subcategory_save_failed:"Error occured while adding new Subcategory",
@@ -107,6 +108,9 @@ module.exports = {
         subcategory_added:"Subcategory added Sucessfully",
         invalid_category_id:"Invalid Category Id",
         invalid_subcategory_id:"Invalid Subcategory Id",
+        category_updated:"category udpated Successfully",
+        subcategory_updated:"subcategory udpated Successfully",
+
 
 
 
@@ -116,6 +120,8 @@ module.exports = {
         material_already:"material already exist",
         material_created:"material added Successfully",
         material_save_failed:"Error occured while adding new material",
+        not_exist:"material not exist",
+
 
     },
     variable:{
@@ -157,7 +163,12 @@ module.exports = {
         disabled_account: "Your account login has been disabled by admin !!! contact support",
         deleted_account: "Your account is deleted permanentlt !!! contact support",
         token_expired: "your token has been expired or not valid",
-        access_refreshed: "Access token is refreshed"
+        access_refreshed: "Access token is refreshed",
+        invalid_admin: "Invalid Admin",
+        invalid_user: "Invalid User",
+
+
+        
     },
     order: {
         order_created: "order created Successfully",

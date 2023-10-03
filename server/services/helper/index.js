@@ -1,6 +1,6 @@
 var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
-const CryptoJS = require('crypto-js')
+
 AWS.config.update({
   region: "us-east-1",
   credentials: new AWS.SharedIniFileCredentials({ profile: "default" }),
@@ -548,7 +548,13 @@ const sendSMSService = async (to, Message) => {
 const addToMulter = multer({
   storage: multer.memoryStorage(),
   fileFilter: (req, file, callback) => {
-    callback(null, true);
+      callback(null, true); // Accept the file
+
+    // if (file.fieldname === 'productImage') {
+    //   callback(null, true); // Accept the file
+    // } else {
+    //   callback(new Error('Invalid fieldname')); // Reject the file
+    // }
   },
 })
 

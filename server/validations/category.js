@@ -16,3 +16,12 @@ module.exports.addSubCategorySchema = {
     })
 
 };
+
+module.exports.updateCategorySchema = {
+    body: joi.object({
+        name: joi.string().required(),
+        description: joi.string().allow(''),
+        id:joi.string().required()
+    })
+
+};

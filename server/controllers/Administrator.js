@@ -1,6 +1,5 @@
 var Administration = require('../utils/Administration');
 const helpers = require('../services/helper');
-const ResponseMessages = require('../constants/ResponseMessages');
 const adminController = {
 
     login: async (req, res) => {
@@ -8,55 +7,11 @@ const adminController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
 
-    addCategories: async (req, res) => {
-        if (!req.file) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
-        }
-        let result = await Administration.addCategories(req.body, req.file);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
     addMaterial: async (req, res) => {
         let result = await Administration.addMaterial(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    addProduct: async (req, res) => {
-        let result = await Administration.addProduct(req.body);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    getProductDetails: async (req, res) => {
-        let result = await Administration.getProductDetails(req.query);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    addProductVarient: async (req, res) => {
-        let result = await Administration.addProductVarient(req.body);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    saveProductImage: async (req, res) => {
-        if (!req.file) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
-        }
-        let result = await Administration.saveProductImage(req.body, req.file);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    addSubCategories: async (req, res) => {
-        if (!req.file) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
-        }
-        let result = await Administration.addSubCategories(req.body, req.file);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    addVariableTypes: async (req, res) => {
-        let result = await Administration.addVariableTypes(req.body,);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    addVariableOptions: async (req, res) => {
-        let result = await Administration.addVariableOptions(req.body);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    getAllVariableTypes: async (req, res) => {
-        let result = await Administration.getAllVariableTypes();
-        return helpers.showOutput(res, result, result.statusCode);
-    },
+   
     // forgotPasswordMail: async (req, res) => {
     //     let requiredFields = ['email'];
     //     let validator = helpers.validateParams(req, requiredFields);
