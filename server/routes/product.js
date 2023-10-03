@@ -11,6 +11,7 @@ const helpers = require('../services/helper/index')
 
 // with user and admin Both token routes
 router.get('/getProductDetails', middleware.verifyTokenBoth, productController.getProductDetails);
+router.get('/getAllProducts', middleware.verifyTokenBoth, productController.getAllProduct);
 
 // with admin token routes
 router.post('/addProduct', middleware.verifyTokenAdmin,validate(productValidation.addProductSchema), productController.addProduct);

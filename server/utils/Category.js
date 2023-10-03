@@ -9,17 +9,9 @@ const categoryUtil = {
     //admin and user both
     getCategories: async (data) => {
         const { includeSubCategory = false, searchKey = '', parentCategoryId } = data
-        console.log(searchKey, "search")
-        const aggregationPipeline = [
-            // {
-            //     $match: {
-            //         name: { $regex: searchKey, $options: 'i' },
-            //     },
-            // },
-        ];
+        const aggregationPipeline = [];
 
         if (includeSubCategory === 'true' || includeSubCategory === true) {
-
 
             if (parentCategoryId) {
                 aggregationPipeline.push(
@@ -50,7 +42,6 @@ const categoryUtil = {
                                 cond: {
                                     $or: [
                                         { $regexMatch: { input: '$$subCategory.name', regex: searchKey, options: 'i' } },
-                                        // { $regexMatch: { input: '$name', regex: searchKey, options: 'i' } }
                                     ],
                                 },
                             },
@@ -60,7 +51,6 @@ const categoryUtil = {
             )
             //ends if
         } else {
-            console.log("else")
             aggregationPipeline.push(
                 {
                     $match: {
@@ -71,7 +61,7 @@ const categoryUtil = {
         }
         //ends if
 
-        console.log(aggregationPipeline,"aggregationPipeline")
+        console.log(aggregationPipeline, "aggregationPipeline")
 
         const result = await Category.aggregate(aggregationPipeline);
         console.log(result, "resulttt")
@@ -81,7 +71,7 @@ const categoryUtil = {
         // }
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
     },
-    //ends
+   
     //admin 
     addCategories: async (data, file) => {
         try {

@@ -13,6 +13,11 @@ const adminController = {
         let result = await Product.getProductDetails(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+      //admin and user both
+      getAllProduct: async (req, res) => {
+        let result = await Product.getAllProduct(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     //admin 
     addProductVarient: async (req, res) => {
         let result = await Product.addProductVarient(req.body);

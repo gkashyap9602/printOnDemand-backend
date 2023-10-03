@@ -199,6 +199,40 @@ const productUtils = {
         }
 
     },
+    getAllProduct: async (data) => {
+        try {
+            const { subCategoryId,pageSize,pageLimit,sort,filter } = data
+
+            const result = await Product.aggregate([
+                {
+                    $match: {
+                        subCategoryId: mongoose.Types.ObjectId(subCategoryId)
+                    }
+                },
+                // {
+                //     $lookup: {
+                //         from: "subCategory",
+                //         localField: "subCategoryId",
+                //         foreignField: "_id",
+                //         as: "productSubCategories",
+                //     }
+                // },
+              
+
+            ]);
+            console.log(result, "resultt get all products")
+
+            // if (result.length === 0) {
+            //     return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
+            // }
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 403);
+
+        }
+
+    },
     addProductVarient: async (data) => {
         try {
             let { productCode, price, productId, productVarientTemplates, varientOptions } = data
