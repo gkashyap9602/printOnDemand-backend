@@ -18,6 +18,14 @@ const adminController = {
         let result = await Product.addProductVarient(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    updateProduct: async (req, res) => {
+        let result = await Product.updateProduct(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    updateProductVarient: async (req, res) => {
+        let result = await Product.updateProductVarient(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     //admin 
     saveProductImage: async (req, res) => {
         if (!req.file) {

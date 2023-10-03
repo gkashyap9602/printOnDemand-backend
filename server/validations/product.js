@@ -17,6 +17,22 @@ module.exports.addProductSchema = {
     })
 
 };
+module.exports.updateProductSchema = {
+    body: joi.object({
+        subCategoryIds: joi.array().required(),
+        materialId:joi.string().required(),
+        title:joi.string().required(),
+        longDescription:joi.string().required(),
+        careInstructions:joi.string(),
+        productionDuration:joi.string(),
+        shortDescription:joi.string(),
+        construction:joi.string(),
+        features:joi.string(),
+        process:joi.string(),
+        productId:joi.string().required()
+    })
+
+};
 module.exports.addProductVarientSchema = {
     body: joi.object({
         productCode: joi.string().required(),

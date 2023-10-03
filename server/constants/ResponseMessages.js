@@ -28,6 +28,10 @@ module.exports = {
         not_exist:"Data not existed",
         invalid_id:"invalid id",
         created_successfully:"created Successfully",
+        update_sucess:"udpated Successfully",
+        update_failed:"Error occured while updating",
+        delete_failed:"Error occured while deleting",
+        delete_sucess:"Deleted Successfully",
 
     },
     users: {
@@ -108,11 +112,7 @@ module.exports = {
         subcategory_added:"Subcategory added Sucessfully",
         invalid_category_id:"Invalid Category Id",
         invalid_subcategory_id:"Invalid Subcategory Id",
-        category_updated:"category udpated Successfully",
-        subcategory_updated:"subcategory udpated Successfully",
-
-
-
+        
 
     },
     material:{

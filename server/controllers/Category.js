@@ -23,31 +23,19 @@ const categoryController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateCategory: async (req, res) => {
-        if (!req.file) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
-        }
         let result = await Category.updateCategory(req.body, req.file);
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateSubcategory: async (req, res) => {
-        if (!req.file) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
-        }
         let result = await Category.updateSubcategory(req.body, req.file);
         return helpers.showOutput(res, result, result.statusCode);
     },
     deleteCategory: async (req, res) => {
-        if (!req.file) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
-        }
-        let result = await Category.deleteCategory(req.body, req.file);
+        let result = await Category.deleteCategory(req.params);
         return helpers.showOutput(res, result, result.statusCode);
-    },  
+    },
     deleteSubcategory: async (req, res) => {
-        if (!req.file) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
-        }
-        let result = await Category.deleteSubcategory(req.body, req.file);
+        let result = await Category.deleteSubcategory(req.params);
         return helpers.showOutput(res, result, result.statusCode);
     },
 

@@ -16,21 +16,22 @@ const productUtils = {
             let { careInstructions, longDescription, subCategoryIds, materialId, variableTypesIds,
                 construction, features, productionDuration, shortDescription, title } = data
 
-            subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
-            variableTypesIds = variableTypesIds.map((id) => mongoose.Types.ObjectId(id))
+                const findProduct = await getSingleData(Product, { title: title })
+                if (findProduct.status) {
+                    return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 403);
+                }
 
-            const findProduct = await getSingleData(Product, { title: title })
-            if (findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 403);
-            }
+                subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
+                variableTypesIds = variableTypesIds.map((id) => mongoose.Types.ObjectId(id))
+
             const findVariableTypes = await getDataArray(VariableTypes, { _id: { $in: variableTypesIds } })
 
-            if (findVariableTypes?.data.length !== variableTypesIds.length) {
+            if (findVariableTypes?.data?.length !== variableTypesIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
             }
             const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } })
 
-            if (findSubCategory?.data.length !== subCategoryIds.length) {
+            if (findSubCategory?.data?.length !== subCategoryIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
             }
             const findMaterial = await getSingleData(Material, { _id: materialId })
@@ -46,16 +47,10 @@ const productUtils = {
                 title,
                 createdOn: helpers.getCurrentDate(),
                 subCategoryId: subCategoryIds,
-                variableTypes: variableTypesIds
-                // categoryId:categoryIds
-                // imageUrl: s3Upload?.data[0],
-                // priceStartsFrom,
-                // materialName,
-                // parentCategoryName,
-                // parentCategoryId,
-                // productionDuration,
-                // shortDescription,
-                // sizeChart,
+                variableTypesId: variableTypesIds,
+                productionDuration,
+                construction,
+                shortDescription,
             }
             const prodRef = new Product(obj)
             const saveProduct = await postData(prodRef)
@@ -69,6 +64,54 @@ const productUtils = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
+    updateProduct: async (data) => {
+        try {
+            let { careInstructions, longDescription, subCategoryIds,materialId,productId,
+                construction, features, productionDuration, shortDescription, title } = data
+
+                
+                const findProduct = await getSingleData(Product, { _id: productId })
+                if (!findProduct.status) {
+                    return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
+                }
+                subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
+              console.log(subCategoryIds,"subCategoryIds")
+                   
+            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } })
+              console.log(findSubCategory,"findSubCategory")
+            if (findSubCategory?.data?.length !== subCategoryIds.length) {
+                return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
+            }
+            const findMaterial = await getSingleData(Material, { _id: materialId })
+
+            if (!findMaterial.status) {
+                return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 403);
+            }
+            //in payload blank value not pass
+            let obj = {
+                careInstructions,
+                longDescription,
+                materialId,
+                features,
+                title,
+                updatedOn: helpers.getCurrentDate(),
+                subCategoryId: subCategoryIds,
+                productionDuration,
+                construction,
+                shortDescription,
+            }
+            const result = await updateSingleData(Product,obj,{_id:productId})
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
+            }
+            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result?.data, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+    },
+    
     getProductDetails: async (data) => {
         try {
             const { productId } = data
@@ -157,6 +200,55 @@ const productUtils = {
 
     },
     addProductVarient: async (data) => {
+        try {
+            let { productCode, price, productId, productVarientTemplates, varientOptions } = data
+
+            const findProduct = await getSingleData(Product, { _id: productId })
+            if (!findProduct.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
+            }
+
+            const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
+            console.log(saveVariableOptions, "saveVariableOptions")
+
+            if (!saveVariableOptions.status) {
+                return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
+            }
+            productVarientTemplates = productVarientTemplates.map((value) => {
+                let item = { ...value }
+                item._id = mongoose.Types.ObjectId()
+                return item
+            })
+            let variableOptions = saveVariableOptions?.data.map((value) => {
+                let item = { ...value }
+                item.variableOptionId = value._id
+                return item
+            })
+            let newObj = {
+                productCode,
+                price,
+                productId,
+                productVarientTemplates,
+                varientOptions: variableOptions
+
+            }
+            const newProductVareint = new ProductVarient(newObj);
+            const productVarient = await postData(newProductVareint)
+
+            console.log(productVarient, "productVarient")
+
+            if (productVarient.status) {
+                return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, productVarient, null, 200);
+            }
+            //ends
+            return helpers.showResponse(false, ResponseMessages?.product.product_varient_save_fail, {}, null, 403);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+
+    },
+    updateProductVarient: async (data) => {
         try {
             let { productCode, price, productId, productVarientTemplates, varientOptions } = data
 
