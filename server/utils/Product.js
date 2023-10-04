@@ -202,10 +202,17 @@ const productUtils = {
     },
     getAllProduct: async (data) => {
         try {
-            const { subCategoryId,pageSize,pageLimit,sort,filter } = data;  
+            let { subCategoryId,pageSize=5,page=1,sort,filter } = data;  
             let id = new ObjectId(subCategoryId)
+            pageSize = Number(pageSize)
+            page = Number(page)
+
+
+            console.log(pageSize,page,"gyguj")
 
             console.log(id)
+            let resultt = await getCount(Product,{ subCategoryId: { $in: [id] }})
+            console.log(resultt,"reultttCount")
             const result = await Product.aggregate([
                 {
                     $match: {
@@ -222,12 +229,25 @@ const productUtils = {
                 },
                 {
                   $addFields:{
-                    priceStartsFrom:{$arrayElemAt:["$ProductVarient.price",0]}
+                    price:{$min:"$ProductVarient.price"},
                   }
                 },
                 // {
+                //     $addFields:{
+                //       priceStartsFrom: {
+                //           $concat: ["$", { $toString: '$price'}]
+                //       }
+                //     }
+                //   },
+                // {
                 //   $unwind:'$ProductVarient'
                 // },
+                {
+                    $skip: (page - 1) * pageSize // Skip records based on the page number
+                },
+                {
+                    $limit: pageSize // Limit the number of records per page
+                },
                 {
                     $project:{
                         _id:1,
@@ -249,8 +269,8 @@ const productUtils = {
 
             ]);
             // console.log(result, "resultt get all products")
-
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
+           
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, {items:result,totalCount:resultt?.data}, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 403);
