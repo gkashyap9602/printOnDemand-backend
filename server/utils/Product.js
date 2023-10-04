@@ -76,10 +76,8 @@ const productUtils = {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
             }
             subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
-            console.log(subCategoryIds, "subCategoryIds")
 
             const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } })
-            console.log(findSubCategory, "findSubCategory")
             if (findSubCategory?.data?.length !== subCategoryIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
             }
@@ -187,7 +185,6 @@ const productUtils = {
                 }
 
             ]);
-            // console.log(result, "resultt get product")
 
             if (result.length === 0) {
                 return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
@@ -203,14 +200,15 @@ const productUtils = {
     },
     getAllProduct: async (data) => {
         try {
-            let { subCategoryId, pageSize = 5, page = 1, sortDirection, sortColumn, materialFilter, } = data;
+            let { subCategoryId, pageSize = 5, page = 1, sortDirection, sortColumn, materialFilter,searchKey } = data;
             let id = new ObjectId(subCategoryId)
             pageSize = Number(pageSize)
             page = Number(page)
 
 
             let matchObj = {
-                subCategoryId: { $in: [id] }
+                subCategoryId: { $in: [id] },
+                title:{ $regex:searchKey,$options:'i'}
             }
             if (materialFilter) {
                 let id = new ObjectId(materialFilter)
@@ -269,7 +267,6 @@ const productUtils = {
                 }
 
             ]);
-            // console.log(result, "resultt get all products")
 
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
         }
@@ -289,7 +286,6 @@ const productUtils = {
             }
 
             const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
-            console.log(saveVariableOptions, "saveVariableOptions")
 
             if (!saveVariableOptions.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
@@ -306,7 +302,7 @@ const productUtils = {
             })
             let newObj = {
                 productCode,
-                price,
+                price:`$${price}`,
                 productId,
                 productVarientTemplates,
                 varientOptions: variableOptions
@@ -315,7 +311,6 @@ const productUtils = {
             const newProductVareint = new ProductVarient(newObj);
             const productVarient = await postData(newProductVareint)
 
-            console.log(productVarient, "productVarient")
 
             if (productVarient.status) {
                 return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, productVarient, null, 200);
@@ -338,7 +333,6 @@ const productUtils = {
             }
 
             const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
-            console.log(saveVariableOptions, "saveVariableOptions")
 
             if (!saveVariableOptions.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
@@ -364,7 +358,6 @@ const productUtils = {
             const newProductVareint = new ProductVarient(newObj);
             const productVarient = await postData(newProductVareint)
 
-            console.log(productVarient, "productVarient")
 
             if (productVarient.status) {
                 return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, productVarient, null, 200);
