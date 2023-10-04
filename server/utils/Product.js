@@ -152,6 +152,9 @@ const productUtils = {
                     }
                 },
                 {
+                  $unwind:'$material'
+                },
+                {
                     $lookup: {
                         from: "productVarient",
                         localField: "_id",
