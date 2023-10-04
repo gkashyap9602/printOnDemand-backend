@@ -3,6 +3,7 @@ let SubCategory = require('../models/subCategory')
 let helpers = require('../services/helper');
 const ResponseMessages = require('../constants/ResponseMessages');
 const { default: mongoose } = require('mongoose');
+let ObjectId = require('mongodb').ObjectId
 const Material = require('../models/Material')
 const Product = require('../models/Product')
 const VariableTypes = require('../models/VariableTypes')
@@ -201,30 +202,54 @@ const productUtils = {
     },
     getAllProduct: async (data) => {
         try {
-            const { subCategoryId,pageSize,pageLimit,sort,filter } = data
+            const { subCategoryId,pageSize,pageLimit,sort,filter } = data;  
+            let id = new ObjectId(subCategoryId)
 
+            console.log(id)
             const result = await Product.aggregate([
                 {
                     $match: {
-                        subCategoryId: mongoose.Types.ObjectId(subCategoryId)
+                        subCategoryId:{$in: [id]}
                     }
                 },
+                {
+                    $lookup: {
+                        from: "productVarient",
+                        localField: "_id",
+                        foreignField: "productId",
+                        as: "ProductVarient",
+                    }
+                },
+                {
+                  $addFields:{
+                    priceStartsFrom:{$arrayElemAt:["$ProductVarient.price",0]}
+                  }
+                },
                 // {
-                //     $lookup: {
-                //         from: "subCategory",
-                //         localField: "subCategoryId",
-                //         foreignField: "_id",
-                //         as: "productSubCategories",
-                //     }
+                //   $unwind:'$ProductVarient'
                 // },
-              
+                {
+                    $project:{
+                        _id:1,
+                        careInstructions:1,
+                        longDescription:1,
+                        priceStartsFrom:1,
+                        productImages:1,
+                        productionDuration:1,
+                        shortDescription:1,
+                        sizeChart:1,
+                        status:1,
+                        title:1,
+                        variantCount:1,
+                        // ProductVarient:1,
+                        priceStartsFrom:1
+
+                    }
+                }          
 
             ]);
-            console.log(result, "resultt get all products")
+            // console.log(result, "resultt get all products")
 
-            // if (result.length === 0) {
-            //     return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
-            // }
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
         }
         catch (err) {
