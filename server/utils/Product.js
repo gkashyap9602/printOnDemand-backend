@@ -17,13 +17,13 @@ const productUtils = {
             let { careInstructions, longDescription, subCategoryIds, materialId, variableTypesIds,
                 construction, features, productionDuration, shortDescription, title } = data
 
-                const findProduct = await getSingleData(Product, { title: title })
-                if (findProduct.status) {
-                    return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 403);
-                }
+            const findProduct = await getSingleData(Product, { title: title })
+            if (findProduct.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 403);
+            }
 
-                subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
-                variableTypesIds = variableTypesIds.map((id) => mongoose.Types.ObjectId(id))
+            subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
+            variableTypesIds = variableTypesIds.map((id) => mongoose.Types.ObjectId(id))
 
             const findVariableTypes = await getDataArray(VariableTypes, { _id: { $in: variableTypesIds } })
 
@@ -67,19 +67,19 @@ const productUtils = {
     },
     updateProduct: async (data) => {
         try {
-            let { careInstructions, longDescription, subCategoryIds,materialId,productId,
+            let { careInstructions, longDescription, subCategoryIds, materialId, productId,
                 construction, features, productionDuration, shortDescription, title } = data
 
-                
-                const findProduct = await getSingleData(Product, { _id: productId })
-                if (!findProduct.status) {
-                    return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
-                }
-                subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
-              console.log(subCategoryIds,"subCategoryIds")
-                   
+
+            const findProduct = await getSingleData(Product, { _id: productId })
+            if (!findProduct.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
+            }
+            subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
+            console.log(subCategoryIds, "subCategoryIds")
+
             const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } })
-              console.log(findSubCategory,"findSubCategory")
+            console.log(findSubCategory, "findSubCategory")
             if (findSubCategory?.data?.length !== subCategoryIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
             }
@@ -101,7 +101,7 @@ const productUtils = {
                 construction,
                 shortDescription,
             }
-            const result = await updateSingleData(Product,obj,{_id:productId})
+            const result = await updateSingleData(Product, obj, { _id: productId })
 
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
@@ -112,7 +112,7 @@ const productUtils = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
-    
+
     getProductDetails: async (data) => {
         try {
             const { productId } = data
@@ -192,7 +192,7 @@ const productUtils = {
             if (result.length === 0) {
                 return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
             }
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess,result[0], null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result[0], null, 200);
 
         }
         catch (err) {
@@ -203,18 +203,34 @@ const productUtils = {
     },
     getAllProduct: async (data) => {
         try {
-            let { subCategoryId,pageSize=5,page=1,sort,filter } = data;  
+            let { subCategoryId, pageSize = 5, page = 1, sortDirection, sortColumn, materialFilter, } = data;
             let id = new ObjectId(subCategoryId)
             pageSize = Number(pageSize)
             page = Number(page)
 
-            let totalCount = await getCount(Product,{ subCategoryId: { $in: [id] }})
-            // console.log(totalCount,"totalCount")
+
+            let matchObj = {
+                subCategoryId: { $in: [id] }
+            }
+            if (materialFilter) {
+                let id = new ObjectId(materialFilter)
+                matchObj.materialId = id
+
+            }
+
+            let totalCount = await getCount(Product, { ...matchObj })
+
             const result = await Product.aggregate([
                 {
                     $match: {
-                        subCategoryId:{$in: [id]}
+                        ...matchObj
                     }
+                },
+                {
+                    $skip: (page - 1) * pageSize // Skip records based on the page number
+                },
+                {
+                    $limit: pageSize // Limit the number of records per page
                 },
                 {
                     $lookup: {
@@ -225,49 +241,37 @@ const productUtils = {
                     }
                 },
                 {
-                  $addFields:{
-                    price:{$min:"$ProductVarient.price"},
-                  }
-                },
-                // {
-                //     $addFields:{
-                //       priceStartsFrom: {
-                //           $concat: ["$", { $toString: '$price'}]
-                //       }
-                //     }
-                //   },
-                // {
-                //   $unwind:'$ProductVarient'
-                // },
-                {
-                    $skip: (page - 1) * pageSize // Skip records based on the page number
+                    $addFields: {
+                        priceStartsFrom: { $min: "$ProductVarient.price" },
+                    }
                 },
                 {
-                    $limit: pageSize // Limit the number of records per page
+                    $sort: {
+                        [sortColumn]: sortDirection === "asc" ? 1 : -1
+                    }
                 },
                 {
-                    $project:{
-                        _id:1,
-                        careInstructions:1,
-                        longDescription:1,
-                        priceStartsFrom:1,
-                        productImages:1,
-                        productionDuration:1,
-                        shortDescription:1,
-                        sizeChart:1,
-                        status:1,
-                        title:1,
-                        variantCount:1,
-                        // ProductVarient:1,
-                        priceStartsFrom:1
+                    $project: {
+                        _id: 1,
+                        careInstructions: 1,
+                        longDescription: 1,
+                        productImages: 1,
+                        productionDuration: 1,
+                        shortDescription: 1,
+                        sizeChart: 1,
+                        status: 1,
+                        title: 1,
+                        variantCount: 1,
+                        priceStartsFrom: 1,
+
 
                     }
-                }          
+                }
 
             ]);
             // console.log(result, "resultt get all products")
-           
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, {items:result,totalCount:totalCount.data}, null, 200);
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 403);
@@ -506,7 +510,7 @@ const productUtils = {
         }
 
     },
- 
+
 }
 
 module.exports = {
