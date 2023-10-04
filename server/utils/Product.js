@@ -200,7 +200,7 @@ const productUtils = {
     },
     getAllProduct: async (data) => {
         try {
-            let { subCategoryId, pageSize = 5, page = 1, sortDirection="asc", sortColumn="title", materialFilter,searchKey=''} = data;
+            let { subCategoryId, pageSize = 5, page = 1, sortDirection="asc", sortColumn="title", materialFilter=null,searchKey=''} = data;
             let id = new ObjectId(subCategoryId)
             pageSize = Number(pageSize)
             page = Number(page)
@@ -210,7 +210,7 @@ const productUtils = {
                 subCategoryId: { $in: [id] },
                 title:{ $regex:searchKey,$options:'i'}
             }
-            if (materialFilter) {
+            if (materialFilter && materialFilter!== (null|| 'null')) {
                 let id = new ObjectId(materialFilter)
                 matchObj.materialId = id
 
