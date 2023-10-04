@@ -187,12 +187,13 @@ const productUtils = {
                 }
 
             ]);
-            console.log(result, "resultt get product")
+            // console.log(result, "resultt get product")
 
             if (result.length === 0) {
                 return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
             }
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess,result[0], null, 200);
+
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 403);
@@ -207,12 +208,8 @@ const productUtils = {
             pageSize = Number(pageSize)
             page = Number(page)
 
-
-            console.log(pageSize,page,"gyguj")
-
-            console.log(id)
-            let resultt = await getCount(Product,{ subCategoryId: { $in: [id] }})
-            console.log(resultt,"reultttCount")
+            let totalCount = await getCount(Product,{ subCategoryId: { $in: [id] }})
+            // console.log(totalCount,"totalCount")
             const result = await Product.aggregate([
                 {
                     $match: {
@@ -270,7 +267,7 @@ const productUtils = {
             ]);
             // console.log(result, "resultt get all products")
            
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, {items:result,totalCount:resultt?.data}, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, {items:result,totalCount:totalCount.data}, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 403);
