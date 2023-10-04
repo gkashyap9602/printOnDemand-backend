@@ -96,6 +96,7 @@ module.exports = {
         invalid_product_id:"Invalid Product Id",
         product_image_save_err:"Error while saving product image",
         product_image_saved:"Product Image Uploaded Successfully",
+        product_code_already:"Product Code Already Exist",
 
 
 

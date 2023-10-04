@@ -200,7 +200,7 @@ const productUtils = {
     },
     getAllProduct: async (data) => {
         try {
-            let { subCategoryId, pageSize = 5, page = 1, sortDirection, sortColumn, materialFilter,searchKey } = data;
+            let { subCategoryId, pageSize = 5, page = 1, sortDirection="asc", sortColumn="title", materialFilter,searchKey=''} = data;
             let id = new ObjectId(subCategoryId)
             pageSize = Number(pageSize)
             page = Number(page)
@@ -279,8 +279,13 @@ const productUtils = {
     addProductVarient: async (data) => {
         try {
             let { productCode, price, productId, productVarientTemplates, varientOptions } = data
-
+            
+            const findProductCode = await getSingleData(ProductVarient, {productCode })
+            if (findProductCode.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
+            }
             const findProduct = await getSingleData(Product, { _id: productId })
+
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
             }
