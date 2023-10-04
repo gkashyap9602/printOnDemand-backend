@@ -3,15 +3,83 @@ let helpers = require('../services/helper')
 const ResponseMessages = require("../constants/ResponseMessages")
 const CSC2 = require('country-state-city');
 const Material = require('../models/Material')
+const Product = require('../models/Product')
 const { default: mongoose } = require('mongoose');
+let ObjectId = require('mongodb').ObjectId
+
 const commonUtil = {
 
   getMaterials: async (data) => {
-    const result = await getDataArray(Material, {})
-    if (!result.status) {
-      return helpers.showResponse(false, ResponseMessages?.material.not_exist, {}, null, 400);
+    const { subCategoryId } = data
+
+    // const result = await getDataArray(Material, {})
+    let aggregationPipeline = [
+             
+    ]
+
+    if (subCategoryId) {
+      console.log("underif")
+      aggregationPipeline.push(
+        {
+          $lookup: {
+            from: "product", // Replace with the actual name of the material collection
+            localField: "_id",
+            foreignField: "materialId",
+            as: "products",
+            // pipeline:[
+            //   {
+            //     $match: {
+            //       '$products.subCategoryId': { $in: [new ObjectId(subCategoryId)] },
+            //     }
+            //   },
+            // ]
+          },
+
+        },
+
+        {
+          $unwind: "$products" // Unwind the materials array
+        },
+        {
+          $match: {
+            "products.subCategoryId": { $in: [new ObjectId(subCategoryId)] }
+          }
+        },
+        {
+          $group: {
+            _id: "$_id",
+            name: { $first: "$name" }, // Assuming the material document has a "name" field
+            // Add other fields from the material document as needed
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            // Include other fields as needed
+          }
+        }
+      )
+    } else {
+      aggregationPipeline.push(
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            // Include other fields as needed
+          }
+        }
+      )
     }
-    return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result?.data?.length > 0 ? result?.data : {}, null, 200);
+
+
+    const result = await Material.aggregate(aggregationPipeline)
+
+    console.log(result, "resultttt")
+    // if (result.length===0) {
+    //   return helpers.showResponse(false, ResponseMessages?.material.not_exist, {}, null, 400);
+    // }
+    return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
   },
   getAllCountries: async () => {
 
@@ -46,7 +114,7 @@ const commonUtil = {
     }
     return helpers.showResponse(false, ResponseMessages?.common.parameter_store_post_error, null, null, 400);
   },
-  
+
   fetchParameterFromAWS: async (data) => {
     let response = await helpers.getParameterFromAWS({
       name: data?.name

@@ -9,7 +9,6 @@ const Product = require('../models/Product')
 const VariableTypes = require('../models/VariableTypes')
 const VariableOptions = require('../models/VariableOptions')
 const ProductVarient = require('../models/ProductVarient')
-
 const productUtils = {
 
     addProduct: async (data) => {
@@ -200,19 +199,20 @@ const productUtils = {
     },
     getAllProduct: async (data) => {
         try {
-            let { subCategoryId, pageSize = 5, page = 1, sortDirection="asc", sortColumn="title", materialFilter=null,searchKey=''} = data;
+            let { subCategoryId, pageSize = 5, page = 1, sortDirection = "asc", sortColumn = "title", materialFilter, searchKey = '' } = data;
             let id = new ObjectId(subCategoryId)
             pageSize = Number(pageSize)
             page = Number(page)
 
-
             let matchObj = {
                 subCategoryId: { $in: [id] },
-                title:{ $regex:searchKey,$options:'i'}
+                title: { $regex: searchKey, $options: 'i' }
             }
-            if (materialFilter && materialFilter!== (null|| 'null')) {
-                let id = new ObjectId(materialFilter)
-                matchObj.materialId = id
+
+            if (materialFilter && materialFilter !== 'null') {
+                materialFilter = JSON.parse(materialFilter)
+                materialFilter = materialFilter.map((id) => new ObjectId(id))
+                matchObj.materialId = { $in: materialFilter }
 
             }
 
@@ -279,8 +279,8 @@ const productUtils = {
     addProductVarient: async (data) => {
         try {
             let { productCode, price, productId, productVarientTemplates, varientOptions } = data
-            
-            const findProductCode = await getSingleData(ProductVarient, {productCode })
+
+            const findProductCode = await getSingleData(ProductVarient, { productCode })
             if (findProductCode.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
             }
@@ -307,7 +307,7 @@ const productUtils = {
             })
             let newObj = {
                 productCode,
-                price:`$${price}`,
+                price: `$${price}`,
                 productId,
                 productVarientTemplates,
                 varientOptions: variableOptions
@@ -414,6 +414,57 @@ const productUtils = {
                 return helpers.showResponse(false, ResponseMessages?.product.product_image_save_err, {}, null, 400);
             }
             return helpers.showResponse(true, ResponseMessages?.product.product_image_saved, result, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
+    deleteProduct: async (data) => {
+        try {
+            const { id } = data
+
+            const find = await getSingleData(Category, { _id: id })
+            if (!find.status) {
+                return helpers.showResponse(false, ResponseMessages?.category.category_not_exist, {}, null, 400);
+            }
+
+            await deleteData(SubCategory, { categoryId: id })
+
+            const result = await deleteById(Category, id)
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
+    deleteProductVarient: async (data) => {
+        try {
+            const { productId, productVarientId } = data
+
+            const find = await getSingleData(ProductVarient, { _id: productVarientId, productId })
+            if (!find.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
+            }
+
+            const result = await deleteById(ProductVarient, productVarientId)
+
+            if (result.status) {
+                const deleteVarientOptions = await deleteById(VariableOptions, productVarientId)
+                console.log(deleteVarientOptions, "deleteVarientOptions")
+
+                return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
+            }
+
+            return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

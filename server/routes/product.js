@@ -20,7 +20,8 @@ router.post('/addProductVarient', middleware.verifyTokenAdmin,validate(productVa
 
 router.post('/updateProduct', middleware.verifyTokenAdmin, helpers.addToMulter.single('productImage'),validate(productValidation.updateProductSchema), productController.updateProduct);
 router.post('/updateProductVarient', middleware.verifyTokenAdmin,validate(productValidation.addProductVarientSchema), productController.updateProductVarient);
-router.delete('/deleteProductVarient', middleware.verifyTokenAdmin, productController.addProductVarient);
+router.delete('/deleteProductVarient', middleware.verifyTokenAdmin, productController.deleteProductVarient);
+// router.delete('/deleteProduct', middleware.verifyTokenAdmin, productController.deleteProduct);
 
 router.post('/addVariableTypes', middleware.verifyTokenAdmin,validate(variableValidation.addVariableTypeSchema), productController.addVariableTypes);
 router.post('/addVariableOptions', middleware.verifyTokenAdmin,validate(variableValidation.addVariableOptionSchema), productController.addVariableOptions);

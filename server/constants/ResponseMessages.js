@@ -90,6 +90,7 @@ module.exports = {
     product:{
         product_already_existed:"Product already existed",
         product_not_exist:"Product does not exist",
+        product_varient_not_exist:"Product Varient does not exist",
         product_created:"Product Created Successfully",
         product_varient_save_fail:"Error occured while adding new Product Varient",
         product_save_failed:"Error occured while adding new Product",

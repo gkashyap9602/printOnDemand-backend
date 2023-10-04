@@ -31,6 +31,14 @@ const adminController = {
         let result = await Product.updateProductVarient(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    deleteProduct: async (req, res) => {
+        let result = await Category.deleteProduct(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    deleteProductVarient: async (req, res) => {
+        let result = await Category.deleteProductVarient(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     //admin 
     saveProductImage: async (req, res) => {
         if (!req.file) {
