@@ -15,7 +15,7 @@ const adminController = {
     },
       //admin and user both
       getAllProduct: async (req, res) => {
-        let result = await Product.getAllProduct(req.body);
+        let result = await Product.getAllProduct(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
     //admin 
