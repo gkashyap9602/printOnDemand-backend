@@ -76,7 +76,8 @@ var Users = new Schema({
     },
     status: {
         type: Number,
-        default: 1,
+        default: 2,
+        Comment:"1 for active 2 for pending Activation 3 for deactivate user",
         enum:[1,2,3]
     },
     payTraceId:{

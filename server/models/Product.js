@@ -1,6 +1,13 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
+// imageType = 1 for product image
+// imageType = 3 for sizeChart image
+// imageType = 2 for product varient image
+
+// templateType = 1 for .pdf file
+// templateType = 2 for .psd file
+// templateType = 3 for .asd file
 var Product = new Schema({
     subCategoryId: [{
         type: mongoose.Types.ObjectId,
@@ -28,9 +35,6 @@ var Product = new Schema({
         type: String,
         required:true
     },
-    // priceStartsFrom: {
-    //     type: String,
-    // },
     productionDuration: {
         type: String,
         default: null,
@@ -54,7 +58,6 @@ var Product = new Schema({
             type: String,
             default: null,
         },
-
     },
     status: {
         type: Number,

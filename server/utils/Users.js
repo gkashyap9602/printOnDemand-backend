@@ -147,7 +147,7 @@ const UserUtils = {
             }
             let userData = result?.data
             if (userData?.password !== md5(password)) {
-                return helpers.showResponse(false, ResponseMessages?.users?.invalid_credentials, null, null, 401);
+                return helpers.showResponse(false, ResponseMessages?.users?.invalid_credentials, null, null, 403);
             }
             if (userData?.status == 0) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_disabled, null, null, 403);

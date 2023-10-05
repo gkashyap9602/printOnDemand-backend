@@ -26,6 +26,7 @@ let users = require("./server/routes/users");
 let common = require("./server/routes/common");
 let category = require("./server/routes/category");
 let product = require("./server/routes/product");
+let productLibrary = require("./server/routes/productLibrary");
 
 
 
@@ -34,6 +35,7 @@ app.use(API_V1 + "user", users);
 app.use(API_V1 + "common", common);
 app.use(API_V1 + "category", category);
 app.use(API_V1 + "product", product);
+app.use(API_V1 + "productLibrary", productLibrary);
 
 
 
