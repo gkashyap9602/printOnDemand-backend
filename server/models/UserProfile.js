@@ -96,9 +96,6 @@ var UserProfile = new Schema({
       type: String,
       default: "",
     },
-    // ncResaleInfo:{
-
-    // },
    
   },
   isExemptionEligible: {

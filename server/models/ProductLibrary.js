@@ -7,10 +7,6 @@ var ProductLibrary = new Schema({
         ref: "users",
         index: true
     },
-    guid: {
-        type: String,
-        index: true
-    },
     title: {
         type: String,
         required: true

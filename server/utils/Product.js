@@ -53,12 +53,12 @@ const productUtils = {
                 shortDescription,
             }
             const prodRef = new Product(obj)
-            const saveProduct = await postData(prodRef)
+            const result = await postData(prodRef)
 
-            if (!saveProduct.status) {
+            if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
             }
-            return helpers.showResponse(true, ResponseMessages?.product.product_created, saveProduct?.data, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.product.product_created, result?.data, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
@@ -108,6 +108,58 @@ const productUtils = {
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
+    },
+    addProductVarient: async (data) => {
+        try {
+            let { productCode, price, productId, productVarientTemplates, varientOptions } = data
+
+            const findProductCode = await getSingleData(ProductVarient, { productCode })
+            if (findProductCode.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
+            }
+            const findProduct = await getSingleData(Product, { _id: productId })
+
+            if (!findProduct.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
+            }
+
+            const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
+
+            if (!saveVariableOptions.status) {
+                return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
+            }
+            productVarientTemplates = productVarientTemplates.map((value) => {
+                let item = { ...value }
+                item._id = mongoose.Types.ObjectId()
+                return item
+            })
+            let variableOptions = saveVariableOptions?.data.map((value) => {
+                let item = { ...value }
+                item.variableOptionId = value._id
+                return item
+            })
+            let newObj = {
+                productCode,
+                price: `$${price}`,
+                productId,
+                productVarientTemplates,
+                varientOptions: variableOptions
+
+            }
+            const newProductVareint = new ProductVarient(newObj);
+            const result = await postData(newProductVareint)
+
+
+            if (result.status) {
+                return helpers.showResponse(true, ResponseMessages?.product?.product_varient_save, result?.data, null, 200);
+            }
+            //ends
+            return helpers.showResponse(false, ResponseMessages?.product?.product_varient_save_fail, {}, null, 403);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+
     },
     updateProductVarient: async (data) => {
         try {
@@ -313,58 +365,7 @@ const productUtils = {
         }
 
     },
-    addProductVarient: async (data) => {
-        try {
-            let { productCode, price, productId, productVarientTemplates, varientOptions } = data
-
-            const findProductCode = await getSingleData(ProductVarient, { productCode })
-            if (findProductCode.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
-            }
-            const findProduct = await getSingleData(Product, { _id: productId })
-
-            if (!findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
-            }
-
-            const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
-
-            if (!saveVariableOptions.status) {
-                return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
-            }
-            productVarientTemplates = productVarientTemplates.map((value) => {
-                let item = { ...value }
-                item._id = mongoose.Types.ObjectId()
-                return item
-            })
-            let variableOptions = saveVariableOptions?.data.map((value) => {
-                let item = { ...value }
-                item.variableOptionId = value._id
-                return item
-            })
-            let newObj = {
-                productCode,
-                price: `$${price}`,
-                productId,
-                productVarientTemplates,
-                varientOptions: variableOptions
-
-            }
-            const newProductVareint = new ProductVarient(newObj);
-            const productVarient = await postData(newProductVareint)
-
-
-            if (productVarient.status) {
-                return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, productVarient, null, 200);
-            }
-            //ends
-            return helpers.showResponse(false, ResponseMessages?.product.product_varient_save_fail, {}, null, 403);
-        }
-        catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 400);
-        }
-
-    },
+   
 
     saveProductImage: async (data, file) => {
         try {
@@ -420,7 +421,7 @@ const productUtils = {
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
-             
+
             let result
             //type 3 for productImages
             if (imageType == 1) {
@@ -429,14 +430,13 @@ const productUtils = {
             //type 3 for sizeChart
             if (imageType == 3) {
                 let obj = {
-                    fileName:"",
-                    // imageType:3,
-                    imageUrl:null
+                    fileName: "",
+                    imageType: 3,
+                    imageUrl: null
 
                 }
-                result = await updateSingleData(Product,obj,{_id:productId})
+                result = await updateSingleData(Product, { sizeChart: obj }, { _id: productId })
             }
-              
             if (result.status) {
                 //varient Options are not deleted from collection?
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
