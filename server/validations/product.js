@@ -45,6 +45,17 @@ module.exports.addProductVarientSchema = {
     })
 
 };
+module.exports.updateProductVarientSchema = {
+    body: joi.object({
+        productCode: joi.string().required(),
+        price: joi.string().required(),
+        productVarientId:joi.string().required(),
+        productVarientTemplates:joi.array().required(),
+        dpi:joi.string(),
+        msrp:joi.string(),
+    })
+
+};
 module.exports.addProductImageSchema = {
     body: joi.object({
         displayOrder: joi.number().required(),

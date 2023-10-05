@@ -9,43 +9,24 @@ const productLibrary = {
 
     saveLibraryImage: async (data, file) => {
         try {
-            let { displayOrder, imageType, productId } = data
-
-            const findProduct = await getSingleData(Product, { _id: productId })
-            if (!findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
-            }
+            let { imageType} = data
 
             const s3Upload = await helpers.uploadFileToS3([file])
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
             }
-            let result
-            if (imageType == 1) {
-                let obj = {
-                    _id: mongoose.Types.ObjectId(),
-                    fileName: '',
-                    imageUrl: s3Upload.data[0],
-                    imageType,
-                    thumbnailPath: "",
-                    displayOrder,
-                }
-                result = await Product.findByIdAndUpdate(productId, { $push: { productImages: obj } }, { new: true })
-
+            let obj = {
+                fileName: '',
+                imageUrl: s3Upload.data[0],
+                imageType,
             }
-            if (imageType == 3) {
-                let obj = {
-                    fileName: '',
-                    imageUrl: s3Upload.data[0],
-                    imageType,
-                }
-                result = await Product.findByIdAndUpdate(productId, { sizeChart: obj }, { new: true })
-
+            let libraryRef = new LibraryImages(obj)
+            let result = await postData(libraryRef)
+           
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.img_save_err, {}, null, 400);
             }
-            if (!result) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_image_save_err, {}, null, 400);
-            }
-            return helpers.showResponse(true, ResponseMessages?.product.product_image_saved, result, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.img_save_sucess, result, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
@@ -53,45 +34,12 @@ const productLibrary = {
         }
 
     },
-    getLibraryImages: async (data, file) => {
+    getLibraryImages: async () => {
         try {
-            let { displayOrder, imageType, productId } = data
 
-            const findProduct = await getSingleData(Product, { _id: productId })
-            if (!findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
-            }
+            const result = await getDataArray(LibraryImages,{})
 
-            const s3Upload = await helpers.uploadFileToS3([file])
-            if (!s3Upload.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
-            }
-            let result
-            if (imageType == 1) {
-                let obj = {
-                    _id: mongoose.Types.ObjectId(),
-                    fileName: '',
-                    imageUrl: s3Upload.data[0],
-                    imageType,
-                    thumbnailPath: "",
-                    displayOrder,
-                }
-                result = await Product.findByIdAndUpdate(productId, { $push: { productImages: obj } }, { new: true })
-
-            }
-            if (imageType == 3) {
-                let obj = {
-                    fileName: '',
-                    imageUrl: s3Upload.data[0],
-                    imageType,
-                }
-                result = await Product.findByIdAndUpdate(productId, { sizeChart: obj }, { new: true })
-
-            }
-            if (!result) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_image_save_err, {}, null, 400);
-            }
-            return helpers.showResponse(true, ResponseMessages?.product.product_image_saved, result, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result?.data, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

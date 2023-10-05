@@ -71,7 +71,7 @@ const categoryUtil = {
         // }
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
     },
-   
+
     //admin 
     addCategories: async (data, file) => {
         try {
@@ -235,15 +235,16 @@ const categoryUtil = {
                 return helpers.showResponse(false, ResponseMessages?.category.category_not_exist, {}, null, 400);
             }
 
-            await deleteData(SubCategory, { categoryId: id })
 
             const result = await deleteById(Category, id)
 
-            if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+            if (result.status) {
+                await deleteData(SubCategory, { categoryId: id })
+
+                return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
 
-            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

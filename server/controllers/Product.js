@@ -32,11 +32,15 @@ const adminController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     deleteProduct: async (req, res) => {
-        let result = await Category.deleteProduct(req.body);
+        let result = await Product.deleteProduct(req.params);
         return helpers.showOutput(res, result, result.statusCode);
     },
     deleteProductVarient: async (req, res) => {
-        let result = await Category.deleteProductVarient(req.body);
+        let result = await Product.deleteProductVarient(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    deleteProductImage: async (req, res) => {
+        let result = await Product.deleteProductImage(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
     //admin 

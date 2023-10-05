@@ -19,9 +19,12 @@ router.post('/saveProductImage', middleware.verifyTokenAdmin, helpers.addToMulte
 router.post('/addProductVarient', middleware.verifyTokenAdmin,validate(productValidation.addProductVarientSchema), productController.addProductVarient);
 
 router.post('/updateProduct', middleware.verifyTokenAdmin, helpers.addToMulter.single('productImage'),validate(productValidation.updateProductSchema), productController.updateProduct);
-router.post('/updateProductVarient', middleware.verifyTokenAdmin,validate(productValidation.addProductVarientSchema), productController.updateProductVarient);
+router.post('/updateProductVarient', middleware.verifyTokenAdmin,validate(productValidation.updateProductVarientSchema), productController.updateProductVarient);
+
 router.delete('/deleteProductVarient', middleware.verifyTokenAdmin, productController.deleteProductVarient);
-// router.delete('/deleteProduct', middleware.verifyTokenAdmin, productController.deleteProduct);
+router.delete('/deleteProduct/:productId', middleware.verifyTokenAdmin, productController.deleteProduct);
+router.delete('/deleteProductImage', middleware.verifyTokenAdmin, productController.deleteProductImage);
+
 
 router.post('/addVariableTypes', middleware.verifyTokenAdmin,validate(variableValidation.addVariableTypeSchema), productController.addVariableTypes);
 router.post('/addVariableOptions', middleware.verifyTokenAdmin,validate(variableValidation.addVariableOptionSchema), productController.addVariableOptions);

@@ -32,6 +32,9 @@ module.exports = {
         update_failed:"Error occured while updating",
         delete_failed:"Error occured while deleting",
         delete_sucess:"Deleted Successfully",
+        img_save_err:"Error occured while saving Image",
+        img_save_sucess:"Image Saved Successfully",
+
 
     },
     users: {
@@ -98,6 +101,7 @@ module.exports = {
         product_image_save_err:"Error while saving product image",
         product_image_saved:"Product Image Uploaded Successfully",
         product_code_already:"Product Code Already Exist",
+        library_img_save_err:"Error occured while saving Library Image"
 
 
 

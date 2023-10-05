@@ -109,6 +109,39 @@ const productUtils = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
+    updateProductVarient: async (data) => {
+        try {
+            let { productCode, price, productVarientId, productVarientTemplates} = data
+
+            const find = await getSingleData(ProductVarient, { _id: productVarientId })
+            if (!find.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 403);
+            }
+            
+            productVarientTemplates = productVarientTemplates.map((value) => {
+                let item = { ...value }
+                item._id = mongoose.Types.ObjectId()
+                return item
+            })
+            
+            let newObj = {
+                productCode,
+                price,
+                productVarientTemplates,
+            }
+
+            const result = await updateSingleData(ProductVarient, newObj, { _id: productVarientId })
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
+            }
+            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result?.data, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+
+    },
 
     getProductDetails: async (data) => {
         try {
@@ -152,7 +185,7 @@ const productUtils = {
                     }
                 },
                 {
-                  $unwind:'$material'
+                    $unwind: '$material'
                 },
                 {
                     $lookup: {
@@ -332,53 +365,7 @@ const productUtils = {
         }
 
     },
-    updateProductVarient: async (data) => {
-        try {
-            let { productCode, price, productId, productVarientTemplates, varientOptions } = data
-
-            const findProduct = await getSingleData(Product, { _id: productId })
-            if (!findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
-            }
-
-            const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
-
-            if (!saveVariableOptions.status) {
-                return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
-            }
-            productVarientTemplates = productVarientTemplates.map((value) => {
-                let item = { ...value }
-                item._id = mongoose.Types.ObjectId()
-                return item
-            })
-            let variableOptions = saveVariableOptions?.data.map((value) => {
-                let item = { ...value }
-                item.variableOptionId = value._id
-                return item
-            })
-            let newObj = {
-                productCode,
-                price,
-                productId,
-                productVarientTemplates,
-                varientOptions: variableOptions
-
-            }
-            const newProductVareint = new ProductVarient(newObj);
-            const productVarient = await postData(newProductVareint)
-
-
-            if (productVarient.status) {
-                return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, productVarient, null, 200);
-            }
-            //ends
-            return helpers.showResponse(false, ResponseMessages?.product.product_varient_save_fail, {}, null, 403);
-        }
-        catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 400);
-        }
-
-    },
+   
     saveProductImage: async (data, file) => {
         try {
             let { displayOrder, imageType, productId } = data
@@ -425,24 +412,52 @@ const productUtils = {
         }
 
     },
+    deleteProductImage: async (data) => {
+        try {
+            const {imageId,productId } = data
+
+            const find = await getSingleData(Product, { _id:productId})
+            if (!find.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
+            }
+
+            // const result = await deleteById(productId, {$in:{productImages:[imageId]}})
+            const result = await Product.updateOne({_id:productId},{$pull:{productImages:{}}})
+
+               
+            if (result.status) {
+                //varient Options are not deleted from collection?
+                return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
+            }
+
+            return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
     deleteProduct: async (data) => {
         try {
-            const { id } = data
+            const { productId } = data
 
-            const find = await getSingleData(Category, { _id: id })
+            const find = await getSingleData(Product, { _id: productId })
             if (!find.status) {
-                return helpers.showResponse(false, ResponseMessages?.category.category_not_exist, {}, null, 400);
+                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
 
-            await deleteData(SubCategory, { categoryId: id })
+            const result = await deleteById(Product, productId)
 
-            const result = await deleteById(Category, id)
+            if (result.status) {
+                
+                //varient Options are not deleted from collection?
+                await deleteData(ProductVarient, { productId: productId })
 
-            if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+                return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
 
-            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
@@ -452,9 +467,9 @@ const productUtils = {
     },
     deleteProductVarient: async (data) => {
         try {
-            const { productId, productVarientId } = data
+            const {productId ,productVarientId} = data
 
-            const find = await getSingleData(ProductVarient, { _id: productVarientId, productId })
+            const find = await getSingleData(ProductVarient, { _id: productVarientId ,productId})
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
             }
@@ -462,9 +477,7 @@ const productUtils = {
             const result = await deleteById(ProductVarient, productVarientId)
 
             if (result.status) {
-                const deleteVarientOptions = await deleteById(VariableOptions, productVarientId)
-                console.log(deleteVarientOptions, "deleteVarientOptions")
-
+                //varient Options are not deleted from collection?
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
 

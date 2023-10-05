@@ -7,7 +7,7 @@ var validate = require('../middleware/validation')
 const helpers = require('../services/helper/index')
 
 //user token routes
-router.post('/saveLibraryImage', middleware.verifyTokenUser, productLibraryController.saveLibraryImage);
+router.post('/saveLibraryImage', middleware.verifyTokenUser,helpers.addToMulter.single('libraryImage'), productLibraryController.saveLibraryImage);
 router.get('/getLibraryImages', middleware.verifyTokenUser, productLibraryController.getLibraryImages);
 
 

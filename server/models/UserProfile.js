@@ -99,14 +99,15 @@ var UserProfile = new Schema({
     // ncResaleInfo:{
 
     // },
-    isExemptionEligible: {
-      type: Boolean,
-      default: false,
-    },
-    ncResaleCertificate: {
-      type: String,
-      default: "",
-    }
+   
+  },
+  isExemptionEligible: {
+    type: Boolean,
+    default: false,
+  },
+  ncResaleCertificate: {
+    type: String,
+    default: "",
   },
   paymentDetails: {
     billingAddressData: {
