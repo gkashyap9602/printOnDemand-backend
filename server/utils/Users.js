@@ -313,8 +313,8 @@ const UserUtils = {
                         $concat: ['$firstName', ' ', '$lastName']
                     }, // Include the 'userProfileData' field
                     ncResaleInfo: {
-                        isExemptionEligible: "$userProfileData.billingAddress.isExemptionEligible",
-                        ncResaleCertificate: "$userProfileData.billingAddress.ncResaleCertificate"
+                        isExemptionEligible: "$userProfileData.isExemptionEligible",
+                        ncResaleCertificate: "$userProfileData.ncResaleCertificate"
                     },
                     userProfileData: "$userProfileData", // Include the 'userProfileData' field
                 }
