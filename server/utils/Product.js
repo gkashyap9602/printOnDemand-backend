@@ -111,19 +111,19 @@ const productUtils = {
     },
     updateProductVarient: async (data) => {
         try {
-            let { productCode, price, productVarientId, productVarientTemplates} = data
+            let { productCode, price, productVarientId, productVarientTemplates } = data
 
             const find = await getSingleData(ProductVarient, { _id: productVarientId })
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 403);
             }
-            
+
             productVarientTemplates = productVarientTemplates.map((value) => {
                 let item = { ...value }
                 item._id = mongoose.Types.ObjectId()
                 return item
             })
-            
+
             let newObj = {
                 productCode,
                 price,
@@ -365,7 +365,7 @@ const productUtils = {
         }
 
     },
-   
+
     saveProductImage: async (data, file) => {
         try {
             let { displayOrder, imageType, productId } = data
@@ -414,17 +414,29 @@ const productUtils = {
     },
     deleteProductImage: async (data) => {
         try {
-            const {imageId,productId } = data
+            const { imageId, productId, imageType } = data
 
-            const find = await getSingleData(Product, { _id:productId})
+            const find = await getSingleData(Product, { _id: productId })
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
+             
+            let result
+            //type 3 for productImages
+            if (imageType == 1) {
+                result = await removeItemFromArray(Product, { _id: productId }, 'productImages', imageId)
+            }
+            //type 3 for sizeChart
+            if (imageType == 3) {
+                let obj = {
+                    fileName:"",
+                    // imageType:3,
+                    imageUrl:null
 
-            // const result = await deleteById(productId, {$in:{productImages:[imageId]}})
-            const result = await Product.updateOne({_id:productId},{$pull:{productImages:{}}})
-
-               
+                }
+                result = await updateSingleData(Product,obj,{_id:productId})
+            }
+              
             if (result.status) {
                 //varient Options are not deleted from collection?
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
@@ -450,7 +462,7 @@ const productUtils = {
             const result = await deleteById(Product, productId)
 
             if (result.status) {
-                
+
                 //varient Options are not deleted from collection?
                 await deleteData(ProductVarient, { productId: productId })
 
@@ -467,9 +479,9 @@ const productUtils = {
     },
     deleteProductVarient: async (data) => {
         try {
-            const {productId ,productVarientId} = data
+            const { productId, productVarientId } = data
 
-            const find = await getSingleData(ProductVarient, { _id: productVarientId ,productId})
+            const find = await getSingleData(ProductVarient, { _id: productVarientId, productId })
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
             }

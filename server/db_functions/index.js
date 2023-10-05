@@ -100,6 +100,25 @@ module.export = updateData = (Model, DataObject, _id) =>{
         });
     });
 }
+module.export = removeItemFromArray = (Model, mainIdObj,arrayKey,itemId) =>{
+    console.log(arrayKey,"arrayKey",[arrayKey])
+    // let obj = {[arrayKey]:{_id:itemId}}
+    
+    return new Promise((resolve,reject)=>{
+        Model.updateOne(mainIdObj,{$pull:{[arrayKey]:{_id:itemId}}},(err,updatedData) => {
+            if(err){
+                let response = helpers.showResponse(false, err,{});
+                return resolve(response);
+            } 
+            if(updatedData?.modifiedCount>0){
+                let response = helpers.showResponse(true, 'success', updatedData);
+                return resolve(response);
+            }
+            let response = helpers.showResponse(false, 'failed',{});
+            return resolve(response);
+        });
+    });
+}
 module.export = updateSingleData = (Model, DataObject, matchObj) =>{
     return new Promise((resolve,reject)=>{
         console.log(matchObj,"lklk")

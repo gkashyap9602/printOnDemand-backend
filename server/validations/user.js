@@ -7,11 +7,11 @@ module.exports.profileSchema = {
         paymentDetails: {
             billingAddressData: {
                 city: joi.string(),
-                countryCode: joi.string(),
-                stateCode: joi.string().max(2).message("State Code Length Must be 2"),
+                country: joi.string(),
+                stateName: joi.string().max(2).message("State Code Length Must be 2"),
                 name: joi.string(),
                 streetAddress: joi.string(),
-                zip: joi.string().max(5).message("Zip Code Length Must be 5"),
+                zipCode: joi.string().max(5).message("Zip Code Length Must be 5"),
             },
             creditCardData: {
                 ccNumber: joi.string(),

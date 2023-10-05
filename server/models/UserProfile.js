@@ -119,11 +119,11 @@ var UserProfile = new Schema({
         type: String,
         default: "",
       },
-      countryCode: {
+      country: {
         type: String,
         default: "",
       },
-      stateCode: {
+      stateName: {
         type: String,
         default: "",
       },
@@ -131,7 +131,7 @@ var UserProfile = new Schema({
         type: String,
         default: "",
       },
-      zip: {
+      zipCode: {
         type: Number,
         default: null,
       },
