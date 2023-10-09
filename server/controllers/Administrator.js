@@ -11,6 +11,10 @@ const adminController = {
         let result = await Administration.addMaterial(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    getAllUsers: async (req, res) => {
+        let result = await Administration.getAllUsers(req.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
    
     // forgotPasswordMail: async (req, res) => {
     //     let requiredFields = ['email'];

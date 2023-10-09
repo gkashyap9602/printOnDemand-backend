@@ -12,6 +12,7 @@ router.post('/login', AdministratorController.login);
 
 // Admin Routes with Token
 router.post('/addMaterial', middleware.verifyTokenAdmin, validate(adminValidation.addMaterialSchema), AdministratorController.addMaterial);
+router.get('/getAllUsers', middleware.verifyTokenAdmin, AdministratorController.getAllUsers);
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

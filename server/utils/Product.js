@@ -17,7 +17,7 @@ const productUtils = {
     addProduct: async (data) => {
         try {
             let { careInstructions, longDescription, subCategoryIds, materialId, variableTypesIds,
-                construction, features, productionDuration, shortDescription, title } = data
+                construction, features, productionDuration, shortDescription, title ,process} = data
 
             const findProduct = await getSingleData(Product, { title: title })
             if (findProduct.status) {
@@ -54,6 +54,7 @@ const productUtils = {
                 productionDuration,
                 construction,
                 shortDescription,
+                process
             }
             const prodRef = new Product(obj)
             const result = await postData(prodRef)
@@ -70,7 +71,7 @@ const productUtils = {
     updateProduct: async (data) => {
         try {
             let { careInstructions, longDescription, subCategoryIds, materialId, productId,
-                construction, features, productionDuration, shortDescription, title } = data
+                construction, features, productionDuration, shortDescription, title ,process} = data
 
 
             const findProduct = await getSingleData(Product, { _id: productId })
@@ -95,14 +96,15 @@ const productUtils = {
                 materialId,
                 features,
                 title,
+                process,
                 updatedOn: helpers.getCurrentDate(),
                 subCategoryId: subCategoryIds,
                 productionDuration,
                 construction,
                 shortDescription,
             }
-            const result = await updateSingleData(Product, obj, { _id: productId })
-
+            const result = await updateSingleData(Product, obj, { _id: productId ,title:findProduct?.data?.title})
+             console.log(result,"resulttUpdate")
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }

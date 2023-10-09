@@ -6,7 +6,8 @@ let md5 = require('md5');
 const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require('../constants/const');
 const { default: mongoose } = require('mongoose');
-const Material = require('../models/Material')
+const Material = require('../models/Material');
+const Users = require('../models/Users');
 
 const adminUtils = {
 
@@ -63,6 +64,93 @@ const adminUtils = {
 
     },
 
+    getAllUsers: async (data) => {
+        try {
+            let { sortColumn = 'createdOn', sortDirection = 'asc', pageIndex = 1, pageSize = 5, searchKey = '' } = data
+            pageIndex = Number(pageIndex)
+            pageSize = Number(pageSize)
+
+            console.log(pageIndex, pageSize, "pagina")
+            console.log(sortColumn, sortDirection, searchKey, "extraa")
+
+            const result = await Users.aggregate([
+                {
+                    $match: {
+                        $or: [
+                            { email: { $regex: searchKey, $options: 'i' } },
+                            // {
+                            //     $expr: {
+                            //       $regexMatch: {
+                            //         input: "$userProfileData.shippingAddress.companyName",
+                            //         regex: searchKey,
+                            //         options: "i"
+                            //       }
+                            //     }
+                            //   }
+                        ]
+                    }
+                },
+                {
+                    $skip: (pageIndex - 1) * pageSize
+
+                },
+                {
+                    $limit: pageSize
+
+                },
+                {
+                    $sort: {
+                        [sortColumn]: sortDirection == 'asc' ? 1 : -1
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "userProfile",
+                        localField: "_id",
+                        foreignField: "userId",
+                        as: "userProfileData",
+                        // pipeline:[{
+                        //     $match:{
+                        //         // 'userProfileData.shippingAddress.companyname': { $regex: searchKey, $options: 'i'  },
+                        //         $expr: {
+                        //           $regexMatch: {
+                        //             input: "$userProfileData.shippingAddress.companyName",
+                        //             regex: searchKey,
+                        //             options: "i"
+                        //           }
+                        //         }
+                        //     }
+                        // }]
+                    }
+                },
+                {
+                    $unwind: '$userProfileData'
+                },
+                {
+                    $addFields: {
+                        shippingAddress: '$userProfileData.shippingAddress'
+                    }
+                },
+               
+                // {
+                //     $unset: 'userProfileData'
+                // },
+                
+
+            ])
+
+            // if (!result.length===0) {
+            //     return helpers.showResponse(false, ResponseMessages?.material.material_save_failed, result?.data, null, 400);
+            // }
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
     // forgotPasswordMail: async (data) => {
     //     try {
     //         let { email } = data;
