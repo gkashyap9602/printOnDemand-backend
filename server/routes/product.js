@@ -16,10 +16,11 @@ router.post('/getAllProducts', middleware.verifyTokenBoth, productController.get
 // with admin token routes
 router.post('/addProduct', middleware.verifyTokenAdmin,validate(productValidation.addProductSchema), productController.addProduct);
 router.post('/saveProductImage', middleware.verifyTokenAdmin, helpers.addToMulter.single('productImage'),validate(productValidation.addProductImageSchema), productController.saveProductImage);
-router.post('/addProductVarient', middleware.verifyTokenAdmin,validate(productValidation.addProductVarientSchema), productController.addProductVarient);
+// router.post('/addProductVarient', middleware.verifyTokenAdmin,validate(productValidation.addProductVarientSchema), productController.addProductVarient);
+router.post('/addProductVarient', middleware.verifyTokenAdmin,helpers.addToMulter.array('productVarientTemplates'),validate(productValidation.addProductVarientSchema), productController.addProductVarient);
 
 router.post('/updateProduct', middleware.verifyTokenAdmin, helpers.addToMulter.single('productImage'),validate(productValidation.updateProductSchema), productController.updateProduct);
-router.post('/updateProductVarient', middleware.verifyTokenAdmin,validate(productValidation.updateProductVarientSchema), productController.updateProductVarient);
+router.post('/updateProductVarient', middleware.verifyTokenAdmin,helpers.addToMulter.array('productVarientTemplates'),validate(productValidation.updateProductVarientSchema), productController.updateProductVarient);
 
 router.delete('/deleteProductVarient', middleware.verifyTokenAdmin, productController.deleteProductVarient);
 router.delete('/deleteProduct/:productId', middleware.verifyTokenAdmin, productController.deleteProduct);

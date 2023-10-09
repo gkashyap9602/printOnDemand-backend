@@ -9,6 +9,9 @@ const Product = require('../models/Product')
 const VariableTypes = require('../models/VariableTypes')
 const VariableOptions = require('../models/VariableOptions')
 const ProductVarient = require('../models/ProductVarient')
+const { getFileType } = require('../services/helper/index')
+const mime = require('mime-types')
+
 const productUtils = {
 
     addProduct: async (data) => {
@@ -109,18 +112,18 @@ const productUtils = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
-    addProductVarient: async (data) => {
+    addProductVarient: async (data, files) => {
         try {
-            let { productCode, price, productId, productVarientTemplates, varientOptions } = data
+            let { productCode, price, productId, varientOptions } = data
 
-            const findProductCode = await getSingleData(ProductVarient, { productCode })
-            if (findProductCode.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
-            }
             const findProduct = await getSingleData(Product, { _id: productId })
 
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
+            }
+            const findProductCode = await getSingleData(ProductVarient, { productCode })
+            if (findProductCode.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
             }
 
             const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
@@ -128,11 +131,28 @@ const productUtils = {
             if (!saveVariableOptions.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
             }
-            productVarientTemplates = productVarientTemplates.map((value) => {
-                let item = { ...value }
-                item._id = mongoose.Types.ObjectId()
+
+            const s3Upload = await helpers.uploadFileToS3(files)
+            if (!s3Upload.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
+            }
+
+            let productVarientTemplates = files.map((file) => {
+                let fileExtension = mime.extension(file.mimetype)
+                let item = {}
+                s3Upload?.data?.map((url) => {
+                    let s3fileExtension = url.split('.').pop().toLowerCase()
+
+                    if (fileExtension == s3fileExtension) {
+                        item._id = mongoose.Types.ObjectId()
+                        item.fileName = file.originalname
+                        item.filePath = url,
+                            item.templateType = getFileType[fileExtension]
+                    }
+                })
                 return item
             })
+
             let variableOptions = saveVariableOptions?.data.map((value) => {
                 let item = { ...value }
                 item.variableOptionId = value._id
@@ -161,30 +181,98 @@ const productUtils = {
         }
 
     },
-    updateProductVarient: async (data) => {
+    // addProductVarient: async (data) => {
+    //     try {
+    //         let { productCode, price, productId, productVarientTemplates, varientOptions } = data
+
+    //         const findProductCode = await getSingleData(ProductVarient, { productCode })
+    //         if (findProductCode.status) {
+    //             return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
+    //         }
+    //         const findProduct = await getSingleData(Product, { _id: productId })
+
+    //         if (!findProduct.status) {
+    //             return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
+    //         }
+
+    //         const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
+
+    //         if (!saveVariableOptions.status) {
+    //             return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
+    //         }
+    //         productVarientTemplates = productVarientTemplates.map((value) => {
+    //             let item = { ...value }
+    //             item._id = mongoose.Types.ObjectId()
+    //             return item
+    //         })
+    //         let variableOptions = saveVariableOptions?.data.map((value) => {
+    //             let item = { ...value }
+    //             item.variableOptionId = value._id
+    //             return item
+    //         })
+    //         let newObj = {
+    //             productCode,
+    //             price: `$${price}`,
+    //             productId,
+    //             productVarientTemplates,
+    //             varientOptions: variableOptions
+
+    //         }
+    //         const newProductVareint = new ProductVarient(newObj);
+    //         const result = await postData(newProductVareint)
+
+
+    //         if (result.status) {
+    //             return helpers.showResponse(true, ResponseMessages?.product?.product_varient_save, result?.data, null, 200);
+    //         }
+    //         //ends
+    //         return helpers.showResponse(false, ResponseMessages?.product?.product_varient_save_fail, {}, null, 403);
+    //     }
+    //     catch (err) {
+    //         return helpers.showResponse(false, err?.message, null, null, 400);
+    //     }
+
+    // },
+    updateProductVarient: async (data, files) => {
         try {
-            let { productCode, price, productVarientId, productVarientTemplates } = data
+            let { productCode, price, productVarientId } = data
 
             const find = await getSingleData(ProductVarient, { _id: productVarientId })
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 403);
             }
 
-            productVarientTemplates = productVarientTemplates.map((value) => {
-                let item = { ...value }
-                item._id = mongoose.Types.ObjectId()
+            const s3Upload = await helpers.uploadFileToS3(files)
+            if (!s3Upload.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
+            }
+
+            let productVarientTemplates = files.map((file) => {
+                let fileExtension = mime.extension(file.mimetype)
+                let item = {}
+                s3Upload?.data?.map((url) => {
+                    let s3fileExtension = url.split('.').pop().toLowerCase()
+
+                    if (fileExtension == s3fileExtension) {
+                        item._id = mongoose.Types.ObjectId()
+                        item.fileName = file.originalname
+                        item.filePath = url,
+                            item.templateType = getFileType[fileExtension]
+                    }
+                })
                 return item
             })
 
             let newObj = {
                 productCode,
-                price,
+                price: `$${price}`,
                 productVarientTemplates,
             }
 
-            const result = await updateSingleData(ProductVarient, newObj, { _id: productVarientId })
-
+            const result = await updateSingleData(ProductVarient, newObj, { _id: productVarientId, productCode: find?.data?.productCode })
+            console.log(result, "resultt")
             if (!result.status) {
+                // result?.message?.code ==11000?result?.message?.codeName + (JSON.stringify(result?.message?.keyValue[0])):
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }
             return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result?.data, null, 200);
@@ -365,7 +453,7 @@ const productUtils = {
         }
 
     },
-   
+
 
     saveProductImage: async (data, file) => {
         try {

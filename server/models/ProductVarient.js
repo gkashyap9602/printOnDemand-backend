@@ -7,14 +7,15 @@ var ProductVarient = new Schema({
         ref: "product",
         index: true
     },
-    productDesignId: {
-        type: mongoose.Types.ObjectId,
-        ref: "productDesign",
-        index: true
-    },
+    // productDesignId: {
+    //     type: mongoose.Types.ObjectId,
+    //     ref: "productDesign",
+    //     index: true
+    // },
     productCode: {
         type: String,
-        required: true
+        required: true,
+        unique:true
     },
     dpi: {
         type: String,

@@ -19,8 +19,12 @@ const adminController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     //admin 
+    // addProductVarient: async (req, res) => {
+    //     let result = await Product.addProductVarient(req.body);
+    //     return helpers.showOutput(res, result, result.statusCode);
+    // },
     addProductVarient: async (req, res) => {
-        let result = await Product.addProductVarient(req.body);
+        let result = await Product.addProductVarient(req.body,req.files);
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateProduct: async (req, res) => {
@@ -28,7 +32,7 @@ const adminController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateProductVarient: async (req, res) => {
-        let result = await Product.updateProductVarient(req.body);
+        let result = await Product.updateProductVarient(req.body,req.files);
         return helpers.showOutput(res, result, result.statusCode);
     },
     deleteProduct: async (req, res) => {

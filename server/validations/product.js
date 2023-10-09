@@ -38,7 +38,7 @@ module.exports.addProductVarientSchema = {
         productCode: joi.string().required(),
         price: joi.string().required(),
         productId:joi.string().required(),
-        productVarientTemplates:joi.array().required(),
+        // productVarientTemplates:joi.any().required(),
         varientOptions:joi.array().required(),
         dpi:joi.string(),
         msrp:joi.string(),
@@ -50,7 +50,7 @@ module.exports.updateProductVarientSchema = {
         productCode: joi.string().required(),
         price: joi.string().required(),
         productVarientId:joi.string().required(),
-        productVarientTemplates:joi.array().required(),
+        // productVarientTemplates:joi.any().required(),
         dpi:joi.string(),
         msrp:joi.string(),
     })
