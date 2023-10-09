@@ -33,6 +33,10 @@ const commonController = {
         let result = await Common.getAllStates(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    getWaitingListStatus: async (req, res) => {
+        let result = await Common.getWaitingListStatus(req.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
 
 }
 

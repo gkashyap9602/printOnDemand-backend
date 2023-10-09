@@ -6,7 +6,7 @@ const Material = require('../models/Material')
 const Product = require('../models/Product')
 const { default: mongoose } = require('mongoose');
 let ObjectId = require('mongodb').ObjectId
-
+const WaitingList = require('../models/WaitingList')
 const commonUtil = {
 
   getMaterials: async (data) => {
@@ -14,7 +14,7 @@ const commonUtil = {
 
     // const result = await getDataArray(Material, {})
     let aggregationPipeline = [
-             
+
     ]
 
     if (subCategoryId) {
@@ -103,6 +103,14 @@ const commonUtil = {
 
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, states.length > 0 ? states : {}, null, 200);
   },
+  getWaitingListStatus: async () => {
+    let result = await getSingleData(WaitingList, {});
+    if (!result.status) {
+      return helpers.showResponse(true, ResponseMessages?.common.database_error, {}, null, 400);
+    }
+    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result?.data, null, 200);
+  },
+
 
   storeParameterToAWS: async (data) => {
     let response = await helpers.postParameterToAWS({

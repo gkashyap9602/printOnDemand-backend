@@ -1,7 +1,9 @@
 const APP_CONSTANTS = require("../constants/const");
 const administration = require(".././models/Administration");
+const WaitingList = require('../models/WaitingList')
 const md5 = require('md5');
 const helpers = require('../services/helper/index')
+
 async function createAdmin() {
     let firstName = 'Admin';
     let lastName = 'Account';
@@ -22,5 +24,16 @@ async function createAdmin() {
     }
 
 }
+async function createWaitingList() {
+    let waitingList = await WaitingList.findOne({})
+    if (!waitingList) {
+        await WaitingList.create({
+            isWaitingListEnable: false,
+            createdOn:helpers.getCurrentDate()
+        });
+        // console.log('Admin Created ');
+    }
 
-module.exports = {createAdmin}
+}
+
+module.exports = {createAdmin,createWaitingList}

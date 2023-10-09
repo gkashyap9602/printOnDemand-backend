@@ -469,7 +469,7 @@ const UserUtils = {
 
     updateBillingAddress: async (data, userId) => {
         let queryObject = { _id: userId }
-        console.log(data,"dataa")
+        console.log(data, "dataa")
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);

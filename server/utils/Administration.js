@@ -8,6 +8,8 @@ const consts = require('../constants/const');
 const { default: mongoose } = require('mongoose');
 const Material = require('../models/Material');
 const Users = require('../models/Users');
+const UserProfile = require('../models/UserProfile')
+const WaitingList = require('../models/WaitingList')
 
 const adminUtils = {
 
@@ -35,6 +37,15 @@ const adminUtils = {
         }
         return helpers.showResponse(false, ResponseMessages?.admin?.invalid_login, null, null, 400);
     },
+    logout: async (adminId) => {
+        let queryObject = { _id: adminId }
+        let result = await getSingleData(Administration, queryObject, 'traceId');
+        if (!result.status) {
+            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
+        }
+        let adminData = result?.data
+        return helpers.showResponse(true, ResponseMessages?.users?.logout_success, adminData, null, 200);
+    },
 
     addMaterial: async (data) => {
         try {
@@ -56,6 +67,23 @@ const adminUtils = {
             }
 
             return helpers.showResponse(true, ResponseMessages?.material.material_created, result?.data, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
+    updateWaitingList: async (data) => {
+        try {
+            const { value } = data
+             console.log(value,"valuee")
+            let result = await updateSingleData(WaitingList, {isWaitingListEnable:value})
+
+            if (result.status) {
+                return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result?.data, null, 200);
+            }
+            return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
@@ -109,18 +137,6 @@ const adminUtils = {
                         localField: "_id",
                         foreignField: "userId",
                         as: "userProfileData",
-                        // pipeline:[{
-                        //     $match:{
-                        //         // 'userProfileData.shippingAddress.companyname': { $regex: searchKey, $options: 'i'  },
-                        //         $expr: {
-                        //           $regexMatch: {
-                        //             input: "$userProfileData.shippingAddress.companyName",
-                        //             regex: searchKey,
-                        //             options: "i"
-                        //           }
-                        //         }
-                        //     }
-                        // }]
                     }
                 },
                 {
@@ -131,23 +147,105 @@ const adminUtils = {
                         shippingAddress: '$userProfileData.shippingAddress'
                     }
                 },
-               
-                // {
-                //     $unset: 'userProfileData'
-                // },
-                
-
+                {
+                    $unset: 'userProfileData'
+                },
             ])
 
-            // if (!result.length===0) {
-            //     return helpers.showResponse(false, ResponseMessages?.material.material_save_failed, result?.data, null, 400);
-            // }
+            const activeUsers = await getCount(Users, { status: 1 })
+            const pendingUsers = await getCount(Users, { status: 2 })
+            const deactivateUsers = await getCount(Users, { status: 3 })
+            const totalUsers = await getCount(Users, {})
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
+            let statusSummary = {
+                active: activeUsers.data,
+                pending: pendingUsers.data,
+                deactivated: deactivateUsers.data,
+                total: totalUsers.data
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { statusSummary, users: result }, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
 
+        }
+
+    },
+    createCustomer: async (data, adminId) => {
+        try {
+            let { firstName, lastName, email, billingAddress, paymentDetails, shippingAddress } = data;
+
+            let existUser = await getSingleData(Users, { email })
+            if (existUser.status) {
+                return helpers.showResponse(false, ResponseMessages?.users.email_already, null, null, 400);
+            }
+            const usersCount = await getCount(Users, { userType: 3 })
+            if (!usersCount.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
+            }
+            const idGenerated = helpers.generateIDs(usersCount?.data)
+
+            let adminData = await getSingleData(Administration, { _id: adminId })
+            console.log(adminData, "adminData", adminId)
+            if (!adminData.status) {
+                return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
+            }
+
+            let newObj = {
+                firstName,
+                lastName,
+                email: email,
+                userName: email,
+                id: idGenerated.idNumber,
+                // guid: randomUUID(),
+                customerId: idGenerated.customerID,
+                createdUser: `${adminData?.data?.firstName} ${adminData?.data?.lastName}`,
+                // customerGuid: randomUUID(),
+                // password: md5(password),
+                createdOn: helpers.getCurrentDate()
+            }
+
+            let userRef = new Users(newObj)
+            let result = await postData(userRef);
+            if (result.status) {
+                // delete data.password
+
+                let ObjProfile = {
+                    userId: result.data._id,
+                    completionStaus: {
+                        basicInfo: true
+                    },
+                    createdOn: helpers.getCurrentDate()
+                }
+                if (billingAddress) {
+                    ObjProfile.billingAddress = billingAddress
+                    ObjProfile.completionStaus.billingInfo = true
+
+                }
+                if (shippingAddress) {
+                    ObjProfile.shippingAddress = shippingAddress
+                    ObjProfile.completionStaus.shippingInfo = true
+                }
+                if (paymentDetails) {
+                    ObjProfile.paymentDetails = paymentDetails,
+                        ObjProfile.completionStaus.paymentInfo = true
+                }
+
+                let userProfileRef = new UserProfile(ObjProfile)
+                let resultProfile = await postData(userProfileRef);
+                if (!resultProfile.status) {
+                    //if userProfile save err then handle user is saved but throw error for profile update issue?
+                    await deleteData(Users, { _id: userRef._id })
+                    return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
+                }
+
+                return helpers.showResponse(true, ResponseMessages?.users?.register_success, data, null, 200);
+            }
+
+            return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
+        } catch (err) {
+            return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
         }
 
     },

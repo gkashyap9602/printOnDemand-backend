@@ -8,6 +8,13 @@ module.exports.loginSchema = {
 
 };
 
+module.exports.updateWaitingList = {
+    body: joi.object({
+        value: joi.boolean().required()
+    })
+
+};
+
 
 
 module.exports.addMaterialSchema = {

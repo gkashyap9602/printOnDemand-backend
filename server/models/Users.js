@@ -28,10 +28,10 @@ var Users = new Schema({
         type: String,
         default: null
     },
-    // token:{
-    //     type: String,
-    //     default: ''
-    // },
+    createdUser:{
+        type: String,
+        default: 'Admin'
+    },
     // is_email_verified: {
     //     type: Number,
     //     default: 1
@@ -78,7 +78,8 @@ var Users = new Schema({
         type: Number,
         default: 2,
         Comment:"1 for active 2 for pending Activation 3 for deactivate user",
-        enum:[1,2,3]
+        enum:[1,2,3],
+        index:true
     },
     payTraceId:{
         type: String,

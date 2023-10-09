@@ -13,6 +13,10 @@ router.post('/login', AdministratorController.login);
 // Admin Routes with Token
 router.post('/addMaterial', middleware.verifyTokenAdmin, validate(adminValidation.addMaterialSchema), AdministratorController.addMaterial);
 router.get('/getAllUsers', middleware.verifyTokenAdmin, AdministratorController.getAllUsers);
+router.post('/createCustomer', middleware.verifyTokenAdmin, AdministratorController.createCustomer);
+router.post('/logout',middleware.verifyTokenAdmin, AdministratorController.logout);
+router.post('/updateWaitingList',middleware.verifyTokenAdmin,validate(adminValidation.updateWaitingList), AdministratorController.updateWaitingList);
+
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

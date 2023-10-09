@@ -10,6 +10,7 @@ router.post('/store_param', commonController.storeParameterToAWS);
 router.get('/getAllCountries',middleware.verifyTokenBoth, commonController.getAllCountries);
 router.get('/getAllStates', middleware.verifyTokenBoth,commonController.getAllStates);
 router.get('/getMaterials', middleware.verifyTokenBoth, commonController.getMaterials);
+router.get('/getWaitingListStatus', middleware.verifyTokenBoth, commonController.getWaitingListStatus);
 
 
 
