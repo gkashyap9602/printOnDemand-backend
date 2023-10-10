@@ -125,7 +125,7 @@ const productUtils = {
                 varientOptions = JSON.parse(varientOptions)
             }
 
-
+            console.log(varientOptions,"afterrrvar")
             const findProduct = await getSingleData(Product, { _id: productId })
 
             if (!findProduct.status) {
@@ -170,7 +170,7 @@ const productUtils = {
             })
             let newObj = {
                 productCode,
-                price: `$${price}`,
+                price: price,
                 productId,
                 productVarientTemplates,
                 varientOptions: variableOptions
@@ -275,7 +275,7 @@ const productUtils = {
 
             let newObj = {
                 productCode,
-                price: `$${price}`,
+                price: price,
                 productVarientTemplates,
             }
 

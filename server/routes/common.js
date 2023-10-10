@@ -13,7 +13,6 @@ router.get('/getMaterials', middleware.verifyTokenBoth, commonController.getMate
 router.get('/getWaitingListStatus', middleware.verifyTokenBoth, commonController.getWaitingListStatus);
 
 
-
 // Common Routes
 router.get('*',(req,res) => {res.status(405).json({status:false, message:"Invalid Get Request"})});
 router.post('*',(req,res) => {res.status(405).json({status:false, message:"Invalid Post Request"})});

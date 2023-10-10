@@ -1,4 +1,3 @@
-
 var express = require('express');
 var router = express.Router();
 var productController = require('../controllers/Product');
@@ -6,7 +5,6 @@ var middleware = require("../middleware/authentication");
 var validate = require('../middleware/validation')
 const productValidation = require("../validations/product")
 const variableValidation = require("../validations/variable")
-
 const helpers = require('../services/helper/index')
 
 // with user and admin Both token routes
@@ -15,21 +13,18 @@ router.post('/getAllProducts', middleware.verifyTokenBoth, productController.get
 
 // with admin token routes
 router.post('/addProduct', middleware.verifyTokenAdmin,validate(productValidation.addProductSchema), productController.addProduct);
+router.post('/addProductVarient', middleware.verifyTokenAdmin,helpers.addToMulter.array('productVarientTemplates'),validate(productValidation.addProductVarientSchema), productController.addProductVarient);
 router.post('/saveProductImage', middleware.verifyTokenAdmin, helpers.addToMulter.single('productImage'),validate(productValidation.addProductImageSchema), productController.saveProductImage);
 // router.post('/addProductVarient', middleware.verifyTokenAdmin,validate(productValidation.addProductVarientSchema), productController.addProductVarient);
-router.post('/addProductVarient', middleware.verifyTokenAdmin,helpers.addToMulter.array('productVarientTemplates'),validate(productValidation.addProductVarientSchema), productController.addProductVarient);
-
 router.post('/updateProduct', middleware.verifyTokenAdmin, helpers.addToMulter.single('productImage'),validate(productValidation.updateProductSchema), productController.updateProduct);
 router.post('/updateProductVarient', middleware.verifyTokenAdmin,helpers.addToMulter.array('productVarientTemplates'),validate(productValidation.updateProductVarientSchema), productController.updateProductVarient);
-
-router.delete('/deleteProductVarient', middleware.verifyTokenAdmin, productController.deleteProductVarient);
 router.delete('/deleteProduct/:productId', middleware.verifyTokenAdmin, productController.deleteProduct);
+router.delete('/deleteProductVarient', middleware.verifyTokenAdmin, productController.deleteProductVarient);
 router.delete('/deleteProductImage', middleware.verifyTokenAdmin, productController.deleteProductImage);
-
-
 router.post('/addVariableTypes', middleware.verifyTokenAdmin,validate(variableValidation.addVariableTypeSchema), productController.addVariableTypes);
 router.post('/addVariableOptions', middleware.verifyTokenAdmin,validate(variableValidation.addVariableOptionSchema), productController.addVariableOptions);
 router.get('/getAllVariableTypes', middleware.verifyTokenAdmin, productController.getAllVariableTypes);
+
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
