@@ -117,7 +117,8 @@ const productUtils = {
     addProductVarient: async (data, files) => {
         try {
             let { productCode, price, productId, varientOptions } = data
-
+               
+            console.log(varientOptions,"varientOptions")
             if(typeof varientOptions == 'string' ){
                 varientOptions = JSON.parse(varientOptions)
             }
@@ -141,7 +142,7 @@ const productUtils = {
 
             let s3Upload = await helpers.uploadFileToS3(files)
             if (!s3Upload.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
+                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, {}, null, 203);
             }
 
             let productVarientTemplates = files.map((file) => {
