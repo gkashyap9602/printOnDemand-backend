@@ -84,6 +84,7 @@ var Product = new Schema({
     productImages: [{
         _id: {
             type: mongoose.Types.ObjectId,
+            index:true
         },
         fileName: {
             type: String,
@@ -109,7 +110,6 @@ var Product = new Schema({
     variantCount: {
         type: Number,
         default: 0,
-
     },
     isDeleted: {
         type: String,

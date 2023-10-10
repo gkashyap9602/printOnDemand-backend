@@ -4,7 +4,8 @@ var Schema = mongoose.Schema;
 var UserProfile = new Schema({
   userId: {
     type: mongoose.Types.ObjectId,
-    ref: "users"
+    ref: "users",
+    index:true
   },
   shippingAddress: {
     companyName: {
@@ -96,7 +97,7 @@ var UserProfile = new Schema({
       type: String,
       default: "",
     },
-   
+
   },
   isExemptionEligible: {
     type: Boolean,

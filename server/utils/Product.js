@@ -118,6 +118,11 @@ const productUtils = {
         try {
             let { productCode, price, productId, varientOptions } = data
 
+            if(typeof varientOptions == 'string' ){
+                varientOptions = JSON.parse(varientOptions)
+            }
+
+
             const findProduct = await getSingleData(Product, { _id: productId })
 
             if (!findProduct.status) {
@@ -134,7 +139,7 @@ const productUtils = {
                 return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
             }
 
-            const s3Upload = await helpers.uploadFileToS3(files)
+            let s3Upload = await helpers.uploadFileToS3(files)
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
             }

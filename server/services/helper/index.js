@@ -539,6 +539,7 @@ const sendSMSService = async (to, Message) => {
 const addToMulter = multer({
     storage: multer.memoryStorage(),
     fileFilter: (req, file, callback) => {
+        console.log(file, "fileeMulter")
         callback(null, true); // Accept the file
     },
 })
@@ -785,6 +786,7 @@ const addToMulter = multer({
 
 
 const convertImageToWebp = async (imageInBuffer) => {
+    console.log(imageInBuffer, "imageinbuffer")
     return new Promise((resolve, reject) => {
         sharp(imageInBuffer)
             .webp({ quality: 50 })
@@ -820,6 +822,7 @@ const uploadFileToS3 = async (files) => {
             for (let i = 0; i < files?.length; i++) {
                 let file = files[i];
                 let mime_type = file?.mimetype.split("/")[0];
+                // console.log(file?.buffer,"file?.buffer")
                 if (mime_type == "image" && !file.originalname.endsWith(".psd")) {
                     let imageNewBuffer = await convertImageToWebp(file?.buffer);
 
@@ -833,7 +836,8 @@ const uploadFileToS3 = async (files) => {
                             size: file.size,
                         });
                     }
-                } else {
+                }
+                else {
                     webpFilesArray.push(file);
                 }
             }
@@ -875,6 +879,7 @@ const uploadFileToS3 = async (files) => {
         }
     });
 };
+
 
 const uploadToS3 = async (files, key) => {
     try {
@@ -933,6 +938,22 @@ const uploadToS3 = async (files, key) => {
     }
 };
 
+
+// Function to convert PSD and AI to compressed image format (e.g., JPEG)
+async function convertPsdAiToImage(buffer) {
+    try {
+        console.log(buffer, "bufferrs")
+        // Use sharp or another library to convert PSD/AI to JPEG
+        const compressedImageBuffer = await sharp(buffer)
+            .jpeg({ quality: 80 }) // Adjust quality as needed
+            .toBuffer();
+
+        return compressedImageBuffer;
+    } catch (error) {
+        console.error('Error converting PSD/AI to image:', error);
+        return null;
+    }
+}
 const generateUsernames = (name, count, all_usernames = null) => {
     const usernames = [];
     const chars = "abcdefghijklmnopqrstuvwxyz0123456789";

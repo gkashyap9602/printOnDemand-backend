@@ -9,7 +9,8 @@ var ProductLibrary = new Schema({
     },
     title: {
         type: String,
-        required: true
+        required: true,
+        index:true
     },
     description: {
         type: String,
@@ -20,7 +21,7 @@ var ProductLibrary = new Schema({
     product_library_images: [{
         _id: {
             type: mongoose.Types.ObjectId,
-            default: mongoose.Types.ObjectId()
+            index:true
         },
         image_url: {
             type: String,
@@ -30,7 +31,6 @@ var ProductLibrary = new Schema({
             type: String,
 
         },
-
     }],
     isDeleted: {
         type: Boolean,

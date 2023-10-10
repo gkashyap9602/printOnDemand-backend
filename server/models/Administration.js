@@ -11,7 +11,8 @@ var AdministratorSchema = new Schema({
     },
     email: {
         type: String,
-        default: ''
+        unique:true,
+        required:true
     },
     password: {
         type: String,
@@ -30,29 +31,6 @@ var AdministratorSchema = new Schema({
         default: 1,
 
     },
-    // device_info: [{
-    //     fcm_token: {
-    //         type: String,
-    //         default: ""
-    //     },
-    //     device_id: {
-    //         type: String,
-    //         default: ""
-    //     },
-    //     os: {
-    //         type: String,
-    //         default: ""
-    //     },
-    //     access_token: {
-    //         type: String,
-    //         default: ""
-    //     },
-    //     refresh_token: {
-    //         type: String,
-    //         default: ""
-    //     }
-    // }],
-
     createdOn: {
         type: String,
         default: null

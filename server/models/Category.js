@@ -5,13 +5,12 @@ var Category = new Schema({
     name: {
         type: String,
         required: true,
-        index:true
+        index: true
     },
     description: {
         type: String,
         default: "",
     },
-
     imageUrl: {
         type: String,
         default: null,

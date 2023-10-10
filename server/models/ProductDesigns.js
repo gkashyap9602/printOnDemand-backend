@@ -11,15 +11,15 @@ var ProductDesign = new Schema({
         required: true
     },
     product_design_files: [{
-        fileName:{
+        fileName: {
             type: String,
             default: null,
         },
-        fileType:{
+        fileType: {
             type: String,
             default: null,
         },
-        filePath:{
+        filePath: {
             type: String,
             default: null,
         }

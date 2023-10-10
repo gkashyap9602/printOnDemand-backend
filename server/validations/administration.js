@@ -16,7 +16,6 @@ module.exports.updateWaitingList = {
 };
 
 
-
 module.exports.addMaterialSchema = {
     body: joi.object({
         name: joi.string().required(),

@@ -4,17 +4,17 @@ var Schema = mongoose.Schema;
 var Users = new Schema({
     firstName: {
         type: String,
-        default: ''
+        required:true
     },
     lastName: {
         type: String,
-        default: ''
+        required:true
+
     },
     email: {
         type: String,
         unique:true,
-        default: '',
-        // required:true
+        required:true
     },
     userName: {
         type: String,
@@ -22,7 +22,7 @@ var Users = new Schema({
     },
     password: {
         type: String,
-        default: ''
+        default: null
     },
     profileImagePath: {
         type: String,
@@ -44,18 +44,10 @@ var Users = new Schema({
         type: Number,
         default: 0
     },
-    // guid:{
-    //     type: String,
-    //     default: null
-    // },
     customerId:{
         type: Number,
         default: 0
     },
-    // customerGuid:{
-    //     type: String,
-    //     default: null
-    // },
     orderSubmissionDelay:{
         type: String,
         default: '00:01:00'

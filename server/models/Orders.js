@@ -2,17 +2,11 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var Orders = new Schema({
-
-    customerGuid: {
+    userId: {
         type: mongoose.Types.ObjectId,
         ref: "users",
         index: true
     },
-    // user_id: {
-    //     type: mongoose.Types.ObjectId,
-    //     ref: "users",
-    //     index: true
-    // },
     customerName: {
         type: String,
         required: true

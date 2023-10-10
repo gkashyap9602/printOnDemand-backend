@@ -4,7 +4,8 @@ var Schema = mongoose.Schema;
 var VariableTypes = new Schema({
     typeName: {
         type: String,
-        required: true
+        required: true,
+        index:true
     },
     createdOn: {
         type: String,
