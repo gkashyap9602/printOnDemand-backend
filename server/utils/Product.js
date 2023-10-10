@@ -119,6 +119,8 @@ const productUtils = {
             let { productCode, price, productId, varientOptions } = data
                
             console.log(varientOptions,"varientOptions")
+            console.log(files,"files")
+
             if(typeof varientOptions == 'string' ){
                 varientOptions = JSON.parse(varientOptions)
             }
