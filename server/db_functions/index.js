@@ -39,12 +39,13 @@ module.export = getJoinData = async(Model, query, feilds, lookup=null, paginatio
 }
 
 module.export = getSingleData = (Model, query, feilds, populate=null) =>{
+    console.log(query,"query")
     return new Promise((resolve,reject)=>{
         Model.findOne(query,feilds)
         .populate(populate)
         .exec((err,data)=>{
             if(err || !data){
-                // console.log(err,"errr getSingleData")
+                console.log(err,"errr getSingleData")
                 let response = helpers.showResponse(false, 'retreive failed ', err);
                 return resolve(response);
             } 

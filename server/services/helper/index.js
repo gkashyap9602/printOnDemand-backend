@@ -914,7 +914,7 @@ const uploadToS3 = async (files, key) => {
                 const params = {
                     Bucket: bucketName,
                     ContentType:
-                        file?.mimetype?.indexOf("image") >= 0 ? "image/webp" : file?.mimetype,
+                        file?.mimetype?.indexOf("image") && !file.originalname.endsWith(".psd") >= 0 ? "image/webp" : file?.mimetype,
                     Key: `${file.fieldname}/${fileName}`,
                     Body: bufferImage,
                 };

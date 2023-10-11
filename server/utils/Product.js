@@ -179,7 +179,6 @@ const productUtils = {
             const newProductVareint = new ProductVarient(newObj);
             const result = await postData(newProductVareint)
 
-
             if (result.status) {
                 return helpers.showResponse(true, ResponseMessages?.product?.product_varient_save, result?.data, null, 200);
             }
@@ -251,10 +250,15 @@ const productUtils = {
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 403);
             }
+            const findCode = await getSingleData(ProductVarient, { productCode:productCode,_id: {$ne:mongoose.Types.ObjectId(productVarientId)} })
+            console.log(findCode,"findCodee")
+            if (findCode.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
+            }
 
             const s3Upload = await helpers.uploadFileToS3(files)
             if (!s3Upload.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
+                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, {}, null, 203);
             }
 
             let productVarientTemplates = files.map((file) => {
@@ -282,6 +286,9 @@ const productUtils = {
             const result = await updateSingleData(ProductVarient, newObj, { _id: productVarientId, productCode: find?.data?.productCode })
             console.log(result, "resultt")
             if (!result.status) {
+                   console.log(result?.message?.keyValue,"objectkeys")
+                let check = Object.keys(result?.message?.keyValue)
+                console.log(check,"check")
                 // result?.message?.code ==11000?result?.message?.codeName + (JSON.stringify(result?.message?.keyValue[0])):
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }
