@@ -3,18 +3,18 @@ const helpers = require('../services/helper');
 const ResponseMessages = require('../constants/ResponseMessages');
 
 const adminController = {
- //admin 
+    //admin 
     addProduct: async (req, res) => {
         let result = await Product.addProduct(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-     //admin and user both
+    //admin and user both
     getProductDetails: async (req, res) => {
         let result = await Product.getProductDetails(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
-      //admin and user both
-      getAllProduct: async (req, res) => {
+    //admin and user both
+    getAllProduct: async (req, res) => {
         let result = await Product.getAllProduct(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
@@ -24,7 +24,11 @@ const adminController = {
     //     return helpers.showOutput(res, result, result.statusCode);
     // },
     addProductVarient: async (req, res) => {
-        let result = await Product.addProductVarient(req.body,req.files);
+        console.log(req.files, "filess")
+        if (req.files.length === 0) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
+        }
+        let result = await Product.addProductVarient(req.body, req.files);
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateProduct: async (req, res) => {
@@ -32,7 +36,8 @@ const adminController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateProductVarient: async (req, res) => {
-        let result = await Product.updateProductVarient(req.body,req.files);
+        console.log(req.files, "files")
+        let result = await Product.updateProductVarient(req.body, req.files);
         return helpers.showOutput(res, result, result.statusCode);
     },
     deleteProduct: async (req, res) => {
