@@ -250,39 +250,43 @@ const productUtils = {
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 403);
             }
+
             const findCode = await getSingleData(ProductVarient, { productCode:productCode,_id: {$ne:mongoose.Types.ObjectId(productVarientId)} })
             console.log(findCode,"findCodee")
             if (findCode.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
             }
 
-            const s3Upload = await helpers.uploadFileToS3(files)
-            if (!s3Upload.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, {}, null, 203);
-            }
-
-            let productVarientTemplates = files.map((file) => {
-                let fileExtension = mime.extension(file.mimetype)
-                let item = {}
-                s3Upload?.data?.map((url) => {
-                    let s3fileExtension = url.split('.').pop().toLowerCase()
-
-                    if (fileExtension == s3fileExtension) {
-                        item._id = mongoose.Types.ObjectId()
-                        item.fileName = file.originalname
-                        item.filePath = url,
-                            item.templateType = getFileType[fileExtension]
-                    }
-                })
-                return item
-            })
-
             let newObj = {
                 productCode,
                 price: price,
-                productVarientTemplates,
             }
 
+             if(files){
+                const s3Upload = await helpers.uploadFileToS3(files)
+                if (!s3Upload.status) {
+                    return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, {}, null, 203);
+                }
+    
+                let productVarientTemplates = files.map((file) => {
+                    let fileExtension = mime.extension(file.mimetype)
+                    let item = {}
+                    s3Upload?.data?.map((url) => {
+                        let s3fileExtension = url.split('.').pop().toLowerCase()
+    
+                        if (fileExtension == s3fileExtension) {
+                            item._id = mongoose.Types.ObjectId()
+                            item.fileName = file.originalname
+                            item.filePath = url,
+                                item.templateType = getFileType[fileExtension]
+                        }
+                    })
+                    return item
+                })
+
+                newObj.productVarientTemplates = productVarientTemplates
+             }
+           
             const result = await updateSingleData(ProductVarient, newObj, { _id: productVarientId, productCode: find?.data?.productCode })
             console.log(result, "resultt")
             if (!result.status) {

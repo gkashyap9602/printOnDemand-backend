@@ -125,7 +125,13 @@ module.export = updateSingleData = (Model, DataObject, matchObj) =>{
         console.log(matchObj,"lklk")
         Model.findOneAndUpdate(matchObj, { $set : DataObject },{new:true},(err,updatedData) => {
             if(err){
-                let response = helpers.showResponse(false, err);
+                let response
+                console.log(err?.name,"errname")
+                // if(err.code === 11000 && err.name === 'MongoError'){
+                //     response = helpers.showResponse(false, err);
+                // }
+                response = helpers.showResponse(false, err);
+
                 return resolve(response);
             } 
             let response = helpers.showResponse(true, 'success', updatedData);
