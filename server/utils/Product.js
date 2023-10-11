@@ -78,6 +78,11 @@ const productUtils = {
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
             }
+
+            const findTitle = await getSingleData(Product, { title, _id: { $ne: productId } })
+            if (findTitle.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_title_already, {}, null, 403);
+            }
             subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
 
             const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } })
@@ -104,7 +109,6 @@ const productUtils = {
                 shortDescription,
             }
             const result = await updateSingleData(Product, obj, { _id: productId, title: findProduct?.data?.title })
-            console.log(result, "resulttUpdate")
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }
@@ -118,16 +122,10 @@ const productUtils = {
         try {
             let { productCode, price, productId, varientOptions } = data
 
-            console.log(varientOptions, "varientOptions")
-            console.log(files, "files")
-
             if (typeof varientOptions == 'string') {
                 varientOptions = JSON.parse(varientOptions)
             }
-
-            console.log(varientOptions, "afterrrvar")
             const findProduct = await getSingleData(Product, { _id: productId })
-
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
             }
@@ -137,7 +135,6 @@ const productUtils = {
             }
 
             const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
-
             if (!saveVariableOptions.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
             }
@@ -252,7 +249,6 @@ const productUtils = {
             }
 
             const findCode = await getSingleData(ProductVarient, { productCode: productCode, _id: { $ne: mongoose.Types.ObjectId(productVarientId) } })
-            console.log(findCode, "findCodee")
             if (findCode.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
             }
@@ -288,12 +284,7 @@ const productUtils = {
             }
 
             const result = await updateSingleData(ProductVarient, newObj, { _id: productVarientId, productCode: find?.data?.productCode })
-            console.log(result, "resultt")
             if (!result.status) {
-                console.log(result?.message?.keyValue, "objectkeys")
-                let check = Object.keys(result?.message?.keyValue)
-                console.log(check, "check")
-                // result?.message?.code ==11000?result?.message?.codeName + (JSON.stringify(result?.message?.keyValue[0])):
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }
             return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result?.data, null, 200);

@@ -102,6 +102,7 @@ module.exports = {
         product_image_save_err:"Error while saving product image",
         product_image_saved:"Product Image Uploaded Successfully",
         product_code_already:"Product Code Already Exist",
+        product_title_already:"Product Title Already Exist",
         library_img_save_err:"Error occured while saving Library Image"
 
 

@@ -61,6 +61,14 @@ const showOutput = (res, response, code) => {
 
 //   }
 // };
+const mongoError = (err) => {
+    if (err.code === 11000 && err.name === 'MongoServerError') {
+        let errKey = Object.keys(err?.keyValue).pop()
+        return showResponse(false, `already exist value ${errKey}`, {}, null, 11000);
+    } else {
+        return showResponse(false, err);
+    }
+}
 
 const validationError = async (res, error) => {
     const code = 403;
@@ -539,7 +547,6 @@ const sendSMSService = async (to, Message) => {
 const addToMulter = multer({
     storage: multer.memoryStorage(),
     fileFilter: (req, file, callback) => {
-        console.log(file, "fileeMulter")
         callback(null, true); // Accept the file
     },
 })
@@ -822,11 +829,12 @@ const uploadFileToS3 = async (files) => {
             for (let i = 0; i < files?.length; i++) {
                 let file = files[i];
                 let mime_type = file?.mimetype.split("/")[0];
-                // console.log(file?.buffer,"file?.buffer")
+                console.log(mime_type, "mime_typemime_type")
                 if (mime_type == "image" && !file.originalname.endsWith(".psd")) {
                     let imageNewBuffer = await convertImageToWebp(file?.buffer);
 
                     if (imageNewBuffer) {
+                        console.log(file.originalname, "file.originalname")
                         webpFilesArray.push({
                             fieldname: file.fieldname,
                             originalname: `${file.originalname}.webp`,
@@ -914,7 +922,7 @@ const uploadToS3 = async (files, key) => {
                 const params = {
                     Bucket: bucketName,
                     ContentType:
-                        file?.mimetype?.indexOf("image") && !file.originalname.endsWith(".psd") >= 0 ? "image/webp" : file?.mimetype,
+                        file?.mimetype?.indexOf("image" && !file.originalname.endsWith(".psd")) >= 0 ? "image/webp" : file?.mimetype,
                     Key: `${file.fieldname}/${fileName}`,
                     Body: bufferImage,
                 };
@@ -1140,5 +1148,6 @@ module.exports = {
     getCurrentDate,
     validationError,
     generateUniquePayTraceID,
-    getFileType
+    getFileType,
+    mongoError
 };

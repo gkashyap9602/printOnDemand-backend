@@ -24,7 +24,6 @@ const adminController = {
     //     return helpers.showOutput(res, result, result.statusCode);
     // },
     addProductVarient: async (req, res) => {
-        console.log(req.files, "filess")
         if (req.files.length === 0) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
         }
@@ -36,7 +35,6 @@ const adminController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateProductVarient: async (req, res) => {
-        console.log(req.files, "files")
         let result = await Product.updateProductVarient(req.body, req.files);
         return helpers.showOutput(res, result, result.statusCode);
     },
