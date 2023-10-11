@@ -145,7 +145,7 @@ const productUtils = {
             }
              console.log(s3Upload,"s333333")
             let productVarientTemplates = files.map((file) => {
-                let fileExtension = mime.extension(file.mimetype)
+                let fileExtension = file.originalname.split('.').pop().toLowerCase()
                 console.log(fileExtension,"fileEx")
                 let item = {}
                 s3Upload?.data?.map((url) => {
