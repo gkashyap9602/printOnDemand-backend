@@ -1,7 +1,6 @@
 var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
 const mime = require('mime-types')
-
 AWS.config.update({
     region: "us-east-1",
     credentials: new AWS.SharedIniFileCredentials({ profile: "default" }),
@@ -549,6 +548,7 @@ const addToMulter = multer({
     fileFilter: (req, file, callback) => {
         callback(null, true); // Accept the file
     },
+    limits:{ fileSize: 5 * 1048576 }, // 5 mb
 })
 
 // const uploadVideoToS3 = async (files) => {
