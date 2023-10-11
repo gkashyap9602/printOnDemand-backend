@@ -822,7 +822,7 @@ const convertImageToWebp = async (imageInBuffer) => {
 //   });
 // };
 const uploadFileToS3 = async (files) => {
-    // console.log(files, "filess")
+    console.log(files, "filess AI")
     return new Promise(async (resolve, reject) => {
         try {
             let webpFilesArray = [];

@@ -138,14 +138,15 @@ const productUtils = {
             if (!saveVariableOptions.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
             }
-
+            console.log("filess",files,"filess")
             let s3Upload = await helpers.uploadFileToS3(files)
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, {}, null, 203);
             }
-
+             console.log(s3Upload,"s333333")
             let productVarientTemplates = files.map((file) => {
                 let fileExtension = mime.extension(file.mimetype)
+                console.log(fileExtension,"fileEx")
                 let item = {}
                 s3Upload?.data?.map((url) => {
                     let s3fileExtension = url.split('.').pop().toLowerCase()
@@ -154,7 +155,7 @@ const productUtils = {
                         item._id = mongoose.Types.ObjectId()
                         item.fileName = file.originalname
                         item.filePath = url,
-                            item.templateType = getFileType[fileExtension]
+                        item.templateType = getFileType[fileExtension]
                     }
                 })
                 return item
