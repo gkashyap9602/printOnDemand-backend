@@ -25,16 +25,16 @@ var Product = new Schema({
     },
     careInstructions: {
         type: String,
-        default:""
+        default: ""
     },
     title: {
         type: String,
         required: true,
-        unique:true
+        unique: true
     },
     longDescription: {
         type: String,
-        required:true
+        required: true
     },
     productionDuration: {
         type: String,
@@ -67,24 +67,24 @@ var Product = new Schema({
     },
     construction: {
         type: String,
-        default:null
+        default: null
     },
     constructionCallout: {
         type: String,
-        default:null
+        default: null
     },
     features: {
         type: String,
-        default:null
+        default: null
     },
     process: {
         type: String,
-        default:null
+        default: null
     },
     productImages: [{
         _id: {
             type: mongoose.Types.ObjectId,
-            index:true
+            index: true
         },
         fileName: {
             type: String,

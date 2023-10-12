@@ -5,7 +5,7 @@ var UserProfile = new Schema({
   userId: {
     type: mongoose.Types.ObjectId,
     ref: "users",
-    index:true
+    index: true
   },
   shippingAddress: {
     companyName: {

@@ -17,34 +17,10 @@ const middleware = {
 					return helpers.showResponse(false, ResponseMessages?.middleware?.token_expired, null, null, 401);
 				}
 				if (decoded?.user_type == "user") {
-					let response = await getSingleData(Users, { _id: decoded._id }, '');
-					if (!response.status) {
-						return helpers.showResponse(false, ResponseMessages.users.invalid_user, null, null, 401);
-					}
-					let userData = response?.data
-					// if (userData.status == 0) {
-					// 	return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account });
-					// }
-					// if (userData.status == 2) {
-					// 	return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
-					// }
-					// decoded = { ...decoded, user_id: userData._id }
+
 					return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, null, null, 200);
 				} else if (decoded?.user_type == "admin") {
 
-					let response = await getSingleData(Administration, { _id: decoded._id }, '');
-
-					if (!response.status) {
-						return helpers.showResponse(false, ResponseMessages.users.invalid_user, null, null, 401);
-					}
-					let adminData = response?.data
-					// if (adminData.status == 0) {
-					// 	return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account });
-					// }
-					// if (adminData.status == 2) {
-					// 	return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account });
-					// }
-					// decoded = { ...decoded, admin_id: adminData._id }
 					return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, null, null, 200);
 				}
 			})
@@ -84,16 +60,16 @@ const middleware = {
 						if (userData.status == 0) {
 							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account, StatusCode: 423 });
 						}
-						if (userData.status == 2) {
-							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account, StatusCode: 451 });
+						if (userData.status == 3) {
+							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deactivated_account, StatusCode: 451 });
 						}
 						decoded = { ...decoded, user_id: userData._id }
 						req.decoded = decoded;
 						req.token = token
 						next();
 					} else if (decoded?.user_type == "admin") {
-
-						let response = await getSingleData(Administration, { _id: decoded._id }, { password: 0 });
+						console.log("under admin")
+						let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
 
 						if (!response.status) {
 							return res.status(401).json({ status: false, message: ResponseMessages?.users.invalid_user, StatusCode: 401 });
@@ -102,8 +78,8 @@ const middleware = {
 						if (adminData.status == 0) {
 							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account, StatusCode: 423 });
 						}
-						if (adminData.status == 2) {
-							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account, StatusCode: 451 });
+						if (adminData.status == 3) {
+							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deactivated_account, StatusCode: 451 });
 						}
 						decoded = { ...decoded, admin_id: adminData._id }
 						req.decoded = decoded;
@@ -134,16 +110,17 @@ const middleware = {
 				let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
 
 				jwt.verify(token, API_SECRET, async (err, decoded) => {
-
 					if (err) {
 						return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.token_expired, StatusCode: 401 });
 					}
 					if (decoded?.type == "refresh") {
 						return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token, StatusCode: 401 });
 					}
+					console.log(decoded, "decodedAdmin")
 					if (decoded?.user_type == "admin") {
+						console.log(decoded, "under iff")
 
-						let response = await getSingleData(Administration, { _id: decoded._id }, { password: 0 });
+						let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
 
 						if (!response.status) {
 							return res.status(401).json({ status: false, message: ResponseMessages?.users.invalid_user, StatusCode: 401 });
@@ -152,14 +129,15 @@ const middleware = {
 						if (adminData.status == 0) {
 							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account, StatusCode: 423 });
 						}
-						if (adminData.status == 2) {
-							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account, StatusCode: 451 });
+						if (adminData.status == 3) {
+							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deactivated_account, StatusCode: 451 });
 						}
 						decoded = { ...decoded, admin_id: adminData._id }
 						req.decoded = decoded;
 						req.token = token
 						next();
 					} else {
+						console.log("else admin verify")
 						return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.invalid_admin, StatusCode: 401 });
 
 					}
@@ -202,8 +180,8 @@ const middleware = {
 						if (userData.status == 0) {
 							return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account, StatusCode: 423 });
 						}
-						if (userData.status == 2) {
-							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account, StatusCode: 451 });
+						if (userData.status == 3) {
+							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deactivated_account, StatusCode: 451 });
 						}
 						decoded = { ...decoded, user_id: userData._id }
 						req.decoded = decoded;

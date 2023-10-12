@@ -1,21 +1,19 @@
 var express = require('express');
 var router = express.Router();
-var AdministratorController = require('../controllers/Administrator');
-var middleware = require("../middleware/authentication");
+var adminController = require('../controllers/Administrator');
+var { verifyTokenAdmin } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
-const adminValidation = require('../validations/administration')
+const { addMaterialSchema, updateWaitingList } = require('../validations/administration')
 
 // without token
-router.post('/login', AdministratorController.login);
-// router.post('/forgot', AdministratorController.forgotPasswordMail);
-// router.post('/reset_password', AdministratorController.forgotChangePassword);
+// router.post('/login', adminController.login);
 
 // Admin Routes with Token
-router.post('/addMaterial', middleware.verifyTokenAdmin, validate(adminValidation.addMaterialSchema), AdministratorController.addMaterial);
-router.get('/getAllUsers', middleware.verifyTokenAdmin, AdministratorController.getAllUsers);
-router.post('/createCustomer', middleware.verifyTokenAdmin, AdministratorController.createCustomer);
-router.post('/logout',middleware.verifyTokenAdmin, AdministratorController.logout);
-router.post('/updateWaitingList',middleware.verifyTokenAdmin,validate(adminValidation.updateWaitingList), AdministratorController.updateWaitingList);
+// router.post('/logout',middleware.verifyTokenAdmin, AdministratorController.logout);
+router.post('/addMaterial', verifyTokenAdmin, validate(addMaterialSchema), adminController.addMaterial);
+router.get('/getAllUsers', verifyTokenAdmin, adminController.getAllUsers);
+router.post('/createCustomer', verifyTokenAdmin, adminController.createCustomer);
+router.post('/updateWaitingList', verifyTokenAdmin, validate(updateWaitingList), adminController.updateWaitingList);
 
 
 // Common Routes

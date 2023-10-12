@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var Material = new Schema({
     name: {
         type: String,
-        required:true
+        required: true
     },
     isDeleted: {
         type: Boolean,

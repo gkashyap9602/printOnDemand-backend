@@ -2,6 +2,7 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var ProductVarient = new Schema({
+    
     productId: {
         type: mongoose.Types.ObjectId,
         ref: "product",
@@ -15,41 +16,41 @@ var ProductVarient = new Schema({
     productCode: {
         type: String,
         required: true,
-        unique:true
+        unique: true
     },
     dpi: {
         type: String,
-        default:null
+        default: null
     },
     varientOptions: [{
-        variableTypeId:{
+        variableTypeId: {
             type: mongoose.Types.ObjectId,
             index: true,
             ref: "variableTypes"
         },
-        variableOptionId:{
+        variableOptionId: {
             type: mongoose.Types.ObjectId,
             index: true,
             ref: "variableOptions"
         },
-       
-       
+
+
     }],
-    productVarientTemplates:[{
-        _id:{
-           type:mongoose.Types.ObjectId,
+    productVarientTemplates: [{
+        _id: {
+            type: mongoose.Types.ObjectId,
         },
         fileName: {
             type: String,
-            default:null
+            default: null
         },
         filePath: {
             type: String,
-            default:null
+            default: null
         },
         templateType: {
             type: Number,
-            default:1
+            default: 1
         },
     }],
     // itemName: {
@@ -69,15 +70,15 @@ var ProductVarient = new Schema({
     },
     msrp: {
         type: String,
-        default:null
+        default: null
     },
     designPanels: {
         type: String,
-        default:null
+        default: null
     },
     designerAvailable: {
         type: Boolean,
-        default:false
+        default: false
     },
     status: {
         type: Number,
@@ -96,19 +97,19 @@ var ProductVarient = new Schema({
             type: String,
 
         },
-        FileName:{
+        FileName: {
             type: String,
 
         },
-        imageType:{
+        imageType: {
             type: String,
 
         },
-        thumbnailPath:{
+        thumbnailPath: {
             type: String,
 
         },
-        displayOrder:{
+        displayOrder: {
             type: String,
 
         }

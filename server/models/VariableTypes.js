@@ -5,7 +5,7 @@ var VariableTypes = new Schema({
     typeName: {
         type: String,
         required: true,
-        index:true
+        index: true
     },
     createdOn: {
         type: String,

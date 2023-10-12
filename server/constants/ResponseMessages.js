@@ -101,9 +101,13 @@ module.exports = {
         invalid_product_id:"Invalid Product Id",
         product_image_save_err:"Error while saving product image",
         product_image_saved:"Product Image Uploaded Successfully",
+        varient_template_update_err:"Error while saving product template",
+        varient_template_update:"Varient template Saved Successfully",
+        varient_template_already:"Varient Template Already Exist",
         product_code_already:"Product Code Already Exist",
         product_title_already:"Product Title Already Exist",
-        library_img_save_err:"Error occured while saving Library Image"
+        library_img_save_err:"Error occured while saving Library Image",
+
 
 
 
@@ -170,6 +174,7 @@ module.exports = {
         invalid_access_token: "Invalid access token",
         disabled_account: "Your account login has been disabled by admin !!! contact support",
         deleted_account: "Your account is deleted permanentlt !!! contact support",
+        deactivated_account: "Your account is deactivated permanentlt !!! contact support",
         token_expired: "your token has been expired or not valid",
         access_refreshed: "Access token is refreshed",
         invalid_admin: "Invalid Admin",

@@ -34,7 +34,8 @@ const authController = {
     },
 
     logout: async (req, res) => {
-        let userId = req.decoded?.user_id;
+        console.log(req.decoded, "decode")
+        let userId = req.decoded?._id;
         if (!userId) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
         }
@@ -86,7 +87,7 @@ const authController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     // createOrder: async (req, res) => {
-        //     let user_id = req.decoded.user_id;
+    //     let user_id = req.decoded.user_id;
     //     if (!user_id) {
     //         return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
     //     }

@@ -101,12 +101,10 @@ module.export = updateData = (Model, DataObject, _id) => {
     });
 }
 module.export = removeItemFromArray = (Model, mainIdObj, arrayKey, itemId) => {
-    console.log(arrayKey, "arrayKey", [arrayKey])
-    // let obj = {[arrayKey]:{_id:itemId}}
-
     return new Promise((resolve, reject) => {
         Model.updateOne(mainIdObj, { $pull: { [arrayKey]: { _id: itemId } } }, (err, updatedData) => {
             if (err) {
+                // console.log(err, "erderer")
                 let response = helpers.showResponse(false, err, {});
                 return resolve(response);
             }
@@ -114,7 +112,7 @@ module.export = removeItemFromArray = (Model, mainIdObj, arrayKey, itemId) => {
                 let response = helpers.showResponse(true, 'success', updatedData);
                 return resolve(response);
             }
-            let response = helpers.showResponse(false, 'failed', {});
+            let response = helpers.showResponse(false, 'update failed', {});
             return resolve(response);
         });
     });

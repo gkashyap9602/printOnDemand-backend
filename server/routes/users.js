@@ -1,28 +1,31 @@
 var express = require('express');
 var router = express.Router();
-var AuthController = require('../controllers/Users');
-var middleware = require("../middleware/authentication");
+var authController = require('../controllers/Users');
+var { verifyTokenUser, verifyTokenBoth } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
-const userValidation  = require('../validations/user')
+const { registrationSchema, loginSchema, forgotSchema, resetPasswordSchema, changePasswordSchema, profileSchema } = require('../validations/user')
 
 // Users Routes without token
-router.post('/register',validate(userValidation.registrationSchema), AuthController.register);
-router.post('/login',validate(userValidation.loginSchema), AuthController.login);
-router.post('/forgotPassword',validate(userValidation.forgotSchema), AuthController.forgotPassword);
-router.post('/resetPassword',validate(userValidation.resetPasswordSchema), AuthController.resetPassword);
+router.post('/register', validate(registrationSchema), authController.register);
+router.post('/login', validate(loginSchema), authController.login);
+router.post('/forgotPassword', validate(forgotSchema), authController.forgotPassword);
+router.post('/resetPassword', validate(resetPasswordSchema), authController.resetPassword);
 
-// with token
-router.post('/changePassword',middleware.verifyTokenUser,validate(userValidation.changePasswordSchema), AuthController.changePasswordWithOld);
-router.get('/getUser/:user_id', middleware.verifyTokenUser, AuthController.getUserDetail);
-router.get('/getUserStatus/:user_id', middleware.verifyTokenUser, AuthController.getUserStatus);
-// router.post('/createOrder', middleware.checkToken, AuthController.allOrders);
-router.post('/getAllOrders', middleware.verifyTokenUser, AuthController.getAllOrders);
-router.get('/getBulkImport', middleware.verifyTokenUser, AuthController.getBulkImport);
-router.post('/logout',middleware.verifyTokenUser, AuthController.logout);
-router.post('/updateBasicDetails', middleware.verifyTokenUser,validate(userValidation.profileSchema), AuthController.updateBasicDetails);
-router.post('/updateShippingDetails', middleware.verifyTokenUser,validate(userValidation.profileSchema), AuthController.updateShippingDetails);
-router.post('/updateBillingAddress', middleware.verifyTokenUser,validate(userValidation.profileSchema), AuthController.updateBillingAddress);
-router.post('/updatePaymentDetails', middleware.verifyTokenUser,validate(userValidation.profileSchema), AuthController.updatePaymentDetails);
+
+// Users admin both routes with token
+router.post('/logout', verifyTokenBoth, authController.logout);
+
+
+// with user token
+router.post('/changePassword', verifyTokenUser, validate(changePasswordSchema), authController.changePasswordWithOld);
+router.get('/getUser/:user_id', verifyTokenUser, authController.getUserDetail);
+router.get('/getUserStatus/:user_id', verifyTokenUser, authController.getUserStatus);
+router.post('/getAllOrders', verifyTokenUser, authController.getAllOrders);
+router.get('/getBulkImport', verifyTokenUser, authController.getBulkImport);
+router.post('/updateBasicDetails', verifyTokenUser, validate(profileSchema), authController.updateBasicDetails);
+router.post('/updateShippingDetails', verifyTokenUser, validate(profileSchema), authController.updateShippingDetails);
+router.post('/updateBillingAddress', verifyTokenUser, validate(profileSchema), authController.updateBillingAddress);
+router.post('/updatePaymentDetails', verifyTokenUser, validate(profileSchema), authController.updatePaymentDetails);
 
 
 // Common Routes

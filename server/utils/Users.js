@@ -152,14 +152,13 @@ const UserUtils = {
             if (userData?.status == 0) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_disabled, null, null, 403);
             }
-            // let device_info = userData?.device_info
+
+            let user_type = userData.userType == 1 ? 'admin' : "user"
             let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
-            let access_token = jwt.sign({ user_type: "user", type: "access", _id: userData._id }, API_SECRET, {
+
+            let access_token = jwt.sign({ user_type: user_type, type: "access", _id: userData._id }, API_SECRET, {
                 expiresIn: consts.ACCESS_EXPIRY
             });
-            // let refresh_token = jwt.sign({ user_type: "user", type: "refresh", _id: userData._id }, API_SECRET, {
-            //     expiresIn: consts.REFRESH_EXPIRY
-            // });
 
             delete userData._doc.password
             userData = { ...userData._doc, token: access_token }

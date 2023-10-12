@@ -6,7 +6,7 @@ var SubCategory = new Schema({
     categoryId: {
         type: mongoose.Types.ObjectId,
         ref: "Category",
-        index:true
+        index: true
     },
     name: {
         type: String,

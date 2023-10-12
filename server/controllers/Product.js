@@ -18,11 +18,6 @@ const adminController = {
         let result = await Product.getAllProduct(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    //admin 
-    // addProductVarient: async (req, res) => {
-    //     let result = await Product.addProductVarient(req.body);
-    //     return helpers.showOutput(res, result, result.statusCode);
-    // },
     addProductVarient: async (req, res) => {
         if (req.files.length === 0) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
@@ -35,7 +30,7 @@ const adminController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateProductVarient: async (req, res) => {
-        let result = await Product.updateProductVarient(req.body, req.files);
+        let result = await Product.updateProductVarient(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
     deleteProduct: async (req, res) => {
@@ -50,7 +45,6 @@ const adminController = {
         let result = await Product.deleteProductImage(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    //admin 
     saveProductImage: async (req, res) => {
         if (!req.file) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
@@ -58,6 +52,18 @@ const adminController = {
         let result = await Product.saveProductImage(req.body, req.file);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    updateVarientTemplate: async (req, res) => {
+        if (!req.file) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
+        }
+        let result = await Product.updateVarientTemplate(req.body, req.file);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    deleteVarientTemplate: async (req, res) => {
+        let result = await Product.deleteVarientTemplate(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    //admin 
     addVariableTypes: async (req, res) => {
         let result = await Product.addVariableTypes(req.body,);
         return helpers.showOutput(res, result, result.statusCode);

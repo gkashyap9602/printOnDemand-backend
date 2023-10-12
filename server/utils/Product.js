@@ -118,10 +118,10 @@ const productUtils = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
-    addProductVarient: async (data, files) => {
+    addProductVarient: async (data,files) => {
         try {
             let { productCode, price, productId, varientOptions } = data
-
+                 
             if (typeof varientOptions == 'string') {
                 varientOptions = JSON.parse(varientOptions)
             }
@@ -138,15 +138,12 @@ const productUtils = {
             if (!saveVariableOptions.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
             }
-            console.log("filess",files,"filess")
             let s3Upload = await helpers.uploadFileToS3(files)
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, {}, null, 203);
             }
-             console.log(s3Upload,"s333333")
             let productVarientTemplates = files.map((file) => {
                 let fileExtension = file.originalname.split('.').pop().toLowerCase()
-                console.log(fileExtension,"fileEx")
                 let item = {}
                 s3Upload?.data?.map((url) => {
                     let s3fileExtension = url.split('.').pop().toLowerCase()
@@ -240,7 +237,7 @@ const productUtils = {
     //     }
 
     // },
-    updateProductVarient: async (data, files) => {
+    updateProductVarient: async (data) => {
         try {
             let { productCode, price, productVarientId } = data
 
@@ -259,30 +256,30 @@ const productUtils = {
                 price: price,
             }
 
-            if (files?.length > 0) {
-                const s3Upload = await helpers.uploadFileToS3(files)
-                if (!s3Upload.status) {
-                    return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, {}, null, 203);
-                }
+            // if (files?.length > 0) {
+            //     const s3Upload = await helpers.uploadFileToS3(files)
+            //     if (!s3Upload.status) {
+            //         return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, {}, null, 203);
+            //     }
 
-                let productVarientTemplates = files.map((file) => {
-                    let fileExtension = mime.extension(file.mimetype)
-                    let item = {}
-                    s3Upload?.data?.map((url) => {
-                        let s3fileExtension = url.split('.').pop().toLowerCase()
+            //     let productVarientTemplates = files.map((file) => {
+            //         let fileExtension = mime.extension(file.mimetype)
+            //         let item = {}
+            //         s3Upload?.data?.map((url) => {
+            //             let s3fileExtension = url.split('.').pop().toLowerCase()
 
-                        if (fileExtension == s3fileExtension) {
-                            item._id = mongoose.Types.ObjectId()
-                            item.fileName = file.originalname
-                            item.filePath = url,
-                                item.templateType = getFileType[fileExtension]
-                        }
-                    })
-                    return item
-                })
+            //             if (fileExtension == s3fileExtension) {
+            //                 item._id = mongoose.Types.ObjectId()
+            //                 item.fileName = file.originalname
+            //                 item.filePath = url,
+            //                     item.templateType = getFileType[fileExtension]
+            //             }
+            //         })
+            //         return item
+            //     })
 
-                newObj.productVarientTemplates = productVarientTemplates
-            }
+            //     newObj.productVarientTemplates = productVarientTemplates
+            // }
 
             const result = await updateSingleData(ProductVarient, newObj, { _id: productVarientId, productCode: find?.data?.productCode })
             if (!result.status) {
@@ -565,6 +562,68 @@ const productUtils = {
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
 
+            return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
+
+    updateVarientTemplate: async (data, file) => {
+        try {
+            let { templateId,templateType, productVarientId } = data
+
+            const findProductVarient = await getSingleData(ProductVarient, { _id: productVarientId })
+            if (!findProductVarient.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 403);
+            }
+            
+            const findVarientTemplate = await getSingleData(ProductVarient, { _id: productVarientId ,productVarientTemplates: {$elemMatch:{templateType}} })
+            console.log(findVarientTemplate,"findVarientTemplate")
+
+            if (findVarientTemplate.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.varient_template_already, {}, null, 403);
+            }
+            
+            const s3Upload = await helpers.uploadFileToS3([file])
+            if (!s3Upload.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
+            }
+            let obj = {
+                _id: mongoose.Types.ObjectId(),
+                fileName: file.originalname,
+                filePath: s3Upload.data[0],
+                templateType,
+            }
+            let result = await ProductVarient.findByIdAndUpdate(productVarientId, { $push: { productVarientTemplates: obj } }, { new: true })
+
+
+            if (!result) {
+                return helpers.showResponse(false, ResponseMessages?.product.varient_template_update_err, {}, null, 400);
+            }
+            return helpers.showResponse(true, ResponseMessages?.product.varient_template_update, result, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
+    deleteVarientTemplate: async (data) => {
+        try {
+            const { templateId, productVarientId, templateType } = data
+
+            const find = await getSingleData(ProductVarient, { _id: productVarientId })
+            if (!find.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
+            }
+
+            let result = await removeItemFromArray(ProductVarient, { _id: productVarientId}, 'productVarientTemplates', templateId)
+            if (result.status) {
+                return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
+            }
             return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
         }
         catch (err) {

@@ -4,17 +4,17 @@ var Schema = mongoose.Schema;
 var Users = new Schema({
     firstName: {
         type: String,
-        required:true
+        required: true
     },
     lastName: {
         type: String,
-        required:true
+        required: true
 
     },
     email: {
         type: String,
-        unique:true,
-        required:true
+        unique: true,
+        required: true
     },
     userName: {
         type: String,
@@ -28,7 +28,7 @@ var Users = new Schema({
         type: String,
         default: null
     },
-    createdUser:{
+    createdUser: {
         type: String,
         default: 'Admin'
     },
@@ -40,48 +40,48 @@ var Users = new Schema({
     //     type: Number,
     //     default: 0
     // },
-    id:{
+    id: {
         type: Number,
         default: 0
     },
-    customerId:{
+    customerId: {
         type: Number,
         default: 0
     },
-    orderSubmissionDelay:{
+    orderSubmissionDelay: {
         type: String,
         default: '00:01:00'
     },
-    isLoginFromShopify:{
+    isLoginFromShopify: {
         type: Boolean,
         default: false
     },
-    storeId:{
+    storeId: {
         type: Number,
         default: null
     },
-    userType:{
+    userType: {
         type: Number,
         default: 3,
-        enum:[1,2,3]
-        
+        enum: [1, 2, 3]
+
     },
     status: {
         type: Number,
         default: 2,
-        Comment:"1 for active 2 for pending Activation 3 for deactivate user",
-        enum:[1,2,3],
-        index:true
+        Comment: "1 for active 2 for pending Activation 3 for deactivate user",
+        enum: [1, 2, 3],
+        index: true
     },
-    payTraceId:{
+    payTraceId: {
         type: String,
         default: null
     },
-    phoneNumber:{
+    phoneNumber: {
         type: String,
         default: null,
     },
-    traceId:{
+    traceId: {
         type: String,
         default: '0HMRHAOHIAHIS:0004003'
     }

@@ -32,10 +32,3 @@ var Category = new Schema({
 
 
 module.exports = mongoose.model("Category", Category, "category");
-
-// Category.virtual('subCategories', {
-//     ref: 'SubCategory',
-//     localField: '_id',
-//     foreignField: 'category_id',
-//     justOne: false,
-//   });

@@ -13,39 +13,39 @@ const WaitingList = require('../models/WaitingList')
 
 const adminUtils = {
 
-    login: async (data) => {
-        let { email, password } = data;
-        let where = {
-            email: email,
-            password: md5(password),
-            status: { $eq: 1 }
-        }
-        let result = await getSingleData(Administration, where, '');
-        if (result.status) {
-            let adminData = result?.data
-            let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
-            let access_token = jwt.sign({ user_type: "admin", type: "access", _id: adminData?._id }, API_SECRET, {
-                expiresIn: consts.ACCESS_EXPIRY
-            });
-            // let refresh_token = jwt.sign({ user_type: "admin", type: "refresh" }, API_SECRET, {
-            //     expiresIn: consts.REFRESH_EXPIRY
-            // });
-            delete adminData?._doc?.password
-            adminData = { ...adminData?._doc, token: access_token }
+    // login: async (data) => {
+    //     let { email, password } = data;
+    //     let where = {
+    //         email: email,
+    //         password: md5(password),
+    //         status: { $eq: 1 }
+    //     }
+    //     let result = await getSingleData(Administration, where, '');
+    //     if (result.status) {
+    //         let adminData = result?.data
+    //         let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
+    //         let access_token = jwt.sign({ user_type: "admin", type: "access", _id: adminData?._id }, API_SECRET, {
+    //             expiresIn: consts.ACCESS_EXPIRY
+    //         });
+    //         // let refresh_token = jwt.sign({ user_type: "admin", type: "refresh" }, API_SECRET, {
+    //         //     expiresIn: consts.REFRESH_EXPIRY
+    //         // });
+    //         delete adminData?._doc?.password
+    //         adminData = { ...adminData?._doc, token: access_token }
 
-            return helpers.showResponse(true, ResponseMessages?.admin?.login_success, adminData, null, 200);
-        }
-        return helpers.showResponse(false, ResponseMessages?.admin?.invalid_login, null, null, 400);
-    },
-    logout: async (adminId) => {
-        let queryObject = { _id: adminId }
-        let result = await getSingleData(Administration, queryObject, 'traceId');
-        if (!result.status) {
-            return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
-        }
-        let adminData = result?.data
-        return helpers.showResponse(true, ResponseMessages?.users?.logout_success, adminData, null, 200);
-    },
+    //         return helpers.showResponse(true, ResponseMessages?.admin?.login_success, adminData, null, 200);
+    //     }
+    //     return helpers.showResponse(false, ResponseMessages?.admin?.invalid_login, null, null, 400);
+    // },
+    // logout: async (adminId) => {
+    //     let queryObject = { _id: adminId }
+    //     let result = await getSingleData(Administration, queryObject, 'traceId');
+    //     if (!result.status) {
+    //         return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
+    //     }
+    //     let adminData = result?.data
+    //     return helpers.showResponse(true, ResponseMessages?.users?.logout_success, adminData, null, 200);
+    // },
 
     addMaterial: async (data) => {
         try {
@@ -77,8 +77,8 @@ const adminUtils = {
     updateWaitingList: async (data) => {
         try {
             const { value } = data
-             console.log(value,"valuee")
-            let result = await updateSingleData(WaitingList, {isWaitingListEnable:value})
+            console.log(value, "valuee")
+            let result = await updateSingleData(WaitingList, { isWaitingListEnable: value })
 
             if (result.status) {
                 return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result?.data, null, 200);
@@ -186,7 +186,7 @@ const adminUtils = {
             }
             const idGenerated = helpers.generateIDs(usersCount?.data)
 
-            let adminData = await getSingleData(Administration, { _id: adminId })
+            let adminData = await getSingleData(Users, { _id: adminId, userType: 1 })
             console.log(adminData, "adminData", adminId)
             if (!adminData.status) {
                 return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
