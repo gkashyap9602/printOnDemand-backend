@@ -32,17 +32,25 @@ const categoryUtil = {
                 );
             }
             aggregationPipeline.push(
-                {
-                    $match: {
-                        status: { $ne: 2 },
-                    },
-                },
+                // {
+                //     $match: {
+                //         'subCategories.status': { $ne: 2 },
+                //     },
+                // },
                 {
                     $lookup: {
                         from: 'subCategory',
                         localField: '_id',
                         foreignField: 'categoryId',
                         as: 'subCategories',
+                        pipeline: [{
+
+                            $match: {
+                                status: { $ne: 2 },
+                            }
+
+                        }]
+
                     },
 
                 },
@@ -249,12 +257,12 @@ const categoryUtil = {
                 return helpers.showResponse(false, ResponseMessages?.category.category_not_exist, {}, null, 400);
             }
 
-            const findSubCategory = await SubCategory.find({ status:{$ne:2},categoryId: id })
+            const findSubCategory = await SubCategory.find({ status: { $ne: 2 }, categoryId: id })
             if (findSubCategory.length > 0) {
                 return helpers.showResponse(false, ResponseMessages?.category.active_subcategory, {}, null, 400);
             }
             const result = await updateSingleData(Category, { status: 2 }, { _id: id })
-            console.log(result, "resultt Category" )
+            console.log(result, "resultt Category")
 
 
             if (result.status) {
@@ -280,7 +288,7 @@ const categoryUtil = {
                 return helpers.showResponse(false, ResponseMessages?.category.subcategory_not_exist, {}, null, 400);
             }
 
-            const findProduct = await Product.find({ status:{$ne:2},subCategoryId: { $in: [id] } })
+            const findProduct = await Product.find({ status: { $ne: 2 }, subCategoryId: { $in: [id] } })
             if (findProduct.length > 0) {
                 return helpers.showResponse(false, ResponseMessages?.product.active_product, {}, null, 400);
             }
