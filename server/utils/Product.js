@@ -19,7 +19,7 @@ const productUtils = {
             let { careInstructions, longDescription, subCategoryIds, materialId, variableTypesIds,
                 construction, features, productionDuration, shortDescription, title, process } = data
 
-            const findProduct = await getSingleData(Product, { title: title })
+            const findProduct = await getSingleData(Product, { title: title ,status: { $ne: 2 }})
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 403);
             }
@@ -32,7 +32,7 @@ const productUtils = {
             if (findVariableTypes?.data?.length !== variableTypesIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
             }
-            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } })
+            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } ,status: { $ne: 2 }})
 
             if (findSubCategory?.data?.length !== subCategoryIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
@@ -74,18 +74,18 @@ const productUtils = {
                 construction, features, productionDuration, shortDescription, title, process } = data
 
 
-            const findProduct = await getSingleData(Product, { _id: productId })
+            const findProduct = await getSingleData(Product, { _id: productId ,status: { $ne: 2 } })
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
             }
 
-            const findTitle = await getSingleData(Product, { title, _id: { $ne: productId } })
+            const findTitle = await getSingleData(Product, { title, _id: { $ne: productId },status: { $ne: 2 } })
             if (findTitle.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_title_already, {}, null, 403);
             }
             subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
 
-            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } })
+            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } ,status: { $ne: 2 }})
             if (findSubCategory?.data?.length !== subCategoryIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
             }
@@ -125,11 +125,11 @@ const productUtils = {
             if (typeof varientOptions == 'string') {
                 varientOptions = JSON.parse(varientOptions)
             }
-            const findProduct = await getSingleData(Product, { _id: productId })
+            const findProduct = await getSingleData(Product, { _id: productId ,status: { $ne: 2 }})
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
             }
-            const findProductCode = await getSingleData(ProductVarient, { productCode })
+            const findProductCode = await getSingleData(ProductVarient, { productCode ,status: { $ne: 2 }})
             if (findProductCode.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
             }
@@ -493,7 +493,7 @@ const productUtils = {
         try {
             let { displayOrder, imageType, productId } = data
 
-            const findProduct = await getSingleData(Product, { _id: productId })
+            const findProduct = await getSingleData(Product, { _id: productId ,status: { $ne: 2 }})
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
             }
