@@ -33,6 +33,11 @@ const categoryUtil = {
             }
             aggregationPipeline.push(
                 {
+                    $match: {
+                        status: { $ne: 2 },
+                    },
+                },
+                {
                     $lookup: {
                         from: 'subCategory',
                         localField: '_id',
@@ -50,6 +55,7 @@ const categoryUtil = {
                                 cond: {
                                     $or: [
                                         { $regexMatch: { input: '$$subCategory.name', regex: searchKey, options: 'i' } },
+                                        {}
                                     ],
                                 },
                             },
