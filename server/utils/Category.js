@@ -237,7 +237,6 @@ const categoryUtil = {
             }
 
             const findSubCategory = await SubCategory.find({ categoryId: id })
-            console.log(findSubCategory, "findSubbb")
             if (findSubCategory.length > 0) {
                 return helpers.showResponse(false, ResponseMessages?.category.active_subcategory, {}, null, 400);
             }
@@ -266,8 +265,7 @@ const categoryUtil = {
                 return helpers.showResponse(false, ResponseMessages?.category.subcategory_not_exist, {}, null, 400);
             }
               
-            const findProduct = await Product.find({ $in:{subCategoryId: id} })
-            console.log(findProduct, "findProduct")
+            const findProduct = await Product.find({ subCategoryId:{$in: [id]} })
             if (findProduct.length > 0) {
                 return helpers.showResponse(false, ResponseMessages?.product.active_product, {}, null, 400);
             }
@@ -275,9 +273,6 @@ const categoryUtil = {
             const result = await deleteById(SubCategory, id)
 
             if (result.status) {
-                // const res = await removeItemFromArray(Product, {}, 'subCategoryId', id)
-                // console.log(res, "response delete from product")
-
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
 
