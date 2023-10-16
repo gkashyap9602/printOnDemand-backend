@@ -107,6 +107,8 @@ module.exports = {
         product_code_already:"Product Code Already Exist",
         product_title_already:"Product Title Already Exist",
         library_img_save_err:"Error occured while saving Library Image",
+        active_product:"There Are Active Products in Subcategory Delete Product First"
+
 
 
 
@@ -124,6 +126,8 @@ module.exports = {
         subcategory_added:"Subcategory added Sucessfully",
         invalid_category_id:"Invalid Category Id",
         invalid_subcategory_id:"Invalid Subcategory Id",
+        active_subcategory:"There Are Active Subcategory Delete Subcategory First"
+        
         
 
     },

@@ -68,7 +68,6 @@ const middleware = {
 						req.token = token
 						next();
 					} else if (decoded?.user_type == "admin") {
-						console.log("under admin")
 						let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
 
 						if (!response.status) {
@@ -116,9 +115,7 @@ const middleware = {
 					if (decoded?.type == "refresh") {
 						return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token, StatusCode: 401 });
 					}
-					console.log(decoded, "decodedAdmin")
 					if (decoded?.user_type == "admin") {
-						console.log(decoded, "under iff")
 
 						let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
 
@@ -137,7 +134,6 @@ const middleware = {
 						req.token = token
 						next();
 					} else {
-						console.log("else admin verify")
 						return res.status(401).json({ status: false, message: ResponseMessages?.middleware?.invalid_admin, StatusCode: 401 });
 
 					}
@@ -226,8 +222,8 @@ const middleware = {
 				if (userData.status == 0) {
 					return res.status(451).json(helpers.showResponse(false, ResponseMessages?.middleware?.disabled_account));
 				}
-				if (userData.status == 2) {
-					return res.status(423).json(helpers.showResponse(false, ResponseMessages?.middleware?.deleted_account));
+				if (userData.status == 3) {
+					return res.status(423).json(helpers.showResponse(false, ResponseMessages?.middleware?.deactivated_account));
 				}
 				let new_token = jwt.sign({ user_type, type: "access" }, API_SECRET, {
 					expiresIn: consts.ACCESS_EXPIRY
@@ -264,8 +260,8 @@ const middleware = {
 				if (adminData.status == 0) {
 					return res.status(451).json(helpers.showResponse(false, ResponseMessages?.middleware?.disabled_account));
 				}
-				if (adminData.status == 2) {
-					return res.status(423).json(helpers.showResponse(false, ResponseMessages?.middleware?.deleted_account));
+				if (adminData.status == 3) {
+					return res.status(423).json(helpers.showResponse(false, ResponseMessages?.middleware?.deactivated_account));
 				}
 				let new_token = jwt.sign({ user_type, type: "access" }, API_SECRET, {
 					expiresIn: consts.ACCESS_EXPIRY

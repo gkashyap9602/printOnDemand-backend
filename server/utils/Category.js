@@ -4,6 +4,7 @@ let Category = require('../models/Category')
 let SubCategory = require('../models/subCategory')
 const ResponseMessages = require("../constants/ResponseMessages")
 const { default: mongoose } = require('mongoose');
+const Product = require('../models/Product')
 
 const categoryUtil = {
     //admin and user both
@@ -235,7 +236,11 @@ const categoryUtil = {
                 return helpers.showResponse(false, ResponseMessages?.category.category_not_exist, {}, null, 400);
             }
 
-
+            const findSubCategory = await SubCategory.find({ categoryId: id })
+            console.log(findSubCategory, "findSubbb")
+            if (findSubCategory.length > 0) {
+                return helpers.showResponse(false, ResponseMessages?.category.active_subcategory, {}, null, 400);
+            }
             const result = await deleteById(Category, id)
 
             if (result.status) {
@@ -260,14 +265,24 @@ const categoryUtil = {
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.subcategory_not_exist, {}, null, 400);
             }
+              
+            const findProduct = await Product.find({ $in:{subCategoryId: id} })
+            console.log(findProduct, "findProduct")
+            if (findProduct.length > 0) {
+                return helpers.showResponse(false, ResponseMessages?.product.active_product, {}, null, 400);
+            }
 
             const result = await deleteById(SubCategory, id)
 
-            if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+            if (result.status) {
+                // const res = await removeItemFromArray(Product, {}, 'subCategoryId', id)
+                // console.log(res, "response delete from product")
+
+                return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
 
-            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

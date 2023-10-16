@@ -822,19 +822,16 @@ const convertImageToWebp = async (imageInBuffer) => {
 //   });
 // };
 const uploadFileToS3 = async (files) => {
-    console.log(files, "filess AI")
     return new Promise(async (resolve, reject) => {
         try {
             let webpFilesArray = [];
             for (let i = 0; i < files?.length; i++) {
                 let file = files[i];
                 let mime_type = file?.mimetype.split("/")[0];
-                console.log(mime_type, "mime_typemime_type")
                 if (mime_type == "image" && !file.originalname.endsWith(".psd")) {
                     let imageNewBuffer = await convertImageToWebp(file?.buffer);
 
                     if (imageNewBuffer) {
-                        console.log(file.originalname, "file.originalname")
                         webpFilesArray.push({
                             fieldname: file.fieldname,
                             originalname: `${file.originalname}.webp`,
@@ -947,21 +944,7 @@ const uploadToS3 = async (files, key) => {
 };
 
 
-// Function to convert PSD and AI to compressed image format (e.g., JPEG)
-async function convertPsdAiToImage(buffer) {
-    try {
-        console.log(buffer, "bufferrs")
-        // Use sharp or another library to convert PSD/AI to JPEG
-        const compressedImageBuffer = await sharp(buffer)
-            .jpeg({ quality: 80 }) // Adjust quality as needed
-            .toBuffer();
 
-        return compressedImageBuffer;
-    } catch (error) {
-        console.error('Error converting PSD/AI to image:', error);
-        return null;
-    }
-}
 const generateUsernames = (name, count, all_usernames = null) => {
     const usernames = [];
     const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
