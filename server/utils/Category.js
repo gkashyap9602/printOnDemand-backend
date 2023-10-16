@@ -10,7 +10,14 @@ const categoryUtil = {
     //admin and user both
     getCategories: async (data) => {
         const { includeSubCategory = false, searchKey = '', parentCategoryId } = data
-        const aggregationPipeline = [];
+        const aggregationPipeline = [
+
+            {
+                $match: {
+                    status: { $ne: 2 },
+                },
+            }
+        ];
 
         if (includeSubCategory === 'true' || includeSubCategory === true) {
 
@@ -236,14 +243,16 @@ const categoryUtil = {
                 return helpers.showResponse(false, ResponseMessages?.category.category_not_exist, {}, null, 400);
             }
 
-            const findSubCategory = await SubCategory.find({ categoryId: id })
+            const findSubCategory = await SubCategory.find({ status:{$ne:2},categoryId: id })
             if (findSubCategory.length > 0) {
                 return helpers.showResponse(false, ResponseMessages?.category.active_subcategory, {}, null, 400);
             }
-            const result = await deleteById(Category, id)
+            const result = await updateSingleData(Category, { status: 2 }, { _id: id })
+            console.log(result, "resultt Category" )
+
 
             if (result.status) {
-                await deleteData(SubCategory, { categoryId: id })
+                // await deleteData(SubCategory, { categoryId: id })
 
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
@@ -264,13 +273,15 @@ const categoryUtil = {
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.subcategory_not_exist, {}, null, 400);
             }
-              
-            const findProduct = await Product.find({ subCategoryId:{$in: [id]} })
+
+            const findProduct = await Product.find({ status:{$ne:2},subCategoryId: { $in: [id] } })
             if (findProduct.length > 0) {
                 return helpers.showResponse(false, ResponseMessages?.product.active_product, {}, null, 400);
             }
 
-            const result = await deleteById(SubCategory, id)
+            // const result = await deleteById(SubCategory, id)
+            const result = await updateSingleData(SubCategory, { status: 2 }, { _id: id })
+            console.log(result, "resultt SubCategory")
 
             if (result.status) {
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);

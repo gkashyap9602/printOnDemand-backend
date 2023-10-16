@@ -299,7 +299,8 @@ const productUtils = {
             const result = await Product.aggregate([
                 {
                     $match: {
-                        _id: mongoose.Types.ObjectId(productId)
+                        _id: mongoose.Types.ObjectId(productId),
+                        status:{$ne:2},
                     }
                 },
                 {
@@ -415,6 +416,7 @@ const productUtils = {
 
             let matchObj = {
                 subCategoryId: { $in: [id] },
+                status:{$ne:2},
                 title: { $regex: searchKey, $options: 'i' }
             }
 
@@ -641,7 +643,8 @@ const productUtils = {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
 
-            const result = await deleteById(Product, productId)
+            const result = await updateSingleData(Product, {status:2},{_id:productId})
+             console.log(result,"resultt Product")
 
             if (result.status) {
 
