@@ -828,23 +828,26 @@ const uploadFileToS3 = async (files) => {
             for (let i = 0; i < files?.length; i++) {
                 let file = files[i];
                 let mime_type = file?.mimetype.split("/")[0];
-                if (mime_type == "image" && !file.originalname.endsWith(".psd")) {
-                    let imageNewBuffer = await convertImageToWebp(file?.buffer);
 
-                    if (imageNewBuffer) {
-                        webpFilesArray.push({
-                            fieldname: file.fieldname,
-                            originalname: `${file.originalname}.webp`,
-                            encoding: file.encoding,
-                            mimetype: file.mimetype,
-                            buffer: imageNewBuffer,
-                            size: file.size,
-                        });
-                    }
-                }
-                else {
-                    webpFilesArray.push(file);
-                }
+                // if (mime_type == "image" && !file.originalname.endsWith(".psd")) {
+                //     let imageNewBuffer = await convertImageToWebp(file?.buffer);
+
+                //     if (imageNewBuffer) {
+                //         webpFilesArray.push({
+                //             fieldname: file.fieldname,
+                //             originalname: `${file.originalname}.webp`,
+                //             encoding: file.encoding,
+                //             mimetype: file.mimetype,
+                //             buffer: imageNewBuffer,
+                //             size: file.size,
+                //         });
+                //     }
+                // }
+                // else {
+                //     webpFilesArray.push(file);
+                // }
+                webpFilesArray.push(file);
+
             }
             // console.log(webpFilesArray,"webfilesss")
             if (webpFilesArray?.length > 0) {
@@ -910,16 +913,17 @@ const uploadToS3 = async (files, key) => {
                     file?.mimetype
                 );
                 let fileName = "";
-                if (file?.mimetype?.indexOf("image" && !file.originalname.endsWith(".psd")) >= 0) {
-                    // image file
-                    fileName = `${file.fieldname}-${Date.now().toString()}.webp`;
-                } else {
-                    fileName = `${file.fieldname}-${Date.now().toString()}${ext}`;
-                }
+                // if (file?.mimetype?.indexOf("image" && !file.originalname.endsWith(".psd")) >= 0) {
+                //     // image file
+                //     fileName = `${file.fieldname}-${Date.now().toString()}.webp`;
+                // } else {
+                //     fileName = `${file.fieldname}-${Date.now().toString()}${ext}`;
+                // }
+                fileName = `${file.fieldname}-${Date.now().toString()}${ext}`;
                 const params = {
                     Bucket: bucketName,
-                    ContentType:
-                        file?.mimetype?.indexOf("image" && !file.originalname.endsWith(".psd")) >= 0 ? "image/webp" : file?.mimetype,
+                    ContentType:file?.mimetype,
+                        // file?.mimetype?.indexOf("image" && !file.originalname.endsWith(".psd")) >= 0 ? "image/webp" : file?.mimetype,
                     Key: `${file.fieldname}/${fileName}`,
                     Body: bufferImage,
                 };
