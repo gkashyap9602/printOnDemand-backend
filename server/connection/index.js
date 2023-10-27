@@ -2,7 +2,7 @@ const helpers = require("../services/helper")
 const mongoose = require('mongoose');
 const path = require('path')
 require('dotenv').config({ path: path.resolve(__dirname, '../../server/.env') })
-const { createAdmin ,createWaitingList} = require('./seed-admin')
+const { createAdmin ,createWaitingList,createCommonContent} = require('./seed-admin')
 
 // console.log(helpers.changeEnv(process.env.ENV_MODE).db,"helpers.changeEnv")
 helpers.getParameterFromAWS({ name: 'MONGODB_URI' }).then((MONGODB_URI) => {
@@ -17,6 +17,7 @@ helpers.getParameterFromAWS({ name: 'MONGODB_URI' }).then((MONGODB_URI) => {
         .then((sucess) => {
             createAdmin()
             createWaitingList()
+            createCommonContent()
 
         })
     var db = mongoose.connection;

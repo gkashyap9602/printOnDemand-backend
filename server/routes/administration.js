@@ -15,6 +15,10 @@ router.get('/getAllUsers', verifyTokenAdmin, adminController.getAllUsers);
 router.post('/createCustomer', verifyTokenAdmin, adminController.createCustomer);
 router.post('/updateWaitingList', verifyTokenAdmin, validate(updateWaitingList), adminController.updateWaitingList);
 
+//admin Setting with admin routes
+router.post('/add_question', verifyTokenAdmin, adminController.addNewQuestion);
+router.post('/upload_answer_video',verifyTokenAdmin, adminController.uploadAnswerVideo);
+router.post('/update_question', verifyTokenAdmin, adminController.updateQuestion);
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

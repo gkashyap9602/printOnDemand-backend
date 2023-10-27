@@ -2,6 +2,7 @@ const APP_CONSTANTS = require("../constants/const");
 // const administration = require(".././models/Administration");
 const user = require('../models/Users')
 const WaitingList = require('../models/WaitingList')
+const CommonContent = require('../models/commonContent')
 const md5 = require('md5');
 const helpers = require('../services/helper/index')
 
@@ -35,5 +36,15 @@ async function createWaitingList() {
     }
 
 }
+async function createCommonContent() {
+    let commonContent = await CommonContent.findOne({})
+    if (!commonContent) {
+        await CommonContent.create({
+        createdOn:helpers.getCurrentDate()
+        });
+        // console.log('Admin Created ');
+    }
 
-module.exports = {createAdmin,createWaitingList}
+}
+
+module.exports = {createAdmin,createWaitingList,createCommonContent}

@@ -12,6 +12,45 @@ const UserProfile = require('../models/UserProfile')
 const WaitingList = require('../models/WaitingList')
 
 const adminUtils = {
+    getQuestions: async () => {
+        let response = await getDataArray(FAQ, { status: { $ne: 2 } }, '', null, { created_on: -1 });
+        if (response.status) {
+            return helpers.showResponse(true, "Here is a list of questions", response.data, null, 200);
+        }
+        return helpers.showResponse(false, 'No data found', null, null, 200);
+    },
+
+    getAdminSettingContent: async () => {
+        let response = await getSingleData(Common, {}, 'about -_id');
+        if (response.status) {
+            return helpers.showResponse(true, "Here is a About Content", response.data, null, 200);
+        }
+        return helpers.showResponse(false, 'No Content Found', null, null, 200);
+    },
+    addNewQuestion: async (data) => {
+        let { question, answer } = data
+        let newObj = {
+            question,
+            answer,
+            status: 1,
+            created_on: moment().unix()
+        }
+        let quesRef = new FAQ(newObj)
+        let response = await postData(quesRef);
+        if (response.status) {
+            return helpers.showResponse(true, "New Question Added Successfully", null, null, 200);
+        }
+        return helpers.showResponse(false, "Unable to add new question at the moment", response, null, 200);
+    },
+   
+    updateQuestion: async (data, ques_id) => {
+        data.updated_on = moment().unix();
+        let response = await updateData(FAQ, data, ObjectId(ques_id));
+        if (response.status) {
+            return helpers.showResponse(true, "Question has been updated", null, null, 200);
+        }
+        return helpers.showResponse(false, "Update failed", null, null, 200);
+    },
 
     // login: async (data) => {
     //     let { email, password } = data;
