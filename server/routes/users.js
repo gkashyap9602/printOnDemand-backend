@@ -13,7 +13,7 @@ router.post('/resetPassword', validate(resetPasswordSchema), authController.rese
 
 
 // Users admin both routes with token
-router.post('/logout', validateCSRFToken, verifyTokenBoth, authController.logout);
+router.post('/logout', verifyTokenBoth, authController.logout);
 
 
 // with user token
