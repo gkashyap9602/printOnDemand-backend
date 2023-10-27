@@ -293,7 +293,20 @@ const middleware = {
 				return res.status(401).json(helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token));
 			}
 		})
-	}
+	},
+	// validate CSRF token middleware
+	validateCSRFToken(req, res, next) {
+		const csrfToken = req.cookies.mycsrfToken;
+		console.log(req.csrfToken,"middle side csrf req");
+		console.log(csrfToken,"middle side csrf cookie");
+		let token = req.headers['_csrfToken'];
+		if (token === csrfToken) {
+			next();
+		} else {
+			res.status(403).json({error:'Invalid CSRF token'});
+		}
+	},
+
 }
 
 module.exports = {

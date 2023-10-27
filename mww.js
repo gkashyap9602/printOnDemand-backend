@@ -7,12 +7,15 @@ const cors = require("cors");
 const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
+const csrf = require('csurf')
+const csrfProtection = csrf({ cookie: true });
 
 require('dotenv').config({path:path.resolve(__dirname, './server/.env')})
 
 
-app.use(cookieParser());
 app.use(helmet())
+// app.use(csrfProtection)
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));

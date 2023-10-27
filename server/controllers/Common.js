@@ -41,10 +41,11 @@ const commonController = {
     },
     //
     csrfToken: async (req, res) => {
-        console.log(req.csrfToken, "csrfTokenn");
+        console.log(req, "reqqcsrfTokenn");
+        console.log(req?.csrfToken, "csrfTokenn");
         console.log(req.cookies, 'cookies');
-        let csrfToken = req?.csrfToken()
-        console.log(csrfToken, "csrf Token");
+        // let csrfToken = req?.csrfToken()
+        // console.log(csrfToken, "csrf Token");
         let result = await Common.csrfToken(csrfToken);
         res.send(result.data)
         // return helpers.showOutput(res, result, result.statusCode);
@@ -57,7 +58,7 @@ const commonController = {
     },
     //
     getQuestions: async (req, res) => {
-        let result = await Common.getQuestions();
+        let result = await Common.getQuestions(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
     getCommonContent: async (req, res) => {

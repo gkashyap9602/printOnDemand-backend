@@ -1,18 +1,18 @@
 var express = require('express');
 var commonController = require('../controllers/Common');
 var router = express.Router();
-var { verifyTokenBoth, verifyTokenAdmin } = require("../middleware/authentication");
+var { verifyTokenBoth, verifyTokenAdmin ,validateCSRFToken} = require("../middleware/authentication");
 const csrf = require('csurf')
 const validate = require('../middleware/validation')
 const { addQuestionSchema, updateQuestionSchema, updateCommonContentSchema } = require('../validations/common')
 // Middleware for CSRF protection
-const csrfProtection = csrf({ cookie: true });
+// const csrfProtection = csrf({ cookie: true });
 
 
 // without Token routes
 router.post('/store_param', commonController.storeParameterToAWS);
-router.get('/csrf', csrfProtection, commonController.csrfToken);
-router.post('/transfer', csrfProtection, commonController.submitCsrfToken);
+router.get('/csrf', commonController.csrfToken);
+router.post('/transfer',validateCSRFToken, commonController.submitCsrfToken);
 
 // with admin and user both token routes
 router.get('/getAllCountries', verifyTokenBoth, commonController.getAllCountries);

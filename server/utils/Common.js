@@ -132,11 +132,6 @@ const commonUtil = {
     console.log(userSessionToken, "userSessionToken");
     let { data } = dataa
 
-    if (dataa._csrf !== userSessionToken) {
-      return helpers.showResponse(false, 'Invalid Csrf Token', {}, null, 400);
-
-    }
-
     return helpers.showResponse(true, 'sucessfully transfer', {}, null, 200);
   },
 
@@ -161,8 +156,6 @@ const commonUtil = {
     }
     return helpers.showResponse(false, ResponseMessages?.common.parameter_data_not_found, null, null, 400);
   },
-
-  //----------------
 
 
   updateCommonContent: async (data) => {
@@ -249,13 +242,24 @@ const commonUtil = {
     if (response.status) {
       return helpers.showResponse(true, "Here is a About Content", response.data, null, 200);
     }
-    return helpers.showResponse(false, 'No Content Found', null, null, 200);
+    return helpers.showResponse(false, 'No Content Found', null, null, 400);
   },
 
-  getQuestions: async () => {
-    let response = await getDataArray(FAQ, { status: { $ne: 2 } }, '', null, { createdOn: -1 });
+  getQuestions: async (data) => {
+    let { pageIndex, pageSize } = data
+    pageIndex = Number(pageIndex)
+    pageSize = Number(pageSize)
+
+    let pagination = {
+      skip: (pageIndex - 1) * pageSize, // Calculate the number of documents to skip
+      limit: pageSize, // Specify the number of documents to return
+    }
+    let totalCount = await getCount(FAQ,{ status: { $ne: 2 } })
+
+    let response = await getDataArray(FAQ, { status: { $ne: 2 } }, '', pagination, { createdOn: -1 });
+
     if (response.status) {
-      return helpers.showResponse(true, "Here is a list of questions", response.data, null, 200);
+      return helpers.showResponse(true, "Here is a list of questions", {data:response.data,totalCount:totalCount.data}, null, 200);
     }
     return helpers.showResponse(false, 'No data found', null, null, 400);
   },
