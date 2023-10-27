@@ -1,6 +1,7 @@
 var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
 const mime = require('mime-types')
+const csrf = require('csurf')
 AWS.config.update({
     region: "us-east-1",
     credentials: new AWS.SharedIniFileCredentials({ profile: "default" }),
@@ -548,247 +549,254 @@ const addToMulter = multer({
     fileFilter: (req, file, callback) => {
         callback(null, true); // Accept the file
     },
-    limits:{ fileSize: 5 * 1048576 }, // 5 mb
+    limits: { fileSize: 5 * 1048576 }, // 5 mb
 })
-
-const uploadVideoToS3 = async (files) => {
-  try {
-    let SecretResponse = await getSecretFromAWS("rico-secret");
-    let region = await getParameterFromAWS({ name: "REGION" });
-    const s3 = new AWS.S3({
-      accessKeyId: await getParameterFromAWS({ name: "ACCESSID" }),
-      secretAccessKey: SecretResponse?.SecretString,
-      region,
-    });
-    let fileName = Date.now().toString() + Math.floor(Math.random() * 1000);
-    const VideoOutputBucket = await getParameterFromAWS({
-      name: "VideoOutputBucket",
-    });
-    const s3UploadPromises = files?.map(async (file) => {
-      return new Promise(async (resolve, reject) => {
-        if (file?.mimetype.indexOf("image") >= 0) {
-          let imageNewBuffer = await convertImageToWebp(file?.buffer);
-          if (imageNewBuffer) {
-            const params = {
-              Bucket: VideoOutputBucket,
-              ContentType: "image/webp",
-              Key: fileName + "/" + fileName + ".webp",
-              Body: imageNewBuffer,
-            };
-            s3.upload(params, (error, data) => {
-              if (error) {
-                console.log("bucketerror", error);
-                resolve(null);
-              } else {
-                resolve({ thumb_url: data.key });
-              }
-            });
-          }
-        } else if (file?.mimetype.indexOf("video") >= 0) {
-          let fileExt = path.extname(file?.originalname);
-          const ElasticTranscoder = new AWS.ElasticTranscoder({
-            region,
-            apiVersion: "2012-09-25",
-          });
-          let VideoInputBucket = await getParameterFromAWS({
-            name: "VideoInputBucket",
-          });
-          let filePath = fileName + fileExt;
-          const params = {
-            Bucket: VideoInputBucket,
-            ContentType: file?.mimetype,
-            Key: filePath,
-            Body: file?.buffer,
-          };
-          s3.upload(params, async (error, data) => {
-            if (error) {
-              console.log("file upload to s3 error", error);
-              return resolve(null);
-            }
-            // Set the pipeline ID and output prefix
-            const PipeLineId = await getParameterFromAWS({
-              name: "PipeLineId",
-            });
-            const OutputKeyPrefix = `${data?.Key.split(".")[0]}/`;
-            // Set the output parameters
-            const outputs = [
-              {
-                Key: OutputKeyPrefix + "hls_400k",
-                PresetId: "1351620000001-200050",
-                SegmentDuration: "10",
-              },
-              {
-                Key: OutputKeyPrefix + "hls_1m",
-                PresetId: "1351620000001-200030",
-                SegmentDuration: "10",
-              },
-              {
-                Key: OutputKeyPrefix + "hls_2m",
-                PresetId: "1351620000001-200010",
-                SegmentDuration: "10",
-              },
-            ];
-            // Set the input parameters
-            const input = {
-              Key: data?.Key,
-            };
-            // Set the job parameters
-            const params = {
-              PipelineId: PipeLineId,
-              Input: input,
-              Outputs: outputs,
-            };
-            // Create the transcoding job
-            await ElasticTranscoder.createJob(params).promise();
-            // Get the URLs of the transcoded files
-            const VideoBase = await getParameterFromAWS({ name: "VideoBase" });
-            const hls400kUrl = `${VideoBase}${OutputKeyPrefix}hls_400k.m3u8`;
-            const hls1mUrl = `${VideoBase}${OutputKeyPrefix}hls_1m.m3u8`;
-            const hls2mUrl = `${VideoBase}${OutputKeyPrefix}hls_2m.m3u8`;
-            // Create the playlist string
-            const playlistString =
-              "#EXTM3U\n" +
-              "#EXT-X-VERSION:3\n" +
-              "#EXT-X-STREAM-INF:BANDWIDTH=400000,RESOLUTION=640x360\n" +
-              hls400kUrl +
-              "\n" +
-              "#EXT-X-STREAM-INF:BANDWIDTH=1000000,RESOLUTION=960x540\n" +
-              hls1mUrl +
-              "\n" +
-              "#EXT-X-STREAM-INF:BANDWIDTH=2000000,RESOLUTION=1280x720\n" +
-              hls2mUrl +
-              "\n";
-            // Create playlist.m3u8 file
-            const playlistParams = {
-              Bucket: VideoOutputBucket,
-              Key: `${OutputKeyPrefix}playlist.m3u8`,
-              ContentType: "application/x-mpegURL",
-              Body: playlistString,
-            };
-            await s3.putObject(playlistParams).promise();
-            resolve({ video_url: playlistParams.Key });
-          });
-        } else {
-          resolve(null);
+const generateCSRFToken = () => {
+    const csrfProtection = csrf({
+        cookie: {
+            httpOnly: true,
+            maxAge: 3600
         }
-      });
     });
-    const s3UploadResults = await Promise.all(s3UploadPromises);
-    let video_url = null;
-    s3UploadResults?.map((resp) => {
-      if (resp && resp?.video_url) {
-        video_url = resp?.video_url;
-      }
-    });
-    if (video_url) {
-      return showResponse(
-        true,
-        ResponseMessages?.common?.file_upload_success,
-        video_url,
-        null,
-        200
-      );
+}
+const uploadVideoToS3 = async (files) => {
+    try {
+        let SecretResponse = await getSecretFromAWS("rico-secret");
+        let region = await getParameterFromAWS({ name: "REGION" });
+        const s3 = new AWS.S3({
+            accessKeyId: await getParameterFromAWS({ name: "ACCESSID" }),
+            secretAccessKey: SecretResponse?.SecretString,
+            region,
+        });
+        let fileName = Date.now().toString() + Math.floor(Math.random() * 1000);
+        const VideoOutputBucket = await getParameterFromAWS({
+            name: "VideoOutputBucket",
+        });
+        const s3UploadPromises = files?.map(async (file) => {
+            return new Promise(async (resolve, reject) => {
+                if (file?.mimetype.indexOf("image") >= 0) {
+                    let imageNewBuffer = await convertImageToWebp(file?.buffer);
+                    if (imageNewBuffer) {
+                        const params = {
+                            Bucket: VideoOutputBucket,
+                            ContentType: "image/webp",
+                            Key: fileName + "/" + fileName + ".webp",
+                            Body: imageNewBuffer,
+                        };
+                        s3.upload(params, (error, data) => {
+                            if (error) {
+                                console.log("bucketerror", error);
+                                resolve(null);
+                            } else {
+                                resolve({ thumb_url: data.key });
+                            }
+                        });
+                    }
+                } else if (file?.mimetype.indexOf("video") >= 0) {
+                    let fileExt = path.extname(file?.originalname);
+                    const ElasticTranscoder = new AWS.ElasticTranscoder({
+                        region,
+                        apiVersion: "2012-09-25",
+                    });
+                    let VideoInputBucket = await getParameterFromAWS({
+                        name: "VideoInputBucket",
+                    });
+                    let filePath = fileName + fileExt;
+                    const params = {
+                        Bucket: VideoInputBucket,
+                        ContentType: file?.mimetype,
+                        Key: filePath,
+                        Body: file?.buffer,
+                    };
+                    s3.upload(params, async (error, data) => {
+                        if (error) {
+                            console.log("file upload to s3 error", error);
+                            return resolve(null);
+                        }
+                        // Set the pipeline ID and output prefix
+                        const PipeLineId = await getParameterFromAWS({
+                            name: "PipeLineId",
+                        });
+                        const OutputKeyPrefix = `${data?.Key.split(".")[0]}/`;
+                        // Set the output parameters
+                        const outputs = [
+                            {
+                                Key: OutputKeyPrefix + "hls_400k",
+                                PresetId: "1351620000001-200050",
+                                SegmentDuration: "10",
+                            },
+                            {
+                                Key: OutputKeyPrefix + "hls_1m",
+                                PresetId: "1351620000001-200030",
+                                SegmentDuration: "10",
+                            },
+                            {
+                                Key: OutputKeyPrefix + "hls_2m",
+                                PresetId: "1351620000001-200010",
+                                SegmentDuration: "10",
+                            },
+                        ];
+                        // Set the input parameters
+                        const input = {
+                            Key: data?.Key,
+                        };
+                        // Set the job parameters
+                        const params = {
+                            PipelineId: PipeLineId,
+                            Input: input,
+                            Outputs: outputs,
+                        };
+                        // Create the transcoding job
+                        await ElasticTranscoder.createJob(params).promise();
+                        // Get the URLs of the transcoded files
+                        const VideoBase = await getParameterFromAWS({ name: "VideoBase" });
+                        const hls400kUrl = `${VideoBase}${OutputKeyPrefix}hls_400k.m3u8`;
+                        const hls1mUrl = `${VideoBase}${OutputKeyPrefix}hls_1m.m3u8`;
+                        const hls2mUrl = `${VideoBase}${OutputKeyPrefix}hls_2m.m3u8`;
+                        // Create the playlist string
+                        const playlistString =
+                            "#EXTM3U\n" +
+                            "#EXT-X-VERSION:3\n" +
+                            "#EXT-X-STREAM-INF:BANDWIDTH=400000,RESOLUTION=640x360\n" +
+                            hls400kUrl +
+                            "\n" +
+                            "#EXT-X-STREAM-INF:BANDWIDTH=1000000,RESOLUTION=960x540\n" +
+                            hls1mUrl +
+                            "\n" +
+                            "#EXT-X-STREAM-INF:BANDWIDTH=2000000,RESOLUTION=1280x720\n" +
+                            hls2mUrl +
+                            "\n";
+                        // Create playlist.m3u8 file
+                        const playlistParams = {
+                            Bucket: VideoOutputBucket,
+                            Key: `${OutputKeyPrefix}playlist.m3u8`,
+                            ContentType: "application/x-mpegURL",
+                            Body: playlistString,
+                        };
+                        await s3.putObject(playlistParams).promise();
+                        resolve({ video_url: playlistParams.Key });
+                    });
+                } else {
+                    resolve(null);
+                }
+            });
+        });
+        const s3UploadResults = await Promise.all(s3UploadPromises);
+        let video_url = null;
+        s3UploadResults?.map((resp) => {
+            if (resp && resp?.video_url) {
+                video_url = resp?.video_url;
+            }
+        });
+        if (video_url) {
+            return showResponse(
+                true,
+                ResponseMessages?.common?.file_upload_success,
+                video_url,
+                null,
+                200
+            );
+        }
+        return showResponse(
+            false,
+            ResponseMessages?.common?.file_upload_error,
+            null,
+            null,
+            200
+        );
+    } catch (err) {
+        console.log(`Error creating transcoding job`, err);
+        return showResponse(
+            false,
+            ResponseMessages?.common?.file_upload_error,
+            err,
+            null,
+            200
+        );
     }
-    return showResponse(
-      false,
-      ResponseMessages?.common?.file_upload_error,
-      null,
-      null,
-      200
-    );
-  } catch (err) {
-    console.log(`Error creating transcoding job`, err);
-    return showResponse(
-      false,
-      ResponseMessages?.common?.file_upload_error,
-      err,
-      null,
-      200
-    );
-  }
 };
 
 // using ffmpeg and its too much time
 const createVideoThumbnail = async (videoFileName, fileExt) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let SecretResponse = await getSecretFromAWS("rico-secret");
-      let region = await getParameterFromAWS({ name: "REGION" });
-      const s3 = new AWS.S3({
-        accessKeyId: await getParameterFromAWS({ name: "ACCESSID" }),
-        secretAccessKey: SecretResponse?.SecretString,
-        region,
-      });
-      let VideoInputBucket = await getParameterFromAWS({
-        name: "VideoInputBucket",
-      });
-      const inputFileName = `${videoFileName}${fileExt}`;
-      const outputFileName = `${videoFileName}-thumbnail.jpg`;
-      const stream = s3
-        .getObject({ Bucket: VideoInputBucket, Key: inputFileName })
-        .createReadStream();
-      ffmpeg(stream)
-        .screenshots({
-          count: 1,
-          filename: outputFileName,
-          folder: "/tmp",
-          timemarks: ["4"],
-        })
-        .on("end", async () => {
-          // Upload the thumbnail to S3
-          const thumbnailPath = `/tmp/${outputFileName}`;
-          const thumbnailFileContent = fs.readFileSync(thumbnailPath);
-          const thumbnailUploadParams = {
-            Bucket: await getParameterFromAWS({ name: "VideoOutputBucket" }),
-            Key: `${videoFileName}/${outputFileName}`,
-            Body: thumbnailFileContent,
-          };
-          s3.upload(thumbnailUploadParams, (err, data) => {
-            if (err) {
-              return resolve(
-                showResponse(
-                  false,
-                  ResponseMessages?.common?.thumbnail_error,
-                  err,
-                  null,
-                  200
-                )
-              );
-            }
+    return new Promise(async (resolve, reject) => {
+        try {
+            let SecretResponse = await getSecretFromAWS("rico-secret");
+            let region = await getParameterFromAWS({ name: "REGION" });
+            const s3 = new AWS.S3({
+                accessKeyId: await getParameterFromAWS({ name: "ACCESSID" }),
+                secretAccessKey: SecretResponse?.SecretString,
+                region,
+            });
+            let VideoInputBucket = await getParameterFromAWS({
+                name: "VideoInputBucket",
+            });
+            const inputFileName = `${videoFileName}${fileExt}`;
+            const outputFileName = `${videoFileName}-thumbnail.jpg`;
+            const stream = s3
+                .getObject({ Bucket: VideoInputBucket, Key: inputFileName })
+                .createReadStream();
+            ffmpeg(stream)
+                .screenshots({
+                    count: 1,
+                    filename: outputFileName,
+                    folder: "/tmp",
+                    timemarks: ["4"],
+                })
+                .on("end", async () => {
+                    // Upload the thumbnail to S3
+                    const thumbnailPath = `/tmp/${outputFileName}`;
+                    const thumbnailFileContent = fs.readFileSync(thumbnailPath);
+                    const thumbnailUploadParams = {
+                        Bucket: await getParameterFromAWS({ name: "VideoOutputBucket" }),
+                        Key: `${videoFileName}/${outputFileName}`,
+                        Body: thumbnailFileContent,
+                    };
+                    s3.upload(thumbnailUploadParams, (err, data) => {
+                        if (err) {
+                            return resolve(
+                                showResponse(
+                                    false,
+                                    ResponseMessages?.common?.thumbnail_error,
+                                    err,
+                                    null,
+                                    200
+                                )
+                            );
+                        }
+                        return resolve(
+                            showResponse(
+                                true,
+                                ResponseMessages?.common?.thumbnail_generated,
+                                data,
+                                null,
+                                200
+                            )
+                        );
+                    });
+                })
+                .on("error", (err) => {
+                    return resolve(
+                        showResponse(
+                            false,
+                            ResponseMessages?.common?.thumbnail_error,
+                            err,
+                            null,
+                            200
+                        )
+                    );
+                });
+        } catch (err) {
             return resolve(
-              showResponse(
-                true,
-                ResponseMessages?.common?.thumbnail_generated,
-                data,
-                null,
-                200
-              )
+                showResponse(
+                    false,
+                    ResponseMessages?.common?.thumbnail_error,
+                    err,
+                    null,
+                    200
+                )
             );
-          });
-        })
-        .on("error", (err) => {
-          return resolve(
-            showResponse(
-              false,
-              ResponseMessages?.common?.thumbnail_error,
-              err,
-              null,
-              200
-            )
-          );
-        });
-    } catch (err) {
-      return resolve(
-        showResponse(
-          false,
-          ResponseMessages?.common?.thumbnail_error,
-          err,
-          null,
-          200
-        )
-      );
-    }
-  });
+        }
+    });
 };
 
 
@@ -922,8 +930,8 @@ const uploadToS3 = async (files, key) => {
                 fileName = `${file.fieldname}-${Date.now().toString()}${ext}`;
                 const params = {
                     Bucket: bucketName,
-                    ContentType:file?.mimetype,
-                        // file?.mimetype?.indexOf("image" && !file.originalname.endsWith(".psd")) >= 0 ? "image/webp" : file?.mimetype,
+                    ContentType: file?.mimetype,
+                    // file?.mimetype?.indexOf("image" && !file.originalname.endsWith(".psd")) >= 0 ? "image/webp" : file?.mimetype,
                     Key: `${file.fieldname}/${fileName}`,
                     Body: bufferImage,
                 };

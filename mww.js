@@ -1,5 +1,5 @@
 require("./server/connection");
-const {API_V1 } = require("./server/constants/const");
+const { API_V1 } = require("./server/constants/const");
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
@@ -8,14 +8,20 @@ const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const csrf = require('csurf')
-const csrfProtection = csrf({ cookie: true });
 
-require('dotenv').config({path:path.resolve(__dirname, './server/.env')})
+const csrfProtection = csrf({
+  cookie: {
+    httpOnly: true,
+    maxAge: 3600
+  }
+});
+
+require('dotenv').config({ path: path.resolve(__dirname, './server/.env') })
 
 
 app.use(helmet())
-// app.use(csrfProtection)
 app.use(cookieParser());
+
 app.use(bodyParser.json());
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,6 +35,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join("/index.html"));
 });
 
+
 let administration = require("./server/routes/administration");
 let users = require("./server/routes/users");
 let common = require("./server/routes/common");
@@ -36,14 +43,12 @@ let category = require("./server/routes/category");
 let product = require("./server/routes/product");
 let productLibrary = require("./server/routes/productLibrary");
 
-
-
-app.use(API_V1 + "administration", administration);
-app.use(API_V1 + "user", users);
-app.use(API_V1 + "common", common);
-app.use(API_V1 + "category", category);
-app.use(API_V1 + "product", product);
-app.use(API_V1 + "productLibrary", productLibrary);
+app.use(API_V1 + "administration", administration, csrfProtection);
+app.use(API_V1 + "user", users, csrfProtection);
+app.use(API_V1 + "common", common, csrfProtection);
+app.use(API_V1 + "category", category, csrfProtection);
+app.use(API_V1 + "product", product, csrfProtection);
+app.use(API_V1 + "productLibrary", productLibrary, csrfProtection);
 
 
 

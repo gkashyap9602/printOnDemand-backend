@@ -127,9 +127,8 @@ const commonUtil = {
   `);
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, data, null, 200);
   },
-  submitCsrfToken: async (dataa, userSessionToken) => {
+  submitCsrfToken: async (dataa) => {
     console.log(dataa, "dataaaSubmit");
-    console.log(userSessionToken, "userSessionToken");
     let { data } = dataa
 
     return helpers.showResponse(true, 'sucessfully transfer', {}, null, 200);

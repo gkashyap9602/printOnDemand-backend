@@ -296,16 +296,25 @@ const middleware = {
 	},
 	// validate CSRF token middleware
 	validateCSRFToken(req, res, next) {
-		const csrfToken = req.cookies.mycsrfToken;
-		console.log(req.csrfToken,"middle side csrf req");
-		console.log(csrfToken,"middle side csrf cookie");
-		let token = req.headers['_csrfToken'];
+		console.log(req.cookies,"cokie");
+		const csrfToken = req.cookies._csrf;
+		console.log(csrfToken, "cookie csrfToken validateCSRFToken");
+
+		let token = req.body._csrf
+		if (!token) {
+			res.status(403).json({ error: 'Invalid CSRF token' });
+
+		}
+		console.log(token, "user tokenenn validateCSRFToken");
 		if (token === csrfToken) {
 			next();
 		} else {
-			res.status(403).json({error:'Invalid CSRF token'});
+			res.status(403).json({ error: 'Not Match Invalid CSRF token' });
 		}
 	},
+
+
+
 
 }
 

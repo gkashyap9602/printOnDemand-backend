@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var authController = require('../controllers/Users');
-var { verifyTokenUser, verifyTokenBoth } = require("../middleware/authentication");
+var { verifyTokenUser, verifyTokenBoth, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
 const { registrationSchema, loginSchema, forgotSchema, resetPasswordSchema, changePasswordSchema, profileSchema } = require('../validations/user')
 
@@ -13,7 +13,7 @@ router.post('/resetPassword', validate(resetPasswordSchema), authController.rese
 
 
 // Users admin both routes with token
-router.post('/logout', verifyTokenBoth, authController.logout);
+router.post('/logout', validateCSRFToken, verifyTokenBoth, authController.logout);
 
 
 // with user token

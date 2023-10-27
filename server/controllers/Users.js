@@ -40,6 +40,14 @@ const authController = {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
         }
         let result = await Users.logout(req.body, userId);
+        if(result.status){
+            console.log(req.cookies,"before");
+            res.clearCookie('_csrf')
+            console.log(req.cookies,"after");
+            console.log(req.session,"sessionafter");
+
+            console.log(result,"result logout");
+        }
         return helpers.showOutput(res, result, result.statusCode);
     },
 
