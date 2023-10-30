@@ -11,6 +11,14 @@ const adminController = {
         let result = await Administration.addMaterial(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    saveNotification: async (req, res) => {
+        let result = await Administration.saveNotification(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    getNotifications: async (req, res) => {
+        let result = await Administration.getNotifications(req.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     updateWaitingList: async (req, res) => {
         let result = await Administration.updateWaitingList(req.body);
         return helpers.showOutput(res, result, result.statusCode);

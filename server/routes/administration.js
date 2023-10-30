@@ -3,7 +3,7 @@ var router = express.Router();
 var adminController = require('../controllers/Administrator');
 var { verifyTokenAdmin } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
-const { addMaterialSchema, updateWaitingList } = require('../validations/administration')
+const { saveNotificationSchema,addMaterialSchema,updateWaitingList } = require('../validations/administration')
 
 // without token
 // router.post('/login', adminController.login);
@@ -14,6 +14,8 @@ router.post('/addMaterial', verifyTokenAdmin, validate(addMaterialSchema), admin
 router.get('/getAllUsers', verifyTokenAdmin, adminController.getAllUsers);
 router.post('/createCustomer', verifyTokenAdmin, adminController.createCustomer);
 router.post('/updateWaitingList', verifyTokenAdmin, validate(updateWaitingList), adminController.updateWaitingList);
+router.post('/saveNotification', verifyTokenAdmin, validate(saveNotificationSchema), adminController.saveNotification);
+router.get('/getNotifications', verifyTokenAdmin, adminController.getNotifications);
 
 
 

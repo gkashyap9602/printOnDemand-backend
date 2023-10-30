@@ -10,6 +10,7 @@ const Material = require('../models/Material');
 const Users = require('../models/Users');
 const UserProfile = require('../models/UserProfile')
 const WaitingList = require('../models/WaitingList')
+const Notification = require('../models/notification')
 
 const adminUtils = {
 
@@ -246,6 +247,109 @@ const adminUtils = {
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
         } catch (err) {
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
+        }
+
+    },
+    saveNotification: async (data) => {
+        try {
+            const { type, title, userIds, description } = data
+
+            console.log(userIds, "useridds");
+
+            let obj = {
+                type,
+                title,
+                userIds,
+                description,
+                createdOn: helpers.getCurrentDate(),
+            }
+            let notiRef = new Notification(obj)
+            let result = await postData(notiRef)
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.save_failed, result?.data, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_save, result?.data, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
+    getNotifications: async (data) => {
+        try {
+            let { type, title, pageIndex, pageSize } = data
+            pageIndex = Number(pageIndex)
+            pageSize = Number(pageSize)
+
+            let matchObj = {}
+            let aggregationPipeline = [
+                {
+                    $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+                },
+                {
+                    $limit: pageSize // Limit the number of records per page
+                },
+                {
+                    $sort: { createdOn: -1 } // Sort by a timestamp field in descending order (latest first)
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "userIds",
+                        foreignField: "_id",
+                        as: "usersData",
+                    }
+                },
+                {
+                    $unwind: '$usersData'
+                },
+                {
+                    $group: {
+                        _id: '$_id', // Group by the unique identifier of the notification
+                        type: { $first: '$type' },
+                        title: { $first: '$title' },
+                        users: {
+                            $push: {
+                                _id: '$usersData._id',
+                                name: '$usersData.firstName'
+                            }
+                        }
+                    }
+                },
+
+                {
+                    $project: {
+                        _id: 1,
+                        title: 1,
+                        type: 1,
+                        users: 1
+                    }
+                }
+            ]
+
+            if (type) {
+                aggregationPipeline.push({
+                    $match: {
+                        type: type,
+                    },
+                });
+                matchObj.type = type
+            }
+
+            let totalCount = await getCount(Notification, matchObj)
+            console.log(totalCount, "totalcounts");
+            const result = await Notification.aggregate(aggregationPipeline)
+            console.log(result, "resultt");
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
+
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
         }
 
     },

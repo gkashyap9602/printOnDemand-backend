@@ -23,3 +23,13 @@ module.exports.addMaterialSchema = {
 
 };
 
+module.exports.saveNotificationSchema = {
+    body: joi.object({
+        type: joi.string().valid('MWW_Global', 'users').required(),
+        title: joi.string().required(),
+        userIds: joi.array(),
+        description: joi.string().required(),
+
+    })
+
+};
