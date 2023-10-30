@@ -176,7 +176,8 @@ const validateParams = (request, feilds) => {
 };
 
 const getCurrentDate = () => {
-    return moment().format('YYYY-MM-DDTHH:mm:ss.SSSSSS')
+    return moment().format('YYYY-MM-DD[T]HH:mm:ss.SSSSSS');
+
 }
 
 //
