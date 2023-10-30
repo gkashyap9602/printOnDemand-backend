@@ -42,6 +42,7 @@ let common = require("./server/routes/common");
 let category = require("./server/routes/category");
 let product = require("./server/routes/product");
 let productLibrary = require("./server/routes/productLibrary");
+let gallery  =  require('./server/routes/Gallery')
 
 app.use(API_V1 + "administration", administration, csrfProtection);
 app.use(API_V1 + "user", users, csrfProtection);
@@ -49,6 +50,7 @@ app.use(API_V1 + "common", common, csrfProtection);
 app.use(API_V1 + "category", category, csrfProtection);
 app.use(API_V1 + "product", product, csrfProtection);
 app.use(API_V1 + "productLibrary", productLibrary, csrfProtection);
+app.use(API_V1 + "gallery", gallery, csrfProtection);
 
 
 
