@@ -284,12 +284,15 @@ const adminUtils = {
             pageIndex = Number(pageIndex)
             pageSize = Number(pageSize)
 
+            let matchObj = {}
+
             if (type) {
                 aggregationPipeline.push({
                     $match: {
                         type: type,
                     },
                 });
+                matchObj.type = type
             }
 
           
