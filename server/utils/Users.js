@@ -138,13 +138,14 @@ const UserUtils = {
     },
     login: async (data) => {
         try {
-            let { isLoginFromShopify, password, email } = data
-            let queryObject = { email: email }
+            let { isLoginFromShopify, password, email, fcmToken } = data
+            let queryObject = { email: email, status: { $ne: 3 } }
 
             let result = await getSingleData(Users, queryObject, '');
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
             }
+
             let userData = result?.data
             if (userData?.password !== md5(password)) {
                 return helpers.showResponse(false, ResponseMessages?.users?.invalid_credentials, null, null, 403);
@@ -160,7 +161,15 @@ const UserUtils = {
                 expiresIn: consts.ACCESS_EXPIRY
             });
 
+            if (fcmToken && userData.userType == 3) {
+                const result = await updateSingleData(Users, { fcmToken }, { _id: userData._id, status: { $ne: 3 } })
+                console.log(result,"update fcmToken");
+                // userData = result.data
+            }
+            console.log(userData,"userData fcm after");
+
             delete userData._doc.password
+
             userData = { ...userData._doc, token: access_token }
 
             return helpers.showResponse(true, ResponseMessages?.users?.login_success, userData, null, 200);
@@ -176,7 +185,7 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
         }
         let userData = result?.data
-        
+
         return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
     },
 

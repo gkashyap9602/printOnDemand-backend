@@ -6,26 +6,27 @@ const galleryUtil = {
 
     addToGallery: async (data, file) => {
         let { description, type } = data
-
+        file.fieldname = `file.fieldname`
+        console.log(file,"filess");
         //upload image to aws s3 bucket
-        const s3Upload = await helpers.uploadFileToS3([file])
-        if (!s3Upload.status) {
-            return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
-        }
+        // const s3Upload = await helpers.uploadFileToS3([file])
+        // if (!s3Upload.status) {
+        //     return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
+        // }
 
-        let newObj = {
-            description,
-            type,
-            url: s3Upload.data[0],
-            createdOn: helpers.getCurrentDate()
-        }
+        // let newObj = {
+        //     description,
+        //     type,
+        //     url: s3Upload.data[0],
+        //     createdOn: helpers.getCurrentDate()
+        // }
 
-        let gallRef = new Gallery(newObj)
-        let response = await postData(gallRef);
-        if (response.status) {
-            return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
-        }
-        return helpers.showResponse(false, ResponseMessages.common.save_failed, response, null, 200);
+        // let gallRef = new Gallery(newObj)
+        // let response = await postData(gallRef);
+        // if (response.status) {
+        //     return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
+        // }
+        return helpers.showResponse(false, ResponseMessages.common.save_failed, 'response', null, 400);
     },
     deleteGallery: async (data, file) => {
         try {

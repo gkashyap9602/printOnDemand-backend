@@ -28,6 +28,10 @@ var Users = new Schema({
         type: String,
         default: null
     },
+    fcmToken: {
+        type: String,
+        default: null
+    },
     createdUser: {
         type: String,
         default: 'Admin'
@@ -63,7 +67,8 @@ var Users = new Schema({
     userType: {
         type: Number,
         default: 3,
-        enum: [1, 2, 3]
+        enum: [1, 2, 3],
+        Comment:'1 for admin 3 for user '
 
     },
     status: {
