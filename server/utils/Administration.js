@@ -311,6 +311,8 @@ const adminUtils = {
                         _id: '$_id', // Group by the unique identifier of the notification
                         type: { $first: '$type' },
                         title: { $first: '$title' },
+                        description:{$first: '$description' },
+                        createdOn:{$first: '$createdOn'},
                         users: {
                             $push: {
                                 _id: '$usersData._id',
@@ -324,6 +326,8 @@ const adminUtils = {
                     $project: {
                         _id: 1,
                         title: 1,
+                        description:1,
+                        createdOn:1,
                         type: 1,
                         users: 1
                     }
@@ -340,7 +344,6 @@ const adminUtils = {
             }
 
             let totalCount = await getCount(Notification, matchObj)
-            console.log(totalCount, "totalcounts");
             const result = await Notification.aggregate(aggregationPipeline)
             console.log(result, "resultt");
 
