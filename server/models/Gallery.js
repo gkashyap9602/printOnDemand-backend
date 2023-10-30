@@ -2,10 +2,10 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var Gallery = new Schema({
-    fileName: {
-        type: String,
-        default: null
-    },
+    // fileName: {
+    //     type: String,
+    //     default: null
+    // },
     type: {
         type: Number,
         default: 1,

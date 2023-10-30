@@ -12,7 +12,7 @@ const csrf = require('csurf')
 const csrfProtection = csrf({
   cookie: {
     httpOnly: true,
-    maxAge: 3600
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 });
 

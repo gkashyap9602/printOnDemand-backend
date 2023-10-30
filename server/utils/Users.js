@@ -164,7 +164,7 @@ const UserUtils = {
             if (fcmToken && userData.userType == 3) {
                 const result = await updateSingleData(Users, { fcmToken }, { _id: userData._id, status: { $ne: 3 } })
                 // console.log(result,"update fcmToken");
-                // userData = result.data
+                userData.fcmToken = result?.data?.fcmToken
             }
             // console.log(userData,"userData fcm after");
 
