@@ -286,16 +286,9 @@ const adminUtils = {
 
             let matchObj = {}
 
-            if (type) {
-                aggregationPipeline.push({
-                    $match: {
-                        type: type,
-                    },
-                });
-                matchObj.type = type
-            }
+            
 
-          
+
 
             let aggregationPipeline = [
 
@@ -316,9 +309,6 @@ const adminUtils = {
                         as: "usersData",
                     }
                 },
-                // {
-                //     $unwind: '$usersData'
-                // },
                 {
                     $addFields: {
                         users: {
@@ -339,16 +329,22 @@ const adminUtils = {
                     $project: {
                         _id: 1,
                         title: 1,
-                        description:1,
-                        createdOn:1,
+                        description: 1,
+                        createdOn: 1,
                         type: 1,
                         users: 1
                     }
                 }
             ]
 
-          
-
+            if (type) {
+                aggregationPipeline.push({
+                    $match: {
+                        type: type,
+                    },
+                });
+                matchObj.type = type
+            }
             let totalCount = await getCount(Notification, matchObj)
             const result = await Notification.aggregate(aggregationPipeline)
             console.log(result, "resultt");
