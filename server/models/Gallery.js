@@ -15,7 +15,7 @@ var Gallery = new Schema({
         type: String,
         default: null,
     },
-    description: {
+    title: {
         type: String,
         default: '',
     },

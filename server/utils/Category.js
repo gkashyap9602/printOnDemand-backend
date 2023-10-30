@@ -98,13 +98,14 @@ const categoryUtil = {
     addCategories: async (data, file) => {
         try {
             const { name, description } = data
-
             const findCategory = await getSingleData(Category, { status: { $ne: 2 },name: name })
             if (findCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.category_already_existed, {}, null, 403);
             }
+            console.log(file,"fileee");
             //upload image to aws s3 bucket
             const s3Upload = await helpers.uploadFileToS3([file])
+            console.log(s3Upload,"category s3 upload");
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
             }

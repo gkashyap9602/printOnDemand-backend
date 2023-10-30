@@ -163,10 +163,10 @@ const UserUtils = {
 
             if (fcmToken && userData.userType == 3) {
                 const result = await updateSingleData(Users, { fcmToken }, { _id: userData._id, status: { $ne: 3 } })
-                console.log(result,"update fcmToken");
+                // console.log(result,"update fcmToken");
                 // userData = result.data
             }
-            console.log(userData,"userData fcm after");
+            // console.log(userData,"userData fcm after");
 
             delete userData._doc.password
 

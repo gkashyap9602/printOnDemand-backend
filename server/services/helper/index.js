@@ -836,8 +836,9 @@ const uploadFileToS3 = async (files) => {
             for (let i = 0; i < files?.length; i++) {
                 let file = files[i];
                 let mime_type = file?.mimetype.split("/")[0];
-
+                console.log(mime_type, "mimeTypess");
                 if (mime_type == "image" && !file.originalname.endsWith(".psd")) {
+                    console.log("under webp");
                     let imageNewBuffer = await convertImageToWebp(file?.buffer);
 
                     if (imageNewBuffer) {
@@ -854,7 +855,6 @@ const uploadFileToS3 = async (files) => {
                 else {
                     webpFilesArray.push(file);
                 }
-                webpFilesArray.push(file);
 
             }
             // console.log(webpFilesArray,"webfilesss")
@@ -921,6 +921,7 @@ const uploadToS3 = async (files, key) => {
                     file?.mimetype
                 );
                 let fileName = "";
+                console.log(file.mimetype, "mimeeee");
                 if (file?.mimetype?.indexOf("image" && !file.originalname.endsWith(".psd")) >= 0) {
                     // image file
                     fileName = `${file.fieldname}-${Date.now().toString()}.webp`;
@@ -930,8 +931,7 @@ const uploadToS3 = async (files, key) => {
                 fileName = `${file.fieldname}-${Date.now().toString()}${ext}`;
                 const params = {
                     Bucket: bucketName,
-                    ContentType: file?.mimetype,
-                    // file?.mimetype?.indexOf("image" && !file.originalname.endsWith(".psd")) >= 0 ? "image/webp" : file?.mimetype,
+                    ContentType: file?.mimetype?.indexOf("image" && !file.originalname.endsWith(".psd")) >= 0 ? "image/webp" : file?.mimetype,
                     Key: `${file.fieldname}/${fileName}`,
                     Body: bufferImage,
                 };

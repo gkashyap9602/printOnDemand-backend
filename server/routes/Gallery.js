@@ -8,10 +8,10 @@ var validate = require('../middleware/validation')
 
 // with Admin Token
 router.post('/addToGallery', verifyTokenAdmin, addToMulter.single('Gallery'), galleryController.addToGallery);
-router.post('/updateGallery', verifyTokenAdmin, addToMulter.single('Gallery'), galleryController.addToGallery);
+router.delete('/deleteFromGallery', verifyTokenAdmin, addToMulter.single('Gallery'), galleryController.deleteFromGallery);
 
 // with User and Admin both Token routes
-router.get('/getGallery', verifyTokenBoth, galleryController.addToGallery);
+router.get('/getGallery', verifyTokenBoth, galleryController.getGallery);
 
 
 // Common Routes

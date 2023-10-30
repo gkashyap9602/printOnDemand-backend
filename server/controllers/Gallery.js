@@ -12,6 +12,14 @@ const galleryController = {
         let result = await Gallery.addToGallery(req.body, req.file);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    deleteFromGallery: async (req, res) => {
+        let result = await Gallery.deleteFromGallery(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    getGallery: async (req, res) => {
+        let result = await Gallery.getGallery(req.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
 
 }
 
