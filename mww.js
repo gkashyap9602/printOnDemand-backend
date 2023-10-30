@@ -44,7 +44,7 @@ let product = require("./server/routes/product");
 let productLibrary = require("./server/routes/productLibrary");
 let gallery  =  require('./server/routes/Gallery')
 
-app.use(API_V1 + "administration", administration, csrfProtection);
+app.use(API_V1 + "administration", administration,);
 app.use(API_V1 + "user", users, csrfProtection);
 app.use(API_V1 + "common", common, csrfProtection);
 app.use(API_V1 + "category", category, csrfProtection);

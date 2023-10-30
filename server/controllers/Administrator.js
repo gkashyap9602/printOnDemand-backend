@@ -19,6 +19,10 @@ const adminController = {
         let result = await Administration.getNotifications(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    deleteNotification: async (req, res) => {
+        let result = await Administration.deleteNotification(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     updateWaitingList: async (req, res) => {
         let result = await Administration.updateWaitingList(req.body);
         return helpers.showOutput(res, result, result.statusCode);

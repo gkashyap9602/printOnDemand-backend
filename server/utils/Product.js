@@ -495,7 +495,7 @@ const productUtils = {
 
             const findProduct = await getSingleData(Product, { _id: productId ,status: { $ne: 2 }})
             if (!findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
 
             const s3Upload = await helpers.uploadFileToS3([file])

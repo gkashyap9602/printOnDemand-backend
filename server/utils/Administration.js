@@ -284,13 +284,16 @@ const adminUtils = {
             pageIndex = Number(pageIndex)
             pageSize = Number(pageSize)
 
-            let matchObj = {}
-
-            
-
-
+            let matchObj = {
+                status:{$ne:2}
+            }
 
             let aggregationPipeline = [
+                {
+                    $match: {
+                        ...matchObj
+                    },
+                },
 
                 {
                     $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
@@ -338,11 +341,13 @@ const adminUtils = {
             ]
 
             if (type) {
-                aggregationPipeline.push({
+                aggregationPipeline.push(
+                    {
                     $match: {
                         type: type,
                     },
-                });
+                }
+                );
                 matchObj.type = type
             }
             let totalCount = await getCount(Notification, matchObj)
@@ -351,6 +356,28 @@ const adminUtils = {
 
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
 
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
+    deleteNotification: async (data) => {
+        try {
+            const { type, notificationId } = data
+
+            const find = await getSingleData(Notification, { _id: notificationId ,type,status: { $ne: 2 }})
+            if (!find.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
+            }
+
+            const result = await updateSingleData(Notification, {status:2}, { _id: notificationId,type})
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, result?.data, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

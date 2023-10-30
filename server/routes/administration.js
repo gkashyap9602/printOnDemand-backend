@@ -16,6 +16,7 @@ router.post('/createCustomer', verifyTokenAdmin, adminController.createCustomer)
 router.post('/updateWaitingList', verifyTokenAdmin, validate(updateWaitingList), adminController.updateWaitingList);
 router.post('/saveNotification', verifyTokenAdmin, validate(saveNotificationSchema), adminController.saveNotification);
 router.get('/getNotifications', verifyTokenAdmin, adminController.getNotifications);
+router.delete('/deleteNotification', verifyTokenAdmin, adminController.deleteNotification);
 
 
 

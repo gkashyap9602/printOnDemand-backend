@@ -23,6 +23,10 @@ var Notification = new Schema({
         type: String,
         required: true
     },
+    status: {
+        type: Number,
+        default: 1,
+    },
 
     createdOn: {
         type: String,
