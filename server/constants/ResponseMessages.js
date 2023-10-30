@@ -15,25 +15,26 @@ module.exports = {
         no_video_thumb_file: "Please select a video thumb file to proceed",
         no_file: "Please select a file to upload",
         thumbnail_error: "Unable to create thumbnail at the moment",
+        added_success:"Added Successfully",
         thumbnail_generated: "Thumbnail generated",
-        server_error:"server error",
-        updated_sucessfully:"updated sucessfully",
-        data:"Data fetched successfully",
-        database_error:"Data fetch unsucessfull",
-        data_retreive_sucess:"Data retrieve successfully",
-        data_not_found:"Data not found",
-        data_save:"Data Saved Successfully",
-        save_failed:"Error Occured while saving Data",
-        already_existed:"Data already existed",
-        not_exist:"Data not existed",
-        invalid_id:"invalid id",
-        created_successfully:"created Successfully",
-        update_sucess:"udpated Successfully",
-        update_failed:"Error occured while updating",
-        delete_failed:"Error occured while deleting",
-        delete_sucess:"Deleted Successfully",
-        img_save_err:"Error occured while saving Image",
-        img_save_sucess:"Image Saved Successfully",
+        server_error: "server error",
+        updated_sucessfully: "updated sucessfully",
+        data: "Data fetched successfully",
+        database_error: "Data fetch unsucessfull",
+        data_retreive_sucess: "Data retrieve successfully",
+        data_not_found: "Data not found",
+        data_save: "Data Saved Successfully",
+        save_failed: "Error Occured while saving Data",
+        already_existed: "Data already existed",
+        not_exist: "Data not existed",
+        invalid_id: "invalid id",
+        created_successfully: "created Successfully",
+        update_sucess: "udpated Successfully",
+        update_failed: "Error occured while updating",
+        delete_failed: "Error occured while deleting",
+        delete_sucess: "Deleted Successfully",
+        img_save_err: "Error occured while saving Image",
+        img_save_sucess: "Image Saved Successfully",
 
 
     },
@@ -47,7 +48,7 @@ module.exports = {
         valid_username: "Valid username !!! Go ahead",
         invalid_old_password: "Invalid old password",
         password_change_failed: "Password Change Failed",
-        password_change_successfull:"Password Changed Successfully",
+        password_change_successfull: "Password Changed Successfully",
         forgot_password_email_sent: "Forgot Password Email has been sent to your registered email address",
         forgot_password_email_error: "Error Occured while sending forgot password email",
         user_account_error: "Something wrong happens to user account",
@@ -87,67 +88,63 @@ module.exports = {
         comment_liked_failed: "comment liked failed",
         comment_unliked_failed: "comment unliked failed",
         error_following: "error while following this user",
-        user_verified:"user verified successfully",
+        user_verified: "user verified successfully",
 
     },
-    product:{
-        product_already_existed:"Product already existed",
-        product_not_exist:"Product does not exist",
-        product_varient_not_exist:"Product Varient does not exist",
-        product_created:"Product Created Successfully",
-        product_varient_save_fail:"Error occured while adding new Product Varient",
-        product_varient_save:"Product Varient Created Successfully",
-        product_save_failed:"Error occured while adding new Product",
-        invalid_product_id:"Invalid Product Id",
-        product_image_save_err:"Error while saving product image",
-        product_image_saved:"Product Image Uploaded Successfully",
-        varient_template_update_err:"Error while saving product template",
-        varient_template_update:"Varient template Saved Successfully",
-        varient_template_already:"Varient Template Already Exist",
-        product_code_already:"Product Code Already Exist",
-        product_title_already:"Product Title Already Exist",
-        library_img_save_err:"Error occured while saving Library Image",
-        active_product:"There Are Active Products in Subcategory Delete Product First"
-
-
-
-
+    product: {
+        product_already_existed: "Product already existed",
+        product_not_exist: "Product does not exist",
+        product_varient_not_exist: "Product Varient does not exist",
+        product_created: "Product Created Successfully",
+        product_varient_save_fail: "Error occured while adding new Product Varient",
+        product_varient_save: "Product Varient Created Successfully",
+        product_save_failed: "Error occured while adding new Product",
+        invalid_product_id: "Invalid Product Id",
+        product_image_save_err: "Error while saving product image",
+        product_image_saved: "Product Image Uploaded Successfully",
+        varient_template_update_err: "Error while saving product template",
+        varient_template_update: "Varient template Saved Successfully",
+        varient_template_already: "Varient Template Already Exist",
+        product_code_already: "Product Code Already Exist",
+        product_title_already: "Product Title Already Exist",
+        library_img_save_err: "Error occured while saving Library Image",
+        active_product: "There Are Active Products in Subcategory Delete Product First"
 
     },
-    category:{
-        subcategory_already_existed:"Subcategory already existed",
-        category_already_existed:"Category already existed",
-        category_not_exist:"Category does not exist",
-        subcategory_not_exist:"Subcategory does not exist",
-        subcategory_added:"subcategory added Successfully",
-        category_save_failed:"Error occured while adding new category",
-        subcategory_save_failed:"Error occured while adding new Subcategory",
-        category_added:"category added Sucessfully",
-        subcategory_added:"Subcategory added Sucessfully",
-        invalid_category_id:"Invalid Category Id",
-        invalid_subcategory_id:"Invalid Subcategory Id",
-        active_subcategory:"There Are Active Subcategory Delete Subcategory First"
-        
-        
+    category: {
+        subcategory_already_existed: "Subcategory already existed",
+        category_already_existed: "Category already existed",
+        category_not_exist: "Category does not exist",
+        subcategory_not_exist: "Subcategory does not exist",
+        subcategory_added: "subcategory added Successfully",
+        category_save_failed: "Error occured while adding new category",
+        subcategory_save_failed: "Error occured while adding new Subcategory",
+        category_added: "category added Sucessfully",
+        subcategory_added: "Subcategory added Sucessfully",
+        invalid_category_id: "Invalid Category Id",
+        invalid_subcategory_id: "Invalid Subcategory Id",
+        active_subcategory: "There Are Active Subcategory Delete Subcategory First"
 
-    },
-    material:{
-        invalid_material_id:"Invalid Material Id",
-        material_already:"material already exist",
-        material_created:"material added Successfully",
-        material_save_failed:"Error occured while adding new material",
-        not_exist:"material not exist",
 
 
     },
-    variable:{
-        variable_option_save_fail:"error while saving variable option",
-        invalid_variable_type:"invalid Variable Type Id",
-        variable_option_already:"Variable Option Already Exist",
-        variable_type_already:"Variable Type Already Exist",
-        variable_type_save_failed:"Error occured while adding new variable type",
-        variable_type_created:"variable type added Successfully",
-        variable_option_created:"variable option added Successfully",
+    material: {
+        invalid_material_id: "Invalid Material Id",
+        material_already: "material already exist",
+        material_created: "material added Successfully",
+        material_save_failed: "Error occured while adding new material",
+        not_exist: "material not exist",
+
+
+    },
+    variable: {
+        variable_option_save_fail: "error while saving variable option",
+        invalid_variable_type: "invalid Variable Type Id",
+        variable_option_already: "Variable Option Already Exist",
+        variable_type_already: "Variable Type Already Exist",
+        variable_type_save_failed: "Error occured while adding new variable type",
+        variable_type_created: "variable type added Successfully",
+        variable_option_created: "variable option added Successfully",
 
 
     },
@@ -170,7 +167,7 @@ module.exports = {
         admin_details_updated: "Administrator details updated",
         admin_details_update_error: "Error while updating details",
         email_already: "Email address is already occupied",
-        
+
     },
     middleware: {
         use_access_token: "Please use access token for identification not refresh token",
@@ -185,7 +182,7 @@ module.exports = {
         invalid_user: "Invalid User",
 
 
-        
+
     },
     order: {
         order_created: "order created Successfully",

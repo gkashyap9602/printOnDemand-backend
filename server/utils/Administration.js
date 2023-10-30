@@ -12,45 +12,6 @@ const UserProfile = require('../models/UserProfile')
 const WaitingList = require('../models/WaitingList')
 
 const adminUtils = {
-    getQuestions: async () => {
-        let response = await getDataArray(FAQ, { status: { $ne: 2 } }, '', null, { created_on: -1 });
-        if (response.status) {
-            return helpers.showResponse(true, "Here is a list of questions", response.data, null, 200);
-        }
-        return helpers.showResponse(false, 'No data found', null, null, 200);
-    },
-
-    getAdminSettingContent: async () => {
-        let response = await getSingleData(Common, {}, 'about -_id');
-        if (response.status) {
-            return helpers.showResponse(true, "Here is a About Content", response.data, null, 200);
-        }
-        return helpers.showResponse(false, 'No Content Found', null, null, 200);
-    },
-    addNewQuestion: async (data) => {
-        let { question, answer } = data
-        let newObj = {
-            question,
-            answer,
-            status: 1,
-            created_on: moment().unix()
-        }
-        let quesRef = new FAQ(newObj)
-        let response = await postData(quesRef);
-        if (response.status) {
-            return helpers.showResponse(true, "New Question Added Successfully", null, null, 200);
-        }
-        return helpers.showResponse(false, "Unable to add new question at the moment", response, null, 200);
-    },
-   
-    updateQuestion: async (data, ques_id) => {
-        data.updated_on = moment().unix();
-        let response = await updateData(FAQ, data, ObjectId(ques_id));
-        if (response.status) {
-            return helpers.showResponse(true, "Question has been updated", null, null, 200);
-        }
-        return helpers.showResponse(false, "Update failed", null, null, 200);
-    },
 
     // login: async (data) => {
     //     let { email, password } = data;
@@ -348,9 +309,50 @@ const adminUtils = {
     // },
     // getDetails: async (admin_id) => {
     //     let queryObject = { _id: ObjectId(admin_id), status: { $ne: 2 } }
-    //     let result = await getSingleData(Administration, queryObject, '-password -access_token -refresh_token');
-    //     if (result.status) {
-    //         return helpers.showResponse(true, ResponseMessages?.admin?.admin_details, result.data, null, 200);
+    //     let resordWithOld: async (data, admin_id) => {
+    //     let { old_password, new_password } = data
+    //     let queryObject = { _id: ObjectId(admin_id), password: md5(old_password), status: { $ne: 2 } }
+    //     let result = await getSingleData(Administration, queryObject, '');
+    //     if (!result.status) {
+    //         return helpers.showResponse(false, ResponseMessages?.admin?.invalid_old_password, null, null, 200);
+    //     }
+    //     let editObj = {
+    //         password: md5(new_password),
+    //         updated_on: moment().unix()
+    //     }
+    //     let response = await updateData(Administration, editObj, ObjectId(admin_id));
+    //     if (response.status) {
+    //         return helpers.showResponse(true, ResponseMessages?.admin?.password_changed, null, null, 200);
+    //     }
+    //     return helpers.showResponse(false, ResponseMessages?.admin?.password_change_error, null, 200);
+    // },
+    // update: async (data, admin_id) => {
+    //     if ("email" in data && data.email != "") {
+    //         let queryObject = { _id: { $ne: ObjectId(admin_id) }, email: data.email, status: { $ne: 2 } }
+    //         let result = await getSingleData(Administration, queryObject, '');
+    //         if (result.status) {
+    //             return helpers.showResponse(false, ResponseMessages?.admin?.email_already, null, null, 200);
+    //         }
+    //     }
+    //     data.updated_on = moment().unix();
+    //     let response = await updateData(Administration, data, ObjectId(admin_id));
+    //     if (response.status) {
+    //         return helpers.showResponse(true, ResponseMessages?.admin?.admin_details_updated, null, null, 200);
+    //     }
+    //     return helpers.showResponse(false, ResponseMessages?.admin?.admin_details_update_error, null, null, 200);
+    // },
+    // getAdminData: async (data) => {
+    //     try {
+    //         let result = await CommonContent.findOne({})
+    //         if (result) {
+    //             return helpers.showResponse(true, ResponseMessages.common.data, result, null, 200);
+    //         }
+    //         return helpers.showResponse(true, ResponseMessages.report.not_found, null, null, 200);
+
+    //     } catch (error) {
+    //         return helpers.showResponse(false, error?.message, null, null, 200);
+    //     }
+    // },turn helpers.showResponse(true, ResponseMessages?.admin?.admin_details, result.data, null, 200);
     //     }
     //     return helpers.showResponse(false, ResponseMessages?.admin?.invalid_admin, null, null, 200);
     // },

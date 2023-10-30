@@ -8,7 +8,7 @@ const FAQ = require('../models/FAQ')
 const { default: mongoose } = require('mongoose');
 let ObjectId = require('mongodb').ObjectId
 const WaitingList = require('../models/WaitingList')
-const commonContent = require('../models/commonContent')
+const commonContent = require('../models/CommonContent')
 
 const commonUtil = {
 

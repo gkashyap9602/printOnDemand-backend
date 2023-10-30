@@ -120,7 +120,7 @@ const middleware = {
 						let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
 
 						if (!response.status) {
-							return res.status(401).json({ status: false, message: ResponseMessages?.users.invalid_user, StatusCode: 401 });
+							return res.status(401).json({ status: false, message: ResponseMessages?.admin.invalid_admin, StatusCode: 401 });
 						}
 						let adminData = response?.data
 						if (adminData.status == 0) {

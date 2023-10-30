@@ -2,7 +2,7 @@ const APP_CONSTANTS = require("../constants/const");
 // const administration = require(".././models/Administration");
 const user = require('../models/Users')
 const WaitingList = require('../models/WaitingList')
-const CommonContent = require('../models/commonContent')
+const CommonContent = require('../models/CommonContent')
 const md5 = require('md5');
 const helpers = require('../services/helper/index')
 
