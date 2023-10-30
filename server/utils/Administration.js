@@ -301,9 +301,9 @@ const adminUtils = {
                 {
                     $limit: pageSize // Limit the number of records per page
                 },
-                {
-                    $sort: { createdOn: -1 } // Sort by a timestamp field in descending order (latest first)
-                },
+                // {
+                //     $sort: { createdOn: -1 } // Sort by a timestamp field in descending order (latest first)
+                // },
                 {
                     $lookup: {
                         from: "users",
@@ -354,7 +354,7 @@ const adminUtils = {
             const result = await Notification.aggregate(aggregationPipeline)
             console.log(result, "resultt");
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result.reverse(), totalCount: totalCount.data }, null, 200);
 
         }
         catch (err) {
@@ -377,7 +377,7 @@ const adminUtils = {
                 return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
             }
 
-            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, result?.data, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

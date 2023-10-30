@@ -55,10 +55,10 @@ const galleryUtil = {
             const result = await updateSingleData(Gallery, obj, { _id: gelleryId, status: { $ne: 2 }, type })
 
             if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
+                return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
             }
 
-            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result?.data, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
