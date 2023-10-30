@@ -326,7 +326,7 @@ const adminUtils = {
                                 input: '$usersData',
                                 as: 'user',
                                 in: {
-                                    id: '$$user._id',
+                                    _id: '$$user._id',
                                     name: {
                                         $concat: ['$$user.firstName', ' ', '$$user.lastName']
                                     }
