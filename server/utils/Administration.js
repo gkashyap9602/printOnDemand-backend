@@ -284,8 +284,18 @@ const adminUtils = {
             pageIndex = Number(pageIndex)
             pageSize = Number(pageSize)
 
-            let matchObj = {}
+            if (type) {
+                aggregationPipeline.push({
+                    $match: {
+                        type: type,
+                    },
+                });
+            }
+
+          
+
             let aggregationPipeline = [
+
                 {
                     $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
                 },
@@ -303,25 +313,25 @@ const adminUtils = {
                         as: "usersData",
                     }
                 },
+                // {
+                //     $unwind: '$usersData'
+                // },
                 {
-                    $unwind: '$usersData'
-                },
-                {
-                    $group: {
-                        _id: '$_id', // Group by the unique identifier of the notification
-                        type: { $first: '$type' },
-                        title: { $first: '$title' },
-                        description:{$first: '$description' },
-                        createdOn:{$first: '$createdOn'},
+                    $addFields: {
                         users: {
-                            $push: {
-                                _id: '$usersData._id',
-                                name: '$usersData.firstName'
+                            $map: {
+                                input: '$usersData',
+                                as: 'user',
+                                in: {
+                                    id: '$$user._id',
+                                    name: {
+                                        $concat: ['$$user.firstName', ' ', '$$user.lastName']
+                                    }
+                                }
                             }
                         }
                     }
                 },
-
                 {
                     $project: {
                         _id: 1,
@@ -334,14 +344,7 @@ const adminUtils = {
                 }
             ]
 
-            if (type) {
-                aggregationPipeline.push({
-                    $match: {
-                        type: type,
-                    },
-                });
-                matchObj.type = type
-            }
+          
 
             let totalCount = await getCount(Notification, matchObj)
             const result = await Notification.aggregate(aggregationPipeline)
