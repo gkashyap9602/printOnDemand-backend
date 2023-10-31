@@ -185,13 +185,14 @@ const generateCsrfToken = () => {
     return crypto.randomUUID()
 }
 const setCookie = (res, _csrfToken) => {
+    console.log('creation token',_csrfToken);
     res.cookie('_xCsrf', _csrfToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-        domain: 'mwwapidev.solidappmaker.ml',
-        path: '/',
+        // httpOnly: true,
+        // secure: true,
+        // sameSite: 'none',
+        // maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+        // domain: 'mwwdev.solidappmaker.ml',
+        // path: '/',
     })
 }
 
