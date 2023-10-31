@@ -182,15 +182,16 @@ const getCurrentDate = () => {
 }
 
 const generateCsrfToken = () => {
-    return  crypto.randomUUID()
+    return crypto.randomUUID()
 }
-const setCookie = (res,_csrfToken) => {
+const setCookie = (res, _csrfToken) => {
     res.cookie('_xCsrf', _csrfToken, {
         httpOnly: true,
         secure: true,
+        sameSite: 'none',
         maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-        // domain: 'localhost',
-        // path: '/',
+        domain: 'https://mwwdev.solidappmaker.ml',
+        path: '/',
     })
 }
 
