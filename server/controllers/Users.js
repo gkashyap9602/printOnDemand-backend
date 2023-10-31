@@ -1,6 +1,7 @@
 var Users = require('../utils/Users');
 var helpers = require('../services/helper')
 const ResponseMessages = require('../constants/ResponseMessages');
+const crypto = require('crypto')
 
 const authController = {
 
@@ -10,7 +11,8 @@ const authController = {
     },
 
     login: async (req, res) => {
-        let result = await Users.login(req.body);
+
+        let result = await Users.login(req.body, res);
         return helpers.showOutput(res, result, result.statusCode);
     },
 
@@ -40,13 +42,11 @@ const authController = {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
         }
         let result = await Users.logout(req.body, userId);
-        if(result.status){
-            console.log(req.cookies,"before");
-            res.clearCookie('_csrf')
-            console.log(req.cookies,"after");
-            console.log(req.session,"sessionafter");
+        if (result.status) {
+            console.log(req.cookies, "before");
+            res.clearCookie('_xCsrf')
+            console.log(req.cookies, "after");
 
-            console.log(result,"result logout");
         }
         return helpers.showOutput(res, result, result.statusCode);
     },

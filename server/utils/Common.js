@@ -127,6 +127,52 @@ const commonUtil = {
   `);
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, data, null, 200);
   },
+  csrfTokenHeader: async (csrfToken) => {
+
+    let data = (`
+    <html>
+    <head>
+        <title>CSRF Demo</title>
+    </head>
+    <body>
+        <h1>CSRF Demo</h1>
+        <form id="csrfForm" action="/api/v1/common/transfer" method="POST">
+            <input type="text" name="amount" placeholder="Amount" required>
+            <input type="submit" value="Transfer">
+        </form>
+    
+        <script>
+            document.getElementById("csrfForm").addEventListener("submit", function(event) {
+                event.preventDefault();
+    
+                // Make an HTTP POST request with headers
+                fetch('/api/v1/common/transfer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json', // Example: Set content type
+                        'xCsrf_Token': ${csrfToken}, // Include the CSRF token in a custom header
+                    },
+                    body: JSON.stringify({
+                        amount: document.querySelector('input[name="amount"]').value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the server
+                    console.log(data,"data res");
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error(error,"errd );
+                });
+            });
+        </script>
+    </body>
+    </html>
+    
+  `);
+    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, data, null, 200);
+  },
   submitCsrfToken: async (dataa) => {
     console.log(dataa, "dataaaSubmit");
     let { data } = dataa

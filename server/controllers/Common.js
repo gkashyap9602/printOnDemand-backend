@@ -41,18 +41,22 @@ const commonController = {
     },
     //
     csrfToken: async (req, res) => {
-        console.log(req.cookies, 'cookies');
-        let csrfToken = req?.cookies?._csrf
-        // console.log(csrfToken, "csrf Token");
+        console.log(req.cookies, 'cookies get side');
+        let csrfToken = req.cookies['_xCsrf']
         let result = await Common.csrfToken(csrfToken);
         res.send(result.data)
-        // return helpers.showOutput(res, result, result.statusCode);
+    },
+    csrfTokenHeader: async (req, res) => {
+        console.log(req.cookies, 'cookies get side');
+        let csrfToken = req.cookies['_xCsrf']
+        let result = await Common.csrfTokenHeader(csrfToken);
+        res.send(result.data)
     },
     submitCsrfToken: async (req, res) => {
+        console.log(req.cookies,"cokkie post");
         let result = await Common.submitCsrfToken(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    //
     getQuestions: async (req, res) => {
         console.log(req.cookies,"cokieeee quesn");
         let result = await Common.getQuestions(req.query);

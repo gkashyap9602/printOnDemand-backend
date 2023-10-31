@@ -2,6 +2,7 @@ var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
 const mime = require('mime-types')
 const csrf = require('csurf')
+const crypto = require('crypto')
 AWS.config.update({
     region: "us-east-1",
     credentials: new AWS.SharedIniFileCredentials({ profile: "default" }),
@@ -180,7 +181,19 @@ const getCurrentDate = () => {
 
 }
 
-//
+const generateCsrfToken = () => {
+    return  crypto.randomUUID()
+}
+const setCookie = (res,_csrfToken) => {
+    res.cookie('_xCsrf', _csrfToken, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+        // domain: 'localhost',
+        // path: '/',
+    })
+}
+
 const validateParamsArray = (data, feilds) => {
     var postKeys = [];
     var missingFeilds = [];
@@ -1135,11 +1148,12 @@ module.exports = {
     // createVideoThumbnail,
     addToMulter,
     generateUsernames,
+    setCookie,
     // uploadAudioToS3,
     sendFcmNotificationTopic,
     // uploadVideoToS31,
     changeEnv,
-    // showOutputNew,
+    generateCsrfToken,
     generateIDs,
     getCurrentDate,
     validationError,

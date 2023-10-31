@@ -9,24 +9,22 @@ const app = express();
 const cookieParser = require('cookie-parser')
 const csrf = require('csurf')
 
-const csrfProtection = csrf({
-  cookie: {
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-});
+// const csrfProtection = csrf({
+//   cookie: {
+//     httpOnly: true,
+//     maxAge: 24 * 60 * 60 * 1000 // 24 hours
+//   }
+// });
 
 require('dotenv').config({ path: path.resolve(__dirname, './server/.env') })
 
 
 app.use(helmet())
 app.use(cookieParser());
-
 app.use(bodyParser.json());
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// webhook.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({ origin: "*" }));
 app.use(express.static(path.join(__dirname, "/server/views")));
 app.use("/files", express.static(__dirname + "/server/uploads"));
@@ -42,15 +40,15 @@ let common = require("./server/routes/common");
 let category = require("./server/routes/category");
 let product = require("./server/routes/product");
 let productLibrary = require("./server/routes/productLibrary");
-let gallery  =  require('./server/routes/Gallery')
+let gallery = require('./server/routes/Gallery')
 
-app.use(API_V1 + "administration", administration, csrfProtection);
-app.use(API_V1 + "user", users, csrfProtection);
-app.use(API_V1 + "common", common, csrfProtection);
-app.use(API_V1 + "category", category, csrfProtection);
-app.use(API_V1 + "product", product, csrfProtection);
-app.use(API_V1 + "productLibrary", productLibrary, csrfProtection);
-app.use(API_V1 + "gallery", gallery, csrfProtection);
+app.use(API_V1 + "administration", administration,);
+app.use(API_V1 + "user", users,);
+app.use(API_V1 + "common", common,);
+app.use(API_V1 + "category", category,);
+app.use(API_V1 + "product", product,);
+app.use(API_V1 + "productLibrary", productLibrary,);
+app.use(API_V1 + "gallery", gallery,);
 
 
 

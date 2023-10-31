@@ -295,23 +295,28 @@ const middleware = {
 		})
 	},
 	// validate CSRF token middleware
-	validateCSRFToken(req, res, next) {
-		console.log(req.cookies,"cokie");
-		const csrfToken = req.cookies._csrf;
-		console.log(csrfToken, "cookie csrfToken validateCSRFToken");
+		validateCSRFToken(req, res, next) {
+			console.log(req.cookies, "cokie validateCSRFToken");
+			const csrfToken = req.cookies['_xCsrf']
 
-		let token = req.body._csrf
-		if (!token) {
-			res.status(403).json({ error: 'Invalid CSRF token' });
+			console.log(csrfToken, "cookie csrfToken validateCSRFToken");
+			if (!csrfToken) {
+				res.status(403).json({ message: 'CSRF Token Not Present In Cookie' })
+			}
 
-		}
-		console.log(token, "user tokenenn validateCSRFToken");
-		if (token === csrfToken) {
-			next();
-		} else {
-			res.status(403).json({ error: 'Not Match Invalid CSRF token' });
-		}
-	},
+			let userSideCsrf = req.get('xCsrf_Token')
+
+			console.log(userSideCsrf, "user tokenenn validateCSRFToken");
+			if (!userSideCsrf) {
+				res.status(403).json({ message: 'CSRF Token Not Provide By User' })
+			}
+
+			if (userSideCsrf === csrfToken) {
+				next();
+			} else {
+				res.status(403).json({ message: 'Invalid CSRF token' });
+			}
+		},
 
 
 
