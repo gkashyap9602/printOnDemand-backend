@@ -25,13 +25,13 @@ app.use(bodyParser.json());
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use(cors({ origin: "*" }));
-app.use(cors({
+app.use(cors({ origin: "*" }));
+// app.use(cors({
 
-  origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:4002", "http://localhost:3002"],
-  credentials:true
+//   origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:4002", "http://localhost:3002"],
+//   credentials:true
 
-}));
+// }));
 app.use(express.static(path.join(__dirname, "/server/views")));
 app.use("/files", express.static(__dirname + "/server/uploads"));
 
