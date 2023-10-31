@@ -5,6 +5,7 @@ const ResponseMessages = require("../constants/ResponseMessages")
 const categoryController = {
 
     getCategories: async (req, res) => {
+        console.log(req.cookies,"req cookies get cat side");
         let result = await Category.getCategories(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },

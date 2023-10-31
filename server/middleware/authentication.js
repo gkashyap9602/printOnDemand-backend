@@ -296,6 +296,7 @@ const middleware = {
 	},
 	// validate CSRF token middleware
 		validateCSRFToken(req, res, next) {
+		
 			console.log(req.cookies, "cokie validateCSRFToken");
 			const csrfToken = req.cookies['_xCsrf']
 
