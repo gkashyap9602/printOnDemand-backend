@@ -68,7 +68,11 @@ const galleryUtil = {
     },
 
     getGallery: async (data) => {
-        const { type } = data
+        const { type, pageIndex, pageSize } = data
+        pageIndex = Number(pageIndex)
+        pageSize = Number(pageSize)
+
+        let totalCount = await getCount(Gallery, { type: Number(type) })
         const aggregationPipeline = [
 
             {
@@ -76,18 +80,20 @@ const galleryUtil = {
                     status: { $ne: 2 },
                     type: Number(type)
                 },
-            }
+            },
+            {
+                $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+            },
+            {
+                $limit: pageSize // Limit the number of records per page
+            },
         ];
 
-        console.log(aggregationPipeline, "aggregationPipeline")
 
         const result = await Gallery.aggregate(aggregationPipeline);
         console.log(result, "resulttt")
 
-        // if (result.length === 0) {
-        //     return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 400);
-        // }
-        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, {data:result,totalCount:totalCount?.data}, null, 200);
     },
 
 }
