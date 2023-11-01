@@ -291,7 +291,7 @@ const commonUtil = {
   },
 
   getQuestions: async (data) => {
-    let { pageIndex, pageSize } = data
+    let { pageIndex = 1, pageSize = 10 } = data
     pageIndex = Number(pageIndex)
     pageSize = Number(pageSize)
 
@@ -299,12 +299,12 @@ const commonUtil = {
       skip: (pageIndex - 1) * pageSize, // Calculate the number of documents to skip
       limit: pageSize, // Specify the number of documents to return
     }
-    let totalCount = await getCount(FAQ,{ status: { $ne: 2 } })
+    let totalCount = await getCount(FAQ, { status: { $ne: 2 } })
 
     let response = await getDataArray(FAQ, { status: { $ne: 2 } }, '', pagination, { createdOn: -1 });
 
     if (response.status) {
-      return helpers.showResponse(true, "Here is a list of questions", {data:response.data,totalCount:totalCount.data}, null, 200);
+      return helpers.showResponse(true, "Here is a list of questions", { data: response.data, totalCount: totalCount.data }, null, 200);
     }
     return helpers.showResponse(false, 'No data found', null, null, 400);
   },

@@ -280,12 +280,12 @@ const adminUtils = {
     },
     getNotifications: async (data) => {
         try {
-            let { type, title, pageIndex, pageSize } = data
+            let { type, title, pageIndex = 1, pageSize = 10 } = data
             pageIndex = Number(pageIndex)
             pageSize = Number(pageSize)
 
             let matchObj = {
-                status:{$ne:2}
+                status: { $ne: 2 }
             }
 
             let aggregationPipeline = [
@@ -343,10 +343,10 @@ const adminUtils = {
             if (type) {
                 aggregationPipeline.push(
                     {
-                    $match: {
-                        type: type,
-                    },
-                }
+                        $match: {
+                            type: type,
+                        },
+                    }
                 );
                 matchObj.type = type
             }
@@ -367,12 +367,12 @@ const adminUtils = {
         try {
             const { type, notificationId } = data
 
-            const find = await getSingleData(Notification, { _id: notificationId ,type,status: { $ne: 2 }})
+            const find = await getSingleData(Notification, { _id: notificationId, type, status: { $ne: 2 } })
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
             }
 
-            const result = await updateSingleData(Notification, {status:2}, { _id: notificationId,type})
+            const result = await updateSingleData(Notification, { status: 2 }, { _id: notificationId, type })
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
             }

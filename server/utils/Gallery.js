@@ -68,11 +68,11 @@ const galleryUtil = {
     },
 
     getGallery: async (data) => {
-        const { type, pageIndex, pageSize } = data
+        let { type, pageIndex = 1, pageSize = 5 } = data
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
 
-        let totalCount = await getCount(Gallery, { type: Number(type) })
+        let totalCount = await getCount(Gallery, { status: { $ne: 2 }, type: Number(type) })
         const aggregationPipeline = [
 
             {
@@ -93,7 +93,7 @@ const galleryUtil = {
         const result = await Gallery.aggregate(aggregationPipeline);
         console.log(result, "resulttt")
 
-        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, {data:result,totalCount:totalCount?.data}, null, 200);
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { items: result, totalCount: totalCount?.data }, null, 200);
     },
 
 }
