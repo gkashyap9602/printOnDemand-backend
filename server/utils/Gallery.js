@@ -18,7 +18,7 @@ const galleryUtil = {
         let newObj = {
             title,
             type,
-            mediaType:name.replace('s',''),
+            mediaType: name.replace('s', ''),
             url: s3Upload.data[0],
             createdOn: helpers.getCurrentDate()
         }
