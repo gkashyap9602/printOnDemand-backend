@@ -25,6 +25,7 @@ app.use(bodyParser.json());
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(csrf())
 app.use(session({
   secret: 'mySecretKey',
   resave: false,
@@ -33,8 +34,8 @@ app.use(session({
     secure: true,
     // sameSite: 'none',
     httpOnly: true,
-    domain:"mwwdev.solidappmaker.ml",
-    path:"/",
+    // domain:"mwwdev.solidappmaker.ml",
+    // path:"/",
     maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
   }
 }));
@@ -61,7 +62,8 @@ let common = require("./server/routes/common");
 let category = require("./server/routes/category");
 let product = require("./server/routes/product");
 let productLibrary = require("./server/routes/productLibrary");
-let gallery = require('./server/routes/Gallery')
+let gallery = require('./server/routes/Gallery');
+const csurf = require("csurf");
 
 app.use(API_V1 + "administration", administration,);
 app.use(API_V1 + "user", users,);
