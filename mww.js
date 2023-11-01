@@ -17,10 +17,7 @@ app.use(bodyParser.json());
 app.use(express.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
-app.use((req, res) => {
-  res.setHeader('xCsrf_Token', 'testing');
 
-})
 app.use(session({
   secret: 'mySecretKey',
   resave: false,
