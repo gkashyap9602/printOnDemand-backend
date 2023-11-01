@@ -8,7 +8,7 @@ const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const csrf = require('csurf')
-
+const session = require('express-session')
 // const csrfProtection = csrf({
 //   cookie: {
 //     httpOnly: true,
@@ -25,6 +25,18 @@ app.use(bodyParser.json());
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(session({
+  secret: 'mySecretKey',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    // secure: true,
+    // sameSite: 'none',
+    // httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
+  }
+}));
+
 app.use(cors({ origin: "*" }));
 // app.use(cors({
 
@@ -32,6 +44,7 @@ app.use(cors({ origin: "*" }));
 //   credentials:true
 
 // }));
+
 app.use(express.static(path.join(__dirname, "/server/views")));
 app.use("/files", express.static(__dirname + "/server/uploads"));
 
