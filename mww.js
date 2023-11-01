@@ -17,7 +17,7 @@ const session = require('express-session')
 // });
 
 require('dotenv').config({ path: path.resolve(__dirname, './server/.env') })
-
+app.request.hostname = 'mwwdev.solidappmaker.ml'
 
 app.use(helmet())
 app.use(cookieParser());
