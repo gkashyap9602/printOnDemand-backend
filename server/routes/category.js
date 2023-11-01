@@ -10,7 +10,7 @@ const { addCategorySchema, addSubCategorySchema, updateCategorySchema } = requir
 router.get('/getCategories', verifyTokenBoth, categoryController.getCategories);
 
 // with Admin Token routes
-router.post('/addCategory', validateCSRFToken, verifyTokenAdmin, addToMulter.single('category'), validate(addCategorySchema), categoryController.addCategories);
+router.post('/addCategory', verifyTokenAdmin, addToMulter.single('category'), validate(addCategorySchema), categoryController.addCategories);
 router.post('/updateCategory', verifyTokenAdmin, addToMulter.single('category'), validate(updateCategorySchema), categoryController.updateCategory);
 router.post('/addSubcategory', verifyTokenAdmin, addToMulter.single('subcategory'), validate(addSubCategorySchema), categoryController.addSubCategories);
 router.post('/updateSubcategory', verifyTokenAdmin, addToMulter.single('subcategory'), validate(updateCategorySchema), categoryController.updateSubcategory);

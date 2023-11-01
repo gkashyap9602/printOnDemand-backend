@@ -1,13 +1,13 @@
 var express = require('express');
 var galleryController = require('../controllers/Gallery');
 var router = express.Router();
-var { verifyTokenAdmin, verifyTokenBoth } = require("../middleware/authentication");
+var { verifyTokenAdmin, verifyTokenBoth, validateCSRFToken } = require("../middleware/authentication");
 const { addToMulter } = require('../services/helper/index')
 var validate = require('../middleware/validation')
 // const { } = require('../validations/category')
 
 // with Admin Token
-router.post('/addToGallery', verifyTokenAdmin, addToMulter.single('Gallery'), galleryController.addToGallery);
+router.post('/addToGallery', validateCSRFToken, verifyTokenAdmin, addToMulter.single('Gallery'), galleryController.addToGallery);
 router.delete('/deleteFromGallery', verifyTokenAdmin, addToMulter.single('Gallery'), galleryController.deleteFromGallery);
 
 // with User and Admin both Token routes
