@@ -300,7 +300,9 @@ const middleware = {
 		console.log(req.cookies, "cokie validateCSRFToken");
 		// const csrfToken = req.cookies['_xCsrf']
 		const serverToken = req.session?.csrfToken;
+		const locales = res.locals
 		console.log(serverToken, "serverToken");
+		console.log(locales,req.locals, "locales");
 		console.log(req.session, "req.session.validateCSRFToken");
 
 		if (!serverToken) {

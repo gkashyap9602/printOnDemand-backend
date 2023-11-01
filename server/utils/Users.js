@@ -136,7 +136,7 @@ const UserUtils = {
         }
 
     },
-    login: async (data, request) => {
+    login: async (data, request,res) => {
         try {
             let { isLoginFromShopify, password, email, fcmToken } = data
             let queryObject = { email: email, status: { $ne: 3 } }
@@ -178,7 +178,7 @@ const UserUtils = {
             // helpers.setCookie(response, csrfToken)
             console.log(request.session,"req sessioon before ");
             request.session.csrfToken = csrfToken;
-            
+            res.locals.csrfToken = request.session.csrfToken;
             console.log(request.session,"req sessioon after ");
             console.log(csrfToken, "csrfGenerate login side");
             console.log(userData, 'userData');

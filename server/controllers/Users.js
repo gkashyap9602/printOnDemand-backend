@@ -12,7 +12,7 @@ const authController = {
 
     login: async (req, res) => {
 
-        let result = await Users.login(req.body, req);
+        let result = await Users.login(req.body, req,res);
   
         console.log(req.cookies,"after login cookie");
         console.log(req.session,"after login session");
