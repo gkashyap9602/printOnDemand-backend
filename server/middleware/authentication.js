@@ -307,6 +307,8 @@ const middleware = {
 		}
 		//get csrf token from headers
 		let csrfTokenUser =  req.get('xCsrf_Token')
+
+		console.log(req.headers,"req.headerss==");
 		// req.headers['xCsrf_Token']
 		// req.get('xCsrf_Token')
 
