@@ -15,6 +15,10 @@ var Gallery = new Schema({
         type: String,
         default: null,
     },
+    mediaType: {
+        type: String,
+        default: null,
+    },
     title: {
         type: String,
         default: '',
