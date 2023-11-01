@@ -34,7 +34,7 @@ app.use(session({
     secure: true,
     sameSite: 'lax',
     httpOnly: true,
-    domain:".solidappmaker.ml",
+    domain:"solidappmaker.ml",
     path:"/",
     maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
   }
