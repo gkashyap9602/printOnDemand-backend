@@ -30,9 +30,9 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   cookie: {
-    // secure: true,
+    secure: true,
     // sameSite: 'none',
-    // httpOnly: true,
+    httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
   }
 }));
