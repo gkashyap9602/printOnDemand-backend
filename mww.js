@@ -32,20 +32,18 @@ app.use(session({
   saveUninitialized: true,
   cookie: {
     secure: true,
-    // sameSite: 'none',
+    sameSite: 'none',
     httpOnly: true,
-    // domain:"mwwdev.solidappmaker.ml",
-    // path:"/",
+    domain:".solidappmaker.ml",
+    path:"/",
     maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
   }
 }));
 
 app.use(cors({ origin: "*" }));
 // app.use(cors({
-
 //   origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:4002", "http://localhost:3002"],
 //   credentials:true
-
 // }));
 
 app.use(express.static(path.join(__dirname, "/server/views")));
@@ -63,7 +61,7 @@ let category = require("./server/routes/category");
 let product = require("./server/routes/product");
 let productLibrary = require("./server/routes/productLibrary");
 let gallery = require('./server/routes/Gallery');
-const csurf = require("csurf");
+
 
 app.use(API_V1 + "administration", administration,);
 app.use(API_V1 + "user", users,);
