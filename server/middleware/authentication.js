@@ -18,10 +18,10 @@ const middleware = {
 				}
 				if (decoded?.user_type == "user") {
 
-					return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, null, null, 200);
+					return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, decoded, null, 200);
 				} else if (decoded?.user_type == "admin") {
 
-					return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, null, null, 200);
+					return helpers.showResponse(true, ResponseMessages?.users?.token_verification_sucess, decoded, null, 200);
 				}
 			})
 		} catch (error) {
@@ -295,38 +295,74 @@ const middleware = {
 		})
 	},
 	// validate CSRF token middleware
-	validateCSRFToken(req, res, next) {
+	validateCSRFToken: async (req, res, next) => {
 
-		console.log(req.cookies, "cokie validateCSRFToken");
-		// const csrfToken = req.cookies['_xCsrf']
-		const serverToken = req.session?.csrfToken;
-		const locales = res.locals
-		console.log(serverToken, "serverToken");
-		console.log(locales,req.locals, "locales");
-		console.log(req.session, "req.session.validateCSRFToken");
-
-		if (!serverToken) {
-			console.log("undefind serverToken");
-			return res.status(403).send({ message: 'Invalid Session or CSRF Token Not Present In Server' })
-
+		let token = req.headers['access_token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
+		console.log(token, "user jwt token csrf");
+		if (!token) {
+			return res.status(401).json({ status: false, message: "Something went wrong with token" });
 		}
+		if (token.startsWith('Bearer ')) {
+			token = token.slice(7, token.length);
+		}
+		//get csrf token from headers
+		let csrfTokenUser = req.get('xCsrf_Token')
 
-		let userSideCsrf = req.get('xCsrf_Token')
-
-		console.log(userSideCsrf, "user tokenenn validateCSRFToken");
-		if (!userSideCsrf) {
+		console.log(csrfTokenUser, "csrfTokenUser validateCSRFToken");
+		if (!csrfTokenUser) {
 			return res.status(403).send({ message: 'CSRF Token Not Provide By User' })
 		}
 
-		if (userSideCsrf === serverToken) {
+		let verifiedUser = await middleware.verifyToken(token)
+		console.log(verifiedUser, "verified users");
+		if (!verifiedUser.status) {
+			return res.status(401).json({ status: false, message: "Invalid user" });
+		}
+		let decoded = verifiedUser?.data
+		//after verified Jwt Token check user Type and verify Csrf Token 
+		if (decoded.user_type == "user") {
+			let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
+			if (!response.status) {
+				return res.status(401).json({ status: false, message: ResponseMessages?.users?.invalid_user, StatusCode: 401 });
+			}
+			let userData = response?.data
+			//check csrf token is valid or not
+			if (userData.csrfToken !== csrfTokenUser) {
+				return res.status(403).json({ status: false, message: 'Invalid Csrf Token', StatusCode: 403 });
+			}
+			if (userData.status == 0) {
+				return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account, StatusCode: 423 });
+			}
+			if (userData.status == 3) {
+				return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deactivated_account, StatusCode: 451 });
+			}
+			decoded = { ...decoded, user_id: userData._id }
+			req.decoded = decoded;
+			req.token = token
+			next()
+		} else if (decoded?.user_type == "admin") {
+			let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
+
+			if (!response.status) {
+				return res.status(401).json({ status: false, message: ResponseMessages?.admin.invalid_admin, StatusCode: 401 });
+			}
+			let adminData = response?.data
+			console.log(adminData.csrfToken, "admin csrftoken");
+			if (adminData.csrfToken !== csrfTokenUser) {
+				return res.status(403).json({ status: false, message: 'Invalid Csrf Token', StatusCode: 403 });
+			}
+			if (adminData.status == 0) {
+				return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account, StatusCode: 423 });
+			}
+			if (adminData.status == 3) {
+				return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deactivated_account, StatusCode: 451 });
+			}
+			decoded = { ...decoded, admin_id: adminData._id }
+			req.decoded = decoded;
+			req.token = token
 			next();
-		} else {
-			return res.status(403).send({ message: 'Invalid CSRF token' });
 		}
 	},
-
-
-
 
 }
 

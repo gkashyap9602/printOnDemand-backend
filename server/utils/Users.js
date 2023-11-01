@@ -166,27 +166,21 @@ const UserUtils = {
                 // console.log(result,"update fcmToken");
                 userData.fcmToken = result?.data?.fcmToken
             }
-            // console.log(userData,"userData fcm after");
+            //generating cryptographic csrf token 
+            let csrfToken = helpers.generateCsrfToken()
+            console.log(csrfToken, "csrfGenerate login side");
+
+            await updateSingleData(Users, { csrfToken }, { _id: userData._id, status: { $ne: 3 } })
 
             delete userData._doc.password
 
             userData = { ...userData._doc, token: access_token }
 
-            //generating cryptographic csrf token 
-            let csrfToken = helpers.generateCsrfToken()
-            //set csrf token in cookies 
-            // helpers.setCookie(response, csrfToken)
-            // console.log(request.CSRFToken(),"req.CSRFToken()");
-            // console.log(request.session, "req sessioon before ");
-            // request.session.csrfToken = csrfToken;
-            // console.log(request.session, "req sessioon after ");
-            console.log(csrfToken, "csrfGenerate login side");
-
             userData.csrfToken = csrfToken
 
             return helpers.showResponse(true, ResponseMessages?.users?.login_success, userData, null, 200);
         } catch (err) {
-            console.log(err,"err");
+            console.log(err, "err");
             return helpers.showResponse(false, ResponseMessages?.users?.login_error, null, null, 400);
         }
     },
@@ -197,6 +191,8 @@ const UserUtils = {
         if (!result.status) {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
         }
+        await updateSingleData(Users, { csrfToken: null }, { _id: userId, status: { $ne: 3 } })
+
         let userData = result?.data
         return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
     },

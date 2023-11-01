@@ -8,15 +8,14 @@ const cors = require("cors");
 const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
-const csrf = require('csurf')
 const session = require('express-session')
 
 
 app.use(helmet())
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(express.json({limit:'50mb'}))
-app.use(bodyParser.urlencoded({ extended: true ,limit:'50mb'}));
+app.use(express.json({ limit: '50mb' }))
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 
 app.use(session({
@@ -28,7 +27,7 @@ app.use(session({
     sameSite: 'lax',
     httpOnly: true,
     domain: "solidappmaker.ml",
-    path:"/",
+    path: "/",
     maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
   }
 }));

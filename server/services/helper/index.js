@@ -1,7 +1,6 @@
 var FCM = require("fcm-node");
 const AWS = require("aws-sdk");
 const mime = require('mime-types')
-const csrf = require('csurf')
 const crypto = require('crypto')
 AWS.config.update({
     region: "us-east-1",
@@ -183,17 +182,6 @@ const getCurrentDate = () => {
 
 const generateCsrfToken = () => {
     return crypto.randomUUID()
-}
-const setCookie = (res, _csrfToken) => {
-    console.log('creation token', _csrfToken);
-    res.cookie('_xCsrf', _csrfToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-        // domain: 'https://mwwdev.solidappmaker.ml',
-        // path: '/',
-    })
 }
 
 const validateParamsArray = (data, feilds) => {
@@ -567,14 +555,6 @@ const addToMulter = multer({
     },
     limits: { fileSize: 5 * 1048576 }, // 5 mb
 })
-const generateCSRFToken = () => {
-    const csrfProtection = csrf({
-        cookie: {
-            httpOnly: true,
-            maxAge: 3600
-        }
-    });
-}
 const uploadVideoToS3 = async (files) => {
     try {
         let SecretResponse = await getSecretFromAWS("rico-secret");
@@ -1150,7 +1130,6 @@ module.exports = {
     // createVideoThumbnail,
     addToMulter,
     generateUsernames,
-    setCookie,
     // uploadAudioToS3,
     sendFcmNotificationTopic,
     // uploadVideoToS31,
