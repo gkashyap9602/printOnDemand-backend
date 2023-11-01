@@ -42,8 +42,8 @@ const commonController = {
     //
     csrfToken: async (req, res) => {
         console.log(req.cookies, 'cookies get side');
-        let csrfToken = req.session.csrfToken
-        console.log(req.session,"req.session get side ");
+        let csrfToken = req?.session?.csrfToken
+        console.log(req?.session,"req.session get side ");
         let result = await Common.csrfToken(csrfToken);
         res.send(result.data)
     },

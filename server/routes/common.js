@@ -5,11 +5,10 @@ var { verifyTokenBoth, verifyTokenAdmin, validateCSRFToken } = require("../middl
 const validate = require('../middleware/validation')
 const { addQuestionSchema, updateQuestionSchema, updateCommonContentSchema } = require('../validations/common')
 
-// without Token routes
 router.post('/store_param', commonController.storeParameterToAWS);
 router.get('/csrf', commonController.csrfToken);
 router.get('/csrfTokenHeader', commonController.csrfTokenHeader);
-router.post('/transfer', validateCSRFToken, commonController.submitCsrfToken);
+router.post('/transfer', commonController.submitCsrfToken);
 
 // with admin and user both token routes
 router.get('/getAllCountries', verifyTokenBoth, commonController.getAllCountries);
@@ -23,8 +22,6 @@ router.get('/getQuestions', verifyTokenBoth, commonController.getQuestions);
 router.post('/addNewQuestion', verifyTokenAdmin, validate(addQuestionSchema), commonController.addNewQuestion);
 router.post('/updateQuestion', verifyTokenAdmin, validate(updateQuestionSchema), commonController.updateQuestion);
 router.post('/updateCommonContent', verifyTokenAdmin, validate(updateCommonContentSchema), commonController.updateCommonContent);
-// router.post('/getCommonData', verifyTokenAdmin, commonController.getCommonData);
-// router.post('/updateCommonData', verifyTokenAdmin, commonController.updateCommonData);
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

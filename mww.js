@@ -1,31 +1,24 @@
 require("./server/connection");
+const path = require("path");
+require('dotenv').config({ path: path.resolve(__dirname, './server/.env') })
 const { API_V1 } = require("./server/constants/const");
 const express = require("express");
 const bodyParser = require("body-parser");
-const path = require("path");
 const cors = require("cors");
 const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const csrf = require('csurf')
 const session = require('express-session')
-// const csrfProtection = csrf({
-//   cookie: {
-//     httpOnly: true,
-//     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-//   }
-// });
 
-require('dotenv').config({ path: path.resolve(__dirname, './server/.env') })
-app.request.hostname = 'mwwdev.solidappmaker.ml'
 
 app.use(helmet())
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(express.json())
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json({limit:'50mb'}))
+app.use(bodyParser.urlencoded({ extended: true ,limit:'50mb'}));
 
-// app.use(csrf())
+
 app.use(session({
   secret: 'mySecretKey',
   resave: false,
@@ -34,7 +27,7 @@ app.use(session({
     secure: true,
     sameSite: 'lax',
     httpOnly: true,
-    domain:"solidappmaker.ml",
+    domain: "solidappmaker.ml",
     path:"/",
     maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
   }
@@ -62,9 +55,8 @@ let product = require("./server/routes/product");
 let productLibrary = require("./server/routes/productLibrary");
 let gallery = require('./server/routes/Gallery');
 
-
 app.use(API_V1 + "administration", administration,);
-app.use(API_V1 + "user", users,);
+app.use(API_V1 + "user", users);
 app.use(API_V1 + "common", common,);
 app.use(API_V1 + "category", category,);
 app.use(API_V1 + "product", product,);

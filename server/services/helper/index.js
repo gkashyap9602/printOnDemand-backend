@@ -189,7 +189,7 @@ const setCookie = (res, _csrfToken) => {
     res.cookie('_xCsrf', _csrfToken, {
         httpOnly: true,
         secure: true,
-    sameSite: 'none',
+        sameSite: 'none',
         maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
         // domain: 'https://mwwdev.solidappmaker.ml',
         // path: '/',

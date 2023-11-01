@@ -5,16 +5,14 @@ var { verifyTokenUser, verifyTokenBoth, validateCSRFToken } = require("../middle
 var validate = require('../middleware/validation')
 const { registrationSchema, loginSchema, forgotSchema, resetPasswordSchema, changePasswordSchema, profileSchema } = require('../validations/user')
 
+// Users admin both routes with token
+router.post('/logout', verifyTokenBoth, authController.logout);
+
 // Users Routes without token
 router.post('/register', validate(registrationSchema), authController.register);
 router.post('/login', validate(loginSchema), authController.login);
 router.post('/forgotPassword', validate(forgotSchema), authController.forgotPassword);
 router.post('/resetPassword', validate(resetPasswordSchema), authController.resetPassword);
-
-
-// Users admin both routes with token
-router.post('/logout', verifyTokenBoth, authController.logout);
-
 
 // with user token
 router.post('/changePassword', verifyTokenUser, validate(changePasswordSchema), authController.changePasswordWithOld);

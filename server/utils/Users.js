@@ -176,15 +176,17 @@ const UserUtils = {
             let csrfToken = helpers.generateCsrfToken()
             //set csrf token in cookies 
             // helpers.setCookie(response, csrfToken)
-            console.log(request.session, "req sessioon before ");
-            request.session.csrfToken = csrfToken;
-            console.log(request.session, "req sessioon after ");
+            // console.log(request.CSRFToken(),"req.CSRFToken()");
+            // console.log(request.session, "req sessioon before ");
+            // request.session.csrfToken = csrfToken;
+            // console.log(request.session, "req sessioon after ");
             console.log(csrfToken, "csrfGenerate login side");
+
             userData.csrfToken = csrfToken
 
             return helpers.showResponse(true, ResponseMessages?.users?.login_success, userData, null, 200);
         } catch (err) {
-            // console.log(err,"err");
+            console.log(err,"err");
             return helpers.showResponse(false, ResponseMessages?.users?.login_error, null, null, 400);
         }
     },
