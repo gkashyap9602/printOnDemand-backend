@@ -39,7 +39,7 @@ app.use(session({
   }
 }));
 
-app.use(cors({ origin: "https://mwwdev.solidappmaker.ml/" }));
+app.use(cors({ origin: "*" }));
 // app.use(cors({
 
 //   origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:4002", "http://localhost:3002"],
