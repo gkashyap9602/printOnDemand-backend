@@ -11,10 +11,10 @@ const authController = {
     },
 
     login: async (req, res) => {
-        let result = await Users.login(req.body, req,res);
+        let result = await Users.login(req.body, req, res);
 
-        console.log(req.session," session after login ")
-        console.log(req.cookies," cookies after login ")
+        console.log(req.session, " session after login ")
+        console.log(req.cookies, " cookies after login ")
         return helpers.showOutput(res, result, result.statusCode);
     },
 
@@ -44,6 +44,9 @@ const authController = {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
         }
         let result = await Users.logout(req.body, userId);
+        if (result.status) {
+            res.clearCookie('_csrfToken')
+        }
         return helpers.showOutput(res, result, result.statusCode);
     },
 

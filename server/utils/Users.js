@@ -205,6 +205,7 @@ const UserUtils = {
         if (!result.status) {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
         }
+        
         await updateSingleData(Users, { csrfToken: null }, { _id: userId, status: { $ne: 3 } })
 
         let userData = result?.data
