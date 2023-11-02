@@ -136,7 +136,7 @@ const UserUtils = {
         }
 
     },
-    login: async (data, request) => {
+    login: async (data, request,response) => {
         try {
             let { isLoginFromShopify, password, email, fcmToken } = data
             let queryObject = { email: email, status: { $ne: 3 } }
@@ -171,7 +171,7 @@ const UserUtils = {
             console.log(csrfToken, "csrfGenerate login side");
 
             request.session.csrfToken = csrfToken
-
+            response.cookie('_csrfToken',csrfToken)
             
 
             await updateSingleData(Users, { csrfToken }, { _id: userData._id, status: { $ne: 3 } })
