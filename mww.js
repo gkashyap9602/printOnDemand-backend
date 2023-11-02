@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const MemoryStore = require('memorystore')(session);
 app.use(helmet())
+app.enable('trust proxy',true);
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.json({ limit: '50mb' }))
