@@ -9,7 +9,7 @@ const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-
+const MemoryStore = require('memorystore')(session);
 app.use(helmet())
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -24,9 +24,12 @@ app.use(cors({
 // app.use(cors({ origin: "*" ,credentials:true}));
 
 app.use(session({
-  secret: 'mySecretKey',
+  secret: 'mySecretKeyy',
   resave: false,
   saveUninitialized: true,
+  store: new MemoryStore({
+    checkPeriod: 86400000, // Prune expired entries every 24 hours
+  }),
   cookie: {
     secure: true,
     sameSite: 'none',
