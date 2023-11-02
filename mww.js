@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const MemoryStore = require('memorystore')(session);
 app.use(helmet())
-app.enable('trust proxy',true);
+app.enable('trust proxy', true);
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.json({ limit: '50mb' }))
@@ -28,9 +28,9 @@ app.use(session({
   secret: 'mySecretKeyy',
   resave: false,
   saveUninitialized: true,
-  store: new MemoryStore({
-    checkPeriod: 86400000, // Prune expired entries every 24 hours
-  }),
+  // store: new MemoryStore({
+  //   checkPeriod: 86400000, // Prune expired entries every 24 hours
+  // }),
   // cookie: {
   //   secure: true,
   //   sameSite: 'none',
