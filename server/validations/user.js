@@ -69,7 +69,7 @@ module.exports.loginSchema = {
         isLoginFromShopify: joi.boolean().required(),
         email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
         password: joi.string().required(),
-        fcmToken:joi.string()
+        fcmToken: joi.string()
     })
 
 };
@@ -89,6 +89,6 @@ module.exports.changePasswordSchema = {
     body: joi.object({
         oldPassword: joi.string().required(),
         newPassword: joi.string().required(),
-        userId:joi.string().allow('')
+        userId: joi.string().allow('')
     })
 };

@@ -8,7 +8,7 @@ const { addQuestionSchema, updateQuestionSchema, updateCommonContentSchema } = r
 //without Token Routes 
 router.post('/store_param', commonController.storeParameterToAWS);
 router.get('/csrf', commonController.csrfToken);
-router.post('/transfer', commonController.submitCsrfToken);
+router.post('/transfer', validateCSRFToken, validateCSRFToken, commonController.submitCsrfToken);
 
 // with admin and user both token routes
 router.get('/getAllCountries', verifyTokenBoth, commonController.getAllCountries);
@@ -19,9 +19,9 @@ router.get('/getCommonContent', verifyTokenBoth, commonController.getCommonConte
 router.get('/getQuestions', verifyTokenBoth, commonController.getQuestions);
 
 // with admin token routes 
-router.post('/addNewQuestion', verifyTokenAdmin, validate(addQuestionSchema), commonController.addNewQuestion);
-router.post('/updateQuestion', verifyTokenAdmin, validate(updateQuestionSchema), commonController.updateQuestion);
-router.post('/updateCommonContent', verifyTokenAdmin, validate(updateCommonContentSchema), commonController.updateCommonContent);
+router.post('/addNewQuestion', validateCSRFToken, verifyTokenAdmin, validate(addQuestionSchema), commonController.addNewQuestion);
+router.post('/updateQuestion', validateCSRFToken, verifyTokenAdmin, validate(updateQuestionSchema), commonController.updateQuestion);
+router.post('/updateCommonContent', validateCSRFToken, verifyTokenAdmin, validate(updateCommonContentSchema), commonController.updateCommonContent);
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

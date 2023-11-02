@@ -2,12 +2,12 @@
 var express = require('express');
 var router = express.Router();
 var productLibraryController = require('../controllers/ProductLibrary');
-var { verifyTokenUser } = require("../middleware/authentication");
+var { verifyTokenUser, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
 const { addToMulter } = require('../services/helper/index')
 
 //user token routes
-router.post('/saveLibraryImage', verifyTokenUser, addToMulter.single('libraryImage'), productLibraryController.saveLibraryImage);
+router.post('/saveLibraryImage', validateCSRFToken, verifyTokenUser, addToMulter.single('libraryImage'), productLibraryController.saveLibraryImage);
 router.get('/getLibraryImages', verifyTokenUser, productLibraryController.getLibraryImages);
 
 // Common Routes

@@ -15,15 +15,15 @@ router.post('/forgotPassword', validate(forgotSchema), authController.forgotPass
 router.post('/resetPassword', validate(resetPasswordSchema), authController.resetPassword);
 
 // with user token
-router.post('/changePassword', verifyTokenUser, validate(changePasswordSchema), authController.changePasswordWithOld);
+router.post('/changePassword', validateCSRFToken, verifyTokenUser, validate(changePasswordSchema), authController.changePasswordWithOld);
 router.get('/getUser/:user_id', verifyTokenUser, authController.getUserDetail);
 router.get('/getUserStatus/:user_id', verifyTokenUser, authController.getUserStatus);
-router.post('/getAllOrders', verifyTokenUser, authController.getAllOrders);
+router.post('/getAllOrders', validateCSRFToken, verifyTokenUser, authController.getAllOrders);
 router.get('/getBulkImport', verifyTokenUser, authController.getBulkImport);
-router.post('/updateBasicDetails', verifyTokenUser, validate(profileSchema), authController.updateBasicDetails);
-router.post('/updateShippingDetails', verifyTokenUser, validate(profileSchema), authController.updateShippingDetails);
-router.post('/updateBillingAddress', verifyTokenUser, validate(profileSchema), authController.updateBillingAddress);
-router.post('/updatePaymentDetails', verifyTokenUser, validate(profileSchema), authController.updatePaymentDetails);
+router.post('/updateBasicDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateBasicDetails);
+router.post('/updateShippingDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateShippingDetails);
+router.post('/updateBillingAddress', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateBillingAddress);
+router.post('/updatePaymentDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updatePaymentDetails);
 
 
 // Common Routes

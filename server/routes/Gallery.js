@@ -8,7 +8,7 @@ const { addToGallery, deleteFromGallery } = require('../validations/administrati
 
 // with Admin Token Routes
 router.post('/addToGallery', validateCSRFToken, verifyTokenAdmin, addToMulter.single('Gallery'), validate(addToGallery), galleryController.addToGallery);
-router.delete('/deleteFromGallery', verifyTokenAdmin, validate(deleteFromGallery), galleryController.deleteFromGallery);
+router.delete('/deleteFromGallery', validateCSRFToken, verifyTokenAdmin, validate(deleteFromGallery), galleryController.deleteFromGallery);
 
 // with User and Admin both Token routes
 router.get('/getGallery', verifyTokenBoth, galleryController.getGallery);
