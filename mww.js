@@ -11,11 +11,11 @@ const cookieParser = require('cookie-parser')
 const session = require('express-session')
 
 app.use(cors({
-  origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:3000", "http://localhost:3002"],
+  origin: ["https://mwwdev.solidappmaker.ml","solidappmaker.ml", "http://localhost:3000", "http://localhost:3002"],
   methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "DELETE"],
   credentials: true
 }));
-// app.set('trust proxy', 1);
+
 app.use(helmet())
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -30,7 +30,7 @@ app.use(session({
   saveUninitialized: true,
   cookie: {
     secure: true,
-    sameSite: 'none',
+    sameSite: 'strict',
     httpOnly: true,
     domain: "solidappmaker.ml",
     path: "/",
