@@ -24,6 +24,7 @@ app.use(cors({
 }));
 
 app.use(session({
+  name:"connect.sid",
   secret: 'mySecretKeyy',
   resave: false,
   saveUninitialized: true,
@@ -31,7 +32,7 @@ app.use(session({
   //   checkPeriod: 86400000, // Prune expired entries every 24 hours
   // }),
   cookie: {
-    // secure: true,
+    secure: true,
     // sameSite: 'none',
     // httpOnly: true,
     // domain: "solidappmaker.ml",
