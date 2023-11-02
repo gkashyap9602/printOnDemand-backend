@@ -24,7 +24,7 @@ app.use(session({
   saveUninitialized: true,
   cookie: {
     secure: true,
-    sameSite: 'lax',
+    sameSite: 'none',
     httpOnly: true,
     domain: "mwwdev.solidappmaker.ml",
     path: "/",
@@ -35,7 +35,7 @@ app.use(session({
 // app.use(cors({ origin: "*" }));
 app.use(cors({
   origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:3000", "http://localhost:3002"],
-  credentials:true
+  credentials: true
 }));
 
 app.use(express.static(path.join(__dirname, "/server/views")));

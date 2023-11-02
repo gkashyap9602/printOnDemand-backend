@@ -9,7 +9,7 @@ const galleryController = {
         if (!req.file) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
         }
-        console.log(req.session,"req sessin get galle side ");
+       
 
         let result = await Gallery.addToGallery(req.body, req.file);
         return helpers.showOutput(res, result, result.statusCode);
@@ -20,6 +20,7 @@ const galleryController = {
     },
     getGallery: async (req, res) => {
         let result = await Gallery.getGallery(req.query);
+        console.log(req.session,"req sessin get galle side ");
         return helpers.showOutput(res, result, result.statusCode);
     },
 
