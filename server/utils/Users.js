@@ -181,7 +181,7 @@ const UserUtils = {
                 maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
             }
         
-            response.cookie('_csrfToken',csrfToken,options)
+            response.cookie('_csrfToken',csrfToken)
             
 
             await updateSingleData(Users, { csrfToken }, { _id: userData._id, status: { $ne: 3 } })
@@ -205,7 +205,7 @@ const UserUtils = {
         if (!result.status) {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
         }
-        
+
         await updateSingleData(Users, { csrfToken: null }, { _id: userId, status: { $ne: 3 } })
 
         let userData = result?.data
