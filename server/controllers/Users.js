@@ -13,7 +13,8 @@ const authController = {
     login: async (req, res) => {
         let result = await Users.login(req.body, req);
 
-        console.log(req.session,"after login ")
+        console.log(req.session," session after login ")
+        console.log(req.cookies," cookies after login ")
         return helpers.showOutput(res, result, result.statusCode);
     },
 
