@@ -31,14 +31,14 @@ app.use(session({
   store: new MemoryStore({
     checkPeriod: 86400000, // Prune expired entries every 24 hours
   }),
-  cookie: {
-    secure: true,
-    sameSite: 'none',
-    httpOnly: true,
-    domain: "solidappmaker.ml",
-    path: "/",
-    maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
-  }
+  // cookie: {
+  //   secure: true,
+  //   sameSite: 'none',
+  //   httpOnly: true,
+  //   domain: "solidappmaker.ml",
+  //   path: "/",
+  //   maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
+  // }
 }));
 app.use(express.static(path.join(__dirname, "/server/views")));
 app.use("/files", express.static(__dirname + "/server/uploads"));

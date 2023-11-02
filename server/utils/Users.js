@@ -170,7 +170,7 @@ const UserUtils = {
             let csrfToken = helpers.generateCsrfToken()
             console.log(csrfToken, "csrfGenerate login side");
 
-            request.session.csrfToken = csrfToken
+            request.session._csrfToken = csrfToken
 
             let options = {
                 secure: true,
@@ -181,7 +181,7 @@ const UserUtils = {
                 maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
             }
         
-            response.cookie('_csrfToken',csrfToken)
+            response.cookie('_csrfTokenD',csrfToken)
             
 
             await updateSingleData(Users, { csrfToken }, { _id: userData._id, status: { $ne: 3 } })
