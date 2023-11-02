@@ -34,7 +34,7 @@ app.use(session({
 
 // app.use(cors({ origin: "*" }));
 app.use(cors({
-  origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:4002", "http://localhost:3002"],
+  origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:3000", "http://localhost:3002"],
   credentials:true
 }));
 
