@@ -24,7 +24,7 @@ app.use(cors({
 
 app.use(session({
   name: "connect.sid",
-  secret: 'mySecretKeyy',
+  secret: process.env.SESSION_KEY,
   resave: false,
   saveUninitialized: true,
   cookie: {
