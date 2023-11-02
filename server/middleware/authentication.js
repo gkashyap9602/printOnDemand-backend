@@ -297,6 +297,9 @@ const middleware = {
 	// validate CSRF token middleware
 	validateCSRFToken: async (req, res, next) => {
 
+		console.log(req.session,"req session validateCSRFToken");
+		console.log(req.cookies,"req cookies validateCSRFToken");
+
 		let token = req.headers['access_token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
 		console.log(token, "user jwt token csrf");
 		if (!token) {

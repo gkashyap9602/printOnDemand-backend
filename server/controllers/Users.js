@@ -12,6 +12,8 @@ const authController = {
 
     login: async (req, res) => {
         let result = await Users.login(req.body, req);
+
+        console.log(req.session,"after login ")
         return helpers.showOutput(res, result, result.statusCode);
     },
 

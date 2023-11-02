@@ -170,6 +170,10 @@ const UserUtils = {
             let csrfToken = helpers.generateCsrfToken()
             console.log(csrfToken, "csrfGenerate login side");
 
+            request.session.csrfToken = csrfToken
+
+            
+
             await updateSingleData(Users, { csrfToken }, { _id: userData._id, status: { $ne: 3 } })
 
             delete userData._doc.password
