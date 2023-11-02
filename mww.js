@@ -24,7 +24,7 @@ app.use(session({
   saveUninitialized: true,
   cookie: {
     secure: true,
-    sameSite: 'none',
+    sameSite: 'lax',
     httpOnly: true,
     domain: "mwwdev.solidappmaker.ml",
     path: "/",
