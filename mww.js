@@ -24,10 +24,10 @@ app.use(session({
   saveUninitialized: true,
   cookie: {
     secure: true,
-    sameSite: 'lax',
+    sameSite: 'none',
     httpOnly: true,
-    domain: "mwwdev.solidappmaker.ml",
-    path: "/",
+    // domain: "mwwdev.solidappmaker.ml",
+    // path: "/",
     maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
   }
 }));
