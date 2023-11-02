@@ -46,6 +46,7 @@ const authController = {
         let result = await Users.logout(req.body, userId);
         if (result.status) {
             res.clearCookie('_csrfToken')
+            console.log(req.cookies,"after clear cookies logout")
         }
         return helpers.showOutput(res, result, result.statusCode);
     },
