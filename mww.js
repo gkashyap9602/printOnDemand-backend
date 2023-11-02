@@ -31,8 +31,8 @@ app.use(session({
   //   checkPeriod: 86400000, // Prune expired entries every 24 hours
   // }),
   cookie: {
-    secure: true,
-    sameSite: 'none',
+    // secure: true,
+    // sameSite: 'none',
     // httpOnly: true,
     // domain: "solidappmaker.ml",
     // path: "/",
