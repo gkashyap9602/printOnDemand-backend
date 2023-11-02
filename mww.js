@@ -29,7 +29,7 @@ app.use(session({
   saveUninitialized: true,
   cookie: {
     secure: true,
-    sameSite: false,
+    sameSite: 'none',
     httpOnly: true,
     domain: "solidappmaker.ml",
     path: "/",
