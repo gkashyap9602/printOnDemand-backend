@@ -3,21 +3,16 @@ var router = express.Router();
 var adminController = require('../controllers/Administrator');
 var { verifyTokenAdmin } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
-const { saveNotificationSchema,addMaterialSchema,updateWaitingList } = require('../validations/administration')
-
-// without token
-// router.post('/login', adminController.login);
+const { saveNotification, addMaterial, updateWaitingList, deleteNotification } = require('../validations/administration')
 
 // Admin Routes with Token
-// router.post('/logout',middleware.verifyTokenAdmin, AdministratorController.logout);
-router.post('/addMaterial', verifyTokenAdmin, validate(addMaterialSchema), adminController.addMaterial);
+router.post('/addMaterial', verifyTokenAdmin, validate(addMaterial), adminController.addMaterial);
 router.get('/getAllUsers', verifyTokenAdmin, adminController.getAllUsers);
 router.post('/createCustomer', verifyTokenAdmin, adminController.createCustomer);
 router.post('/updateWaitingList', verifyTokenAdmin, validate(updateWaitingList), adminController.updateWaitingList);
-router.post('/saveNotification', verifyTokenAdmin, validate(saveNotificationSchema), adminController.saveNotification);
+router.post('/saveNotification', verifyTokenAdmin, validate(saveNotification), adminController.saveNotification);
 router.get('/getNotifications', verifyTokenAdmin, adminController.getNotifications);
-router.delete('/deleteNotification', verifyTokenAdmin, adminController.deleteNotification);
-
+router.delete('/deleteNotification', verifyTokenAdmin, validate(deleteNotification), adminController.deleteNotification);
 
 
 // Common Routes

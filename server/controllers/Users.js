@@ -1,7 +1,6 @@
 var Users = require('../utils/Users');
 var helpers = require('../services/helper')
 const ResponseMessages = require('../constants/ResponseMessages');
-const crypto = require('crypto')
 
 const authController = {
 
@@ -12,7 +11,6 @@ const authController = {
 
     login: async (req, res) => {
         let result = await Users.login(req.body, req, res);
-
         console.log(req.session, " session after login ")
         console.log(req.cookies, " cookies after login ")
         return helpers.showOutput(res, result, result.statusCode);

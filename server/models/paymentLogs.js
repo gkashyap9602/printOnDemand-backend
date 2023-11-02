@@ -51,7 +51,7 @@ const paymentSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
-    gift_type:{
+    gift_type: {
         type: String,
         default: null,
     }

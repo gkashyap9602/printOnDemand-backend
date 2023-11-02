@@ -18,6 +18,7 @@ var Category = new Schema({
     status: {
         type: Number,
         default: 1,
+        Comment:"1 for active 2 for delete "
     },
     createdOn: {
         type: String,

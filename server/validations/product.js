@@ -1,7 +1,7 @@
 
 const joi = require("joi");
 
-module.exports.addProductSchema = {
+module.exports.addProduct = {
     body: joi.object({
         subCategoryIds: joi.array().required(),
         variableTypesIds: joi.array().required(),
@@ -17,7 +17,7 @@ module.exports.addProductSchema = {
     })
 
 };
-module.exports.updateProductSchema = {
+module.exports.updateProduct = {
     body: joi.object({
         subCategoryIds: joi.array().required(),
         materialId: joi.string().required(),
@@ -33,7 +33,7 @@ module.exports.updateProductSchema = {
     })
 
 };
-module.exports.addProductVarientSchema = {
+module.exports.addProductVarient= {
     body: joi.object({
         productCode: joi.string().required(),
         price: joi.string().required(),
@@ -45,7 +45,7 @@ module.exports.addProductVarientSchema = {
     })
 
 };
-module.exports.updateProductVarientSchema = {
+module.exports.updateProductVarient= {
     body: joi.object({
         productCode: joi.string().required(),
         price: joi.string().required(),
@@ -56,7 +56,7 @@ module.exports.updateProductVarientSchema = {
     })
 
 };
-module.exports.addProductImageSchema = {
+module.exports.addProductImage= {
     body: joi.object({
         displayOrder: joi.number().required(),
         imageType: joi.number().required().valid(1, 2, 3),//1 for productimage 2 for varientImage 3 for Size chart
@@ -65,14 +65,14 @@ module.exports.addProductImageSchema = {
 
 };
 
-module.exports.updateVarientTemplateSchema = {
+module.exports.updateVarientTemplate= {
     body: joi.object({
         templateType: joi.number().required().valid(1, 2, 3), //1 for pdf 2 for psd 3 for ai file type
         productVarientId: joi.string().required(),
         productVarientTemplates: joi.string()
     })
 };
-module.exports.deleteVarientTemplateSchema = {
+module.exports.deleteVarientTemplate = {
     body: joi.object({
         templateId: joi.string().required(),
         productVarientId: joi.string().required()

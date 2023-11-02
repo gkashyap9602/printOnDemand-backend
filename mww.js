@@ -9,7 +9,6 @@ const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-// const MemoryStore = require('memorystore')(session);
 app.use(helmet())
 app.enable('trust proxy', true);
 app.use(cookieParser());
@@ -18,21 +17,18 @@ app.use(express.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(cors({
-  origin: ["https://mwwdev.solidappmaker.ml", "solidappmaker.ml", "http://localhost:3000", "http://localhost:3002"],
+  origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:3000", "http://localhost:3002"],
   methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "DELETE"],
   credentials: true
 }));
 
 app.use(session({
-  name:"connect.sid",
+  name: "connect.sid",
   secret: 'mySecretKeyy',
   resave: false,
   saveUninitialized: true,
-  // store: new MemoryStore({
-  //   checkPeriod: 86400000, // Prune expired entries every 24 hours
-  // }),
   cookie: {
-    secure: true,
+    // secure: true,
     // sameSite: 'none',
     // httpOnly: true,
     // domain: "solidappmaker.ml",

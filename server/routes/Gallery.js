@@ -4,15 +4,14 @@ var router = express.Router();
 var { verifyTokenAdmin, verifyTokenBoth, validateCSRFToken } = require("../middleware/authentication");
 const { addToMulter } = require('../services/helper/index')
 var validate = require('../middleware/validation')
-// const { } = require('../validations/category')
+const { addToGallery, deleteFromGallery } = require('../validations/administration')
 
-// with Admin Token
-router.post('/addToGallery', validateCSRFToken, verifyTokenAdmin, addToMulter.single('Gallery'), galleryController.addToGallery);
-router.delete('/deleteFromGallery', verifyTokenAdmin, addToMulter.single('Gallery'), galleryController.deleteFromGallery);
+// with Admin Token Routes
+router.post('/addToGallery', validateCSRFToken, verifyTokenAdmin, addToMulter.single('Gallery'), validate(addToGallery), galleryController.addToGallery);
+router.delete('/deleteFromGallery', verifyTokenAdmin, validate(deleteFromGallery), galleryController.deleteFromGallery);
 
 // with User and Admin both Token routes
 router.get('/getGallery', verifyTokenBoth, galleryController.getGallery);
-
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

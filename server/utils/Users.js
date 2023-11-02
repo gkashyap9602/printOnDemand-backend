@@ -170,20 +170,8 @@ const UserUtils = {
             let csrfToken = helpers.generateCsrfToken()
             console.log(csrfToken, "csrfGenerate login side");
 
+            //create user session and  pass csrf token 
             request.session._csrfToken = csrfToken
-
-            // let options = {
-            //     secure: true,
-            //     sameSite: 'none',
-            //     httpOnly: true,
-            //     domain: "solidappmaker.ml",
-            //     path: "/",
-            //     maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
-            // }
-
-            // response.cookie('_csrfTokenD',csrfToken)
-
-            // await updateSingleData(Users, { csrfToken }, { _id: userData._id, status: { $ne: 3 } })
 
             delete userData._doc.password
 

@@ -2,7 +2,6 @@ var Common = require('../utils/Common');
 var helpers = require('../services/helper')
 const ResponseMessages = require('../constants/ResponseMessages');
 
-
 const commonController = {
 
     storeParameterToAWS: async (req, res) => {
@@ -43,29 +42,21 @@ const commonController = {
     csrfToken: async (req, res) => {
         console.log(req.cookies, 'cookies get side');
         let csrfToken = req?.session?.csrfToken
-        console.log(req?.session,"req.session get side ");
+        console.log(req?.session, "req.session get side ");
         let result = await Common.csrfToken(csrfToken);
         res.send(result.data)
     },
-    csrfTokenHeader: async (req, res) => {
-        console.log(req.cookies, 'cookies get side');
-        let csrfToken = req.session.csrfToken
-        console.log(req.session,"req.session get side ");
-        let result = await Common.csrfTokenHeader(csrfToken);
-        res.send(result.data)
-    },
+
     submitCsrfToken: async (req, res) => {
-        console.log(req.cookies,"cokkie post");
+        console.log(req.cookies, "cokkie post");
         let result = await Common.submitCsrfToken(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
     getQuestions: async (req, res) => {
-        console.log(req.cookies,"cokieeee quesn");
         let result = await Common.getQuestions(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
     getCommonContent: async (req, res) => {
-        console.log(req.cookies,"cokieeee quesndd");
         let result = await Common.getCommonContent();
         return helpers.showOutput(res, result, result.statusCode);
     },
@@ -94,36 +85,6 @@ const commonController = {
         let result = await Common.updateCommonContent(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    // admin functions
-    // uploadAnswerVideo: async (req, res) => {
-    //     answerVideo(req, res, async (err) => {
-    //         if (!req.file || err) {
-    //             return helpers.showOutput(res, helpers.showResponse(false, ControllerMessages.NO_IMAGE), 203);
-    //         }
-    //         let { filename, mimetype } = req.file
-    //         if (mimetype.indexOf("video") == -1) {
-    //             return helpers.showOutput(res, helpers.showResponse(false, "Only Video File Accepted"), 203);
-    //         }
-    //         return helpers.showOutput(res, helpers.showResponse(true, ControllerMessages.UPLOADED, filename), 200);
-    //     });
-    // },
-
-    // getCommonData: async (req, res) => {
-    //     let admin_id = req.decoded.admin_id;
-    //     if (!admin_id) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, ControllerMessages.INVALID_ADMIN), 403);
-    //     }
-    //     let result = await Common.getCommonData();
-    //     return helpers.showOutput(res, result, result.statusCode);
-    // },
-    // updateCommonData: async (req, res) => {
-    //     let admin_id = req.decoded.admin_id;
-    //     if (!admin_id) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, ControllerMessages.INVALID_ADMIN), 403);
-    //     }
-    //     let result = await Common.updateCommonData(req.body);
-    //     return helpers.showOutput(res, result, result.statusCode);
-    // },
 
 }
 

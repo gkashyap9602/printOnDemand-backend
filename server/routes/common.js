@@ -5,9 +5,9 @@ var { verifyTokenBoth, verifyTokenAdmin, validateCSRFToken } = require("../middl
 const validate = require('../middleware/validation')
 const { addQuestionSchema, updateQuestionSchema, updateCommonContentSchema } = require('../validations/common')
 
+//without Token Routes 
 router.post('/store_param', commonController.storeParameterToAWS);
 router.get('/csrf', commonController.csrfToken);
-router.get('/csrfTokenHeader', commonController.csrfTokenHeader);
 router.post('/transfer', commonController.submitCsrfToken);
 
 // with admin and user both token routes

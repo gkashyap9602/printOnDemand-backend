@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var ProductVarient = new Schema({
-    
+
     productId: {
         type: mongoose.Types.ObjectId,
         ref: "product",
