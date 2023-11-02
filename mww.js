@@ -9,7 +9,7 @@ const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-const MemoryStore = require('memorystore')(session);
+// const MemoryStore = require('memorystore')(session);
 app.use(helmet())
 app.enable('trust proxy', true);
 app.use(cookieParser());
@@ -22,7 +22,6 @@ app.use(cors({
   methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "DELETE"],
   credentials: true
 }));
-// app.use(cors({ origin: "*" ,credentials:true}));
 
 app.use(session({
   secret: 'mySecretKeyy',
@@ -31,14 +30,14 @@ app.use(session({
   // store: new MemoryStore({
   //   checkPeriod: 86400000, // Prune expired entries every 24 hours
   // }),
-  // cookie: {
-  //   secure: true,
-  //   sameSite: 'none',
-  //   httpOnly: true,
-  //   domain: "solidappmaker.ml",
-  //   path: "/",
-  //   maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
-  // }
+  cookie: {
+    secure: true,
+    sameSite: 'none',
+    httpOnly: true,
+    // domain: "solidappmaker.ml",
+    // path: "/",
+    maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
+  }
 }));
 app.use(express.static(path.join(__dirname, "/server/views")));
 app.use("/files", express.static(__dirname + "/server/uploads"));

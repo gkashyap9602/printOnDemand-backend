@@ -205,7 +205,7 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
         }
 
-        await updateSingleData(Users, { csrfToken: null }, { _id: userId, status: { $ne: 3 } })
+        // await updateSingleData(Users, { csrfToken: null }, { _id: userId, status: { $ne: 3 } })
 
         let userData = result?.data
         return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
