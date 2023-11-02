@@ -17,6 +17,7 @@ const session = require('express-session')
 //   methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "DELETE"],
 //   credentials: true
 // }));
+app.use(cors({ origin: "*" ,credentials:true}));
 
 app.use(helmet())
 app.use(cookieParser());
@@ -24,7 +25,6 @@ app.use(bodyParser.json());
 app.use(express.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
-app.use(cors({ origin: "*" }));
 
 app.use(session({
   secret: 'mySecretKey',
