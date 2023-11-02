@@ -13,9 +13,9 @@ const session = require('express-session')
 app.use(cors({
   origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:3000", "http://localhost:3002"],
   methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "DELETE"],
-  credentials: true
+  // credentials: true
 }));
-
+app.set('trust proxy', 1);
 app.use(helmet())
 app.use(cookieParser());
 app.use(bodyParser.json());
