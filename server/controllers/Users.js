@@ -38,7 +38,6 @@ const authController = {
     },
 
     logout: async (req, res) => {
-        console.log(req.decoded, "decode")
         let userId = req.decoded?._id;
         if (!userId) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
@@ -46,7 +45,9 @@ const authController = {
         let result = await Users.logout(req.body, userId);
         if (result.status) {
             res.clearCookie('_csrfToken')
-            console.log(req.cookies,"after clear cookies logout")
+            req?.session?.destroy();
+            console.log(req.cookies, "after clear cookies logout")
+            console.log(req.session, "after destroy session logout")
         }
         return helpers.showOutput(res, result, result.statusCode);
     },

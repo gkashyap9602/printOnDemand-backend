@@ -297,79 +297,108 @@ const middleware = {
 	// validate CSRF token middleware
 	validateCSRFToken: async (req, res, next) => {
 
-		console.log(req.session,"req session validateCSRFToken");
-		console.log(req.cookies,"req cookies validateCSRFToken");
+		console.log(req.session, "req session validateCSRFToken");
+		console.log(req.cookies, "req cookies validateCSRFToken");
 
-		let token = req.headers['access_token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-		console.log(token, "user jwt token csrf");
-		if (!token) {
-			return res.status(401).json({ status: false, message: "Something went wrong with token" });
-		}
-		if (token.startsWith('Bearer ')) {
-			token = token.slice(7, token.length);
+		let { _csrfToken } = req?.session
+		console.log(_csrfToken, "CsrfToken session  validateCSRFToken");
+
+		if (!_csrfToken) {
+			return res.status(403).json({ message: "Token is not present in the server" })
 		}
 		//get csrf token from headers
-		let csrfTokenUser =  req.get('xCsrf_Token')
+		let userCsrfToken = req.get('xCsrf_Token') || req.get('x-csrf-token')
+		console.log(userCsrfToken, "userCsrfToken validateCSRFToken");
 
-		console.log(req.headers,"req.headerss==");
-		// req.headers['xCsrf_Token']
-		// req.get('xCsrf_Token')
-
-		console.log(csrfTokenUser, "csrfTokenUser validateCSRFToken");
-		if (!csrfTokenUser) {
-			return res.status(403).send({ message: 'CSRF Token Not Provide By User' })
+		if (!userCsrfToken) {
+			return res.status(403).json({ message: "Token is not provided by user " })
 		}
 
-		let verifiedUser = await middleware.verifyToken(token)
-		console.log(verifiedUser, "verified users");
-		if (!verifiedUser.status) {
-			return res.status(401).json({ status: false, message: "Invalid user" });
-		}
-		let decoded = verifiedUser?.data
-		//after verified Jwt Token check user Type and verify Csrf Token 
-		if (decoded.user_type == "user") {
-			let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
-			if (!response.status) {
-				return res.status(401).json({ status: false, message: ResponseMessages?.users?.invalid_user, StatusCode: 401 });
-			}
-			let userData = response?.data
-			//check csrf token is valid or not
-			if (userData.csrfToken !== csrfTokenUser) {
-				return res.status(403).json({ status: false, message: 'Invalid Csrf Token', StatusCode: 403 });
-			}
-			if (userData.status == 0) {
-				return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account, StatusCode: 423 });
-			}
-			if (userData.status == 3) {
-				return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deactivated_account, StatusCode: 451 });
-			}
-			decoded = { ...decoded, user_id: userData._id }
-			req.decoded = decoded;
-			req.token = token
-			next()
-		} else if (decoded?.user_type == "admin") {
-			let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
+		if (_csrfToken !== userCsrfToken) {
+			return res.status(403).json({ message: "Invalid Csrf Token" })
 
-			if (!response.status) {
-				return res.status(401).json({ status: false, message: ResponseMessages?.admin.invalid_admin, StatusCode: 401 });
-			}
-			let adminData = response?.data
-			console.log(adminData.csrfToken, "admin csrftoken");
-			if (adminData.csrfToken !== csrfTokenUser) {
-				return res.status(403).json({ status: false, message: 'Invalid Csrf Token', StatusCode: 403 });
-			}
-			if (adminData.status == 0) {
-				return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account, StatusCode: 423 });
-			}
-			if (adminData.status == 3) {
-				return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deactivated_account, StatusCode: 451 });
-			}
-			decoded = { ...decoded, admin_id: adminData._id }
-			req.decoded = decoded;
-			req.token = token
-			next();
 		}
+
+		next()
+
 	},
+
+	// validateCSRFToken: async (req, res, next) => {
+
+	// 	console.log(req.session,"req session validateCSRFToken");
+	// 	console.log(req.cookies,"req cookies validateCSRFToken");
+
+	// 	let token = req.headers['access_token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
+	// 	console.log(token, "user jwt token csrf");
+	// 	if (!token) {
+	// 		return res.status(401).json({ status: false, message: "Something went wrong with token" });
+	// 	}
+	// 	if (token.startsWith('Bearer ')) {
+	// 		token = token.slice(7, token.length);
+	// 	}
+	// 	//get csrf token from headers
+	// 	let csrfTokenUser =  req.get('xCsrf_Token')
+
+	// 	console.log(req.headers,"req.headerss==");
+	// 	// req.headers['xCsrf_Token']
+	// 	// req.get('xCsrf_Token')
+
+	// 	console.log(csrfTokenUser, "csrfTokenUser validateCSRFToken");
+	// 	if (!csrfTokenUser) {
+	// 		return res.status(403).send({ message: 'CSRF Token Not Provide By User' })
+	// 	}
+
+	// 	let verifiedUser = await middleware.verifyToken(token)
+	// 	console.log(verifiedUser, "verified users");
+	// 	if (!verifiedUser.status) {
+	// 		return res.status(401).json({ status: false, message: "Invalid user" });
+	// 	}
+	// 	let decoded = verifiedUser?.data
+	// 	//after verified Jwt Token check user Type and verify Csrf Token 
+	// 	if (decoded.user_type == "user") {
+	// 		let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
+	// 		if (!response.status) {
+	// 			return res.status(401).json({ status: false, message: ResponseMessages?.users?.invalid_user, StatusCode: 401 });
+	// 		}
+	// 		let userData = response?.data
+	// 		//check csrf token is valid or not
+	// 		if (userData.csrfToken !== csrfTokenUser) {
+	// 			return res.status(403).json({ status: false, message: 'Invalid Csrf Token', StatusCode: 403 });
+	// 		}
+	// 		if (userData.status == 0) {
+	// 			return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account, StatusCode: 423 });
+	// 		}
+	// 		if (userData.status == 3) {
+	// 			return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deactivated_account, StatusCode: 451 });
+	// 		}
+	// 		decoded = { ...decoded, user_id: userData._id }
+	// 		req.decoded = decoded;
+	// 		req.token = token
+	// 		next()
+	// 	} else if (decoded?.user_type == "admin") {
+	// 		let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
+
+	// 		if (!response.status) {
+	// 			return res.status(401).json({ status: false, message: ResponseMessages?.admin.invalid_admin, StatusCode: 401 });
+	// 		}
+	// 		let adminData = response?.data
+	// 		console.log(adminData.csrfToken, "admin csrftoken");
+	// 		if (adminData.csrfToken !== csrfTokenUser) {
+	// 			return res.status(403).json({ status: false, message: 'Invalid Csrf Token', StatusCode: 403 });
+	// 		}
+	// 		if (adminData.status == 0) {
+	// 			return res.status(423).json({ status: false, message: ResponseMessages?.middleware?.disabled_account, StatusCode: 423 });
+	// 		}
+	// 		if (adminData.status == 3) {
+	// 			return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deactivated_account, StatusCode: 451 });
+	// 		}
+	// 		decoded = { ...decoded, admin_id: adminData._id }
+	// 		req.decoded = decoded;
+	// 		req.token = token
+	// 		next();
+	// 	}
+	// },
+
 
 }
 

@@ -136,7 +136,7 @@ const UserUtils = {
         }
 
     },
-    login: async (data, request,response) => {
+    login: async (data, request, response) => {
         try {
             let { isLoginFromShopify, password, email, fcmToken } = data
             let queryObject = { email: email, status: { $ne: 3 } }
@@ -172,19 +172,18 @@ const UserUtils = {
 
             request.session._csrfToken = csrfToken
 
-            let options = {
-                secure: true,
-                sameSite: 'none',
-                httpOnly: true,
-                domain: "solidappmaker.ml",
-                path: "/",
-                maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
-            }
-        
-            response.cookie('_csrfTokenD',csrfToken)
-            
+            // let options = {
+            //     secure: true,
+            //     sameSite: 'none',
+            //     httpOnly: true,
+            //     domain: "solidappmaker.ml",
+            //     path: "/",
+            //     maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
+            // }
 
-            await updateSingleData(Users, { csrfToken }, { _id: userData._id, status: { $ne: 3 } })
+            // response.cookie('_csrfTokenD',csrfToken)
+
+            // await updateSingleData(Users, { csrfToken }, { _id: userData._id, status: { $ne: 3 } })
 
             delete userData._doc.password
 
