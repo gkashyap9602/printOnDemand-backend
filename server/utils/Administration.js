@@ -305,7 +305,7 @@ const adminUtils = {
                 //     await deleteData(Users, { _id: userRef._id })
                 //     return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
                 // }
-                return helpers.showResponse(true, ResponseMessages?.users?.register_success, data, null, 200);
+                return helpers.showResponse(true, ResponseMessages?.admin., data, null, 200);
             }
 
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);

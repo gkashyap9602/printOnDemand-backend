@@ -167,6 +167,7 @@ module.exports = {
         admin_details_updated: "Administrator details updated",
         admin_details_update_error: "Error while updating details",
         email_already: "Email address is already occupied",
+        subAdmin_added:"SubAdmin Added Successfully"
 
     },
     middleware: {
