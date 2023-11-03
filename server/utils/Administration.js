@@ -106,17 +106,11 @@ const adminUtils = {
                 {
                     $match: {
                         $or: [
-                            { email: { $regex: searchKey, $options: 'i' } },
+                            {
+                                email: { $regex: searchKey, $options: 'i' },
+                                // firstName: { $regex: searchKey, $options: 'i' }
+                            },
                             { userType: 3 }
-                            // {
-                            //     $expr: {
-                            //       $regexMatch: {
-                            //         input: "$userProfileData.shippingAddress.companyName",
-                            //         regex: searchKey,
-                            //         options: "i"
-                            //       }
-                            //     }
-                            //   }
                         ]
                     }
                 },
@@ -264,12 +258,6 @@ const adminUtils = {
                 return helpers.showResponse(false, ResponseMessages?.admin.email_already, null, null, 400);
             }
 
-            // let superAdminData = await getSingleData(Users, { _id: adminId, userType: 1 })
-            // console.log(superAdminData, "adminData", adminId)
-            // if (!superAdminData.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
-            // }
-
             let newObj = {
                 firstName,
                 lastName,
@@ -285,28 +273,6 @@ const adminUtils = {
             let result = await postData(subAdminRef);
             if (result.status) {
                 delete data.password
-
-                // if (billingAddress) {
-                //     ObjProfile.billingAddress = billingAddress
-                //     ObjProfile.completionStaus.billingInfo = true
-
-                // }
-                // if (shippingAddress) {
-                //     ObjProfile.shippingAddress = shippingAddress
-                //     ObjProfile.completionStaus.shippingInfo = true
-                // }
-                // if (paymentDetails) {
-                //     ObjProfile.paymentDetails = paymentDetails,
-                //         ObjProfile.completionStaus.paymentInfo = true
-                // }
-
-                // let userProfileRef = new UserProfile(ObjProfile)
-                // let resultProfile = await postData(userProfileRef);
-                // if (!resultProfile.status) {
-                //     //if userProfile save err then handle user is saved but throw error for profile update issue?
-                //     await deleteData(Users, { _id: userRef._id })
-                //     return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
-                // }
                 return helpers.showResponse(true, ResponseMessages?.admin.subAdmin_added, data, null, 200);
             }
 

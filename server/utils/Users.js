@@ -140,7 +140,7 @@ const UserUtils = {
         try {
             let { isLoginFromShopify, password, email, fcmToken } = data
             let queryObject = { email: email, status: { $ne: 2 } }
-           
+
             let result = await getSingleData(Users, queryObject, '');
             console.log(result, "result login");
             if (!result.status) {

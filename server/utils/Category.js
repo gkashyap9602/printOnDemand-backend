@@ -98,14 +98,14 @@ const categoryUtil = {
     addCategories: async (data, file) => {
         try {
             const { name, description } = data
-            const findCategory = await getSingleData(Category, { status: { $ne: 2 },name: name })
+            const findCategory = await getSingleData(Category, { status: { $ne: 2 }, name: name })
             if (findCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.category_already_existed, {}, null, 403);
             }
-            console.log(file,"fileee");
+            console.log(file, "fileee");
             //upload image to aws s3 bucket
             const s3Upload = await helpers.uploadFileToS3([file])
-            console.log(s3Upload,"category s3 upload");
+            console.log(s3Upload, "category s3 upload");
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
             }
@@ -137,11 +137,11 @@ const categoryUtil = {
         try {
             const { name, description, categoryId } = data
 
-            const findCategory = await getSingleData(Category, { _id: categoryId ,status: { $ne: 2 }})
+            const findCategory = await getSingleData(Category, { _id: categoryId, status: { $ne: 2 } })
             if (!findCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.category_not_exist, {}, null, 400);
             }
-            const findSubCategory = await getSingleData(SubCategory, { status: { $ne: 2 },name: name })
+            const findSubCategory = await getSingleData(SubCategory, { status: { $ne: 2 }, name: name })
             if (findSubCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.subcategory_already_existed, {}, null, 403);
             }
@@ -176,7 +176,7 @@ const categoryUtil = {
         try {
             const { name, description, id } = data
 
-            const find = await getSingleData(Category, { status: { $ne: 2 },_id: id })
+            const find = await getSingleData(Category, { status: { $ne: 2 }, _id: id })
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.category_not_exist, {}, null, 203);
             }
@@ -196,7 +196,7 @@ const categoryUtil = {
                 obj.imageUrl = s3Upload.data[0]
             }
 
-            const result = await updateSingleData(Category, obj, { _id: id ,status: { $ne: 2 }})
+            const result = await updateSingleData(Category, obj, { _id: id, status: { $ne: 2 } })
 
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
@@ -215,7 +215,7 @@ const categoryUtil = {
         try {
             const { name, description, id } = data
 
-            const find = await getSingleData(SubCategory, { status: { $ne: 2 },_id: id })
+            const find = await getSingleData(SubCategory, { status: { $ne: 2 }, _id: id })
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.subcategory_not_exist, {}, null, 203);
             }
@@ -235,7 +235,7 @@ const categoryUtil = {
                 obj.imageUrl = s3Upload.data[0]
             }
 
-            const result = await updateSingleData(SubCategory, obj, { _id: id ,status: { $ne: 2 }})
+            const result = await updateSingleData(SubCategory, obj, { _id: id, status: { $ne: 2 } })
 
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);

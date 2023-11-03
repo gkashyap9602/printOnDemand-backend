@@ -19,7 +19,7 @@ const productUtils = {
             let { careInstructions, longDescription, subCategoryIds, materialId, variableTypesIds,
                 construction, features, productionDuration, shortDescription, title, process } = data
 
-            const findProduct = await getSingleData(Product, { title: title ,status: { $ne: 2 }})
+            const findProduct = await getSingleData(Product, { title: title, status: { $ne: 2 } })
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 403);
             }
@@ -32,7 +32,7 @@ const productUtils = {
             if (findVariableTypes?.data?.length !== variableTypesIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
             }
-            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } ,status: { $ne: 2 }})
+            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds }, status: { $ne: 2 } })
 
             if (findSubCategory?.data?.length !== subCategoryIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
@@ -74,18 +74,18 @@ const productUtils = {
                 construction, features, productionDuration, shortDescription, title, process } = data
 
 
-            const findProduct = await getSingleData(Product, { _id: productId ,status: { $ne: 2 } })
+            const findProduct = await getSingleData(Product, { _id: productId, status: { $ne: 2 } })
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
             }
 
-            const findTitle = await getSingleData(Product, { title, _id: { $ne: productId },status: { $ne: 2 } })
+            const findTitle = await getSingleData(Product, { title, _id: { $ne: productId }, status: { $ne: 2 } })
             if (findTitle.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_title_already, {}, null, 403);
             }
             subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
 
-            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds } ,status: { $ne: 2 }})
+            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds }, status: { $ne: 2 } })
             if (findSubCategory?.data?.length !== subCategoryIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
             }
@@ -118,18 +118,18 @@ const productUtils = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
-    addProductVarient: async (data,files) => {
+    addProductVarient: async (data, files) => {
         try {
             let { productCode, price, productId, varientOptions } = data
-                 
+
             if (typeof varientOptions == 'string') {
                 varientOptions = JSON.parse(varientOptions)
             }
-            const findProduct = await getSingleData(Product, { _id: productId ,status: { $ne: 2 }})
+            const findProduct = await getSingleData(Product, { _id: productId, status: { $ne: 2 } })
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
             }
-            const findProductCode = await getSingleData(ProductVarient, { productCode ,status: { $ne: 2 }})
+            const findProductCode = await getSingleData(ProductVarient, { productCode, status: { $ne: 2 } })
             if (findProductCode.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
             }
@@ -152,7 +152,7 @@ const productUtils = {
                         item._id = mongoose.Types.ObjectId()
                         item.fileName = file.originalname
                         item.filePath = url,
-                        item.templateType = getFileType[fileExtension]
+                            item.templateType = getFileType[fileExtension]
                     }
                 })
                 return item
@@ -185,58 +185,6 @@ const productUtils = {
         }
 
     },
-    // addProductVarient: async (data) => {
-    //     try {
-    //         let { productCode, price, productId, productVarientTemplates, varientOptions } = data
-
-    //         const findProductCode = await getSingleData(ProductVarient, { productCode })
-    //         if (findProductCode.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
-    //         }
-    //         const findProduct = await getSingleData(Product, { _id: productId })
-
-    //         if (!findProduct.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
-    //         }
-
-    //         const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
-
-    //         if (!saveVariableOptions.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.variable.variable_option_save_fail, {}, null, 400);
-    //         }
-    //         productVarientTemplates = productVarientTemplates.map((value) => {
-    //             let item = { ...value }
-    //             item._id = mongoose.Types.ObjectId()
-    //             return item
-    //         })
-    //         let variableOptions = saveVariableOptions?.data.map((value) => {
-    //             let item = { ...value }
-    //             item.variableOptionId = value._id
-    //             return item
-    //         })
-    //         let newObj = {
-    //             productCode,
-    //             price: `$${price}`,
-    //             productId,
-    //             productVarientTemplates,
-    //             varientOptions: variableOptions
-
-    //         }
-    //         const newProductVareint = new ProductVarient(newObj);
-    //         const result = await postData(newProductVareint)
-
-
-    //         if (result.status) {
-    //             return helpers.showResponse(true, ResponseMessages?.product?.product_varient_save, result?.data, null, 200);
-    //         }
-    //         //ends
-    //         return helpers.showResponse(false, ResponseMessages?.product?.product_varient_save_fail, {}, null, 403);
-    //     }
-    //     catch (err) {
-    //         return helpers.showResponse(false, err?.message, null, null, 400);
-    //     }
-
-    // },
     updateProductVarient: async (data) => {
         try {
             let { productCode, price, productVarientId } = data
@@ -255,31 +203,6 @@ const productUtils = {
                 productCode,
                 price: price,
             }
-
-            // if (files?.length > 0) {
-            //     const s3Upload = await helpers.uploadFileToS3(files)
-            //     if (!s3Upload.status) {
-            //         return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, {}, null, 203);
-            //     }
-
-            //     let productVarientTemplates = files.map((file) => {
-            //         let fileExtension = mime.extension(file.mimetype)
-            //         let item = {}
-            //         s3Upload?.data?.map((url) => {
-            //             let s3fileExtension = url.split('.').pop().toLowerCase()
-
-            //             if (fileExtension == s3fileExtension) {
-            //                 item._id = mongoose.Types.ObjectId()
-            //                 item.fileName = file.originalname
-            //                 item.filePath = url,
-            //                     item.templateType = getFileType[fileExtension]
-            //             }
-            //         })
-            //         return item
-            //     })
-
-            //     newObj.productVarientTemplates = productVarientTemplates
-            // }
 
             const result = await updateSingleData(ProductVarient, newObj, { _id: productVarientId, productCode: find?.data?.productCode })
             if (!result.status) {
@@ -300,7 +223,7 @@ const productUtils = {
                 {
                     $match: {
                         _id: mongoose.Types.ObjectId(productId),
-                        status:{$ne:2},
+                        status: { $ne: 2 },
                     }
                 },
                 {
@@ -416,7 +339,7 @@ const productUtils = {
 
             let matchObj = {
                 subCategoryId: { $in: [id] },
-                status:{$ne:2},
+                status: { $ne: 2 },
                 title: { $regex: searchKey, $options: 'i' }
             }
 
@@ -493,7 +416,7 @@ const productUtils = {
         try {
             let { displayOrder, imageType, productId } = data
 
-            const findProduct = await getSingleData(Product, { _id: productId ,status: { $ne: 2 }})
+            const findProduct = await getSingleData(Product, { _id: productId, status: { $ne: 2 } })
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
@@ -575,20 +498,20 @@ const productUtils = {
 
     updateVarientTemplate: async (data, file) => {
         try {
-            let { templateId,templateType, productVarientId } = data
+            let { templateId, templateType, productVarientId } = data
 
             const findProductVarient = await getSingleData(ProductVarient, { _id: productVarientId })
             if (!findProductVarient.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 403);
             }
-            
-            const findVarientTemplate = await getSingleData(ProductVarient, { _id: productVarientId ,productVarientTemplates: {$elemMatch:{templateType}} })
-            console.log(findVarientTemplate,"findVarientTemplate")
+
+            const findVarientTemplate = await getSingleData(ProductVarient, { _id: productVarientId, productVarientTemplates: { $elemMatch: { templateType } } })
+            console.log(findVarientTemplate, "findVarientTemplate")
 
             if (findVarientTemplate.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.varient_template_already, {}, null, 403);
             }
-            
+
             const s3Upload = await helpers.uploadFileToS3([file])
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
@@ -622,7 +545,7 @@ const productUtils = {
                 return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
             }
 
-            let result = await removeItemFromArray(ProductVarient, { _id: productVarientId}, 'productVarientTemplates', templateId)
+            let result = await removeItemFromArray(ProductVarient, { _id: productVarientId }, 'productVarientTemplates', templateId)
             if (result.status) {
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
@@ -643,8 +566,8 @@ const productUtils = {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
 
-            const result = await updateSingleData(Product, {status:2},{_id:productId})
-             console.log(result,"resultt Product")
+            const result = await updateSingleData(Product, { status: 2 }, { _id: productId })
+            console.log(result, "resultt Product")
 
             if (result.status) {
 

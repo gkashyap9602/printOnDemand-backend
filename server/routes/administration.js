@@ -7,7 +7,7 @@ const { saveNotification, addMaterial, updateWaitingList, deleteNotification, ad
 
 // Admin Routes with Token
 router.post('/addMaterial', validateCSRFToken, verifyTokenAdmin, validate(addMaterial), adminController.addMaterial);
-router.post('/createCustomer', validateCSRFToken, verifyTokenAdmin, adminController.createCustomer);
+router.post('/createCustomer', verifyTokenAdmin, adminController.createCustomer);
 router.post('/activeInactiveUser', verifyTokenAdmin, validate(activeInactiveuser), adminController.activeInactiveUser);
 router.post('/updateWaitingList', validateCSRFToken, verifyTokenAdmin, validate(updateWaitingList), adminController.updateWaitingList);
 router.post('/saveNotification', validateCSRFToken, verifyTokenAdmin, validate(saveNotification), adminController.saveNotification);
