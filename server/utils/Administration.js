@@ -255,6 +255,143 @@ const adminUtils = {
         }
 
     },
+    addSubAdmin: async (data, adminId) => {
+        try {
+            let { firstName, lastName, email, password } = data;
+
+            let subAdminData = await getSingleData(Users, { email, userType: 2 })
+            if (subAdminData.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin.email_already, null, null, 400);
+            }
+
+            // let superAdminData = await getSingleData(Users, { _id: adminId, userType: 1 })
+            // console.log(superAdminData, "adminData", adminId)
+            // if (!superAdminData.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
+            // }
+
+            let newObj = {
+                firstName,
+                lastName,
+                email: email,
+                userName: email,
+                password: md5(password),
+                createdOn: helpers.getCurrentDate()
+            }
+
+            let subAdminRef = new Users(newObj)
+            let result = await postData(subAdminRef);
+            if (result.status) {
+                delete data.password
+
+                // if (billingAddress) {
+                //     ObjProfile.billingAddress = billingAddress
+                //     ObjProfile.completionStaus.billingInfo = true
+
+                // }
+                // if (shippingAddress) {
+                //     ObjProfile.shippingAddress = shippingAddress
+                //     ObjProfile.completionStaus.shippingInfo = true
+                // }
+                // if (paymentDetails) {
+                //     ObjProfile.paymentDetails = paymentDetails,
+                //         ObjProfile.completionStaus.paymentInfo = true
+                // }
+
+                // let userProfileRef = new UserProfile(ObjProfile)
+                // let resultProfile = await postData(userProfileRef);
+                // if (!resultProfile.status) {
+                //     //if userProfile save err then handle user is saved but throw error for profile update issue?
+                //     await deleteData(Users, { _id: userRef._id })
+                //     return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
+                // }
+                return helpers.showResponse(true, ResponseMessages?.users?.register_success, data, null, 200);
+            }
+
+            return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
+        } catch (err) {
+            return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
+        }
+
+    },
+
+    getSubAdmin: async (data, adminId) => {
+        try {
+            let { firstName, lastName, email, billingAddress, paymentDetails, shippingAddress } = data;
+
+            let existUser = await getSingleData(Users, { email })
+            if (existUser.status) {
+                return helpers.showResponse(false, ResponseMessages?.users.email_already, null, null, 400);
+            }
+            const usersCount = await getCount(Users, { userType: 3 })
+            if (!usersCount.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
+            }
+            const idGenerated = helpers.generateIDs(usersCount?.data)
+
+            let adminData = await getSingleData(Users, { _id: adminId, userType: 1 })
+            console.log(adminData, "adminData", adminId)
+            if (!adminData.status) {
+                return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
+            }
+
+            let newObj = {
+                firstName,
+                lastName,
+                email: email,
+                userName: email,
+                id: idGenerated.idNumber,
+                // guid: randomUUID(),
+                customerId: idGenerated.customerID,
+                createdUser: `${adminData?.data?.firstName} ${adminData?.data?.lastName}`,
+                // customerGuid: randomUUID(),
+                // password: md5(password),
+                createdOn: helpers.getCurrentDate()
+            }
+
+            let userRef = new Users(newObj)
+            let result = await postData(userRef);
+            if (result.status) {
+                // delete data.password
+
+                let ObjProfile = {
+                    userId: result.data._id,
+                    completionStaus: {
+                        basicInfo: true
+                    },
+                    createdOn: helpers.getCurrentDate()
+                }
+                if (billingAddress) {
+                    ObjProfile.billingAddress = billingAddress
+                    ObjProfile.completionStaus.billingInfo = true
+
+                }
+                if (shippingAddress) {
+                    ObjProfile.shippingAddress = shippingAddress
+                    ObjProfile.completionStaus.shippingInfo = true
+                }
+                if (paymentDetails) {
+                    ObjProfile.paymentDetails = paymentDetails,
+                        ObjProfile.completionStaus.paymentInfo = true
+                }
+
+                let userProfileRef = new UserProfile(ObjProfile)
+                let resultProfile = await postData(userProfileRef);
+                if (!resultProfile.status) {
+                    //if userProfile save err then handle user is saved but throw error for profile update issue?
+                    await deleteData(Users, { _id: userRef._id })
+                    return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
+                }
+
+                return helpers.showResponse(true, ResponseMessages?.users?.register_success, data, null, 200);
+            }
+
+            return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
+        } catch (err) {
+            return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
+        }
+
+    },
     activeInactiveUser: async (data) => {
         try {
             let { status, userId } = data

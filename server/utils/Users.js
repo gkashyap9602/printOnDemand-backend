@@ -139,7 +139,7 @@ const UserUtils = {
     login: async (data, request, response) => {
         try {
             let { isLoginFromShopify, password, email, fcmToken } = data
-            let queryObject = { email: email, status: { $ne: 3 } }
+            let queryObject = { email: email, status: { $ne: 2 } }
 
             let result = await getSingleData(Users, queryObject, '');
             if (!result.status) {
@@ -154,7 +154,7 @@ const UserUtils = {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_disabled, null, null, 403);
             }
 
-            let user_type = userData.userType == 1 ? 'admin' : "user"
+            let user_type = userData.userType == 3 ? 'user' : "admin"
             let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
 
             let access_token = jwt.sign({ user_type: user_type, type: "access", _id: userData._id }, API_SECRET, {

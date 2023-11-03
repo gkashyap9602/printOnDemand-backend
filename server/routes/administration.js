@@ -14,6 +14,8 @@ router.post('/saveNotification', validateCSRFToken, verifyTokenAdmin, validate(s
 router.delete('/deleteNotification', validateCSRFToken, verifyTokenAdmin, validate(deleteNotification), adminController.deleteNotification);
 router.get('/getNotifications', verifyTokenAdmin, adminController.getNotifications);
 router.get('/getAllUsers', verifyTokenAdmin, adminController.getAllUsers);
+router.post('/addSubAdmin', validateCSRFToken, verifyTokenAdmin, adminController.addSubAdmin);
+router.get('/getSubAdmin', verifyTokenAdmin, adminController.getSubAdmin);
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
