@@ -305,10 +305,10 @@ const adminUtils = {
                 //     await deleteData(Users, { _id: userRef._id })
                 //     return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
                 // }
-                return helpers.showResponse(true, ResponseMessages?.admin., data, null, 200);
+                return helpers.showResponse(true, ResponseMessages?.admin.subAdmin_added, data, null, 200);
             }
 
-            return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
+            return helpers.showResponse(false, ResponseMessages?.admin.subAdmin_save_fail, null, null, 400);
         } catch (err) {
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
         }
