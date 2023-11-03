@@ -257,7 +257,7 @@ const adminUtils = {
     },
     addSubAdmin: async (data, adminId) => {
         try {
-            let { firstName, lastName, email, password } = data;
+            let { firstName, lastName, email, password, access } = data;
 
             let subAdminData = await getSingleData(Users, { email, userType: 2 })
             if (subAdminData.status) {
@@ -276,6 +276,8 @@ const adminUtils = {
                 email: email,
                 userName: email,
                 password: md5(password),
+                userType: 2,
+                access,
                 createdOn: helpers.getCurrentDate()
             }
 
@@ -315,80 +317,58 @@ const adminUtils = {
 
     },
 
-    getSubAdmin: async (data, adminId) => {
+    getAllSubAdmins: async (data) => {
         try {
-            let { firstName, lastName, email, billingAddress, paymentDetails, shippingAddress } = data;
+            let { sortColumn = 'createdOn', sortDirection = 'asc', pageIndex = 1, pageSize = 5, searchKey = '', subAdminId } = data
+            pageIndex = Number(pageIndex)
+            pageSize = Number(pageSize)
 
-            let existUser = await getSingleData(Users, { email })
-            if (existUser.status) {
-                return helpers.showResponse(false, ResponseMessages?.users.email_already, null, null, 400);
-            }
-            const usersCount = await getCount(Users, { userType: 3 })
-            if (!usersCount.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
-            }
-            const idGenerated = helpers.generateIDs(usersCount?.data)
+            console.log(pageIndex, pageSize, "pagina")
+            console.log(sortColumn, sortDirection, searchKey, "extraa")
 
-            let adminData = await getSingleData(Users, { _id: adminId, userType: 1 })
-            console.log(adminData, "adminData", adminId)
-            if (!adminData.status) {
-                return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
+            let matchObj = {
+                email: { $regex: searchKey, $options: 'i' },
+                userType: 2,
+                status: { $ne: 2 }
             }
 
-            let newObj = {
-                firstName,
-                lastName,
-                email: email,
-                userName: email,
-                id: idGenerated.idNumber,
-                // guid: randomUUID(),
-                customerId: idGenerated.customerID,
-                createdUser: `${adminData?.data?.firstName} ${adminData?.data?.lastName}`,
-                // customerGuid: randomUUID(),
-                // password: md5(password),
-                createdOn: helpers.getCurrentDate()
+            if (subAdminId) {
+                matchObj._id = mongoose.Types.ObjectId(subAdminId)
             }
+            console.log(subAdminId, "subAdminId");
+            console.log(matchObj, "matchObj");
 
-            let userRef = new Users(newObj)
-            let result = await postData(userRef);
-            if (result.status) {
-                // delete data.password
+            const result = await Users.aggregate([
+                {
+                    $match: {
+                        $or: [
+                            { ...matchObj }
 
-                let ObjProfile = {
-                    userId: result.data._id,
-                    completionStaus: {
-                        basicInfo: true
-                    },
-                    createdOn: helpers.getCurrentDate()
-                }
-                if (billingAddress) {
-                    ObjProfile.billingAddress = billingAddress
-                    ObjProfile.completionStaus.billingInfo = true
+                        ]
+                    }
+                },
+                {
+                    $skip: (pageIndex - 1) * pageSize
 
-                }
-                if (shippingAddress) {
-                    ObjProfile.shippingAddress = shippingAddress
-                    ObjProfile.completionStaus.shippingInfo = true
-                }
-                if (paymentDetails) {
-                    ObjProfile.paymentDetails = paymentDetails,
-                        ObjProfile.completionStaus.paymentInfo = true
-                }
+                },
+                {
+                    $limit: pageSize
 
-                let userProfileRef = new UserProfile(ObjProfile)
-                let resultProfile = await postData(userProfileRef);
-                if (!resultProfile.status) {
-                    //if userProfile save err then handle user is saved but throw error for profile update issue?
-                    await deleteData(Users, { _id: userRef._id })
-                    return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
-                }
+                },
+                {
+                    $sort: {
+                        [sortColumn]: sortDirection == 'asc' ? 1 : -1
+                    }
+                },
 
-                return helpers.showResponse(true, ResponseMessages?.users?.register_success, data, null, 200);
-            }
+            ])
 
-            return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
+            const totalUsers = await getCount(Users, { userType: 2, status: { $ne: 2 } })
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalUsers.data }, null, 200);
         } catch (err) {
-            return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
+            console.log(err, "err get side");
+            return helpers.showResponse(false, ResponseMessages?.common.database_error, err, null, 400);
         }
 
     },
@@ -399,6 +379,41 @@ const adminUtils = {
             let result = await updateSingleData(Users, { status }, { _id: userId })
             if (result.status) {
 
+                return helpers.showResponse(true, ResponseMessages?.common.update_sucess, null, null, 200);
+            }
+
+        } catch (err) {
+            return helpers.showResponse(false, ResponseMessages?.common.update_failed, err, null, 400);
+        }
+
+    },
+    updateSubAdmin: async (data) => {
+        try {
+            let { firstName, lastName, access, subAdminId, status } = data
+
+            let matchObj = {
+                _id: subAdminId,
+                userType: 2,
+                status: { $ne: 2 }
+            }
+
+            let updateObj = {
+                firstName,
+                lastName,
+                access
+            }
+            if (status) {
+                updateObj.status = status
+            }
+
+            let subAdminData = await getSingleData(Users, matchObj)
+
+            if (!subAdminData.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.not_exist, null, null, 400);
+            }
+
+            let result = await updateSingleData(Users, updateObj, matchObj)
+            if (result.status) {
                 return helpers.showResponse(true, ResponseMessages?.common.update_sucess, null, null, 200);
             }
 

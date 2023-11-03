@@ -32,10 +32,6 @@ var Users = new Schema({
         type: String,
         default: null
     },
-    csrfToken: {
-        type: String,
-        default: null
-    },
     createdUser: {
         type: String,
         default: 'Admin'
@@ -77,11 +73,31 @@ var Users = new Schema({
     },
     status: {
         type: Number,
-        default: 2,
-        Comment: "1 for active 2 for delete/deactivate  3 for pending",
+        default: 3,
+        Comment: "1 for active 2 for delete  3 for pending 4 for deactivate ",
         enum: [1, 2, 3],
         index: true
     },
+    access: [{
+        title: {
+            type: String,
+            default: ''
+        },
+        accessUrl: [{
+            type: String
+        }],
+        value: {
+            read: {
+                type: Boolean,
+                default: false,
+
+            },
+            write: {
+                type: Boolean,
+                default: false,
+            }
+        }
+    }],
     payTraceId: {
         type: String,
         default: null

@@ -48,16 +48,20 @@ const adminController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
    
-    getSubAdmin: async (req, res) => {
+    getAllSubAdmins: async (req, res) => {
         let adminId = req.decoded?.admin_id
         if (!adminId) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
         }
-        let result = await Administration.getSubAdmin(req.body, adminId);
+        let result = await Administration.getAllSubAdmins(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
     activeInactiveUser: async (req, res) => {
         let result = await Administration.activeInactiveUser(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    updateSubAdmin: async (req, res) => {
+        let result = await Administration.updateSubAdmin(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
 

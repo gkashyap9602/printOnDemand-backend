@@ -15,7 +15,7 @@ module.exports.addMaterial = {
 
 };
 
-module.exports.saveNotification= {
+module.exports.saveNotification = {
     body: joi.object({
         type: joi.string().valid('MWW_Global', 'users').required(),
         title: joi.string().required(),
@@ -25,7 +25,36 @@ module.exports.saveNotification= {
     })
 
 };
-module.exports.deleteNotification= {
+module.exports.addSubAdmin = {
+    body: joi.object({
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+        firstName: joi.string().required(),
+        lastName: joi.string(),
+        password: joi.string().required(),
+        access: joi.array().required()
+
+    })
+
+};
+module.exports.activeInactiveuser = {
+    body: joi.object({
+        status: joi.any().required(),
+        userId: joi.string().required()
+
+    })
+
+};
+module.exports.updateSubAdmin = {
+    body: joi.object({
+        subAdminId: joi.string().required(),
+        firstName: joi.string().required(),
+        lastName: joi.string(),
+        access: joi.array().required(),
+        status: joi.any()
+    })
+
+};
+module.exports.deleteNotification = {
     body: joi.object({
         notificationId: joi.string().required(),
         type: joi.string().valid('MWW_Global', 'users').required(),
