@@ -107,6 +107,7 @@ const adminUtils = {
                     $match: {
                         $or: [
                             { email: { $regex: searchKey, $options: 'i' } },
+                            { userType: 3 }
                             // {
                             //     $expr: {
                             //       $regexMatch: {
@@ -141,7 +142,11 @@ const adminUtils = {
                     }
                 },
                 {
-                    $unwind: '$userProfileData'
+                    $unwind: {
+                        path: "$userProfileData",
+                        preserveNullAndEmptyArrays: false
+                    },
+
                 },
                 {
                     $addFields: {
@@ -153,10 +158,10 @@ const adminUtils = {
                 },
             ])
 
-            const activeUsers = await getCount(Users, { status: 1 })
-            const pendingUsers = await getCount(Users, { status: 2 })
-            const deactivateUsers = await getCount(Users, { status: 3 })
-            const totalUsers = await getCount(Users, {})
+            const activeUsers = await getCount(Users, { status: 1, userType: 3 })
+            const pendingUsers = await getCount(Users, { status: 2, userType: 3 })
+            const deactivateUsers = await getCount(Users, { status: 3, userType: 3 })
+            const totalUsers = await getCount(Users, { userType: 3 })
 
             let statusSummary = {
                 active: activeUsers.data,
@@ -247,6 +252,21 @@ const adminUtils = {
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
         } catch (err) {
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
+        }
+
+    },
+    activeInactiveUser: async (data) => {
+        try {
+            let { status, userId } = data
+            status = Number(status)
+            let result = await updateSingleData(Users, { status }, { _id: userId })
+            if (result.status) {
+
+                return helpers.showResponse(true, ResponseMessages?.common.update_sucess, null, null, 200);
+            }
+
+        } catch (err) {
+            return helpers.showResponse(false, ResponseMessages?.common.update_failed, err, null, 400);
         }
 
     },

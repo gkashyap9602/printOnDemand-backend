@@ -29,7 +29,7 @@ module.exports = {
         not_exist: "Data not existed",
         invalid_id: "invalid id",
         created_successfully: "created Successfully",
-        update_sucess: "udpated Successfully",
+        update_sucess: "Updated Successfully",
         update_failed: "Error occured while updating",
         delete_failed: "Error occured while deleting",
         delete_sucess: "Deleted Successfully",
