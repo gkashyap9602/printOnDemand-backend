@@ -19,7 +19,7 @@ async function createAdmin() {
             userType: APP_CONSTANTS.ROLE.ADMIN_ROLE,
             password: hashPassword,
             phone: '9898989898',
-            createdOn:helpers.getCurrentDate()
+            createdOn: helpers.getCurrentDate()
         });
         console.log('Admin Created ');
     }
@@ -30,7 +30,7 @@ async function createWaitingList() {
     if (!waitingList) {
         await WaitingList.create({
             isWaitingListEnable: false,
-            createdOn:helpers.getCurrentDate()
+            createdOn: helpers.getCurrentDate()
         });
         // console.log('Admin Created ');
     }
@@ -40,11 +40,11 @@ async function createCommonContent() {
     let commonContent = await CommonContent.findOne({})
     if (!commonContent) {
         await CommonContent.create({
-        createdOn:helpers.getCurrentDate()
+            createdOn: helpers.getCurrentDate()
         });
         // console.log('Admin Created ');
     }
 
 }
 
-module.exports = {createAdmin,createWaitingList,createCommonContent}
+module.exports = { createAdmin, createWaitingList, createCommonContent }

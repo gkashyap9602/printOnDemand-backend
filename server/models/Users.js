@@ -72,13 +72,13 @@ var Users = new Schema({
         type: Number,
         default: 3,
         enum: [1, 2, 3],
-        Comment: '1 for admin 3 for user '
+        Comment: '1 for admin 3 for user 2 for subAdmin'
 
     },
     status: {
         type: Number,
         default: 2,
-        Comment: "1 for active 2 for pending Activation 3 for deactivate user",
+        Comment: "1 for active 2 for delete/deactivate  3 for pending",
         enum: [1, 2, 3],
         index: true
     },
