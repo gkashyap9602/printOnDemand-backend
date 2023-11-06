@@ -673,25 +673,21 @@ const productUtils = {
     },
     deleteVariable: async (data) => {
         try {
-
-            console.log(data, "dataa");
             const { variableTypeId } = data
 
-            const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId })
+            const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId, status: { $ne: 2 } })
             if (!findVariableType.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
             }
 
             const result = await updateSingleData(VariableTypes, { status: 2 }, { _id: variableTypeId })
-            console.log(result, "resultt Category")
-
-            await updateByQuery(VariableOptions, { status: 2 }, { variableTypeId: variableTypeId })
 
             if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
+                return helpers.showResponse(false, ResponseMessages?.common.delete_failed, result?.data, null, 400);
             }
+            await updateByQuery(VariableOptions, { status: 2 }, { variableTypeId: variableTypeId })
 
-            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, result?.data, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 403);
