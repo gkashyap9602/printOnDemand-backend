@@ -6,9 +6,14 @@ var Material = new Schema({
         type: String,
         required: true
     },
-    isDeleted: {
-        type: Boolean,
-        default: false,
+    // isDeleted: {
+    //     type: Boolean,
+    //     default: false,
+    // },
+    status: {
+        type: Number,
+        default: 1,
+        Comment: "1 for active 2 for delete "
     },
     createdOn: {
         type: String,

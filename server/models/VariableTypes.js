@@ -7,6 +7,12 @@ var VariableTypes = new Schema({
         required: true,
         index: true
     },
+    status: {
+        type: Number,
+        default: 1,
+        Comment:"1 for active 2 for delete "
+
+    },
     createdOn: {
         type: String,
         default: null,

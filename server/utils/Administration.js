@@ -75,6 +75,36 @@ const adminUtils = {
         }
 
     },
+
+    updateMaterial: async (data) => {
+        console.log(data, "dataa");
+        let { materialId, name, status } = data
+        let updateObj = {
+            updatedOn: helpers.getCurrentDate()
+        }
+
+        if (status) {
+            updateObj.status = status
+        }
+        if (name) {
+            updateObj.name = name
+        }
+        let matchObj = {
+            _id: mongoose.Types.ObjectId(materialId),
+            status: { $ne: 2 }
+        }
+
+        const find = await getSingleData(Material, matchObj)
+        if (!find.status) {
+            return helpers.showResponse(false, ResponseMessages?.material.not_exist, {}, null, 400);
+        }
+
+        let response = await updateSingleData(Material, data, matchObj);
+        if (response.status) {
+            return helpers.showResponse(true, status ? "Delete Successfully" : ResponseMessages.common.update_sucess, null, null, 200);
+        }
+        return helpers.showResponse(false, status ? "Error While Deleting" : ResponseMessages.common.update_failed, response, null, 400);
+    },
     updateWaitingList: async (data) => {
         try {
             const { value } = data
@@ -367,10 +397,16 @@ const adminUtils = {
                 status: { $ne: 2 }
             }
 
-            let updateObj = {
-                firstName,
-                lastName,
-                access
+            let updateObj = {}
+
+            if (firstName) {
+                updateObj.firstName = firstName
+            }
+            if (lastName) {
+                updateObj.lastName = lastName
+            }
+            if (access) {
+                updateObj.access = access
             }
             if (status) {
                 updateObj.status = status
@@ -384,11 +420,11 @@ const adminUtils = {
 
             let result = await updateSingleData(Users, updateObj, matchObj)
             if (result.status) {
-                return helpers.showResponse(true, ResponseMessages?.common.update_sucess, null, null, 200);
+                return helpers.showResponse(true, status ? "Deleted Successfully" : ResponseMessages?.common.update_sucess, null, null, 200);
             }
 
         } catch (err) {
-            return helpers.showResponse(false, ResponseMessages?.common.update_failed, err, null, 400);
+            return helpers.showResponse(false, status ? "Error While Deleting" : ResponseMessages?.common.update_failed, err, null, 400);
         }
 
     },

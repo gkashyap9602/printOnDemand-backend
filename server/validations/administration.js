@@ -14,6 +14,14 @@ module.exports.addMaterial = {
     })
 
 };
+module.exports.updateMaterial = {
+    body: joi.object({
+        materialId: joi.string().required(),
+        name: joi.string(),
+        status: joi.number()
+    })
+
+};
 
 module.exports.saveNotification = {
     body: joi.object({
@@ -47,9 +55,9 @@ module.exports.activeInactiveuser = {
 module.exports.updateSubAdmin = {
     body: joi.object({
         subAdminId: joi.string().required(),
-        firstName: joi.string().required(),
+        firstName: joi.string(),
         lastName: joi.string(),
-        access: joi.array().required(),
+        access: joi.array(),
         status: joi.any()
     })
 

@@ -613,7 +613,7 @@ const productUtils = {
         try {
             const { typeName } = data
 
-            const findProduct = await getSingleData(VariableTypes, { typeName })
+            const findProduct = await getSingleData(VariableTypes, { typeName, status: { $ne: 2 } })
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.variable_type_already, {}, null, 403);
             }
@@ -642,11 +642,11 @@ const productUtils = {
         try {
             const { value, variableTypeId } = data
 
-            const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId })
+            const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId, status: { $ne: 2 } })
             if (!findVariableType.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
             }
-            const find = await getSingleData(VariableOptions, { value })
+            const find = await getSingleData(VariableOptions, { value, status: { $ne: 2 } })
             if (find.status) {
                 return helpers.showResponse(false, ResponseMessages?.variable.variable_option_already, {}, null, 403);
             }
@@ -671,17 +671,50 @@ const productUtils = {
         }
 
     },
+    deleteVariable: async (data) => {
+        try {
+
+            console.log(data, "dataa");
+            const { variableTypeId } = data
+
+            const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId })
+            if (!findVariableType.status) {
+                return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
+            }
+
+            const result = await updateSingleData(VariableTypes, { status: 2 }, { _id: variableTypeId })
+            console.log(result, "resultt Category")
+
+            await updateByQuery(VariableOptions, { status: 2 }, { variableTypeId: variableTypeId })
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.admin?.save_failed, result?.data, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 403);
+        }
+
+    },
     getAllVariableTypes: async () => {
         try {
             const result = await VariableTypes.aggregate(
-                [{
-                    $lookup: {
-                        from: 'variableOptions',
-                        localField: '_id',
-                        foreignField: 'variableTypeId',
-                        as: 'variableOptions',
+                [
+                    {
+                        $match: {
+                            status: { $ne: 2 },
+                        }
                     },
-                },]
+                    {
+                        $lookup: {
+                            from: 'variableOptions',
+                            localField: '_id',
+                            foreignField: 'variableTypeId',
+                            as: 'variableOptions',
+                        },
+                    },]
             )
 
             if (result.length === 0) {

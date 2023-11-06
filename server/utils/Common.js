@@ -15,7 +15,13 @@ const commonUtil = {
   getMaterials: async (data) => {
     const { subCategoryId } = data
 
-    let aggregationPipeline = []
+    let aggregationPipeline = [
+      {
+        $match: {
+          status: { $ne: 2 }
+        }
+      },
+    ]
 
     if (subCategoryId) {
       console.log("underif")

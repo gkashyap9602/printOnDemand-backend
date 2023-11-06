@@ -15,3 +15,10 @@ module.exports.addVariableOption = {
     })
 
 };
+
+module.exports.deleteVariable = {
+    body: joi.object({
+        variableTypeId: joi.string().required(),
+    })
+
+};
