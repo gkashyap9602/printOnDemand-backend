@@ -54,7 +54,6 @@ let product = require("./server/routes/product");
 let productLibrary = require("./server/routes/productLibrary");
 let gallery = require('./server/routes/Gallery');
 
-app.use(proxy('http://127.0.0.1:3000'));
 
 app.use(API_V1 + "administration", administration,);
 app.use(API_V1 + "user", users);
@@ -64,7 +63,7 @@ app.use(API_V1 + "product", product,);
 app.use(API_V1 + "productLibrary", productLibrary,);
 app.use(API_V1 + "gallery", gallery,);
 
-// app.use(proxy('http://127.0.0.1:3000'));
+app.use(proxy('http://127.0.0.1:3000'));
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`https server running on port ${process.env.PORT || 3000}`);
