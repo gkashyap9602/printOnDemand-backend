@@ -9,7 +9,13 @@ const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-const proxy = require('express-http-proxy')
+var httpProxy = require('http-proxy');
+var apiProxy = httpProxy.createProxyServer();
+var frontend = 'http://localhost:3000';
+
+app.all("/*", function (req, res) {
+  apiProxy.web(req, res, { target: frontend });
+});
 app.use(helmet())
 app.enable('trust proxy', true);
 
@@ -63,7 +69,6 @@ app.use(API_V1 + "product", product,);
 app.use(API_V1 + "productLibrary", productLibrary,);
 app.use(API_V1 + "gallery", gallery,);
 
-app.use(proxy('http://127.0.0.1:3000'));
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`https server running on port ${process.env.PORT || 3000}`);
