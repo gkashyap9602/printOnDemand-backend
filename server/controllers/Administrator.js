@@ -44,7 +44,7 @@ const adminController = {
         if (!adminId) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
         }
-        let result = await Administration.addSubAdmin(req.body, adminId);
+        let result = await Administration.addSubAdmin(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
    

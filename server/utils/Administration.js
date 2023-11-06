@@ -253,11 +253,11 @@ const adminUtils = {
         }
 
     },
-    addSubAdmin: async (data, adminId) => {
+    addSubAdmin: async (data,) => {
         try {
             let { firstName, lastName, email, password, access } = data;
 
-            let subAdminData = await getSingleData(Users, { email, userType: 2 })
+            let subAdminData = await getSingleData(Users, { email, userType: { $in: [1, 2] } })
             if (subAdminData.status) {
                 return helpers.showResponse(false, ResponseMessages?.admin.email_already, null, null, 400);
             }

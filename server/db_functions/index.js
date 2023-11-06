@@ -57,8 +57,8 @@ module.export = getSingleData = (Model, query, feilds, populate = null) => {
 module.export = postData = (modalRefrence) => {
     return new Promise((resolve, reject) => {
         modalRefrence.save((err, savedData) => {
+
             if (err) {
-                console.log(err)
                 let response = helpers.showResponse(false, err);
                 return resolve(response);
             }
