@@ -45,7 +45,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join("/index.html"));
 });
 
-
 let administration = require("./server/routes/administration");
 let users = require("./server/routes/users");
 let common = require("./server/routes/common");
@@ -62,7 +61,7 @@ app.use(API_V1 + "product", product,);
 app.use(API_V1 + "productLibrary", productLibrary,);
 app.use(API_V1 + "gallery", gallery,);
 
-app.use(proxy('http://localhost:3000'));
+app.use(proxy('http://127.0.0.1:3000'));
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`https server running on port ${process.env.PORT || 3000}`);
