@@ -105,12 +105,16 @@ const adminUtils = {
             const result = await Users.aggregate([
                 {
                     $match: {
+                        userType: 3,
+
                         $or: [
                             {
                                 email: { $regex: searchKey, $options: 'i' },
-                                // firstName: { $regex: searchKey, $options: 'i' }
                             },
-                            { userType: 3 }
+                            {
+                                firstName: { $regex: searchKey, $options: 'i' }
+                            },
+
                         ]
                     }
                 },

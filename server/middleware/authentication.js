@@ -173,6 +173,7 @@ const middleware = {
 							return res.status(401).json({ status: false, message: ResponseMessages?.users?.invalid_user, StatusCode: 401 });
 						}
 						let userData = response?.data
+						console.log(userData.status, "status jwt side");
 						if (userData.status == 2) {
 							return res.status(451).json({ status: false, message: ResponseMessages?.middleware?.deleted_account, StatusCode: 451 });
 						}
