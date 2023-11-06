@@ -2,11 +2,6 @@ var Administration = require('../utils/Administration');
 const helpers = require('../services/helper');
 const adminController = {
 
-    // login: async (req, res) => {
-    //     let result = await Administration.login(req.body);
-    //     return helpers.showOutput(res, result, result.statusCode);
-    // },
-
     addMaterial: async (req, res) => {
         let result = await Administration.addMaterial(req.body);
         return helpers.showOutput(res, result, result.statusCode);
@@ -51,7 +46,7 @@ const adminController = {
         let result = await Administration.addSubAdmin(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-   
+
     getAllSubAdmins: async (req, res) => {
         let adminId = req.decoded?.admin_id
         if (!adminId) {
@@ -68,15 +63,6 @@ const adminController = {
         let result = await Administration.updateSubAdmin(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-
-    // logout: async (req, res) => {
-    //     let adminId = req.decoded?.admin_id;
-    //     if (!adminId) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
-    //     }
-    //     let result = await Administration.logout(adminId);
-    //     return helpers.showOutput(res, result, result.statusCode);
-    // },
 
 }
 

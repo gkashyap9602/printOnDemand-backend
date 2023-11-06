@@ -109,48 +109,6 @@ const authController = {
         let result = await Users.getBulkImport(req?.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    // // admin panel
-    // getAllUsers: async (req, res) => {
-    //     let requiredFields = ["page", "limit"];
-    //     let validator = helpers.validateParams(req, requiredFields);
-    //     if (!validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
-    //     }
-    //     let admin_id = req.decoded.admin_id;
-    //     if (!admin_id) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
-    //     }
-    //     let result = await Users.getAllUsers(req.body);
-    //     return helpers.showOutput(res, result, result.code);
-    // },
-
-    // getDetailByAdmin: async (req, res) => {
-    //     let requiredFields = ['_id'];
-    //     let validator = helpers.validateParams(req, requiredFields);
-    //     if (!validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
-    //     }
-    //     let admin_id = req.decoded.admin_id;
-    //     if (!admin_id) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
-    //     }
-    //     let result = await Users.getUserDetail(req.body._id);
-    //     return helpers.showOutput(res, result, result.code);
-    // },
-
-    // updateUserByAdmin: async (req, res) => {
-    //     let requiredFields = ['user_id'];
-    //     let validator = helpers.validateParams(req, requiredFields);
-    //     if (!validator.status) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, validator.message), 203);
-    //     }
-    //     let admin_id = req.decoded.admin_id;
-    //     if (!admin_id) {
-    //         return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
-    //     }
-    //     let result = await Users.updateUserAdmin(req.body, req.body.user_id);
-    //     return helpers.showOutput(res, result, result.code);
-    // },
 }
 
 module.exports = {

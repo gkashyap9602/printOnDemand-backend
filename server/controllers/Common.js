@@ -38,20 +38,7 @@ const commonController = {
         let result = await Common.getWaitingListStatus(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    //
-    csrfToken: async (req, res) => {
-        console.log(req.cookies, 'cookies get side');
-        let csrfToken = req?.session?.csrfToken
-        console.log(req?.session, "req.session get side ");
-        let result = await Common.csrfToken(csrfToken);
-        res.send(result.data)
-    },
 
-    submitCsrfToken: async (req, res) => {
-        console.log(req.cookies, "cokkie post");
-        let result = await Common.submitCsrfToken(req.body);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
     getQuestions: async (req, res) => {
         let result = await Common.getQuestions(req.query);
         return helpers.showOutput(res, result, result.statusCode);
@@ -61,20 +48,12 @@ const commonController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     addNewQuestion: async (req, res) => {
-        let admin_id = req.decoded.admin_id;
-        if (!admin_id) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.admin.invalid_admin), 403);
-        }
         let result = await Common.addNewQuestion(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
 
     updateQuestion: async (req, res) => {
-        let admin_id = req.decoded.admin_id;
-        if (!admin_id) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.admin.invalid_admin), 403);
-        }
-        let result = await Common.updateQuestion(req.body, req.body.quesId);
+        let result = await Common.updateQuestion(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateCommonContent: async (req, res) => {

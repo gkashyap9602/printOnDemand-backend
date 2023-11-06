@@ -114,33 +114,6 @@ const commonUtil = {
     }
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result?.data, null, 200);
   },
-  csrfToken: async (csrfToken) => {
-
-    let data = (`
-    <html>
-    <head>
-        <title>CSRF Demo</title>
-    </head>
-    <body>
-        <h1>CSRF Demo</h1>
-        <form action="/api/v1/common/transfer" method="POST">
-        <input type="text" name="amount" placeholder="Amount" required>
-        <input type="submit" value="Transfer">
-        <input type="hidden" name="_csrf" value="${csrfToken}">
-        </form>
-    </body>
-    </html>
-  `);
-    return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, data, null, 200);
-  },
-
-  submitCsrfToken: async (dataa) => {
-    console.log(dataa, "dataaaSubmit");
-    let { data } = dataa
-
-    return helpers.showResponse(true, 'sucessfully transfer', {}, null, 200);
-  },
-
 
   storeParameterToAWS: async (data) => {
     let response = await helpers.postParameterToAWS({
@@ -181,27 +154,6 @@ const commonUtil = {
       createdOn: helpers.getCurrentDate()
     }
 
-    // if ("answerVideo" in data && data.answerVideo !== "") {
-    //   newObj.answerVideo = data.answerVideo
-    //   let file_name = ""
-    //   let actualVideoPath = `http://localhost:5030/files/${data.answerVideo}`
-    //   console.log(actualVideoPath)
-    //   file_name = `${new Date().getTime()}.jpeg`;
-    //   let localPath = path.join(__dirname, "/../../uploads/thumbs/" + file_name)
-    //   await Thumbler({
-    //     type: 'video',
-    //     input: actualVideoPath,
-    //     output: localPath,
-    //     time: '00:00:03',
-    //     size: '150*150'
-    //   }, async function (err, path) {
-    //     if (err) {
-    //       return helpers.showResponse(false, 'Thumbnail not Added', null, null, 400);
-    //     }
-    //   });
-    //   newObj.answerVideoThumb = "thumbs/" + file_name
-    // }
-
     let quesRef = new FAQ(newObj)
     let response = await postData(quesRef);
     if (response.status) {
@@ -210,30 +162,13 @@ const commonUtil = {
     return helpers.showResponse(false, "Unable to add new question at the moment", response, null, 400);
   },
 
-  updateQuestion: async (data, quesId) => {
-
+  updateQuestion: async (data) => {
+    let { quesId } = data
     const findQues = await getSingleData(FAQ, { _id: quesId, status: { $ne: 2 } })
     if (!findQues.status) {
       return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
     }
-    // if ("answerVideo" in data && data.answerVideo !== "") {
-    //   let file_name = ""
-    //   let actualVideoPath = `http://localhost:5030/files/${data.answerVideo}`
-    //   file_name = `${new Date().getTime()}.jpeg`;
-    //   let localPath = path.join(__dirname, "/../../uploads/thumbs/" + file_name)
-    //   await Thumbler({
-    //     type: 'video',
-    //     input: actualVideoPath,
-    //     output: localPath,
-    //     time: '00:00:10',
-    //     size: '150*150'
-    //   }, async function (err, path) {
-    //     if (err) {
-    //       return helpers.showResponse(false, 'Thumbnail not Added', null, null, 400);
-    //     }
-    //   });
-    //   data.answer_video_thumb = "thumbs/" + file_name
-    // }
+
     data.updatedOn = helpers.getCurrentDate();
     let response = await updateData(FAQ, data, ObjectId(quesId));
     if (response.status) {
@@ -269,21 +204,6 @@ const commonUtil = {
     }
     return helpers.showResponse(false, 'No data found', null, null, 400);
   },
-  // updateCommonData: async (data) => {
-  //   data.updated_on = moment().unix();
-  //   let response = await updateByQuery(commonContent, data);
-  //   if (response.status) {
-  //     return helpers.showResponse(true, "Common details has been updated", null, null, 200);
-  //   }
-  //   return helpers.showResponse(false, "Update failed", response, null, 200);
-  // },
-  // getCommonData: async () => {
-  //   let response = await getSingleData(commonContent, {}, '');
-  //   if (response.status) {
-  //     return helpers.showResponse(true, "Here is a Data", response.data, null, 200);
-  //   }
-  //   return helpers.showResponse(false, 'No Content Found', null, null, 200);
-  // },
 }
 
 module.exports = {

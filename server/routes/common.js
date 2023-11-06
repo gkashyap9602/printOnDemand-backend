@@ -7,8 +7,6 @@ const { addQuestionSchema, updateQuestionSchema, updateCommonContentSchema } = r
 
 //without Token Routes 
 router.post('/store_param', commonController.storeParameterToAWS);
-router.get('/csrf', commonController.csrfToken);
-router.post('/transfer', validateCSRFToken, validateCSRFToken, commonController.submitCsrfToken);
 
 // with admin and user both token routes
 router.get('/getAllCountries', verifyTokenBoth, commonController.getAllCountries);
