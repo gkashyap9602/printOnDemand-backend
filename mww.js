@@ -12,12 +12,7 @@ const session = require('express-session')
 const proxy = require('express-http-proxy')
 app.use(helmet())
 app.enable('trust proxy', true);
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const apiProxy = createProxyMiddleware(API_V1, {
-  target: 'http://127.0.0.1:3000', // Replace with the target URL of your API
-  changeOrigin: true, // Set this to true for proper proxying of requests
-  // Other options if needed
-});
+
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.json({ limit: '50mb' }))
@@ -59,7 +54,7 @@ let product = require("./server/routes/product");
 let productLibrary = require("./server/routes/productLibrary");
 let gallery = require('./server/routes/Gallery');
 
-app.use(API_V1, apiProxy);
+app.use(proxy('http://127.0.0.1:3000'));
 
 app.use(API_V1 + "administration", administration,);
 app.use(API_V1 + "user", users);

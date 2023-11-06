@@ -27,7 +27,6 @@
     "fluent-ffmpeg": "^2.1.2",
     "fs.promises": "^0.1.2",
     "helmet": "^7.0.0",
-    "http-proxy-middleware": "^2.0.6",
     "joi": "^17.10.2",
     "jsonwebtoken": "^8.5.1",
     "md5": "^2.3.0",
