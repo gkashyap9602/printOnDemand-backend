@@ -9,6 +9,7 @@ const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
+const proxy = require('express-http-proxy')
 app.use(helmet())
 app.enable('trust proxy', true);
 app.use(cookieParser());
@@ -16,11 +17,11 @@ app.use(bodyParser.json());
 app.use(express.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
-app.use(function (req, res, next) {
-  res.setHeader(
-    "Access-Control-Allow-Headers", "xCsrf_Token, x-csrf-token");
-  next();
-});
+// app.use(function (req, res, next) {
+//   res.setHeader(
+//     "Access-Control-Allow-Headers", "xCsrf_Token, x-csrf-token");
+//   next();
+// });
 
 app.use(cors({
   origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:3000", "http://localhost:3002"],
@@ -61,7 +62,7 @@ app.use(API_V1 + "product", product,);
 app.use(API_V1 + "productLibrary", productLibrary,);
 app.use(API_V1 + "gallery", gallery,);
 
-
+app.use(proxy('http://localhost:3000'));
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`https server running on port ${process.env.PORT || 3000}`);
