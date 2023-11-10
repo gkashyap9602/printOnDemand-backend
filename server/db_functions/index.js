@@ -120,12 +120,17 @@ module.export = removeItemFromArray = (Model, mainIdObj, arrayKey, itemId) => {
 module.export = updateSingleData = (Model, DataObject, matchObj) => {
     return new Promise((resolve, reject) => {
         Model.findOneAndUpdate(matchObj, { $set: DataObject }, { new: true }, (err, updatedData) => {
+            console.log(updatedData, "updatedData");
             if (err) {
                 let response = helpers.showResponse(false, err);
                 return resolve(response);
+            } else if (updatedData) {
+                let response = helpers.showResponse(true, 'success', updatedData);
+                return resolve(response);
+            } else {
+                let response = helpers.showResponse(false, 'failed', null);
+                return resolve(response);
             }
-            let response = helpers.showResponse(true, 'success', updatedData);
-            return resolve(response);
         });
     });
 }

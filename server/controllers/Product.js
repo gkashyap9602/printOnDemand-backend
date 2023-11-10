@@ -76,6 +76,10 @@ const adminController = {
         let result = await Product.deleteVariable(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    updateVariable: async (req, res) => {
+        let result = await Product.updateVariable(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     getAllVariableTypes: async (req, res) => {
         let result = await Product.getAllVariableTypes();
         return helpers.showOutput(res, result, result.statusCode);

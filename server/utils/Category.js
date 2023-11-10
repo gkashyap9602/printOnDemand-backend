@@ -100,7 +100,7 @@ const categoryUtil = {
             const { name, description } = data
             const findCategory = await getSingleData(Category, { status: { $ne: 2 }, name: name })
             if (findCategory.status) {
-                return helpers.showResponse(false, ResponseMessages?.category.category_already_existed, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.category.category_already_existed, {}, null, 400);
             }
             console.log(file, "fileee");
             //upload image to aws s3 bucket
@@ -143,7 +143,7 @@ const categoryUtil = {
             }
             const findSubCategory = await getSingleData(SubCategory, { status: { $ne: 2 }, name: name })
             if (findSubCategory.status) {
-                return helpers.showResponse(false, ResponseMessages?.category.subcategory_already_existed, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.category.subcategory_already_existed, {}, null, 400);
             }
             //upload image to aws s3 bucket
             const s3Upload = await helpers.uploadFileToS3([file])

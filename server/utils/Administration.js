@@ -53,7 +53,7 @@ const adminUtils = {
             const { name } = data
             const findMaterial = await getSingleData(Material, { name: name })
             if (findMaterial.status) {
-                return helpers.showResponse(false, ResponseMessages?.material.material_already, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.material.material_already, {}, null, 400);
             }
 
             let obj = {
@@ -422,9 +422,10 @@ const adminUtils = {
             if (result.status) {
                 return helpers.showResponse(true, status ? "Deleted Successfully" : ResponseMessages?.common.update_sucess, null, null, 200);
             }
+            return helpers.showResponse(false, status ? "Error While Deleting" : ResponseMessages?.common.update_failed, err, null, 400);
 
         } catch (err) {
-            return helpers.showResponse(false, status ? "Error While Deleting" : ResponseMessages?.common.update_failed, err, null, 400);
+            return helpers.showResponse(false, err?.message, null, null, 400);
         }
 
     },

@@ -18,13 +18,13 @@ router.post('/resetPassword', validate(resetPasswordSchema), authController.rese
 router.post('/changePassword', validateCSRFToken, verifyTokenUser, validate(changePasswordSchema), authController.changePasswordWithOld);
 router.post('/getAllOrders', validateCSRFToken, verifyTokenUser, authController.getAllOrders);
 router.post('/updateBasicDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateBasicDetails);
+router.post('/updatePersonalDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updatePersonalDetails);
 router.post('/updateShippingDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateShippingDetails);
 router.post('/updateBillingAddress', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateBillingAddress);
 router.post('/updatePaymentDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updatePaymentDetails);
 router.get('/getUser/:user_id', verifyTokenUser, authController.getUserDetail);
 router.get('/getUserStatus/:user_id', verifyTokenUser, authController.getUserStatus);
 router.get('/getBulkImport', verifyTokenUser, authController.getBulkImport);
-
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

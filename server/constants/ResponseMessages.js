@@ -138,8 +138,10 @@ module.exports = {
 
     },
     variable: {
+        active_options: "There Are Active Options Delete Options First",
         variable_option_save_fail: "error while saving variable option",
         invalid_variable_type: "invalid Variable Type Id",
+        invalid_variable_option: "invalid Variable Option Id",
         variable_option_already: "Variable Option Already Exist",
         variable_type_already: "Variable Type Already Exist",
         variable_type_save_failed: "Error occured while adding new variable type",

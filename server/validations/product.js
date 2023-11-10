@@ -5,7 +5,7 @@ module.exports.addProduct = {
     body: joi.object({
         subCategoryIds: joi.array().required(),
         variableTypesIds: joi.array().required(),
-        materialId: joi.string().required(),
+        materialIds: joi.array().required(),
         title: joi.string().required(),
         longDescription: joi.string().required(),
         careInstructions: joi.string(),
@@ -20,7 +20,7 @@ module.exports.addProduct = {
 module.exports.updateProduct = {
     body: joi.object({
         subCategoryIds: joi.array().required(),
-        materialId: joi.string().required(),
+        materialIds: joi.array().required(),
         title: joi.string().required(),
         longDescription: joi.string().required(),
         careInstructions: joi.string(),

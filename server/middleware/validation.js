@@ -10,7 +10,7 @@ module.exports = function (schema) {
                 req.body = value;
                 next()
             }
-            else if(schema.query) {
+            else if (schema.query) {
                 const { error, value } = schema.query.validate(req.query);
                 if (error) throw error;
                 req.query = value;

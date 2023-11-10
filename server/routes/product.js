@@ -4,13 +4,13 @@ var productController = require('../controllers/Product');
 var { verifyTokenAdmin, verifyTokenBoth, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
 const { addToMulter } = require('../services/helper/index')
-const { addVariableType, addVariableOption, deleteVariable } = require("../validations/variable")
+const { addVariableType, addVariableOption, deleteVariable, updateVariable } = require("../validations/variable")
 const { addProduct, addProductVarient, addProductImage, updateProduct, updateProductVarient,
     updateVarientTemplate, deleteVarientTemplate } = require("../validations/product")
 
 // with user and admin Both token routes
 router.get('/getProductDetails', verifyTokenBoth, productController.getProductDetails);
-router.post('/getAllProducts', validateCSRFToken, verifyTokenBoth, productController.getAllProduct);
+router.post('/getAllProducts', verifyTokenBoth, productController.getAllProduct);
 
 // with admin token routes
 router.post('/addProduct', validateCSRFToken, verifyTokenAdmin, validate(addProduct), productController.addProduct);
@@ -26,6 +26,7 @@ router.delete('/deleteVarientTemplate', validateCSRFToken, verifyTokenAdmin, val
 router.post('/addVariableTypes', validateCSRFToken, verifyTokenAdmin, validate(addVariableType), productController.addVariableTypes);
 router.post('/addVariableOptions', validateCSRFToken, verifyTokenAdmin, validate(addVariableOption), productController.addVariableOptions);
 router.delete('/deleteVariable', validateCSRFToken, verifyTokenAdmin, validate(deleteVariable), productController.deleteVariable);
+router.post('/updateVariable', validateCSRFToken, verifyTokenAdmin, validate(updateVariable), productController.updateVariable);
 router.get('/getAllVariableTypes', verifyTokenAdmin, productController.getAllVariableTypes);
 
 

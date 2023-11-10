@@ -33,6 +33,15 @@ module.exports.profileSchema = {
             stateName: joi.string(),
             zipCode: joi.string().max(5).message("Zip Code Length Must be 5"),
         },
+        personalDetails: {
+            height: joi.string().required(),
+            weight: joi.string().required(),
+            race: joi.string().required(),
+            age: joi.number().required(),
+            gender: joi.string().valid('male', 'female').required(),
+            authenticity: joi.string().required(),
+            waist: joi.string().required(),
+        },
         isExemptionEligible: joi.boolean(),
         ncResaleCertificate: joi.string().allow(''),
 

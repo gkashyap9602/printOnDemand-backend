@@ -13,44 +13,48 @@ const { getFileType } = require('../services/helper/index')
 const mime = require('mime-types')
 
 const productUtils = {
-
+    
     addProduct: async (data) => {
         try {
-            let { careInstructions, longDescription, subCategoryIds, materialId, variableTypesIds,
+            let { careInstructions, longDescription, subCategoryIds, materialIds, variableTypesIds,
                 construction, features, productionDuration, shortDescription, title, process } = data
 
             const findProduct = await getSingleData(Product, { title: title, status: { $ne: 2 } })
             if (findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 400);
             }
-
             subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
             variableTypesIds = variableTypesIds.map((id) => mongoose.Types.ObjectId(id))
+            materialIds = materialIds.map((id) => mongoose.Types.ObjectId(id))
 
             const findVariableTypes = await getDataArray(VariableTypes, { _id: { $in: variableTypesIds } })
 
-            if (findVariableTypes?.data?.length !== variableTypesIds.length) {
-                return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
+            if (findVariableTypes?.data?.length !== variableTypesIds?.length) {
+                return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 400);
             }
             const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds }, status: { $ne: 2 } })
 
-            if (findSubCategory?.data?.length !== subCategoryIds.length) {
-                return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
+            if (findSubCategory?.data?.length !== subCategoryIds?.length) {
+                return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 400);
             }
-            const findMaterial = await getSingleData(Material, { _id: materialId })
 
-            if (!findMaterial.status) {
-                return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 403);
+            const findMaterials = await getDataArray(Material, { _id: { $in: materialIds } })
+            // const findMaterial = await getSingleData(Material, { _id: materialId })
+            if (findMaterials?.data?.length !== materialIds?.length) {
+                return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
             }
+            // if (!findMaterial.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
+            // }
             let obj = {
                 careInstructions,
                 longDescription,
-                materialId,
                 features,
                 title,
                 createdOn: helpers.getCurrentDate(),
                 subCategoryId: subCategoryIds,
                 variableTypesId: variableTypesIds,
+                materialId: materialIds,
                 productionDuration,
                 construction,
                 shortDescription,
@@ -58,6 +62,7 @@ const productUtils = {
             }
             const prodRef = new Product(obj)
             const result = await postData(prodRef)
+
 
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
@@ -70,40 +75,47 @@ const productUtils = {
     },
     updateProduct: async (data) => {
         try {
-            let { careInstructions, longDescription, subCategoryIds, materialId, productId,
+            let { careInstructions, longDescription, subCategoryIds, materialIds, productId,
                 construction, features, productionDuration, shortDescription, title, process } = data
 
 
             const findProduct = await getSingleData(Product, { _id: productId, status: { $ne: 2 } })
             if (!findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
 
             const findTitle = await getSingleData(Product, { title, _id: { $ne: productId }, status: { $ne: 2 } })
             if (findTitle.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_title_already, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.product_title_already, {}, null, 400);
             }
             subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
+            materialIds = materialIds.map((id) => mongoose.Types.ObjectId(id))
 
             const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds }, status: { $ne: 2 } })
             if (findSubCategory?.data?.length !== subCategoryIds.length) {
-                return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 400);
             }
-            const findMaterial = await getSingleData(Material, { _id: materialId })
 
-            if (!findMaterial.status) {
-                return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 403);
+
+            // const findMaterial = await getSingleData(Material, { _id: materialId })
+
+            // if (!findMaterial.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
+            // }
+            const findMaterials = await getDataArray(Material, { _id: { $in: materialIds }, status: { $ne: 2 } })
+            if (findMaterials?.data?.length !== materialIds.length) {
+                return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
             }
             //in payload blank value not pass
             let obj = {
                 careInstructions,
                 longDescription,
-                materialId,
                 features,
                 title,
                 process,
                 updatedOn: helpers.getCurrentDate(),
                 subCategoryId: subCategoryIds,
+                materialId: materialIds,
                 productionDuration,
                 construction,
                 shortDescription,
@@ -127,11 +139,11 @@ const productUtils = {
             }
             const findProduct = await getSingleData(Product, { _id: productId, status: { $ne: 2 } })
             if (!findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
             const findProductCode = await getSingleData(ProductVarient, { productCode, status: { $ne: 2 } })
             if (findProductCode.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 400);
             }
 
             const saveVariableOptions = await insertMany(VariableOptions, varientOptions)
@@ -175,10 +187,13 @@ const productUtils = {
             const result = await postData(newProductVareint)
 
             if (result.status) {
+
+                await Product.updateOne({ _id: productId }, { $inc: { variantCount: 1 } })
+
                 return helpers.showResponse(true, ResponseMessages?.product?.product_varient_save, result?.data, null, 200);
             }
             //ends
-            return helpers.showResponse(false, ResponseMessages?.product?.product_varient_save_fail, {}, null, 403);
+            return helpers.showResponse(false, ResponseMessages?.product?.product_varient_save_fail, {}, null, 400);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
@@ -191,12 +206,12 @@ const productUtils = {
 
             const find = await getSingleData(ProductVarient, { _id: productVarientId })
             if (!find.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
             }
 
             const findCode = await getSingleData(ProductVarient, { productCode: productCode, _id: { $ne: mongoose.Types.ObjectId(productVarientId) } })
             if (findCode.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 400);
             }
 
             let newObj = {
@@ -258,9 +273,9 @@ const productUtils = {
                         as: "material"
                     }
                 },
-                {
-                    $unwind: '$material'
-                },
+                // {
+                //     $unwind: '$material'
+                // },
                 {
                     $lookup: {
                         from: "productVarient",
@@ -300,8 +315,7 @@ const productUtils = {
                             },
                             //  {
                             //     $project:{
-                            //         _id:0,
-                            //         varientOptions:0
+                            //         // varientOptions:0
                             //     }
                             //   }
 
@@ -311,7 +325,8 @@ const productUtils = {
                 {
                     $project: {
                         subCategoryId: 0,
-                        variableTypesId: 0
+                        variableTypesId: 0,
+                        materialId: 0
                     }
                 }
 
@@ -324,7 +339,7 @@ const productUtils = {
 
         }
         catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 403);
+            return helpers.showResponse(false, err?.message, null, null, 400);
 
         }
 
@@ -335,12 +350,22 @@ const productUtils = {
             let id = new ObjectId(subCategoryId)
             pageSize = Number(pageSize)
             page = Number(page)
+            searchKey = searchKey.trim()
 
+            const searchTerms = searchKey.split(' ');
+            const titleSearch = searchTerms[0];
+            const valueSearch = searchTerms.slice(1).join(' ');
 
+            console.log(titleSearch, "titleSearch ");
+            console.log(valueSearch, "valueSearch");
             let matchObj = {
                 subCategoryId: { $in: [id] },
-                status: { $ne: 2 },
-                title: { $regex: searchKey, $options: 'i' }
+                // status: { $ne: 2 },
+                // title: { $regex: titleSearch, $options: 'i' },
+
+            }
+            if (titleSearch) {
+                matchObj.title = { $regex: titleSearch, $options: 'i' }
             }
 
             if (materialFilter && materialFilter !== 'null') {
@@ -355,7 +380,7 @@ const productUtils = {
             const result = await Product.aggregate([
                 {
                     $match: {
-                        ...matchObj
+                        ...matchObj,
                     }
                 },
                 {
@@ -370,11 +395,42 @@ const productUtils = {
                         localField: "_id",
                         foreignField: "productId",
                         as: "ProductVarient",
+
                     }
                 },
                 {
+                    $lookup: {
+                        from: "variableOptions",
+                        localField: "ProductVarient.varientOptions.variableOptionId",
+                        foreignField: "_id",
+                        as: "Variable",
+
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "variableTypes",
+                        localField: "Variable.variableTypeId",
+                        foreignField: "_id",
+                        as: "VariableTypes",
+                    }
+                },
+
+                {
                     $addFields: {
                         priceStartsFrom: { $min: "$ProductVarient.price" },
+
+                    }
+                },
+                // {
+                //     $unwind: "$Variable" // Unwind the "Variable" array
+                // },
+                {
+                    $match: {
+                        "Variable.value": {
+                            $regex: valueSearch, // Use the regex filter on "Variable.value"
+                            $options: 'i'
+                        }
                     }
                 },
                 {
@@ -395,6 +451,9 @@ const productUtils = {
                         title: 1,
                         variantCount: 1,
                         priceStartsFrom: 1,
+                        // ProductVarient: 1,
+                        Variable: 1,
+                        VariableTypes: 1,
 
 
                     }
@@ -405,12 +464,11 @@ const productUtils = {
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
         }
         catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 403);
+            return helpers.showResponse(false, err?.message, null, null, 400);
 
         }
 
     },
-
 
     saveProductImage: async (data, file) => {
         try {
@@ -458,6 +516,7 @@ const productUtils = {
         }
 
     },
+
     deleteProductImage: async (data) => {
         try {
             const { imageId, productId, imageType } = data
@@ -468,7 +527,7 @@ const productUtils = {
             }
 
             let result
-            //type 3 for productImages
+            //type 1 for productImages
             if (imageType == 1) {
                 result = await removeItemFromArray(Product, { _id: productId }, 'productImages', imageId)
             }
@@ -502,14 +561,14 @@ const productUtils = {
 
             const findProductVarient = await getSingleData(ProductVarient, { _id: productVarientId })
             if (!findProductVarient.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
             }
 
             const findVarientTemplate = await getSingleData(ProductVarient, { _id: productVarientId, productVarientTemplates: { $elemMatch: { templateType } } })
             console.log(findVarientTemplate, "findVarientTemplate")
 
             if (findVarientTemplate.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.varient_template_already, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.product.varient_template_already, {}, null, 400);
             }
 
             const s3Upload = await helpers.uploadFileToS3([file])
@@ -572,8 +631,8 @@ const productUtils = {
             if (result.status) {
 
                 //varient Options are not deleted from collection?
-                await deleteData(ProductVarient, { productId: productId })
-
+                // await deleteData(ProductVarient, { productId: productId })
+                await updateByQuery(ProductVarient, { status: 2 }, { productId: productId })
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
 
@@ -594,10 +653,12 @@ const productUtils = {
                 return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
             }
 
-            const result = await deleteById(ProductVarient, productVarientId)
-
+            // const result = await deleteById(ProductVarient, productVarientId)
+            const result = await updateSingleData(ProductVarient, { status: 2 }, { _id: productVarientId, productId })
             if (result.status) {
                 //varient Options are not deleted from collection?
+                await Product.updateOne({ _id: productId }, { $inc: { variantCount: -1 } })
+
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
 
@@ -615,7 +676,7 @@ const productUtils = {
 
             const findProduct = await getSingleData(VariableTypes, { typeName, status: { $ne: 2 } })
             if (findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.variable.variable_type_already, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.variable.variable_type_already, {}, null, 400);
             }
 
             let obj = {
@@ -644,11 +705,11 @@ const productUtils = {
 
             const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId, status: { $ne: 2 } })
             if (!findVariableType.status) {
-                return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 400);
             }
             const find = await getSingleData(VariableOptions, { value, status: { $ne: 2 } })
             if (find.status) {
-                return helpers.showResponse(false, ResponseMessages?.variable.variable_option_already, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.variable.variable_option_already, {}, null, 400);
             }
 
             let obj = {
@@ -667,30 +728,81 @@ const productUtils = {
             return helpers.showResponse(true, ResponseMessages?.admin?.created_successfully, result?.data, null, 200);
         }
         catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 403);
+            return helpers.showResponse(false, err?.message, null, null, 400);
         }
 
     },
     deleteVariable: async (data) => {
         try {
-            const { variableTypeId } = data
+            const { variableTypeId, variableOptionId } = data
 
-            const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId, status: { $ne: 2 } })
-            if (!findVariableType.status) {
-                return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 403);
+            let result
+
+            if (variableTypeId) {
+
+                const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId, status: { $ne: 2 } })
+                if (!findVariableType.status) {
+                    return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 400);
+                }
+                const findVariableOptions = await VariableOptions.find({ status: { $ne: 2 }, variableTypeId: variableTypeId })
+                if (findVariableOptions.length > 0) {
+                    return helpers.showResponse(false, ResponseMessages?.variable.active_options, {}, null, 400);
+                }
+                result = await updateSingleData(VariableTypes, { status: 2 }, { _id: variableTypeId })
             }
+            if (variableOptionId) {
 
-            const result = await updateSingleData(VariableTypes, { status: 2 }, { _id: variableTypeId })
+                const findVariableOption = await getSingleData(VariableOptions, { _id: variableOptionId, status: { $ne: 2 } })
+                if (!findVariableOption.status) {
+                    return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_option, {}, null, 400);
+                }
+
+                result = await updateSingleData(VariableOptions, { status: 2 }, { _id: variableOptionId })
+            }
 
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.delete_failed, result?.data, null, 400);
             }
-            await updateByQuery(VariableOptions, { status: 2 }, { variableTypeId: variableTypeId })
 
             return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, result?.data, null, 200);
         }
         catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 403);
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+
+    },
+    updateVariable: async (data) => {
+        try {
+            const { variableTypeId, typeName, value, variableOptionId } = data
+
+            let result
+
+            if (variableTypeId && typeName) {
+
+                const findVariableType = await getSingleData(VariableTypes, { _id: variableTypeId, status: { $ne: 2 } })
+                if (!findVariableType.status) {
+                    return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 400);
+                }
+                result = await updateSingleData(VariableTypes, { typeName }, { _id: variableTypeId })
+            }
+            if (variableOptionId && value) {
+
+                const findVariableOption = await getSingleData(VariableOptions, { _id: variableOptionId, status: { $ne: 2 } })
+                if (!findVariableOption.status) {
+                    return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_option, {}, null, 400);
+                }
+                result = await updateSingleData(VariableOptions, { value }, { _id: variableOptionId })
+
+            }
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.update_failed, result?.data, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result?.data, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
         }
 
     },
@@ -714,13 +826,13 @@ const productUtils = {
             )
 
             if (result.length === 0) {
-                return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 403);
+                return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
             }
 
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
         }
         catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 403);
+            return helpers.showResponse(false, err?.message, null, null, 400);
 
         }
 

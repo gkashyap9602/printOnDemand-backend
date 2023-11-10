@@ -7,6 +7,37 @@ var UserProfile = new Schema({
     ref: "users",
     index: true
   },
+  personalDetails: {
+    height: {
+      type: String,
+      default: null
+    },
+    weight: {
+      type: String,
+      default: null
+    },
+    race: {
+      type: String,
+      default: null
+    },
+    age: {
+      type: Number,
+      default: null
+    },
+    gender: {
+      type: String,
+      default: null,
+      // enum: ['male','female']
+    },
+    authenticity: {
+      type: String,
+      default: null
+    },
+    waist: {
+      type: String,
+      default: null
+    },
+  },
   shippingAddress: {
     companyName: {
       type: String,
@@ -48,7 +79,6 @@ var UserProfile = new Schema({
       type: String,
       default: "",
     },
-
     companyPhone: {
       type: String,
       default: "",
@@ -99,6 +129,7 @@ var UserProfile = new Schema({
     },
 
   },
+
   isExemptionEligible: {
     type: Boolean,
     default: false,

@@ -461,9 +461,23 @@ const UserUtils = {
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
         }
-        data.updatedOn = helpers.getCurrentDate();
+        data.updatedOn = helpers.getCurrentDate()
 
         let result = await updateSingleData(Users, data, { _id: user_id })
+        if (result.status) {
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result?.data, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+    },
+    updatePersonalDetails: async (data, user_id) => {
+        let queryObject = { _id: user_id }
+        let checkUser = await getSingleData(Users, queryObject, '');
+        if (!checkUser?.status) {
+            return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
+        }
+        data.updatedOn = helpers.getCurrentDate();
+
+        let result = await updateSingleData(UserProfile, data, { userId: user_id })
         if (result.status) {
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result?.data, null, 200);
         }

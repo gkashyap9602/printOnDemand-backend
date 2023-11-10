@@ -9,7 +9,6 @@ var Users = new Schema({
     lastName: {
         type: String,
         required: true
-
     },
     email: {
         type: String,
@@ -36,22 +35,18 @@ var Users = new Schema({
         type: String,
         default: 'Admin'
     },
-    // is_email_verified: {
-    //     type: Number,
-    //     default: 1
-    // },
     // is_blocked: {
     //     type: Number,
     //     default: 0
     // },
-    id: {
-        type: Number,
-        default: 0
-    },
-    customerId: {
-        type: Number,
-        default: 0
-    },
+    // id: {
+    //     type: Number,
+    //     default: 0
+    // },
+    // customerId: {
+    //     type: Number,
+    //     default: 0
+    // },
     orderSubmissionDelay: {
         type: String,
         default: '00:01:00'

@@ -13,7 +13,7 @@ router.delete('/deleteFromGallery', validateCSRFToken, verifyTokenAdmin, validat
 // with User and Admin both Token routes
 router.get('/getGallery', verifyTokenBoth, galleryController.getGallery);
 
-// Common Routes
+// Common Routes 
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
 router.post('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Post Request" }) });
 

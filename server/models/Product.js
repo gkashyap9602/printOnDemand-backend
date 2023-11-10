@@ -5,9 +5,9 @@ var Schema = mongoose.Schema;
 // imageType = 3 for sizeChart image
 // imageType = 2 for product varient image
 
-// templateType = 1 for .pdf file
-// templateType = 2 for .psd file
-// templateType = 3 for .asd file
+// templateType = 1 for .pdf file [ not compressed ]
+// templateType = 2 for .psd file [ not compressed ]
+// templateType = 3 for .asd file [ not compressed ]
 var Product = new Schema({
     subCategoryId: [{
         type: mongoose.Types.ObjectId,
@@ -17,12 +17,14 @@ var Product = new Schema({
     variableTypesId: [{
         type: mongoose.Types.ObjectId,
         ref: "variableTypes",
+        index: true,
+
+    }],
+    materialId: [{
+        type: mongoose.Types.ObjectId,
+        ref: "material",
         index: true
     }],
-    materialId: {
-        type: mongoose.Types.ObjectId,
-        ref: "material"
-    },
     careInstructions: {
         type: String,
         default: ""
@@ -63,7 +65,7 @@ var Product = new Schema({
     status: {
         type: Number,
         default: 1,
-        Comment:"1 for active 2 for delete "
+        Comment: "1 for active 2 for delete "
 
     },
     construction: {
@@ -112,9 +114,13 @@ var Product = new Schema({
         type: Number,
         default: 0,
     },
-    isDeleted: {
-        type: String,
-        default: null,
+    isCustomizable: {
+        type: Boolean,
+        default: false,
+    },
+    isPersonalizable: {
+        type: Boolean,
+        default: false,
     },
     createdOn: {
         type: String,
@@ -127,4 +133,9 @@ var Product = new Schema({
 });
 
 
-module.exports = mongoose.model("Product", Product, "product");
+Product.pre('aggregate', function () {
+    // Add a $match state to the beginning of each pipeline.
+    this.pipeline().unshift({ $match: { status: { $ne: 2 } } });
+})
+
+module.exports = mongoose.model("Product", Product, "product")
