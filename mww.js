@@ -9,7 +9,7 @@ const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-// const proxy = require('express-http-proxy');
+const proxy = require('express-http-proxy');
 const { createProxyMiddleware } = require('http-proxy-middleware')
 
 const proxyMiddleware = createProxyMiddleware({
@@ -46,10 +46,12 @@ app.use(session({
 app.use(express.static(path.join(__dirname, "/server/views")));
 app.use("/files", express.static(__dirname + "/server/uploads"));
 
-app.use(API_V1, proxyMiddleware);
+// app.use(API_V1, proxyMiddleware);
 
 app.use(API_V1, proxy('http://127.0.0.1:3000'));
+
 app.use(proxy('http://127.0.0.1:3000'));
+
 app.get("/", (req, res) => {
   res.sendFile(path.join("/index.html"));
 });
