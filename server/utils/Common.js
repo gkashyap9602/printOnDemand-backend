@@ -170,7 +170,7 @@ const commonUtil = {
     }
 
     data.updatedOn = helpers.getCurrentDate();
-    let response = await updateData(FAQ, data, ObjectId(quesId));
+    let response = await updateData(FAQ, data, new ObjectId(quesId));
     if (response.status) {
       return helpers.showResponse(true, "Question has been updated", null, null, 200);
     }
