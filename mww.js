@@ -48,6 +48,8 @@ app.use("/files", express.static(__dirname + "/server/uploads"));
 
 app.use(API_V1, proxyMiddleware);
 
+app.use(API_V1, proxy('http://127.0.0.1:3000'));
+app.use(proxy('http://127.0.0.1:3000'));
 app.get("/", (req, res) => {
   res.sendFile(path.join("/index.html"));
 });
@@ -69,7 +71,7 @@ app.use(API_V1 + "product", product,);
 app.use(API_V1 + "productLibrary", productLibrary,);
 app.use(API_V1 + "gallery", gallery,);
 
-app.use(API_V1, proxy('http://127.0.0.1:3000'));
+// app.use(API_V1, proxy('http://127.0.0.1:3000'));
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`https server running on port ${process.env.PORT || 3000}`);
