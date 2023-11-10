@@ -9,7 +9,8 @@ const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-
+const MongoStore = require("connect-mongo");
+const helpers = require('./server/services/helper')
 app.use(helmet())
 app.enable('trust proxy', true);
 
@@ -24,43 +25,57 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(session({
-  name: "connect.sid",
-  secret: process.env.SESSION_KEY,
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    maxAge: 24 * 60 * 60 * 1000, //24 hours in miliseconds
-    sameSite: 'lax'
-  },
-}));
 
-app.use(express.static(path.join(__dirname, "/server/views")));
-app.use("/files", express.static(__dirname + "/server/uploads"));
+(async function () {
+  const MONGODB_URI = await helpers.getParameterFromAWS({ name: 'MONGODB_URI' })
+  let mongoUrl = `${MONGODB_URI}&authSource=${helpers.changeEnv(process.env.ENV_MODE).db}`
+  app.use(session({
+    name: "connect.sid",
+    // store: new MongoStore({mongoose}),
+    secret: process.env.SESSION_KEY,
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({
+      mongoUrl: mongoUrl,
+      dbName: helpers.changeEnv(process.env.ENV_MODE).db,
+      collectionName: "sessions",
+      stringify: false,
+      autoRemove: "interval",
+      autoRemoveInterval: 1
+    }),
+    ///jkb
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, //24 hours in miliseconds
+    },
+  }));
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join("/index.html"));
-});
+  app.use(express.static(path.join(__dirname, "/server/views")));
+  app.use("/files", express.static(__dirname + "/server/uploads"));
 
-let administration = require("./server/routes/administration");
-let users = require("./server/routes/users");
-let common = require("./server/routes/common");
-let category = require("./server/routes/category");
-let product = require("./server/routes/product");
-let productLibrary = require("./server/routes/productLibrary");
-let gallery = require('./server/routes/Gallery');
+  app.get("/", (req, res) => {
+    res.sendFile(path.join("/index.html"));
+  });
+  //jkdd
+  let administration = require("./server/routes/administration");
+  let users = require("./server/routes/users");
+  let common = require("./server/routes/common");
+  let category = require("./server/routes/category");
+  let product = require("./server/routes/product");
+  let productLibrary = require("./server/routes/productLibrary");
+  let gallery = require('./server/routes/Gallery');
+
+  app.use(API_V1 + "administration", administration,);
+  app.use(API_V1 + "user", users);
+  app.use(API_V1 + "common", common,);
+  app.use(API_V1 + "category", category,);
+  app.use(API_V1 + "product", product,);
+  app.use(API_V1 + "productLibrary", productLibrary,);
+  app.use(API_V1 + "gallery", gallery,);
 
 
-app.use(API_V1 + "administration", administration,);
-app.use(API_V1 + "user", users);
-app.use(API_V1 + "common", common,);
-app.use(API_V1 + "category", category,);
-app.use(API_V1 + "product", product,);
-app.use(API_V1 + "productLibrary", productLibrary,);
-app.use(API_V1 + "gallery", gallery,);
-
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`https server running on port ${process.env.PORT || 3000}`);
-});
+  app.listen(process.env.PORT || 3000, () => {
+    console.log(`https server running on port ${process.env.PORT || 3000}`);
+  });
+  //self call fn ends here 
+})()
 
