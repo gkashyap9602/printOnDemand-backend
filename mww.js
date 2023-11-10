@@ -9,11 +9,11 @@ const helmet = require('helmet')
 const app = express();
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-const proxy = require('express-http-proxy');
+// const proxy = require('express-http-proxy');
 const { createProxyMiddleware } = require('http-proxy-middleware')
 
 const proxyMiddleware = createProxyMiddleware({
-  target: 'http://localhost:3000',
+  target: 'http://localhost:3000/',
   changeOrigin: true,
   // pathRewrite: { '^/api': '' },
 });
@@ -68,7 +68,7 @@ app.use(API_V1 + "product", product,);
 app.use(API_V1 + "productLibrary", productLibrary,);
 app.use(API_V1 + "gallery", gallery,);
 
-app.use(proxy('http://127.0.0.1:3000'));
+// app.use(API_V1, proxy('http://127.0.0.1:3000'));
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`https server running on port ${process.env.PORT || 3000}`);
