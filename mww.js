@@ -10,6 +10,13 @@ const app = express();
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const proxy = require('express-http-proxy');
+const { createProxyMiddleware } = require('http-proxy-middleware')
+
+const proxyMiddleware = createProxyMiddleware({
+  target: 'http://localhost:3000',
+  changeOrigin: true,
+  // pathRewrite: { '^/api': '' },
+});
 
 app.use(helmet())
 app.enable('trust proxy', true);
@@ -20,7 +27,7 @@ app.use(express.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(cors({
-  origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:3000", "http://localhost:3002"],
+  origin: ["https://mwwdev.solidappmaker.ml", "http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3002"],
   methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "DELETE"],
   credentials: true
 }));
@@ -31,11 +38,14 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   cookie: {
-    maxAge: 24 * 60 * 60 * 1000 //24 hours in miliseconds
-  }
+    maxAge: 24 * 60 * 60 * 1000, //24 hours in miliseconds
+    sameSite: 'lax'
+  },
 }));
 app.use(express.static(path.join(__dirname, "/server/views")));
 app.use("/files", express.static(__dirname + "/server/uploads"));
+
+app.use(API_V1, proxyMiddleware);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join("/index.html"));
