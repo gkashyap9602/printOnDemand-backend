@@ -565,7 +565,6 @@ const productUtils = {
             }
 
             const findVarientTemplate = await getSingleData(ProductVarient, { _id: productVarientId, productVarientTemplates: { $elemMatch: { templateType } } })
-            console.log(findVarientTemplate, "findVarientTemplate")
 
             if (findVarientTemplate.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.varient_template_already, {}, null, 400);
@@ -626,7 +625,6 @@ const productUtils = {
             }
 
             const result = await updateSingleData(Product, { status: 2 }, { _id: productId })
-            console.log(result, "resultt Product")
 
             if (result.status) {
 

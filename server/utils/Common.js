@@ -24,7 +24,6 @@ const commonUtil = {
     ]
 
     if (subCategoryId) {
-      console.log("underif")
       aggregationPipeline.push(
         {
           $lookup: {
@@ -32,13 +31,6 @@ const commonUtil = {
             localField: "_id",
             foreignField: "materialId",
             as: "products",
-            // pipeline:[
-            //   {
-            //     $match: {
-            //       '$products.subCategoryId': { $in: [new ObjectId(subCategoryId)] },
-            //     }
-            //   },
-            // ]
           },
 
         },
@@ -54,8 +46,8 @@ const commonUtil = {
         {
           $group: {
             _id: "$_id",
-            name: { $first: "$name" }, // Assuming the material document has a "name" field
-            // Add other fields from the material document as needed
+            name: { $first: "$name" },
+
           }
         },
         {
@@ -80,8 +72,6 @@ const commonUtil = {
 
 
     const result = await Material.aggregate(aggregationPipeline)
-
-    console.log(result, "resultttt")
 
     return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
   },
@@ -179,7 +169,6 @@ const commonUtil = {
 
   getCommonContent: async () => {
     let response = await getSingleData(commonContent, {}, '');
-    console.log(response, "responseee");
     if (response.status) {
       return helpers.showResponse(true, "Here is a About Content", response.data, null, 200);
     }

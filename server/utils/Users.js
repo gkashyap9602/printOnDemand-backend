@@ -1,7 +1,7 @@
 require('../db_functions');
 let Users = require('../models/Users');
 let UserProfile = require('../models/UserProfile')
-let ObjectId = require('mongodb').ObjectID;
+let ObjectId = require('mongodb').ObjectId;
 let jwt = require('jsonwebtoken');
 let helpers = require('../services/helper');
 const md5 = require('md5');
@@ -17,9 +17,9 @@ const Material = require("../models/Material")
 const UserUtils = {
 
     checkEmailExistance: async (email, user_id = null) => {
-        let queryObject = { email }
+        let queryObject = { email, status: { $ne: 2 } }
         if (user_id) {
-            queryObject = { email, _id: { $ne: ObjectId(user_id) } }
+            queryObject = { email, _id: { $ne: new ObjectId(user_id) }, status: { $ne: 2 } }
         }
         let result = await getSingleData(Users, queryObject, '');
         if (result?.status) {
@@ -38,37 +38,52 @@ const UserUtils = {
         }
         return helpers.showResponse(true, ResponseMessages?.users?.valid_username, null, null, 200);
     },
-    register: async (data) => {
+    register: async (data, profileImg) => {
         try {
-            let { firstName, lastName, email, password } = data;
+            let { firstName, lastName, email, password, phoneNumber, } = data;
 
+            console.log(data, "dataaa");
             let emailExistanceResponse = await UserUtils.checkEmailExistance(email)
             if (!emailExistanceResponse?.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 403);
             }
-            const usersCount = await getCount(Users, { userType: 3 })
-            if (!usersCount.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
-            }
-            const idGenerated = helpers.generateIDs(usersCount?.data)
 
             let newObj = {
                 firstName,
                 lastName,
                 email: email,
                 userName: email,
-                id: idGenerated.idNumber,
+                phoneNumber,
+                // id: idGenerated.idNumber,
                 // guid: randomUUID(),
-                customerId: idGenerated.customerID,
+                // customerId: idGenerated.customerID,
                 // customerGuid: randomUUID(),
                 password: md5(password),
                 createdOn: helpers.getCurrentDate()
             }
 
+
+            if (profileImg) {
+                //upload image to aws s3 bucket
+                const s3Upload = await helpers.uploadFileToS3([profileImg])
+                if (!s3Upload.status) {
+                    return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
+                }
+
+                newObj.profileImagePath = s3Upload?.data[0]
+            }
+            const usersCount = await getCount(Users, { userType: 3 })
+
+            if (!usersCount.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
+            }
+            // const idGenerated = helpers.generateIDs(usersCount?.data)
+
+
             let userRef = new Users(newObj)
             let result = await postData(userRef);
             if (result.status) {
-                delete data.password
+                delete result?.data?.password
                 let ObjProfile = {
                     userId: result.data._id,
                     completionStaus: {
@@ -127,11 +142,12 @@ const UserUtils = {
      
                  `
                 let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
-                return helpers.showResponse(true, ResponseMessages?.users?.register_success, data, null, 200);
+                return helpers.showResponse(true, ResponseMessages?.users?.register_success, result?.data, null, 200);
             }
 
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
         } catch (err) {
+            console.log(err, "err while register new user");
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
         }
 
@@ -142,7 +158,6 @@ const UserUtils = {
             let queryObject = { email: email, status: { $ne: 2 } }
 
             let result = await getSingleData(Users, queryObject, '');
-            console.log(result, "result login");
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
             }
@@ -164,12 +179,10 @@ const UserUtils = {
 
             if (fcmToken && userData.userType == 3) {
                 const result = await updateSingleData(Users, { fcmToken }, { _id: userData._id, status: { $ne: 3 } })
-                // console.log(result,"update fcmToken");
                 userData.fcmToken = result?.data?.fcmToken
             }
             //generating cryptographic csrf token 
             let csrfToken = helpers.generateCsrfToken()
-            console.log(csrfToken, "csrfGenerate login side");
 
             //create user session and  pass csrf token 
             request.session._csrfToken = csrfToken
@@ -215,7 +228,7 @@ const UserUtils = {
                 expiresIn: consts.ACCESS_EXPIRY
             });
 
-            let link = `${consts.FRONTEND_URL}/resetPassword?resetPasswordToken=${token}&&email=${email}`
+            let link = `${consts.FRONTEND_URL}/#/resetPassword?resetPasswordToken=${token}&&email=${email}`
             let to = email
             let subject = `Reset Your Password For MWW On Demand`
             const logoPath = path.join(__dirname, '../views', 'logo.png');
@@ -283,7 +296,7 @@ const UserUtils = {
             password: md5(newPassword),
             updatedOn: helpers.getCurrentDate()
         }
-        let result = await updateData(Users, editObj, ObjectId(userData?._id))
+        let result = await updateData(Users, editObj, new ObjectId(userData?._id))
         if (!result?.status) {
             return helpers.showResponse(false, ResponseMessages?.users?.password_reset_error, null, null, 400);
         }
@@ -293,7 +306,7 @@ const UserUtils = {
     changePasswordWithOld: async (data, user_id) => {
         let { oldPassword, newPassword, userId } = data;
 
-        let result = await getSingleData(Users, { password: { $eq: md5(oldPassword) }, _id: ObjectId(user_id) });
+        let result = await getSingleData(Users, { password: { $eq: md5(oldPassword) }, _id: new ObjectId(user_id) });
         if (!result.status) {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_old_password, null, null, 400);
         }
@@ -301,7 +314,7 @@ const UserUtils = {
             password: md5(newPassword),
             updatedOn: helpers.getCurrentDate()
         }
-        let response = await updateByQuery(Users, updatedData, { password: { $eq: md5(oldPassword) }, _id: ObjectId(user_id) });
+        let response = await updateByQuery(Users, updatedData, { password: { $eq: md5(oldPassword) }, _id: new ObjectId(user_id) });
         if (response.status) {
             return helpers.showResponse(true, ResponseMessages.users.password_change_successfull, null, null, 200);
         }
@@ -503,7 +516,6 @@ const UserUtils = {
 
     updateBillingAddress: async (data, userId) => {
         let queryObject = { _id: userId }
-        console.log(data, "dataa")
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);

@@ -77,7 +77,6 @@ const adminUtils = {
     },
 
     updateMaterial: async (data) => {
-        console.log(data, "dataa");
         let { materialId, name, status } = data
         let updateObj = {
             updatedOn: helpers.getCurrentDate()
@@ -108,7 +107,6 @@ const adminUtils = {
     updateWaitingList: async (data) => {
         try {
             const { value } = data
-            console.log(value, "valuee")
             let result = await updateSingleData(WaitingList, { isWaitingListEnable: value })
 
             if (result.status) {
@@ -129,8 +127,6 @@ const adminUtils = {
             pageIndex = Number(pageIndex)
             pageSize = Number(pageSize)
 
-            console.log(pageIndex, pageSize, "pagina")
-            console.log(sortColumn, sortDirection, searchKey, "extraa")
 
             const result = await Users.aggregate([
                 {
@@ -221,7 +217,6 @@ const adminUtils = {
             const idGenerated = helpers.generateIDs(usersCount?.data)
 
             let adminData = await getSingleData(Users, { _id: adminId, userType: 1 })
-            console.log(adminData, "adminData", adminId)
             if (!adminData.status) {
                 return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
             }
@@ -323,9 +318,6 @@ const adminUtils = {
             pageIndex = Number(pageIndex)
             pageSize = Number(pageSize)
 
-            console.log(pageIndex, pageSize, "pagina")
-            console.log(sortColumn, sortDirection, searchKey, "extraa")
-
             let matchObj = {
                 email: { $regex: searchKey, $options: 'i' },
                 userType: 2,
@@ -335,8 +327,6 @@ const adminUtils = {
             if (subAdminId) {
                 matchObj._id = mongoose.Types.ObjectId(subAdminId)
             }
-            console.log(subAdminId, "subAdminId");
-            console.log(matchObj, "matchObj");
 
             const result = await Users.aggregate([
                 {
@@ -422,7 +412,7 @@ const adminUtils = {
             if (result.status) {
                 return helpers.showResponse(true, status ? "Deleted Successfully" : ResponseMessages?.common.update_sucess, null, null, 200);
             }
-            return helpers.showResponse(false, status ? "Error While Deleting" : ResponseMessages?.common.update_failed, err, null, 400);
+            return helpers.showResponse(false, status ? "Error While Deleting " : ResponseMessages?.common.update_failed, err, null, 400);
 
         } catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
@@ -432,8 +422,6 @@ const adminUtils = {
     saveNotification: async (data) => {
         try {
             const { type, title, userIds, description } = data
-
-            console.log(userIds, "useridds");
 
             let obj = {
                 type,
@@ -531,7 +519,6 @@ const adminUtils = {
             }
             let totalCount = await getCount(Notification, matchObj)
             const result = await Notification.aggregate(aggregationPipeline)
-            console.log(result, "resultt");
 
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
 

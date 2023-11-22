@@ -8,13 +8,11 @@ const galleryUtil = {
         let { title, type } = data
         let name = type == 1 ? 'Images' : 'Videos'
         file.fieldname = `${file.fieldname}${name}`
-        console.log(file, "filess");
         //upload image to aws s3 bucket
         const s3Upload = await helpers.uploadFileToS3([file])
         if (!s3Upload.status) {
             return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
         }
-        console.log(s3Upload, "s3uploadd");
         let newObj = {
             title,
             type,
@@ -44,14 +42,6 @@ const galleryUtil = {
                 status: 2,
                 updatedOn: helpers.getCurrentDate(),
             }
-            // if (file) {
-            //     //upload image to aws s3 bucket
-            //     const s3Upload = await helpers.uploadFileToS3([file])
-            //     if (!s3Upload.status) {
-            //         return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
-            //     }
-            //     obj.imageUrl = s3Upload.data[0]
-            // }
 
             const result = await updateSingleData(Gallery, obj, { _id: gelleryId, status: { $ne: 2 }, type })
 
@@ -92,7 +82,6 @@ const galleryUtil = {
 
 
         const result = await Gallery.aggregate(aggregationPipeline);
-        console.log(result, "resulttt")
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { items: result, totalCount: totalCount?.data }, null, 200);
     },

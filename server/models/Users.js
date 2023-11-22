@@ -12,7 +12,6 @@ var Users = new Schema({
     },
     email: {
         type: String,
-        // unique: true,
         required: true
     },
     userName: {
@@ -117,3 +116,4 @@ var Users = new Schema({
 });
 
 module.exports = mongoose.model('User', Users, 'users');
+

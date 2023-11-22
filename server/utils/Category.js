@@ -82,15 +82,8 @@ const categoryUtil = {
             )
         }
         //ends if
-
-        console.log(aggregationPipeline, "aggregationPipeline")
-
         const result = await Category.aggregate(aggregationPipeline);
-        console.log(result, "resulttt")
 
-        // if (result.length === 0) {
-        //     return helpers.showResponse(false, ResponseMessages.common.data_not_found, null, null, 400);
-        // }
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
     },
 
@@ -102,10 +95,8 @@ const categoryUtil = {
             if (findCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.category_already_existed, {}, null, 400);
             }
-            console.log(file, "fileee");
             //upload image to aws s3 bucket
             const s3Upload = await helpers.uploadFileToS3([file])
-            console.log(s3Upload, "category s3 upload");
             if (!s3Upload.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
             }
@@ -263,8 +254,6 @@ const categoryUtil = {
                 return helpers.showResponse(false, ResponseMessages?.category.active_subcategory, {}, null, 400);
             }
             const result = await updateSingleData(Category, { status: 2 }, { _id: id })
-            console.log(result, "resultt Category")
-
 
             if (result.status) {
                 // await deleteData(SubCategory, { categoryId: id })
@@ -296,7 +285,6 @@ const categoryUtil = {
 
             // const result = await deleteById(SubCategory, id)
             const result = await updateSingleData(SubCategory, { status: 2 }, { _id: id })
-            console.log(result, "resultt SubCategory")
 
             if (result.status) {
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);

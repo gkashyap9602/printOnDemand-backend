@@ -5,7 +5,10 @@ const ResponseMessages = require('../constants/ResponseMessages');
 const authController = {
 
     register: async (req, res) => {
-        let result = await Users.register(req.body);
+        // if (!req.file) {
+        //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
+        // }
+        let result = await Users.register(req.body, req.file);
         return helpers.showOutput(res, result, result.statusCode);
     },
 

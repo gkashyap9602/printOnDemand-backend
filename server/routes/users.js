@@ -4,12 +4,13 @@ var authController = require('../controllers/Users');
 var { verifyTokenUser, verifyTokenBoth, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
 const { registrationSchema, loginSchema, forgotSchema, resetPasswordSchema, changePasswordSchema, profileSchema } = require('../validations/user')
-
+const { addToMulter } = require('../services/helper')
 // Users admin both routes with token
 router.post('/logout', verifyTokenBoth, authController.logout);
 
 // Users Routes without token
-router.post('/register', validate(registrationSchema), authController.register);
+router.post('/register', addToMulter.single('profileImg'), validate(registrationSchema), authController.register);
+
 router.post('/login', validate(loginSchema), authController.login);
 router.post('/forgotPassword', validate(forgotSchema), authController.forgotPassword);
 router.post('/resetPassword', validate(resetPasswordSchema), authController.resetPassword);

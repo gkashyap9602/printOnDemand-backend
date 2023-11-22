@@ -69,6 +69,7 @@ module.exports.registrationSchema = {
         lastName: joi.string().required(),
         email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
         password: joi.string().min(6).required(),
+        phoneNumber: joi.string().max(10).message("Please Enter valid number"),
 
     })
 };

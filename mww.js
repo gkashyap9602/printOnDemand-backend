@@ -35,6 +35,7 @@ app.use(cors({
     secret: process.env.SESSION_KEY,
     resave: false,
     saveUninitialized: true,
+    // proxy: true,
     store: MongoStore.create({
       mongoUrl: mongoUrl,
       dbName: helpers.changeEnv(process.env.ENV_MODE).db,
