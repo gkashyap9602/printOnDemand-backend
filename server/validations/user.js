@@ -4,6 +4,7 @@ module.exports.profileSchema = {
     body: joi.object({
         firstName: joi.string(),
         lastName: joi.string(),
+        phoneNumber: joi.string(),
         paymentDetails: {
             billingAddressData: {
                 city: joi.string(),
