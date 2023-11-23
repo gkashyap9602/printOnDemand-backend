@@ -483,7 +483,7 @@ const UserUtils = {
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result?.data, null, 200);
     },
 
-    updateBasicDetails: async (data, user_id) => {
+    updateBasicDetails: async (data, user_id, profileImg) => {
         let queryObject = { _id: user_id }
 
         let checkUser = await getSingleData(Users, queryObject, '');
@@ -491,6 +491,16 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
         }
         data.updatedOn = helpers.getCurrentDate();
+
+        if (profileImg) {
+            //upload image to aws s3 bucket
+            const s3Upload = await helpers.uploadFileToS3([profileImg])
+            if (!s3Upload.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
+            }
+
+            data.profileImagePath = s3Upload?.data[0]
+        }
 
         let result = await updateSingleData(Users, data, { _id: user_id })
         if (result.status) {

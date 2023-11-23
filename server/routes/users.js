@@ -18,7 +18,7 @@ router.post('/resetPassword', validate(resetPasswordSchema), authController.rese
 // with user token
 router.post('/changePassword', validateCSRFToken, verifyTokenUser, validate(changePasswordSchema), authController.changePasswordWithOld);
 router.post('/getAllOrders', validateCSRFToken, verifyTokenUser, authController.getAllOrders);
-router.post('/updateBasicDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateBasicDetails);
+router.post('/updateBasicDetails', validateCSRFToken, verifyTokenUser, addToMulter.single('profileImg'), validate(profileSchema), authController.updateBasicDetails);
 router.post('/updatePersonalDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updatePersonalDetails);
 router.post('/updateShippingDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateShippingDetails);
 router.post('/updateBillingAddress', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateBillingAddress);
