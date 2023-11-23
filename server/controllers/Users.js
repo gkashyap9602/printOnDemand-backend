@@ -120,6 +120,10 @@ const authController = {
         let result = await Users.getBulkImport(req?.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    refreshCsrfToken: async (req, res) => {
+        let result = await Users.refreshCsrfToken(req);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
 }
 
 module.exports = {

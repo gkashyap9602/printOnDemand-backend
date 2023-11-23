@@ -212,6 +212,21 @@ const UserUtils = {
         let userData = result?.data
         return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
     },
+    refreshCsrfToken: async (request) => {
+        try {
+            if (request?.session?._csrfToken) {
+                let newCsrfToken = helpers.generateCsrfToken();
+                request.session._csrfToken = newCsrfToken;
+
+                return helpers.showResponse(true, 'Token Generated Successfully', { csrfToken: newCsrfToken }, null, 200);
+            } else {
+                return helpers.showResponse(false, 'Session not available', null, null, 500);
+            }
+        } catch (error) {
+            console.error('Error refreshing CSRF token:', error);
+            return helpers.showResponse(false, 'Error refreshing CSRF token', null, null, 500);
+        }
+    },
 
 
     forgotPassword: async (data) => {
@@ -326,9 +341,9 @@ const UserUtils = {
     getUserDetail: async (data) => {
         let { user_id } = data
         //check if userprofile nor register than it shows empty object??
-        console.log(user_id,"useridd");
+        console.log(user_id, "useridd");
         let result = await Users.aggregate([
-            { $match: { _id: mongoose.Types.ObjectId(user_id), status: {$ne:2}} },  // Match the specific user by _id and status
+            { $match: { _id: mongoose.Types.ObjectId(user_id), status: { $ne: 2 } } },  // Match the specific user by _id and status
 
             {
                 $lookup: {
@@ -475,7 +490,7 @@ const UserUtils = {
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
         }
-        data.updatedOn = helpers.getCurrentDate()
+        data.updatedOn = helpers.getCurrentDate();
 
         let result = await updateSingleData(Users, data, { _id: user_id })
         if (result.status) {

@@ -15,7 +15,7 @@ module.exports = {
         no_video_thumb_file: "Please select a video thumb file to proceed",
         no_file: "Please select a file to upload",
         thumbnail_error: "Unable to create thumbnail at the moment",
-        added_success:"Added Successfully",
+        added_success: "Added Successfully",
         thumbnail_generated: "Thumbnail generated",
         server_error: "server error",
         updated_sucessfully: "updated sucessfully",
@@ -54,7 +54,7 @@ module.exports = {
         user_account_error: "Something wrong happens to user account",
         invalid_email: "Mentioned email is not registered with us",
         invalid_phone: "Mentioned phone is not registered with us",
-        verification_email_sent: "Email Verification Code has been sent to your email address",
+        verification_email_sent: "Email Verification Link has been sent to your email address",
         verification_email_error: "Unable to send verification email to your email address",
         verification_sms_sent: "SMS Verification Code has been sent to your phone number",
         verification_sms_error: "Unable to send verification sms to your phone number",
@@ -169,8 +169,8 @@ module.exports = {
         admin_details_updated: "Administrator details updated",
         admin_details_update_error: "Error while updating details",
         email_already: "Email address is already occupied",
-        subAdmin_added:"SubAdmin Added Successfully",
-        subAdmin_save_fail:"Error while Creating SubAdmin",
+        subAdmin_added: "SubAdmin Added Successfully",
+        subAdmin_save_fail: "Error while Creating SubAdmin",
 
 
     },

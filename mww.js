@@ -31,7 +31,6 @@ app.use(cors({
   let mongoUrl = `${MONGODB_URI}&authSource=${helpers.changeEnv(process.env.ENV_MODE).db}`
   app.use(session({
     name: "connect.sid",
-    // store: new MongoStore({mongoose}),
     secret: process.env.SESSION_KEY,
     resave: false,
     saveUninitialized: true,
@@ -47,6 +46,7 @@ app.use(cors({
 
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24 hours in miliseconds
+      // maxAge: 5000, //5sec
     },
   }));
 
