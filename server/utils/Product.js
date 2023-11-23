@@ -13,7 +13,7 @@ const { getFileType } = require('../services/helper/index')
 const mime = require('mime-types')
 
 const productUtils = {
-    
+
     addProduct: async (data) => {
         try {
             let { careInstructions, longDescription, subCategoryIds, materialIds, variableTypesIds,
@@ -360,7 +360,7 @@ const productUtils = {
             console.log(valueSearch, "valueSearch");
             let matchObj = {
                 subCategoryId: { $in: [id] },
-                // status: { $ne: 2 },
+                status: { $ne: 2 },
                 // title: { $regex: titleSearch, $options: 'i' },
 
             }
@@ -375,9 +375,13 @@ const productUtils = {
 
             }
 
+
+
             let totalCount = await getCount(Product, { ...matchObj })
 
-            const result = await Product.aggregate([
+            console.log(matchObj, "matchObj");
+
+            let aggregate = [
                 {
                     $match: {
                         ...matchObj,
@@ -426,14 +430,6 @@ const productUtils = {
                 //     $unwind: "$Variable" // Unwind the "Variable" array
                 // },
                 {
-                    $match: {
-                        "Variable.value": {
-                            $regex: valueSearch, // Use the regex filter on "Variable.value"
-                            $options: 'i'
-                        }
-                    }
-                },
-                {
                     $sort: {
                         [sortColumn]: sortDirection === "asc" ? 1 : -1
                     }
@@ -458,8 +454,24 @@ const productUtils = {
 
                     }
                 }
+            ]
 
-            ]);
+            if (valueSearch) {
+                console.log("under value search");
+
+                let match = {
+                    $match: {
+                        "Variable.value": { $regex: valueSearch, $options: 'i' },
+                    }
+                }
+                aggregate.push(match)
+
+            }
+
+
+
+
+            const result = await Product.aggregate(aggregate);
 
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
         }

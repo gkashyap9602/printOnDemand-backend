@@ -336,92 +336,76 @@ const UserUtils = {
         return helpers.showResponse(false, ResponseMessages.users.password_change_failed, null, null, 400);
     },
 
-  // // with token 
-  getUserDetail: async (data) => {
-    let { user_id } = data;
-    console.log(user_id, "useridd");
-    let result = await Users.aggregate([
-        { $match: { _id: mongoose.Types.ObjectId(user_id), status: { $ne: 2 } } },  // Match the specific user by _id and status
+    // // with token 
+    getUserDetail: async (data) => {
+        let { user_id } = data;
+        console.log(user_id, "useridd");
+        let result = await Users.aggregate([
+            { $match: { _id: mongoose.Types.ObjectId(user_id), status: { $ne: 2 } } },  // Match the specific user by _id and status
 
-        {
-            $lookup: {
-                from: "userProfile",
-                localField: "_id",
-                foreignField: "userId",
-                as: "userProfileData"
-            }
-        },
-        {
-            $unwind: "$userProfileData"
-        },
-        {
-            $addFields: {
-                fullName: {
-                    $concat: ['$firstName', ' ', '$lastName']
-                },
-                ncResaleInfo: {
-                    isExemptionEligible: "$userProfileData.isExemptionEligible",
-                    ncResaleCertificate: "$userProfileData.ncResaleCertificate"
-                },
-                userProfileData: "$userProfileData", // Include the 'userProfileData' field
-            }
-        },
-        {
-            $unset: "password" // Exclude the 'password' field
-        },
-        {
-            $replaceRoot: {
-                newRoot: {
-                    $mergeObjects: [
-                        // {
-                        //     _id: '$_id',
-                        //     firstName: '$firstName',
-                        //     lastName: '$lastName',
-                        //     email: '$email',
-                        //     // Add other fields from the Users collection that you want to include
-                        // },
-                        "$$ROOT",
-                        {
-                            fullName: {
-                                $concat: ['$firstName', ' ', '$lastName']
-                            },
-                            ncResaleInfo: {
-                                isExemptionEligible: "$userProfileData.isExemptionEligible",
-                                ncResaleCertificate: "$userProfileData.ncResaleCertificate"
-                            },
-                           
-                            userProfileData: {
-                                // Exclude the _id field from userProfileData
-                                $cond: {
-                                    if: { $ne: ["$userProfileData", null] },
-                                    then: {
-                                        // Include all fields except _id
-                                        $mergeObjects: [
-                                            "$userProfileData",
-                                            { _id: "$$REMOVE" }
-                                        ]
-                                    },
-                                    else: null
-                                }
-                            },
-
-
-                        }
-                    ]
+            {
+                $lookup: {
+                    from: "userProfile",
+                    localField: "_id",
+                    foreignField: "userId",
+                    as: "userProfileData"
                 }
-            }
-        },
-        // {
-        //     $unset: "userProfileData" // Exclude the 'password' field
-        // },
-    ]);
+            },
+            {
+                $unwind: "$userProfileData"
+            },
+            {
+                $addFields: {
+                    fullName: {
+                        $concat: ['$firstName', ' ', '$lastName']
+                    },
+                    ncResaleInfo: {
+                        isExemptionEligible: "$userProfileData.isExemptionEligible",
+                        ncResaleCertificate: "$userProfileData.ncResaleCertificate"
+                    },
+                    userProfileData: "$userProfileData", // Include the 'userProfileData' field
+                }
+            },
+            {
+                $unset: "password" // Exclude the 'password' field
+            },
+            {
+                $replaceRoot: {
+                    newRoot: {
+                        $mergeObjects: [
+                            // {
+                            //     _id: '$_id',
+                            //     firstName: '$firstName',
+                            //     lastName: '$lastName',
+                            //     email: '$email',
+                            //     // Add other fields from the Users collection that you want to include
+                            // },
+                            "$$ROOT",
+                            {
+                                fullName: {
+                                    $concat: ['$firstName', ' ', '$lastName']
+                                },
+                                ncResaleInfo: {
+                                    isExemptionEligible: "$userProfileData.isExemptionEligible",
+                                    ncResaleCertificate: "$userProfileData.ncResaleCertificate"
+                                },
 
-    if (result.length === 0) {
-        return helpers.showResponse(false, 'User Not found ', null, null, 400);
-    }
+                            }
+                        ]
+                    }
+                }
+            },
+            // {
+            //     $unset: "userProfileData" // Exclude the 'password' field
+            // },
+        ]);
 
-    return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
-},
+        if (result.length === 0) {
+            return helpers.showResponse(false, 'User Not found ', null, null, 400);
+        }
+
+        return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
+    },
 
     // // // with token 
     // getUserDetail: async (data) => {
@@ -463,7 +447,7 @@ const UserUtils = {
     //         {
     //             $unset: "userProfileData" // Exclude the 'password' field
     //         },
-         
+
     //     ])
 
     //     if (result.length === 0) {
