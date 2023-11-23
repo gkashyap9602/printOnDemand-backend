@@ -382,7 +382,7 @@ const UserUtils = {
 
 
         if (result.length === 0) {
-            return helpers.showResponse(false, ResponseMessages?.common.data_not_found, null, null, 400);
+            return helpers.showResponse(false, 'User Not found ', null, null, 400);
         }
 
         return helpers.showResponse(true, ResponseMessages?.users?.user_detail, result.length > 0 ? result[0] : {}, null, 200);
