@@ -41,6 +41,7 @@
     "path": "^0.12.7",
     "pdfkit": "^0.13.0",
     "razorpay": "^2.8.6",
+    "react-zendesk": "^0.1.13",
     "sharp": "^0.32.1",
     "yt-get": "^1.1.2",
     "ytdl-core": "^4.11.4"

@@ -9,6 +9,7 @@ const { default: mongoose } = require('mongoose');
 let ObjectId = require('mongodb').ObjectId
 const WaitingList = require('../models/WaitingList')
 const commonContent = require('../models/CommonContent')
+const axios = require('axios')
 
 const commonUtil = {
 
@@ -74,6 +75,52 @@ const commonUtil = {
     const result = await Material.aggregate(aggregationPipeline)
 
     return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
+  },
+  fetchZendeskFAQs: async () => {
+    try {
+      const API_TOKEN = `TvS7y1gQdlK9bZn5Ckp3RHaLeLqUG9tibR7fEdbr`;
+      const response = await axios.get('https://sachtech.zendesk.com/api/v2/help_center/en-us/articles.json', {
+        headers: {
+          Authorization: API_TOKEN, // Replace with your Zendesk API token
+          "Content-Type": "application/json",
+        }
+      })
+      console.log("Zendesk FAQs:", response);
+      if (!response) {
+        return helpers.showResponse(false, "faq error", response, null, 400);
+
+      }
+      return helpers.showResponse(true, "faq fetch sucess", response, null, 200);
+
+    } catch (error) {
+      console.error("Error fetching Zendesk FAQs:", error);
+      return helpers.showResponse(false, "faq errorr", error, null, 400);
+    }
+  },
+  TwofetchZendeskFAQs: async () => {
+    try {
+      const API_TOKEN = "TvS7y1gQdlK9bZn5Ckp3RHaLeLqUG9tibR7fEdbr";
+      const response = await fetch('https://sachtech.zendesk.com/api/v2/help_center/en-us/articles.json', {
+        method: 'GET',
+        headers: {
+          Authorization: API_TOKEN, // Replace with your Zendesk API token
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log(response,"responseeee");
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // const data = await response.json();
+      // console.log("Zendesk FAQs:", data);
+      return helpers.showResponse(true, "faq errorr", response, null, 200);
+      // Handle the FAQs data as needed
+    } catch (error) {
+      console.error("Error fetching Zendesk FAQs:", error);
+      return helpers.showResponse(false, "faq errorr", error, null, 400);
+    }
   },
   getAllCountries: async () => {
 

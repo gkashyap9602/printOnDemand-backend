@@ -20,6 +20,8 @@ router.get('/getQuestions', verifyTokenBoth, commonController.getQuestions);
 router.post('/addNewQuestion', validateCSRFToken, verifyTokenAdmin, validate(addQuestionSchema), commonController.addNewQuestion);
 router.post('/updateQuestion', validateCSRFToken, verifyTokenAdmin, validate(updateQuestionSchema), commonController.updateQuestion);
 router.post('/updateCommonContent', validateCSRFToken, verifyTokenAdmin, validate(updateCommonContentSchema), commonController.updateCommonContent);
+router.get('/fetchZendeskFAQs', commonController.fetchZendeskFAQs);
+router.get('/TwofetchZendeskFAQs', commonController.TwofetchZendeskFAQs);
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
