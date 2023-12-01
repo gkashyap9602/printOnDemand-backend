@@ -108,7 +108,7 @@ const commonUtil = {
         },
       });
 
-      console.log(response,"responseeee");
+      console.log(response, "responseeee");
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }

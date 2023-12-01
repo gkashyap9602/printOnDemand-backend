@@ -176,7 +176,8 @@ const UserUtils = {
             let access_token = jwt.sign({ user_type: user_type, type: "access", _id: userData._id }, API_SECRET, {
                 expiresIn: consts.ACCESS_EXPIRY
             });
-
+              
+            //save fcmToken in users collection 
             if (fcmToken && userData.userType == 3) {
                 const result = await updateSingleData(Users, { fcmToken }, { _id: userData._id, status: { $ne: 3 } })
                 userData.fcmToken = result?.data?.fcmToken

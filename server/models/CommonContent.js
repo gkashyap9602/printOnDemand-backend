@@ -14,7 +14,7 @@ var CommonContent = new Schema({
         type: String,
         default: ''
     },
-    disclaimer: {
+    howItWorks: {
         type: String,
         default: ''
     },
