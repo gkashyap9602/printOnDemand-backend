@@ -104,17 +104,11 @@ const productLibrary = {
 
             // console.log(productLibraryImages, "productLibraryImages");
 
+
             const find = await getSingleData(ProductLibrary, { _id: productLibraryId, status: { $ne: 2 } })
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
-
-            // Retrieve the previous variant data
-            // const previousVariant = find.data.productLibraryVarients.find((variant) => {
-            //     console.log(variant._id,"varientttt");
-            //     console.log(mongoose.Types.ObjectId(productLibraryVariantId),"productLibraryVariantId");
-            //    return  variant._id ==  mongoose.Types.ObjectId(productLibraryVariantId)
-            // });
 
             const previousVariant = find.data.productLibraryVarients.find((variant) => variant._id.toString() == productLibraryVariantId.toString());
 
@@ -130,20 +124,26 @@ const productLibrary = {
             const updateData = {
                 // Your update data goes here
                 // For example, if you want to update the "price" field:
-                $set: {
-                    // "productLibraryVarients.$.price": Number(retailPrice),
-                    "productLibraryVarients.$.retailPrice": Number(retailPrice),
-                    "productLibraryVarients.$.profit": Number(profit),
-                    updateOn: helpers.getCurrentDate()
-                }
+                // $set: {
+                // "productLibraryVarients.$.price": Number(retailPrice),
+                "productLibraryVarients.$.retailPrice": Number(retailPrice),
+                "productLibraryVarients.$.profit": Number(profit),
+                updatedOn: helpers.getCurrentDate(),
+
+                // },
             };
+
+            if (productLibraryImages) {
+                updateData.productLibraryImages = productLibraryImages
+            }
+
             // Update the document
             const result = await ProductLibrary.updateOne(
                 {
                     "_id": productLibraryId,
                     "productLibraryVarients._id": productLibraryVariantId
                 },
-                updateData
+                { $set: updateData }
             );
 
             if (result.modifiedCount > 0) {
