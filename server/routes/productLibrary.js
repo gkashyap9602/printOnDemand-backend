@@ -12,6 +12,7 @@ router.get('/getLibraryImages', verifyTokenUser, productLibraryController.getLib
 router.post('/create', verifyTokenUser,addToMulter.array('productLibrary'), productLibraryController.createProductLibrary);
 router.post('/update', verifyTokenUser,addToMulter.array('productLibrary'), productLibraryController.updateProductLibrary);
 router.post('/getLibrary', verifyTokenUser, productLibraryController.getProductLibrary);
+router.post('/getLibraryDetails', verifyTokenUser, productLibraryController.getProductLibraryDetails);
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

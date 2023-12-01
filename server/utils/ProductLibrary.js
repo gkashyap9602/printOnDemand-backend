@@ -214,42 +214,47 @@ const productLibrary = {
 
                     }
                 },
-
-
-                // {
-                //     $addFields: {
-                //         priceStartsFrom: { $min: "$ProductVarient.price" },
-
-                //     }
-                // },
+                {
+                    $addFields: {
+                        productLibraryVarients: {
+                            $map: {
+                                input: "$productLibraryVarients",
+                                as: "plv",
+                                in: {
+                                    $mergeObjects: [
+                                        "$$plv",
+                                        {
+                                            ProductVarient: {
+                                                $arrayElemAt: [
+                                                    {
+                                                        $filter: {
+                                                            input: "$ProductVarient",
+                                                            as: "pv",
+                                                            cond: {
+                                                                $eq: ["$$plv.productVarientId", "$$pv._id"]
+                                                            }
+                                                        }
+                                                    },
+                                                    0 // Get the first element of the array
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    $unset: "ProductVarient"
+                },
 
                 {
                     $sort: {
                         [sortColumn]: sortDirection === "asc" ? 1 : -1
                     }
                 },
-                // {
-                //     $project: {
-                //         _id: 1,
-                //         careInstructions: 1,
-                //         longDescription: 1,
-                //         productImages: 1,
-                //         productionDuration: 1,
-                //         shortDescription: 1,
-                //         sizeChart: 1,
-                //         isCustomizable: 1,
-                //         isPersonalizable: 1,
-                //         status: 1,
-                //         title: 1,
-                //         variantCount: 1,
-                //         priceStartsFrom: 1,
-                //         // ProductVarient: 1,
-                //         Variable: 1,
-                //         VariableTypes: 1,
 
-
-                //     }
-                // }
             ]
 
 
@@ -262,6 +267,72 @@ const productLibrary = {
 
         }
 
+    },
+    getProductLibraryDetails: async (data) => {
+        try {
+            const { productLibraryId } = data;
+
+            const result = await ProductLibrary.aggregate([
+                {
+                    $match: {
+                        _id: mongoose.Types.ObjectId(productLibraryId),
+                        status: { $ne: 2 },
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "productVarient",
+                        localField: "productLibraryVarients.productVarientId",
+                        foreignField: "_id",
+                        as: "ProductVarient",
+                    }
+                },
+
+                {
+                    $addFields: {
+                        productLibraryVarients: {
+                            $map: {
+                                input: "$productLibraryVarients",
+                                as: "plv",
+                                in: {
+                                    $mergeObjects: [
+                                        "$$plv",
+                                        {
+                                            ProductVarient: {
+                                                $arrayElemAt: [
+                                                    {
+                                                        $filter: {
+                                                            input: "$ProductVarient",
+                                                            as: "pv",
+                                                            cond: {
+                                                                $eq: ["$$plv.productVarientId", "$$pv._id"]
+                                                            }
+                                                        }
+                                                    },
+                                                    0 // Get the first element of the array
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    $unset: "ProductVarient"
+                }
+            ]);
+
+            if (result.length === 0) {
+                return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retrieve_success, result[0], null, 200);
+
+        } catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
     },
 
     updateProduct: async (data) => {

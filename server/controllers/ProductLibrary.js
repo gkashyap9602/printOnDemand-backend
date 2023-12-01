@@ -35,6 +35,10 @@ const productLibraryController = {
         let result = await ProductLibrary.getProductLibrary(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    getProductLibraryDetails: async (req, res) => {
+        let result = await ProductLibrary.getProductLibraryDetails(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
 
 }
 
