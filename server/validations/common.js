@@ -22,7 +22,7 @@ module.exports.updateCommonContentSchema = {
         about: joi.string(),
         privacyPolicy: joi.string(),
         termsConditions: joi.string(),
-        disclaimer: joi.string()
+        howItWorks: joi.string()
     })
 
 };
