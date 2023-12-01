@@ -2,48 +2,95 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var ProductLibrary = new Schema({
-    user_id: {
+    userId: {
         type: mongoose.Types.ObjectId,
         ref: "users",
         index: true
     },
+    productId: {
+        type: mongoose.Types.ObjectId,
+        ref: "product",
+        index: true
+    },
     title: {
         type: String,
-        required: true,
         index: true
     },
     description: {
         type: String,
+        default: null
     },
-    designType: {
+    status: {
+        type: Number,
+        default: 1,
+        Comment: "1 for active 2 for delete "
+
+    },
+    addToStore: {
+        type: Number,
+        default: 0,
+        Comment: "1 for add 0 for not add "
+
+    },
+
+    designDetails: {
         type: String,
+        default: null
     },
-    product_library_images: [{
+    productLibraryImages: [{
         _id: {
             type: mongoose.Types.ObjectId,
             index: true
         },
-        image_url: {
+        imageUrl: {
             type: String,
+            default: null
 
         },
-        display_order: {
-            type: String,
+        displayOrder: {
+            type: Number,
+            default: 0
 
         },
     }],
-    isDeleted: {
-        type: Boolean,
-        default: false,
-    },
-    isProductDeleted: {
-        type: Boolean,
-        default: false,
-    },
-    deletedOn: {
-        type: String,
-        default: null,
-    },
+    productLibraryVarients: [{
+        _id: {
+            type: mongoose.Types.ObjectId,
+            index: true
+        },
+        productVarientId: {
+            type: mongoose.Types.ObjectId,
+            ref: "productVarient"
+        },
+        price: {
+            type: Number,
+            default: null
+
+        },
+        profit: {
+            type: Number,
+            default: null
+
+        },
+        retailPrice: {
+            type: Number,
+            default: null
+
+        },
+
+    }],
+    // isDeleted: {
+    //     type: Boolean,
+    //     default: false,
+    // },
+    // isProductDeleted: {
+    //     type: Boolean,
+    //     default: false,
+    // },
+    // deletedOn: {
+    //     type: String,
+    //     default: null,
+    // },
     createdOn: {
         type: String,
         default: null,

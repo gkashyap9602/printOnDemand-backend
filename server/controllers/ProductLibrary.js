@@ -15,6 +15,26 @@ const productLibraryController = {
         let result = await ProductLibrary.getLibraryImages();
         return helpers.showOutput(res, result, result.statusCode);
     },
+    createProductLibrary: async (req, res) => {
+        let userId = req.decoded._id;
+        if (!userId) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await ProductLibrary.createProductLibrary(req.body,userId);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    updateProductLibrary: async (req, res) => {
+        let userId = req.decoded._id;
+        if (!userId) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await ProductLibrary.updateProductLibrary(req.body,userId);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    getProductLibrary: async (req, res) => {
+        let result = await ProductLibrary.getProductLibrary(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
 
 }
 
