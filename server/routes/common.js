@@ -17,8 +17,8 @@ router.get('/getCommonContent', verifyTokenBoth, commonController.getCommonConte
 router.get('/getQuestions', verifyTokenBoth, commonController.getQuestions);
 
 // with admin token routes 
-router.post('/addNewQuestion', validateCSRFToken, verifyTokenAdmin, validate(addQuestionSchema), commonController.addNewQuestion);
-router.post('/updateQuestion', validateCSRFToken, verifyTokenAdmin, validate(updateQuestionSchema), commonController.updateQuestion);
+router.post('/addNewQuestion', verifyTokenAdmin, validate(addQuestionSchema), commonController.addNewQuestion);
+router.post('/updateQuestion', verifyTokenAdmin, validate(updateQuestionSchema), commonController.updateQuestion);
 router.post('/updateCommonContent', verifyTokenAdmin, validate(updateCommonContentSchema), commonController.updateCommonContent);
 router.get('/fetchZendeskFAQs', commonController.fetchZendeskFAQs);
 router.get('/TwofetchZendeskFAQs', commonController.TwofetchZendeskFAQs);
