@@ -59,6 +59,14 @@ const commonController = {
         let result = await Common.getSearchArticle(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    raiseTicket: async (req, res) => {
+        let userId = req.decoded.user_id;
+        if (!userId) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Common.raiseTicket(req.body,userId);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     getCommonContent: async (req, res) => {
         let result = await Common.getCommonContent();
         return helpers.showOutput(res, result, result.statusCode);
@@ -69,12 +77,12 @@ const commonController = {
     },
     fetchZendeskFAQs: async (req, res) => {
         let result = await Common.fetchZendeskFAQs(req.body);
-        console.log(result,"resullsss");
+        console.log(result, "resullsss");
         return helpers.showOutput(res, result, result.statusCode);
     },
     TwofetchZendeskFAQs: async (req, res) => {
         let result = await Common.TwofetchZendeskFAQs(req.body);
-        console.log(result,"resullsss");
+        console.log(result, "resullsss");
         return helpers.showOutput(res, result, result.statusCode);
     },
 

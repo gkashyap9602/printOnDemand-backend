@@ -3,7 +3,7 @@ var commonController = require('../controllers/Common');
 var router = express.Router();
 var { verifyTokenBoth, verifyTokenAdmin, validateCSRFToken } = require("../middleware/authentication");
 const validate = require('../middleware/validation')
-const { addQuestionSchema, updateQuestionSchema, updateCommonContentSchema } = require('../validations/common')
+const { addQuestionSchema, updateQuestionSchema, updateCommonContentSchema, raiseTicket } = require('../validations/common')
 
 //without Token Routes 
 router.post('/store_param', commonController.storeParameterToAWS);
@@ -19,6 +19,7 @@ router.get('/getFaqCategories', verifyTokenBoth, commonController.getFaqCategori
 router.get('/getCategoriesArticle', verifyTokenBoth, commonController.getCategoriesArticle);
 router.get('/getSingleCategoryArticle', verifyTokenBoth, commonController.getSingleCategoryArticle);
 router.get('/getSearchArticle', verifyTokenBoth, commonController.getSearchArticle);
+router.post('/raiseTicket', verifyTokenBoth, validate(raiseTicket), commonController.raiseTicket);
 
 // with admin token routes 
 router.post('/addNewQuestion', verifyTokenAdmin, validate(addQuestionSchema), commonController.addNewQuestion);

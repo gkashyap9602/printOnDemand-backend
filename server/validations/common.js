@@ -17,6 +17,13 @@ module.exports.updateQuestionSchema = {
     })
 
 };
+module.exports.raiseTicket = {
+    body: joi.object({
+        description: joi.string().required(),
+        subject: joi.string().required(),
+    })
+
+};
 module.exports.updateCommonContentSchema = {
     body: joi.object({
         about: joi.string(),

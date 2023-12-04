@@ -11,6 +11,7 @@ const WaitingList = require('../models/WaitingList')
 const commonContent = require('../models/CommonContent')
 const axios = require('axios')
 const { ZENDESK_AUTH, ZENDESK_BASE_URL } = require('../constants/const')
+const Users = require('../models/Users')
 
 const commonUtil = {
 
@@ -347,14 +348,38 @@ const commonUtil = {
 
     }
   },
-  raiseTicket: async (data) => {
-
+  raiseTicket: async (data, userId) => {
     try {
-
       let { description, subject } = data
+      let query = {
+        status: { $ne: 2 },
+        userType: 3,
+        _id: userId
+
+      }
+      let findUser = await getSingleData(Users, query)
+
+      if (!findUser.status) {
+        return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, {}, null, 400);
+      }
+
+      let body = {
+        "request": {
+          "requester": {
+            "name": findUser.data.firstName + " " + findUser.data.lastName,
+            "email": findUser.data.email
+          },
+          "subject": subject,
+          "comment": {
+            "body": description
+          }
+        }
+      }
+
+      console.log(body, "boddyyyyy");
 
 
-      let response = await axios.get(`${ZENDESK_BASE_URL}/requests`, {
+      let response = await axios.post(`${ZENDESK_BASE_URL}/requests`, body, {
         headers: {
           Authorization: `Basic ${ZENDESK_AUTH}`,
           "Content-Type": "application/json",
@@ -364,11 +389,12 @@ const commonUtil = {
       console.log(response.data, "responsee");
 
       if (response.data) {
-        return helpers.showResponse(true, "Here is result in Articles  ", response.data, null, 200);
+        return helpers.showResponse(true, "Ticket Raise Successfully", response.data, null, 200);
       }
-      return helpers.showResponse(false, 'No data found', null, null, 400);
+      return helpers.showResponse(false, 'Error Occur While Generating Ticket ', null, null, 400);
 
     } catch (error) {
+      console.log(error, "errrrr");
       return helpers.showResponse(false, error?.message, null, null, 400);
 
     }
