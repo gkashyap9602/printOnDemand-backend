@@ -112,7 +112,7 @@ const productLibrary = {
 
             const previousVariant = find.data.productLibraryVarients.find((variant) => variant._id.toString() == productLibraryVariantId.toString());
 
-            console.log(previousVariant, "previiiii");
+            console.log(previousVariant, "previousVariant");
             if (!previousVariant) {
                 return helpers.showResponse(false, "varient not exist", {}, null, 400);
             }
@@ -122,15 +122,9 @@ const productLibrary = {
             const profit = Number(retailPrice) - previousPrice;
 
             const updateData = {
-                // Your update data goes here
-                // For example, if you want to update the "price" field:
-                // $set: {
-                // "productLibraryVarients.$.price": Number(retailPrice),
                 "productLibraryVarients.$.retailPrice": Number(retailPrice),
                 "productLibraryVarients.$.profit": Number(profit),
                 updatedOn: helpers.getCurrentDate(),
-
-                // },
             };
 
             if (productLibraryImages) {
@@ -205,49 +199,49 @@ const productLibrary = {
                 {
                     $limit: pageSize // Limit the number of records per page
                 },
-                {
-                    $lookup: {
-                        from: "productVarient",
-                        localField: "productLibraryVarients.productVarientId",
-                        foreignField: "_id",
-                        as: "ProductVarient",
+                // {
+                //     $lookup: {
+                //         from: "productVarient",
+                //         localField: "productLibraryVarients.productVarientId",
+                //         foreignField: "_id",
+                //         as: "ProductVarient",
 
-                    }
-                },
-                {
-                    $addFields: {
-                        productLibraryVarients: {
-                            $map: {
-                                input: "$productLibraryVarients",
-                                as: "plv",
-                                in: {
-                                    $mergeObjects: [
-                                        "$$plv",
-                                        {
-                                            ProductVarient: {
-                                                $arrayElemAt: [
-                                                    {
-                                                        $filter: {
-                                                            input: "$ProductVarient",
-                                                            as: "pv",
-                                                            cond: {
-                                                                $eq: ["$$plv.productVarientId", "$$pv._id"]
-                                                            }
-                                                        }
-                                                    },
-                                                    0 // Get the first element of the array
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $unset: "ProductVarient"
-                },
+                //     }
+                // },
+                // {
+                //     $addFields: {
+                //         productLibraryVarients: {
+                //             $map: {
+                //                 input: "$productLibraryVarients",
+                //                 as: "plv",
+                //                 in: {
+                //                     $mergeObjects: [
+                //                         "$$plv",
+                //                         {
+                //                             ProductVarient: {
+                //                                 $arrayElemAt: [
+                //                                     {
+                //                                         $filter: {
+                //                                             input: "$ProductVarient",
+                //                                             as: "pv",
+                //                                             cond: {
+                //                                                 $eq: ["$$plv.productVarientId", "$$pv._id"]
+                //                                             }
+                //                                         }
+                //                                     },
+                //                                     0 // Get the first element of the array
+                //                                 ]
+                //                             }
+                //                         }
+                //                     ]
+                //                 }
+                //             }
+                //         }
+                //     }
+                // },
+                // {
+                //     $unset: "ProductVarient"
+                // },
 
                 {
                     $sort: {
@@ -271,7 +265,6 @@ const productLibrary = {
     getProductLibraryDetails: async (data) => {
         try {
             const { productLibraryId } = data;
-
             const result = await ProductLibrary.aggregate([
                 {
                     $match: {
@@ -279,119 +272,55 @@ const productLibrary = {
                         status: { $ne: 2 },
                     }
                 },
+                // {
+                //     $lookup: {
+                //         from: "productVarient",
+                //         localField: "productLibraryVarients.productVarientId",
+                //         foreignField: "_id",
+                //         as: "ProductVarient",
+                //     }
+                // }
                 {
                     $lookup: {
-                        from: "productVarient",
-                        localField: "productLibraryVarients.productVarientId",
-                        foreignField: "_id",
-                        as: "ProductVarient",
-                    }
-                },
-
-                {
-                    $addFields: {
-                        productLibraryVarients: {
-                            $map: {
-                                input: "$productLibraryVarients",
-                                as: "plv",
-                                in: {
-                                    $mergeObjects: [
-                                        "$$plv",
-                                        {
-                                            ProductVarient: {
-                                                $arrayElemAt: [
-                                                    {
-                                                        $filter: {
-                                                            input: "$ProductVarient",
-                                                            as: "pv",
-                                                            cond: {
-                                                                $eq: ["$$plv.productVarientId", "$$pv._id"]
-                                                            }
-                                                        }
-                                                    },
-                                                    0 // Get the first element of the array
-                                                ]
-                                            }
-                                        }
-                                    ]
+                        from: 'productVarient',
+                        let: { variantId: '$productLibraryVarients.productVarientId' },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: { $eq: ['$_id', '$$variantId'] }
                                 }
-                            }
-                        }
+                            },
+                        ],
+                        as: 'productLibraryVarients.productVarientDetails'
                     }
                 },
-                {
-                    $unset: "ProductVarient"
-                }
             ]);
+            console.log(result)
 
-            if (result.length === 0) {
-                return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
-            }
+            // let query = {
+            //     _id: mongoose.Types.ObjectId(productLibraryId),
+            //     status: { $ne: 2 }
+            // }
+            // let populate = [{
+            //     path : 'productLibraryVarients.productVarientId',
+            //     modl : 'productVarient'
+            // }]
+            // let result = await getSingleData(ProductLibrary, query, '', populate);
+            // console.log(result)
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retrieve_success, result[0], null, 200);
+
+            // if (result.length === 0) {
+            //     return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
+            // }
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retrieve_success, result, null, 200);
 
         } catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
 
-    updateProduct: async (data) => {
-        try {
-            let { careInstructions, longDescription, subCategoryIds, materialIds, productId,
-                construction, features, productionDuration, shortDescription, title, process } = data
 
-
-            const findProduct = await getSingleData(Product, { _id: productId, status: { $ne: 2 } })
-            if (!findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
-            }
-
-            const findTitle = await getSingleData(Product, { title, _id: { $ne: productId }, status: { $ne: 2 } })
-            if (findTitle.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_title_already, {}, null, 400);
-            }
-            subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
-            materialIds = materialIds.map((id) => mongoose.Types.ObjectId(id))
-
-            const findSubCategory = await getDataArray(SubCategory, { _id: { $in: subCategoryIds }, status: { $ne: 2 } })
-            if (findSubCategory?.data?.length !== subCategoryIds.length) {
-                return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 400);
-            }
-
-
-            // const findMaterial = await getSingleData(Material, { _id: materialId })
-
-            // if (!findMaterial.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
-            // }
-            const findMaterials = await getDataArray(Material, { _id: { $in: materialIds }, status: { $ne: 2 } })
-            if (findMaterials?.data?.length !== materialIds.length) {
-                return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
-            }
-            //in payload blank value not pass
-            let obj = {
-                careInstructions,
-                longDescription,
-                features,
-                title,
-                process,
-                updatedOn: helpers.getCurrentDate(),
-                subCategoryId: subCategoryIds,
-                materialId: materialIds,
-                productionDuration,
-                construction,
-                shortDescription,
-            }
-            const result = await updateSingleData(Product, obj, { _id: productId, title: findProduct?.data?.title })
-            if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
-            }
-            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result?.data, null, 200);
-        }
-        catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 400);
-        }
-    },
 }
 
 module.exports = {

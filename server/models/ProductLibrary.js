@@ -60,7 +60,7 @@ var ProductLibrary = new Schema({
         },
         productVarientId: {
             type: mongoose.Types.ObjectId,
-            ref: "productVarient"
+            ref: "ProductVarient"
         },
         price: {
             type: Number,

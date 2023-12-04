@@ -15,6 +15,10 @@ router.get('/getMaterials', verifyTokenBoth, commonController.getMaterials);
 router.get('/getWaitingListStatus', verifyTokenBoth, commonController.getWaitingListStatus);
 router.get('/getCommonContent', verifyTokenBoth, commonController.getCommonContent);
 router.get('/getQuestions', verifyTokenBoth, commonController.getQuestions);
+router.get('/getFaqCategories', verifyTokenBoth, commonController.getFaqCategories);
+router.get('/getCategoriesArticle', verifyTokenBoth, commonController.getCategoriesArticle);
+router.get('/getSingleCategoryArticle', verifyTokenBoth, commonController.getSingleCategoryArticle);
+router.get('/getSearchArticle', verifyTokenBoth, commonController.getSearchArticle);
 
 // with admin token routes 
 router.post('/addNewQuestion', verifyTokenAdmin, validate(addQuestionSchema), commonController.addNewQuestion);

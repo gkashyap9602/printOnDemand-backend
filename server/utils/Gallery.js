@@ -30,9 +30,9 @@ const galleryUtil = {
     },
     deleteFromGallery: async (data) => {
         try {
-            const { title, gelleryId, type } = data
+            const { title, galleryId, type } = data
 
-            const find = await getSingleData(Gallery, { status: { $ne: 2 }, _id: gelleryId, type })
+            const find = await getSingleData(Gallery, { status: { $ne: 2 }, _id: galleryId, type })
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
             }
@@ -43,7 +43,7 @@ const galleryUtil = {
                 updatedOn: helpers.getCurrentDate(),
             }
 
-            const result = await updateSingleData(Gallery, obj, { _id: gelleryId, status: { $ne: 2 }, type })
+            const result = await updateSingleData(Gallery, obj, { _id: galleryId, status: { $ne: 2 }, type })
 
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);

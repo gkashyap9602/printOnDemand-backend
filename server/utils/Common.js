@@ -10,6 +10,7 @@ let ObjectId = require('mongodb').ObjectId
 const WaitingList = require('../models/WaitingList')
 const commonContent = require('../models/CommonContent')
 const axios = require('axios')
+const { ZENDESK_AUTH, ZENDESK_BASE_URL } = require('../constants/const')
 
 const commonUtil = {
 
@@ -239,6 +240,139 @@ const commonUtil = {
       return helpers.showResponse(true, "Here is a list of questions", { data: response.data, totalCount: totalCount.data }, null, 200);
     }
     return helpers.showResponse(false, 'No data found', null, null, 400);
+  },
+  getFaqCategories: async (data) => {
+    try {
+
+
+      let { pageIndex = 1, pageSize = 10 } = data
+      pageIndex = Number(pageIndex)
+      pageSize = Number(pageSize)
+
+      let response = await axios.get(`${ZENDESK_BASE_URL}/help_center/categories`, {
+        headers: {
+          Authorization: `Basic ${ZENDESK_AUTH}`,
+          "Content-Type": "application/json",
+        }
+      })
+
+      console.log(response.data, "responsee");
+
+      if (response.data) {
+        return helpers.showResponse(true, "Here is a Categories of faq", response.data, null, 200);
+      }
+      return helpers.showResponse(false, 'No data found', null, null, 400);
+    } catch (error) {
+      return helpers.showResponse(false, error.message, null, null, 400);
+
+    }
+  },
+  getCategoriesArticle: async (data) => {
+    try {
+
+
+      let { pageIndex = 1, pageSize = 10 } = data
+      pageIndex = Number(pageIndex)
+      pageSize = Number(pageSize)
+
+      let response = await axios.get(`${ZENDESK_BASE_URL}/help_center/articles?page=${pageIndex}&per_page=${pageSize}`, {
+        headers: {
+          Authorization: `Basic ${ZENDESK_AUTH}`,
+          "Content-Type": "application/json",
+        }
+      })
+
+      console.log(response.data, "responsee");
+
+      if (response.data) {
+        return helpers.showResponse(true, "Here is Articles of  Categories ", response.data, null, 200);
+      }
+      return helpers.showResponse(false, 'No data found', null, null, 400);
+    } catch (error) {
+      return helpers.showResponse(false, error?.message, null, null, 400);
+
+    }
+  },
+  getSingleCategoryArticle: async (data) => {
+
+    try {
+
+      let { pageIndex = 1, pageSize = 10, categoryId } = data
+      pageIndex = Number(pageIndex)
+      pageSize = Number(pageSize)
+
+      let response = await axios.get(`${ZENDESK_BASE_URL}/help_center/categories/${categoryId}/articles?page=${pageIndex}&per_page=${pageSize}`, {
+        headers: {
+          Authorization: `Basic ${ZENDESK_AUTH}`,
+          "Content-Type": "application/json",
+        }
+      })
+
+      console.log(response.data, "responsee");
+
+      if (response.data) {
+        return helpers.showResponse(true, "Here is Articles of  Category ", response.data, null, 200);
+      }
+      return helpers.showResponse(false, 'No data found', null, null, 400);
+
+    } catch (error) {
+      return helpers.showResponse(false, error?.message, null, null, 400);
+
+    }
+  },
+  getSearchArticle: async (data) => {
+
+    try {
+
+      let { pageIndex = 1, pageSize = 10, query } = data
+      pageIndex = Number(pageIndex)
+      pageSize = Number(pageSize)
+
+      let response = await axios.get(`${ZENDESK_BASE_URL}/help_center/articles/search?query=${query}&page=${pageIndex}&per_page=${pageSize}`, {
+        headers: {
+          Authorization: `Basic ${ZENDESK_AUTH}`,
+          "Content-Type": "application/json",
+        }
+      })
+
+      console.log(response.data, "responsee");
+
+      if (response.data) {
+        return helpers.showResponse(true, "Here is result in Articles  ", response.data, null, 200);
+      }
+      return helpers.showResponse(false, 'No data found', null, null, 400);
+
+    } catch (error) {
+      return helpers.showResponse(false, error?.message, null, null, 400);
+
+    }
+  },
+  raiseTicket: async (data) => {
+
+    try {
+
+      let { pageIndex = 1, pageSize = 10, query } = data
+      pageIndex = Number(pageIndex)
+      pageSize = Number(pageSize)
+
+      let response = await axios.get(`${ZENDESK_BASE_URL}/requests`, {
+        headers: {
+          Authorization: `Basic ${ZENDESK_AUTH}`,
+          "Content-Type": "application/json",
+        }
+      })
+
+      console.log(response.data, "responsee");
+
+      if (response.data) {
+        return helpers.showResponse(true, "Here is result in Articles  ", response.data, null, 200);
+      }
+      return helpers.showResponse(false, 'No data found', null, null, 400);
+
+    } catch (error) {
+      return helpers.showResponse(false, error?.message, null, null, 400);
+
+    }
   },
 }
 

@@ -43,6 +43,22 @@ const commonController = {
         let result = await Common.getQuestions(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    getFaqCategories: async (req, res) => {
+        let result = await Common.getFaqCategories(req.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    getCategoriesArticle: async (req, res) => {
+        let result = await Common.getCategoriesArticle(req.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    getSingleCategoryArticle: async (req, res) => {
+        let result = await Common.getSingleCategoryArticle(req.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    getSearchArticle: async (req, res) => {
+        let result = await Common.getSearchArticle(req.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     getCommonContent: async (req, res) => {
         let result = await Common.getCommonContent();
         return helpers.showOutput(res, result, result.statusCode);
