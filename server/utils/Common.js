@@ -351,9 +351,8 @@ const commonUtil = {
 
     try {
 
-      let { pageIndex = 1, pageSize = 10, query } = data
-      pageIndex = Number(pageIndex)
-      pageSize = Number(pageSize)
+      let { description, subject } = data
+
 
       let response = await axios.get(`${ZENDESK_BASE_URL}/requests`, {
         headers: {

@@ -73,6 +73,7 @@ module.exports.deleteNotification = {
 module.exports.addToGallery = {
     body: joi.object({
         type: joi.number().valid(1, 2).required(), //1 for images 2 for videos
+        title: joi.string(), //1 for images 2 for videos
 
     })
 
