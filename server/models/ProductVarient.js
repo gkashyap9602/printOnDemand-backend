@@ -5,7 +5,7 @@ var ProductVarient = new Schema({
 
     productId: {
         type: mongoose.Types.ObjectId,
-        ref: "product",
+        ref: "Product",
         index: true
     },
     // productDesignId: {
@@ -26,12 +26,12 @@ var ProductVarient = new Schema({
         variableTypeId: {
             type: mongoose.Types.ObjectId,
             index: true,
-            ref: "variableTypes"
+            ref: "VariableTypes"
         },
         variableOptionId: {
             type: mongoose.Types.ObjectId,
             index: true,
-            ref: "variableOptions"
+            ref: "VariableOptions"
         },
 
 

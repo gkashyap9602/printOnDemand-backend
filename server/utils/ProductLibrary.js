@@ -199,49 +199,20 @@ const productLibrary = {
                 {
                     $limit: pageSize // Limit the number of records per page
                 },
-                // {
-                //     $lookup: {
-                //         from: "productVarient",
-                //         localField: "productLibraryVarients.productVarientId",
-                //         foreignField: "_id",
-                //         as: "ProductVarient",
+                {
+                    $addFields: {
+                        priceStartFrom: { $min: "$productLibraryVarients.retailPrice" }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "product",
+                        localField: "productId",
+                        foreignField: "_id",
+                        as: "ProductData",
 
-                //     }
-                // },
-                // {
-                //     $addFields: {
-                //         productLibraryVarients: {
-                //             $map: {
-                //                 input: "$productLibraryVarients",
-                //                 as: "plv",
-                //                 in: {
-                //                     $mergeObjects: [
-                //                         "$$plv",
-                //                         {
-                //                             ProductVarient: {
-                //                                 $arrayElemAt: [
-                //                                     {
-                //                                         $filter: {
-                //                                             input: "$ProductVarient",
-                //                                             as: "pv",
-                //                                             cond: {
-                //                                                 $eq: ["$$plv.productVarientId", "$$pv._id"]
-                //                                             }
-                //                                         }
-                //                                     },
-                //                                     0 // Get the first element of the array
-                //                                 ]
-                //                             }
-                //                         }
-                //                     ]
-                //                 }
-                //             }
-                //         }
-                //     }
-                // },
-                // {
-                //     $unset: "ProductVarient"
-                // },
+                    }
+                },
 
                 {
                     $sort: {
@@ -265,55 +236,98 @@ const productLibrary = {
     getProductLibraryDetails: async (data) => {
         try {
             const { productLibraryId } = data;
-            const result = await ProductLibrary.aggregate([
-                {
-                    $match: {
-                        _id: mongoose.Types.ObjectId(productLibraryId),
-                        status: { $ne: 2 },
-                    }
-                },
-                // {
-                //     $lookup: {
-                //         from: "productVarient",
-                //         localField: "productLibraryVarients.productVarientId",
-                //         foreignField: "_id",
-                //         as: "ProductVarient",
-                //     }
-                // }
-                {
-                    $lookup: {
-                        from: 'productVarient',
-                        let: { variantId: '$productLibraryVarients.productVarientId' },
-                        pipeline: [
-                            {
-                                $match: {
-                                    $expr: { $eq: ['$_id', '$$variantId'] }
-                                }
-                            },
-                        ],
-                        as: 'productLibraryVarients.productVarientDetails'
-                    }
-                },
-            ]);
-            console.log(result)
+            // const result = await ProductLibrary.aggregate([
+            //     {
+            //         $match: {
+            //             _id: mongoose.Types.ObjectId(productLibraryId),
+            //             status: { $ne: 2 },
+            //         }
+            //     },
+            //     {
+            //         $lookup: {
+            //             from: "productVarient",
+            //             localField: "productLibraryVarients.productVarientId",
+            //             foreignField: "_id",
+            //             as: "ProductVarientData",
+            //         }
+            //     },
+            //     {
+            //         $lookup: {
+            //             from: "variableOptions",
+            //             localField: "ProductVarientData.varientOptions.variableOptionId",
+            //             foreignField: "_id",
+            //             as: "variableOptionsData",
+            //         }
+            //     },
+            //     {
+            //         $addFields: {
+            //             productLibraryVarients: {
+            //                 $map: {
+            //                     input: "$productLibraryVarients",
+            //                     as: "plv",
+            //                     in: {
+            //                         $mergeObjects: [
+            //                             "$$plv",
+            //                             {
+            //                                 ProductVarient: {
+            //                                     $arrayElemAt: [
+            //                                         {
+            //                                             $filter: {
+            //                                                 input: "$ProductVarientData",
+            //                                                 as: "pv",
+            //                                                 cond: {
+            //                                                     $eq: ["$$plv.productVarientId", "$$pv._id"]
+            //                                                 }
+            //                                             }
+            //                                         },
+            //                                         0 // Get the first element of the array
+            //                                     ]
+            //                                 }
+            //                             }
+            //                         ]
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     },
 
-            // let query = {
-            //     _id: mongoose.Types.ObjectId(productLibraryId),
-            //     status: { $ne: 2 }
-            // }
-            // let populate = [{
-            //     path : 'productLibraryVarients.productVarientId',
-            //     modl : 'productVarient'
-            // }]
-            // let result = await getSingleData(ProductLibrary, query, '', populate);
+            //     // {
+            //     //     $lookup: {
+            //     //         from: "variableOptions",
+            //     //         localField: "ProductVarient.varientOptions.variableOptionId",
+            //     //         foreignField: "_id",
+            //     //         as: "variableOptionss",
+            //     //     }
+            //     // },
+
+            //     // {
+            //     //     $unset: "ProductVarient"
+            //     // },
+            // ]);
             // console.log(result)
 
+            let query = {
+                _id: mongoose.Types.ObjectId(productLibraryId),
+                status: { $ne: 2 }
+            }
+            let populate = [{
+                path: 'productLibraryVarients.productVarientId',
+                populate: {
+                    path: 'varientOptions.variableOptionId', // Add the path for nested population
+                },
 
-            // if (result.length === 0) {
-            //     return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
-            // }
+                select: 'productVarientId.varientOptions'
+            }]
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retrieve_success, result, null, 200);
+            let result = await getSingleData(ProductLibrary, query, '', populate);
+            console.log(result, 'result')
+
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result.data, null, 200);
 
         } catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
