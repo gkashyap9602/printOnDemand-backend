@@ -4,12 +4,12 @@ var Schema = mongoose.Schema;
 var ProductLibrary = new Schema({
     userId: {
         type: mongoose.Types.ObjectId,
-        ref: "users",
+        ref: "Users",
         index: true
     },
     productId: {
         type: mongoose.Types.ObjectId,
-        ref: "product",
+        ref: "Product",
         index: true
     },
     title: {

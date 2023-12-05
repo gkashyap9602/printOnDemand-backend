@@ -154,38 +154,33 @@ const productLibrary = {
     },
     getProductLibrary: async (data) => {
         try {
-            console.log(data, "dataaaa");
-            let { pageSize = 5, page = 1, sortDirection = "asc", sortColumn = "title", materialFilter, searchKey = '' } = data;
+            let { pageSize = 10, page = 1, sortDirection = "asc", sortColumn = "title", materialFilter, searchKey = '' } = data;
             pageSize = Number(pageSize)
             page = Number(page)
-            // searchKey = searchKey.trim()
 
-            // const searchTerms = searchKey.split(' ');
-            // const titleSearch = searchTerms[0];
-            // const valueSearch = searchTerms.slice(1).join(' ');
-
-            // console.log(titleSearch, "titleSearch ");
-            // console.log(valueSearch, "valueSearch");
             let matchObj = {
-                // subCategoryId: { $in: [id] },
                 status: { $ne: 2 },
-                // title: { $regex: searchKey, $options: 'i' },
-
             }
             if (searchKey) {
                 matchObj.title = { $regex: searchKey, $options: 'i' }
             }
 
-            if (materialFilter && materialFilter !== 'null') {
-                materialFilter = JSON.parse(materialFilter)
-                materialFilter = materialFilter.map((id) => new ObjectId(id))
-                matchObj.materialId = { $in: materialFilter }
-
-            }
-
-            let totalCount = await getCount(ProductLibrary, { ...matchObj })
 
             console.log(matchObj, "matchObj");
+
+            if (materialFilter) {
+
+                materialFilter = materialFilter.map((id) => new ObjectId(id))
+            }
+
+            let countAggregate = [
+                {
+                    $match: {
+                        ...matchObj,
+                    }
+                },
+
+            ];
 
             let aggregate = [
                 {
@@ -204,15 +199,6 @@ const productLibrary = {
                         priceStartFrom: { $min: "$productLibraryVarients.retailPrice" }
                     }
                 },
-                {
-                    $lookup: {
-                        from: "product",
-                        localField: "productId",
-                        foreignField: "_id",
-                        as: "ProductData",
-
-                    }
-                },
 
                 {
                     $sort: {
@@ -222,12 +208,51 @@ const productLibrary = {
 
             ]
 
+            console.log(materialFilter, "material8889090");
+            if (materialFilter && materialFilter !== 'null') {
+                let lookupObj = {
+                    $lookup: {
+                        from: "product",
+                        localField: "productId",
+                        foreignField: "_id",
+                        as: "ProductData",
+
+                    }
+                }
+                let matchObj = {
+                    $match: {
+                        "ProductData.materialId": { $in: materialFilter }
+                    }
+                }
+                let unsetObj = {
+                    $unset: "ProductData"
+                }
+
+
+                aggregate.push(
+                    { ...lookupObj }, { ...matchObj }, { ...unsetObj }
+                )
+                countAggregate.push({ ...lookupObj }, { ...matchObj }, { ...unsetObj },)
+
+
+            }
+
+            console.log(countAggregate, "countAggregate");
+            console.log(aggregate, "aggregate");
 
             const result = await ProductLibrary.aggregate(aggregate);
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
+            countAggregate.push({
+                $count: "totalCount"
+            })
+            let count = await ProductLibrary.aggregate(countAggregate)
+            console.log(count, "count");
+
+            let totalCount = count[0]?.totalCount ? count[0].totalCount : 0
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount }, null, 200);
         }
         catch (err) {
+            console.log(err, "error catch");
             return helpers.showResponse(false, err?.message, null, null, 400);
 
         }
@@ -259,37 +284,42 @@ const productLibrary = {
             //             as: "variableOptionsData",
             //         }
             //     },
-            //     {
-            //         $addFields: {
-            //             productLibraryVarients: {
-            //                 $map: {
-            //                     input: "$productLibraryVarients",
-            //                     as: "plv",
-            //                     in: {
-            //                         $mergeObjects: [
-            //                             "$$plv",
-            //                             {
-            //                                 ProductVarient: {
-            //                                     $arrayElemAt: [
-            //                                         {
-            //                                             $filter: {
-            //                                                 input: "$ProductVarientData",
-            //                                                 as: "pv",
-            //                                                 cond: {
-            //                                                     $eq: ["$$plv.productVarientId", "$$pv._id"]
-            //                                                 }
-            //                                             }
-            //                                         },
-            //                                         0 // Get the first element of the array
-            //                                     ]
-            //                                 }
-            //                             }
-            //                         ]
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     },
+            //     // {
+            //     //     $project:{
+
+            //     //     }
+            //     // }
+            //     // {
+            //     //     $addFields: {
+            //     //         productLibraryVarients: {
+            //     //             $map: {
+            //     //                 input: "$productLibraryVarients",
+            //     //                 as: "plv",
+            //     //                 in: {
+            //     //                     $mergeObjects: [
+            //     //                         "$$plv",
+            //     //                         {
+            //     //                             ProductVarient: {
+            //     //                                 $arrayElemAt: [
+            //     //                                     {
+            //     //                                         $filter: {
+            //     //                                             input: "$ProductVarientData",
+            //     //                                             as: "pv",
+            //     //                                             cond: {
+            //     //                                                 $eq: ["$$plv.productVarientId", "$$pv._id"]
+            //     //                                             }
+            //     //                                         }
+            //     //                                     },
+            //     //                                     0 // Get the first element of the array
+            //     //                                 ]
+            //     //                             }
+            //     //                         }
+            //     //                     ]
+            //     //                 }
+            //     //             }
+            //     //         }
+            //     //     }
+            //     // },
 
             //     // {
             //     //     $lookup: {
@@ -304,7 +334,6 @@ const productLibrary = {
             //     //     $unset: "ProductVarient"
             //     // },
             // ]);
-            // console.log(result)
 
             let query = {
                 _id: mongoose.Types.ObjectId(productLibraryId),

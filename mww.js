@@ -46,6 +46,7 @@ app.use(cors({
 
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24 hours in miliseconds
+      // secure: false
       // maxAge: 5000, //5sec
     },
   }));
