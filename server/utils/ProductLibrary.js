@@ -5,7 +5,7 @@ const { default: mongoose } = require('mongoose');
 let ObjectId = require('mongodb').ObjectId
 const LibraryImages = require('../models/LibraryImages');
 const ProductLibrary = require('../models/ProductLibrary');
-
+const ProductLibraryVarient = require("../models/ProductLibraryVarient")
 const productLibrary = {
 
     saveLibraryImage: async (data, file) => {
@@ -55,21 +55,7 @@ const productLibrary = {
             console.log(productLibraryImages, "productLibraryImages");
             console.log(productLibraryVarients, "productLibraryVarients");
 
-            if (productLibraryVarients) {
-                let abc = {}
-                productLibraryVarients = productLibraryVarients.map((value) => {
-                    let obj = {
-                        _id: mongoose.Types.ObjectId(),
-                        productVarientId: value.productVarientId,
-                        price: value.price,
-                        profit: Number(Number(value.price) * 2 - Number(value.price)),
-                        retailPrice: Number(value.price) * 2
-                    }
-                    abc = obj
-                    return obj
-                })
-                console.log(abc, "objjjj");
-            }
+
             const findProduct = await getSingleData(ProductLibrary, { title: title, status: { $ne: 2 } })
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 400);
@@ -92,59 +78,98 @@ const productLibrary = {
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
             }
+            // if (productLibraryVarients) {
+            productLibraryVarients = productLibraryVarients.map((value) => {
+                let obj = {
+                    productLibraryId: result?.data?._id,
+                    productVarientId: value.productVarientId,
+                    // retailPrice: value.price,
+                    profit: Number(Number(value.price) * 2 - Number(value.price)),
+                    price: Number(value.price) * 2,
+                    productLibraryVarientImages: productLibraryImages,
+                    createdOn: helpers.getCurrentDate()
+                }
+                return obj
+            })
+
+            const libraryVareintSaved = await insertMany(ProductLibraryVarient, productLibraryVarients)
+
+            console.log(libraryVareintSaved, "libraryVareintSaved");
+            if (!libraryVareintSaved.status) {
+                //delete productlibrary if failed 
+                await deleteById(ProductLibrary, result.data._id)
+                return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
+            }
+
+
+            // }
+
             return helpers.showResponse(true, ResponseMessages?.product.product_created, result?.data, null, 200);
         }
         catch (err) {
+            console.log(err, "errorrr");
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
-    updateProductLibrary: async (data, userId) => {
+    updateProductLibrary: async (data) => {
         try {
-            let { productLibraryId, productLibraryVariantId, retailPrice, productLibraryImages } = data
+            let { productLibraryId, description, title } = data
+            let updateDataObj = {
+                updatedOn: helpers.getCurrentDate()
+            }
 
-            // console.log(productLibraryImages, "productLibraryImages");
+            let matchObj = {
+                _id: productLibraryId,
+                status: { $ne: 2 }
+            }
 
-
-            const find = await getSingleData(ProductLibrary, { _id: productLibraryId, status: { $ne: 2 } })
+            const find = await getSingleData(ProductLibrary, matchObj)
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
 
-            const previousVariant = find.data.productLibraryVarients.find((variant) => variant._id.toString() == productLibraryVariantId);
+            if (description) {
+                updateDataObj.description = description
+            }
+            if (title) {
+                updateDataObj.title = title
+            }
+            const response = await updateSingleData(ProductLibrary, updateDataObj, matchObj)
+            if (!response.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
+            }
+            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, {}, null, 200);
+        }
+        catch (err) {
+            console.log(err, "error sideeee");
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+    },
+    updateProductLibraryVarient: async (data) => {
+        try {
+            let { productLibraryVariantId, price, profit } = data
 
-            console.log(previousVariant, "previousVariant");
-            if (!previousVariant) {
-                return helpers.showResponse(false, "varient not exist", {}, null, 400);
+            let matchObj = {
+                _id: productLibraryVariantId,
+                status: { $ne: 2 }
             }
 
-            // Calculate profit based on the previous price
-            const previousPrice = previousVariant.price;
-            const profit = Number(retailPrice) - previousPrice;
-
-            const updateData = {
-                "productLibraryVarients.$.retailPrice": Number(retailPrice),
-                "productLibraryVarients.$.profit": Number(profit),
-                updatedOn: helpers.getCurrentDate(),
-            };
-
-            if (productLibraryImages) {
-                updateData.productLibraryImages = productLibraryImages
+            let updateData = {
+                price,
+                profit,
+                updatedOn: helpers.getCurrentDate()
             }
 
-            // Update the document
-            const result = await ProductLibrary.updateOne(
-                {
-                    "_id": productLibraryId,
-                    "productLibraryVarients._id": productLibraryVariantId
-                },
-                { $set: updateData }
-            );
-
-            if (result.modifiedCount > 0) {
-                return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result, null, 200);
+            const find = await getSingleData(ProductLibraryVarient, matchObj)
+            if (!find.status) {
+                return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
+            }
+            const result = await updateSingleData(ProductLibraryVarient, updateData, matchObj)
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }
 
-            return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
+            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result.data, null, 200);
 
         }
         catch (err) {
@@ -173,15 +198,6 @@ const productLibrary = {
                 materialFilter = materialFilter.map((id) => new ObjectId(id))
             }
 
-            let countAggregate = [
-                {
-                    $match: {
-                        ...matchObj,
-                    }
-                },
-
-            ];
-
             let aggregate = [
                 {
                     $match: {
@@ -195,8 +211,16 @@ const productLibrary = {
                     $limit: pageSize // Limit the number of records per page
                 },
                 {
+                    $lookup: {
+                        from: 'productLibraryVarient',
+                        localField: '_id',
+                        foreignField: 'productLibraryId',
+                        as: 'varientData',
+                    }
+                },
+                {
                     $addFields: {
-                        priceStartFrom: { $min: "$productLibraryVarients.retailPrice" }
+                        priceStartFrom: { $min: "$varientData.price" }
                     }
                 },
 
@@ -205,51 +229,19 @@ const productLibrary = {
                         [sortColumn]: sortDirection === "asc" ? 1 : -1
                     }
                 },
+                {
+                    $project: {
+                        varientData: 0
+                    }
+                }
 
             ]
 
-            console.log(materialFilter, "material8889090");
-            if (materialFilter && materialFilter !== 'null') {
-                let lookupObj = {
-                    $lookup: {
-                        from: "product",
-                        localField: "productId",
-                        foreignField: "_id",
-                        as: "ProductData",
-
-                    }
-                }
-                let matchObj = {
-                    $match: {
-                        "ProductData.materialId": { $in: materialFilter }
-                    }
-                }
-                let unsetObj = {
-                    $unset: "ProductData"
-                }
-
-
-                aggregate.push(
-                    { ...lookupObj }, { ...matchObj }, { ...unsetObj }
-                )
-                countAggregate.push({ ...lookupObj }, { ...matchObj }, { ...unsetObj },)
-
-
-            }
-
-            console.log(countAggregate, "countAggregate");
             console.log(aggregate, "aggregate");
 
             const result = await ProductLibrary.aggregate(aggregate);
 
-            countAggregate.push({
-                $count: "totalCount"
-            })
-            let count = await ProductLibrary.aggregate(countAggregate)
-            console.log(count, "count");
-
-            let totalCount = count[0]?.totalCount ? count[0].totalCount : 0
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount }, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result }, null, 200);
         }
         catch (err) {
             console.log(err, "error catch");
@@ -258,119 +250,302 @@ const productLibrary = {
         }
 
     },
+    // getProductLibrary: async (data) => {
+    //     try {
+    //         let { pageSize = 10, page = 1, sortDirection = "asc", sortColumn = "title", materialFilter, searchKey = '' } = data;
+    //         pageSize = Number(pageSize)
+    //         page = Number(page)
+
+    //         let matchObj = {
+    //             status: { $ne: 2 },
+    //         }
+    //         if (searchKey) {
+    //             matchObj.title = { $regex: searchKey, $options: 'i' }
+    //         }
+
+
+    //         console.log(matchObj, "matchObj");
+
+    //         if (materialFilter) {
+
+    //             materialFilter = materialFilter.map((id) => new ObjectId(id))
+    //         }
+
+    //         let countAggregate = [
+    //             {
+    //                 $match: {
+    //                     ...matchObj,
+    //                 }
+    //             },
+
+    //         ];
+
+    //         let aggregate = [
+    //             {
+    //                 $match: {
+    //                     ...matchObj,
+    //                 }
+    //             },
+    //             {
+    //                 $skip: (page - 1) * pageSize // Skip records based on the page number
+    //             },
+    //             {
+    //                 $limit: pageSize // Limit the number of records per page
+    //             },
+    //             {
+    //                 $addFields: {
+    //                     priceStartFrom: { $min: "$productLibraryVarients.retailPrice" }
+    //                 }
+    //             },
+
+    //             {
+    //                 $sort: {
+    //                     [sortColumn]: sortDirection === "asc" ? 1 : -1
+    //                 }
+    //             },
+
+    //         ]
+
+    //         console.log(materialFilter, "material8889090");
+    //         if (materialFilter && materialFilter !== 'null') {
+    //             let lookupObj = {
+    //                 $lookup: {
+    //                     from: "product",
+    //                     localField: "productId",
+    //                     foreignField: "_id",
+    //                     as: "ProductData",
+
+    //                 }
+    //             }
+    //             let matchObj = {
+    //                 $match: {
+    //                     "ProductData.materialId": { $in: materialFilter }
+    //                 }
+    //             }
+    //             let unsetObj = {
+    //                 $unset: "ProductData"
+    //             }
+
+
+    //             aggregate.push(
+    //                 { ...lookupObj }, { ...matchObj }, { ...unsetObj }
+    //             )
+    //             countAggregate.push({ ...lookupObj }, { ...matchObj }, { ...unsetObj },)
+
+
+    //         }
+
+    //         console.log(countAggregate, "countAggregate");
+    //         console.log(aggregate, "aggregate");
+
+    //         const result = await ProductLibrary.aggregate(aggregate);
+
+    //         countAggregate.push({
+    //             $count: "totalCount"
+    //         })
+    //         let count = await ProductLibrary.aggregate(countAggregate)
+    //         console.log(count, "count");
+
+    //         let totalCount = count[0]?.totalCount ? count[0].totalCount : 0
+    //         return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount }, null, 200);
+    //     }
+    //     catch (err) {
+    //         console.log(err, "error catch");
+    //         return helpers.showResponse(false, err?.message, null, null, 400);
+
+    //     }
+
+    // },
     getProductLibraryDetails: async (data) => {
         try {
             const { productLibraryId } = data;
-            // const result = await ProductLibrary.aggregate([
-            //     {
-            //         $match: {
-            //             _id: mongoose.Types.ObjectId(productLibraryId),
-            //             status: { $ne: 2 },
-            //         }
-            //     },
-            //     {
-            //         $lookup: {
-            //             from: "productVarient",
-            //             localField: "productLibraryVarients.productVarientId",
-            //             foreignField: "_id",
-            //             as: "ProductVarientData",
-            //         }
-            //     },
-            //     {
-            //         $lookup: {
-            //             from: "variableOptions",
-            //             localField: "ProductVarientData.varientOptions.variableOptionId",
-            //             foreignField: "_id",
-            //             as: "variableOptionsData",
-            //         }
-            //     },
-            //     // {
-            //     //     $project:{
 
-            //     //     }
-            //     // }
-            //     // {
-            //     //     $addFields: {
-            //     //         productLibraryVarients: {
-            //     //             $map: {
-            //     //                 input: "$productLibraryVarients",
-            //     //                 as: "plv",
-            //     //                 in: {
-            //     //                     $mergeObjects: [
-            //     //                         "$$plv",
-            //     //                         {
-            //     //                             ProductVarient: {
-            //     //                                 $arrayElemAt: [
-            //     //                                     {
-            //     //                                         $filter: {
-            //     //                                             input: "$ProductVarientData",
-            //     //                                             as: "pv",
-            //     //                                             cond: {
-            //     //                                                 $eq: ["$$plv.productVarientId", "$$pv._id"]
-            //     //                                             }
-            //     //                                         }
-            //     //                                     },
-            //     //                                     0 // Get the first element of the array
-            //     //                                 ]
-            //     //                             }
-            //     //                         }
-            //     //                     ]
-            //     //                 }
-            //     //             }
-            //     //         }
-            //     //     }
-            //     // },
-
-            //     // {
-            //     //     $lookup: {
-            //     //         from: "variableOptions",
-            //     //         localField: "ProductVarient.varientOptions.variableOptionId",
-            //     //         foreignField: "_id",
-            //     //         as: "variableOptionss",
-            //     //     }
-            //     // },
-
-            //     // {
-            //     //     $unset: "ProductVarient"
-            //     // },
-            // ]);
-
-            let query = {
-                _id: mongoose.Types.ObjectId(productLibraryId),
-                status: { $ne: 2 }
-            }
-            let populate = [{
-                path: 'productLibraryVarients.productVarientId',
-                populate: {
-                    path: 'varientOptions.variableOptionId', // Add the path for nested population
+            console.log(productLibraryId, "productLibraryId");
+            const result = await ProductLibrary.aggregate([
+                {
+                    $match: {
+                        _id: mongoose.Types.ObjectId(productLibraryId),
+                        status: { $ne: 2 },
+                    }
                 },
+                {
+                    $lookup: {
+                        from: "productLibraryVarient",
+                        localField: "_id",
+                        foreignField: "productLibraryId",
+                        as: "productLibraryVarients",
+                        pipeline: [ //choose specific feilds to show
+                            {
+                                $project: {
+                                    _id: 1,
+                                    productLibraryId: 1,
+                                    productVarientId: 1,
+                                    retailPrice: "$price",
+                                    profit: 1,
+                                    status: 1,
+                                    createdOn: 1
 
-                select: 'productVarientId.varientOptions'
-            }]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    $unwind: "$productLibraryVarients"
+                },
+                {
+                    $lookup: {
+                        from: "productVarient",
+                        localField: "productLibraryVarients.productVarientId",
+                        foreignField: "_id",
+                        as: "productVarients",
+                        pipeline: [ //choose specific feilds to show
+                            {
+                                $project: {
+                                    _id: 1,
+                                    productCode: 1,
+                                    costPrice: "$price",
+                                    varientOptions: 1,
+                                    createdOn: 1
 
-            let result = await getSingleData(ProductLibrary, query, '', populate);
-            console.log(result, 'result')
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    $unwind: "$productVarients"
+                },
+                {
+                    $lookup: {
+                        from: "variableOptions",
+                        let: { varientOptions: "$productVarients.varientOptions" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $in: ["$_id", "$$varientOptions.variableOptionId"]
+                                    }
+                                }
+                            },
+                            {
+                                $lookup: {
+                                    from: "variableTypes",
+                                    localField: "variableTypeId",
+                                    foreignField: "_id",
+                                    as: "productVariableType",
+                                }
+                            },
+                            {
+                                $unwind: "$productVariableType"
+                            },
+                            {
 
-            let dataa = result.data.toObject()
-               
-            let productLibraryImages = dataa.productLibraryImages || [];
-            delete dataa.productLibraryImages
-            let productLibraryVarients = dataa.productLibraryVarients.map(variant => {
-                return {
-                    ...variant,
-                    productLibraryImages
-                };
-            });
+                                $project: {
+                                    _id: 1,
+                                    variableTypeId: 1,
+                                    value: 1,
+                                    // Add other fields you want to include in the result
+                                    variableTypeName: '$productVariableType.typeName' // Example of creating a new field
+                                }
 
-            dataa.productLibraryVarients = productLibraryVarients
+                            }
 
-            console.log("12121", dataa, "updatedData");
+                        ],
+                        as: "productVarientOptions",
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$_id",
+                        title: { $first: "$title" },
+                        description: { $first: "$description" },
+                        status: { $first: "$status" },
+                        addToStore: { $first: "$addToStore" },
+                        designDetails: { $first: "$designDetails" },
+                        productLibraryImages: { $first: "$productLibraryImages" },
+                        userId: { $first: "$userId" },
+                        productId: { $first: "$productId" },
+                        createdOn: { $first: "$createdOn" },
 
-            if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
-            }
+                        // entireObject: { $first: "$$ROOT" },
+                        productLibraryVarients: {
+                            $push: {
+                                $mergeObjects: [
+                                    "$productLibraryVarients",
+                                    {
+                                        productVarients: {
+                                            _id: "$productVarients._id",
+                                            productCode: "$productVarients.productCode",
+                                            costPrice: "$productVarients.costPrice"
+                                        },
+                                        productVarientOptions: "$productVarientOptions"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                // {
+                //     $project: {
+                //         title: 1,
+                //         description: 1,
+                //         status: 1,
+                //         addToStore: 1,
+                //         designDetails: 1,
+                //         productLibraryImages: 1,
+                //         userId: 1,
+                //         productId: 1,
+                //         createdOn: 1,
+                //         productLibraryVarients: {
+                //             $map: {
+                //                 input: "$productLibraryVarients",
+                //                 as: "variant",
+                //                 in: {
+                //                     $mergeObjects: [
+                //                         {
+                //                             // productVarients: {
+                //                                 _id: "$$variant.productVarients._id",
+                //                                 productCode: "$$variant.productVarients.productCode",
+                //                                 // varientOptions: "$$variant.productVarients.varientOptions",
+                //                                 createdOn: "$$variant.productVarients.createdOn",
+                //                                 costPrice: "$$variant.productVarients.costPrice",
+                //                                 retailPrice: "$$variant.price",
+                //                                 profit: "$$variant.profit",
+                //                                 status: "$$variant.status",
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, dataa, null, 200);
+
+                //                                 // Add other fields you want to include
+                //                             // },
+                //                             productVarientOptions: "$$variant.productVarientOptions"
+                //                         }
+                //                     ]
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+            ]);
+
+
+
+            // let query = {
+            //     _id: mongoose.Types.ObjectId(productLibraryId),
+            //     status: { $ne: 2 }
+            // }
+            // let populate = [{
+            // path: 'productLibraryId',
+            // // populate: {
+            // //     path: 'productVarientId',
+            // // },
+
+            // // select: 'productVarientId.varientOptions'
+            // }]
+
+            // let result = await getSingleData(ProductLibraryVarient, query, '', populate);
+            // console.log(result, 'result')
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
 
         } catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

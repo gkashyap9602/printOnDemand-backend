@@ -1,43 +1,31 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
-var ProductLibrary = new Schema({
-    userId: {
+var ProductLibraryVarient = new Schema({
+    productLibraryId: {
         type: mongoose.Types.ObjectId,
-        ref: "Users",
-        index: true
+        ref: "ProductLibrary"
     },
-    productId: {
+    productVarientId: {
         type: mongoose.Types.ObjectId,
-        ref: "Product",
-        index: true
+        ref: "ProductVarient"
     },
-    title: {
-        type: String,
-        index: true
-    },
-    description: {
-        type: String,
-        default: null
-    },
-    status: {
+    price: {
         type: Number,
-        default: 1,
-        Comment: "1 for active 2 for delete "
+        default: null,
 
     },
-    addToStore: {
+    profit: {
         type: Number,
-        default: 0,
-        Comment: "1 for add 0 for not add "
-
-    },
-
-    designDetails: {
-        type: String,
         default: null
+
     },
-    productLibraryImages: [{
+    retailPrice: {
+        type: Number,
+        default: null
+
+    },
+    productLibraryVarientImages: [{
         _id: {
             type: mongoose.Types.ObjectId,
             index: true
@@ -53,6 +41,12 @@ var ProductLibrary = new Schema({
 
         },
     }],
+    status: {
+        type: Number,
+        default: 1,
+        Comment: "1 for active 2 for delete "
+
+    },
     createdOn: {
         type: String,
         default: null,
@@ -64,4 +58,4 @@ var ProductLibrary = new Schema({
 });
 
 
-module.exports = mongoose.model("ProductLibrary", ProductLibrary, "productLibrary");
+module.exports = mongoose.model("ProductLibraryVarient", ProductLibraryVarient, "productLibraryVarient");

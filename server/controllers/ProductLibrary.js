@@ -24,11 +24,11 @@ const productLibraryController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateProductLibrary: async (req, res) => {
-        let userId = req.decoded._id;
-        if (!userId) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
-        }
-        let result = await ProductLibrary.updateProductLibrary(req.body,userId);
+        let result = await ProductLibrary.updateProductLibrary(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    updateProductLibraryVarient: async (req, res) => {
+        let result = await ProductLibrary.updateProductLibraryVarient(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
     getProductLibrary: async (req, res) => {
@@ -36,7 +36,7 @@ const productLibraryController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     getProductLibraryDetails: async (req, res) => {
-        let result = await ProductLibrary.getProductLibraryDetails(req.body);
+        let result = await ProductLibrary.getProductLibraryDetails(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
 
