@@ -10,7 +10,7 @@ router.post('/addToCart', orderController.addToCart);
 // router.delete('/deleteFromGallery', verifyTokenAdmin, validate(deleteFromGallery), orderController.deleteFromGallery);
 
 // with User and Admin both Token routes
-// router.get('/getGallery', verifyTokenBoth, orderController.getGallery);
+router.get('/getCartItems', verifyTokenBoth, orderController.getCartItems);
 
 // Common Routes 
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

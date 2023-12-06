@@ -110,7 +110,7 @@ const productLibrary = {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
 
-            const previousVariant = find.data.productLibraryVarients.find((variant) => variant._id.toString() == productLibraryVariantId.toString());
+            const previousVariant = find.data.productLibraryVarients.find((variant) => variant._id.toString() == productLibraryVariantId);
 
             console.log(previousVariant, "previousVariant");
             if (!previousVariant) {

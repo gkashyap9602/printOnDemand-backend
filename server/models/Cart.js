@@ -9,13 +9,12 @@ var Cart = new Schema({
     },
     productLibraryVariantId: {
         type: mongoose.Types.ObjectId,
-        // ref: "ProductLibrary",
+        ref: "ProductLibrary",
         index: true
     },
     quantity: {
         type: Number,
         default: 1
-
     },
     createdOn: {
         type: String,

@@ -9,15 +9,11 @@ const orderUtil = {
     addToCart: async (data) => {
 
         try {
-            let { cartItems, quantity } = data
+            let { cartItems } = data
 
-            let newObj = {
-                cartItems,
-                createdOn: helpers.getCurrentDate()
-            }
+            cartItems.map((value) => value.createdOn = helpers.getCurrentDate())
 
-            let cartRef = new Cart(newObj)
-            let response = await postData(cartRef);
+            let response = await insertMany(Cart, cartItems);
             if (response.status) {
                 return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
             }
@@ -58,33 +54,62 @@ const orderUtil = {
 
     // },
 
-    // getGallery: async (data) => {
-    //     let { type, pageIndex = 1, pageSize = 5 } = data
-    //     pageIndex = Number(pageIndex)
-    //     pageSize = Number(pageSize)
+    getCartItems: async (data) => {
+        let { pageIndex = 1, pageSize = 5 } = data
+        pageIndex = Number(pageIndex)
+        pageSize = Number(pageSize)
 
-    //     let totalCount = await getCount(Gallery, { status: { $ne: 2 }, type: Number(type) })
-    //     const aggregationPipeline = [
-
-    //         {
-    //             $match: {
-    //                 status: { $ne: 2 },
-    //                 type: Number(type)
-    //             },
-    //         },
-    //         {
-    //             $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-    //         },
-    //         {
-    //             $limit: pageSize // Limit the number of records per page
-    //         },
-    //     ];
+        // let totalCount = await getCount(Gallery, { status: { $ne: 2 }, type: Number(type) })
 
 
-    //     const result = await Gallery.aggregate(aggregationPipeline);
+        const aggregationPipeline = [
 
-    //     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { items: result, totalCount: totalCount?.data }, null, 200);
-    // },
+            // {
+            //     $match: {
+            //         status: { $ne: 2 },
+            //     },
+            // },
+            {
+                $lookup: {
+                    from: "ProductLibrary",
+                    localField: "productLibraryId",
+                    foreignField: "_id",
+                    as: "ProductLibraryData"
+                }
+            }
+            // {
+            //     $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+            // },
+            // {
+            //     $limit: pageSize // Limit the number of records per page
+            // },
+        ];
+
+
+        // const result = await Cart.aggregate(aggregationPipeline);
+
+        // let query = {
+        //     // _id: mongoose.Types.ObjectId(productLibraryId),
+        //     status: { $ne: 2 }
+        // }
+        let populate = [
+            {
+                path: 'productLibraryVariantId', // Use the actual field name in your Cart schema
+                // populate: {
+                //     path: 'productVarientId', // Add any other fields you want to populate
+                // },
+            },
+        ];
+
+        let result = await getSingleData(Cart, {}, '', populate);
+        console.log(result, 'result')
+
+        // if (result.length === 0) {
+        //     return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
+        // }
+
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.data, null, 200);
+    },
 
 }
 

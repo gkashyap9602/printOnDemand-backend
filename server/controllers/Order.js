@@ -13,11 +13,10 @@ const orderController = {
     //     let result = await Gallery.deleteFromGallery(req.body);
     //     return helpers.showOutput(res, result, result.statusCode);
     // },
-    // getGallery: async (req, res) => {
-    //     let result = await Gallery.getGallery(req.query);
-    //     console.log(req.session, "req sessin get galle side ");
-    //     return helpers.showOutput(res, result, result.statusCode);
-    // },
+    getCartItems: async (req, res) => {
+        let result = await Order.getCartItems(req.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
 
 }
 
