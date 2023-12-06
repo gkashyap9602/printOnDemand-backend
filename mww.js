@@ -65,6 +65,7 @@ app.use(cors({
   let product = require("./server/routes/product");
   let productLibrary = require("./server/routes/productLibrary");
   let gallery = require('./server/routes/Gallery');
+  let order = require('./server/routes/Order');
 
   app.use(API_V1 + "administration", administration,);
   app.use(API_V1 + "user", users);
@@ -73,6 +74,7 @@ app.use(cors({
   app.use(API_V1 + "product", product,);
   app.use(API_V1 + "productLibrary", productLibrary,);
   app.use(API_V1 + "gallery", gallery,);
+  app.use(API_V1 + "order", order,);
 
 
   app.listen(process.env.PORT || 3000, () => {

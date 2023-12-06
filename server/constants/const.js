@@ -3,7 +3,7 @@ module.exports = {
     REFRESH_EXPIRY: "30d",
     API_V1: "/api/v1/",
     BASE_URL: "http://localhost:3000/api/v1",
-    FRONTEND_URL: "https://mwwdev.solidappmaker.ml",
+    FRONTEND_URL: "https://mwwdev.solidappmaker.in",
     ZENDESK_AUTH: "YWRtaW5pc3RyYXRvckBtd3dvbmRlbWFuZC5jb206YmZOQWhFYUM0cEVtM1ljIQ==",
     ZENDESK_BASE_URL: "https://mwwondemand.zendesk.com/api/v2",
     ROLE: {

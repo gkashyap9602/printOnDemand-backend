@@ -351,12 +351,26 @@ const productLibrary = {
             let result = await getSingleData(ProductLibrary, query, '', populate);
             console.log(result, 'result')
 
+            let dataa = result.data.toObject()
+               
+            let productLibraryImages = dataa.productLibraryImages || [];
+            delete dataa.productLibraryImages
+            let productLibraryVarients = dataa.productLibraryVarients.map(variant => {
+                return {
+                    ...variant,
+                    productLibraryImages
+                };
+            });
+
+            dataa.productLibraryVarients = productLibraryVarients
+
+            console.log("12121", dataa, "updatedData");
 
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
             }
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result.data, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, dataa, null, 200);
 
         } catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

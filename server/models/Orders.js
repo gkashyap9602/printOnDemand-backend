@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var Orders = new Schema({
     userId: {
         type: mongoose.Types.ObjectId,
-        ref: "users",
+        ref: "Users",
         index: true
     },
     customerName: {
