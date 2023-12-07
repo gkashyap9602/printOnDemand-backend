@@ -8,4 +8,18 @@ module.exports.addToCart = {
 
 };
 
+module.exports.updateCart = {
+    body: joi.object({
+        cartId: joi.string().length(24).message("Invalid Id please check").required(),
+        quantity:joi.number().max(9999).required()
+    })
+
+};
+module.exports.deleteCart = {
+    body: joi.object({
+        cartId: joi.string().length(24).message("Invalid Id please check").required(),
+    })
+
+};
+
 

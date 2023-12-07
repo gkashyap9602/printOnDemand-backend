@@ -4,8 +4,6 @@ const ResponseMessages = require("../constants/ResponseMessages")
 const CSC2 = require('country-state-city');
 const Material = require('../models/Material')
 const Product = require('../models/Product')
-const FAQ = require('../models/FAQ')
-const { default: mongoose } = require('mongoose');
 let ObjectId = require('mongodb').ObjectId
 const WaitingList = require('../models/WaitingList')
 const commonContent = require('../models/CommonContent')
@@ -73,59 +71,12 @@ const commonUtil = {
       )
     }
 
-
     const result = await Material.aggregate(aggregationPipeline)
 
     return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
   },
-  fetchZendeskFAQs: async () => {
-    try {
-      const API_TOKEN = `TvS7y1gQdlK9bZn5Ckp3RHaLeLqUG9tibR7fEdbr`;
-      const response = await axios.get('https://sachtech.zendesk.com/api/v2/help_center/en-us/articles.json', {
-        headers: {
-          Authorization: API_TOKEN, // Replace with your Zendesk API token
-          "Content-Type": "application/json",
-        }
-      })
-      console.log("Zendesk FAQs:", response);
-      if (!response) {
-        return helpers.showResponse(false, "faq error", response, null, 400);
 
-      }
-      return helpers.showResponse(true, "faq fetch sucess", response, null, 200);
-
-    } catch (error) {
-      console.error("Error fetching Zendesk FAQs:", error);
-      return helpers.showResponse(false, "faq errorr", error, null, 400);
-    }
-  },
-  TwofetchZendeskFAQs: async () => {
-    try {
-      const API_TOKEN = "TvS7y1gQdlK9bZn5Ckp3RHaLeLqUG9tibR7fEdbr";
-      const response = await fetch('https://sachtech.zendesk.com/api/v2/help_center/en-us/articles.json', {
-        method: 'GET',
-        headers: {
-          Authorization: API_TOKEN, // Replace with your Zendesk API token
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log(response, "responseeee");
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      // const data = await response.json();
-      // console.log("Zendesk FAQs:", data);
-      return helpers.showResponse(true, "faq errorr", response, null, 200);
-      // Handle the FAQs data as needed
-    } catch (error) {
-      console.error("Error fetching Zendesk FAQs:", error);
-      return helpers.showResponse(false, "faq errorr", error, null, 400);
-    }
-  },
   getAllCountries: async () => {
-
     const countries = CSC2.Country.getAllCountries()
 
     //change response of countries 
@@ -185,36 +136,55 @@ const commonUtil = {
     return helpers.showResponse(false, "Common details Update failed", response, null, 400);
   },
 
-  addNewQuestion: async (data) => {
-    let { question, answer } = data
-    let newObj = {
-      question,
-      answer,
-      createdOn: helpers.getCurrentDate()
-    }
+  // addNewQuestion: async (data) => {
+  //   let { question, answer } = data
+  //   let newObj = {
+  //     question,
+  //     answer,
+  //     createdOn: helpers.getCurrentDate()
+  //   }
 
-    let quesRef = new FAQ(newObj)
-    let response = await postData(quesRef);
-    if (response.status) {
-      return helpers.showResponse(true, "New Question Added Successfully", null, null, 200);
-    }
-    return helpers.showResponse(false, "Unable to add new question at the moment", response, null, 400);
-  },
+  //   let quesRef = new FAQ(newObj)
+  //   let response = await postData(quesRef);
+  //   if (response.status) {
+  //     return helpers.showResponse(true, "New Question Added Successfully", null, null, 200);
+  //   }
+  //   return helpers.showResponse(false, "Unable to add new question at the moment", response, null, 400);
+  // },
 
-  updateQuestion: async (data) => {
-    let { quesId } = data
-    const findQues = await getSingleData(FAQ, { _id: quesId, status: { $ne: 2 } })
-    if (!findQues.status) {
-      return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
-    }
+  // updateQuestion: async (data) => {
+  //   let { quesId } = data
+  //   const findQues = await getSingleData(FAQ, { _id: quesId, status: { $ne: 2 } })
+  //   if (!findQues.status) {
+  //     return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
+  //   }
 
-    data.updatedOn = helpers.getCurrentDate();
-    let response = await updateData(FAQ, data, new ObjectId(quesId));
-    if (response.status) {
-      return helpers.showResponse(true, "Question has been updated", null, null, 200);
-    }
-    return helpers.showResponse(false, "Question Update failed", null, null, 400);
-  },
+  //   data.updatedOn = helpers.getCurrentDate();
+  //   let response = await updateData(FAQ, data, new ObjectId(quesId));
+  //   if (response.status) {
+  //     return helpers.showResponse(true, "Question has been updated", null, null, 200);
+  //   }
+  //   return helpers.showResponse(false, "Question Update failed", null, null, 400);
+  // },
+
+  //   getQuestions: async (data) => {
+  //     let { pageIndex = 1, pageSize = 10 } = data
+  //     pageIndex = Number(pageIndex)
+  //     pageSize = Number(pageSize)
+
+  //     let pagination = {
+  //       skip: (pageIndex - 1) * pageSize, // Calculate the number of documents to skip
+  //       limit: pageSize, // Specify the number of documents to return
+  //     }
+  //     let totalCount = await getCount(FAQ, { status: { $ne: 2 } })
+
+  //     let response = await getDataArray(FAQ, { status: { $ne: 2 } }, '', pagination, { createdOn: -1 });
+
+  //     if (response.status) {
+  //       return helpers.showResponse(true, "Here is a list of questions", { data: response.data, totalCount: totalCount.data }, null, 200);
+  //     }
+  //     return helpers.showResponse(false, 'No data found', null, null, 400);
+  //   },
 
   getCommonContent: async () => {
     let response = await getSingleData(commonContent, {}, '');
@@ -222,25 +192,6 @@ const commonUtil = {
       return helpers.showResponse(true, "Here is a About Content", response.data, null, 200);
     }
     return helpers.showResponse(false, 'No Content Found', null, null, 400);
-  },
-
-  getQuestions: async (data) => {
-    let { pageIndex = 1, pageSize = 10 } = data
-    pageIndex = Number(pageIndex)
-    pageSize = Number(pageSize)
-
-    let pagination = {
-      skip: (pageIndex - 1) * pageSize, // Calculate the number of documents to skip
-      limit: pageSize, // Specify the number of documents to return
-    }
-    let totalCount = await getCount(FAQ, { status: { $ne: 2 } })
-
-    let response = await getDataArray(FAQ, { status: { $ne: 2 } }, '', pagination, { createdOn: -1 });
-
-    if (response.status) {
-      return helpers.showResponse(true, "Here is a list of questions", { data: response.data, totalCount: totalCount.data }, null, 200);
-    }
-    return helpers.showResponse(false, 'No data found', null, null, 400);
   },
   getFaqCategories: async (data) => {
     try {

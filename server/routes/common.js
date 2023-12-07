@@ -3,7 +3,7 @@ var commonController = require('../controllers/Common');
 var router = express.Router();
 var { verifyTokenBoth, verifyTokenAdmin, validateCSRFToken } = require("../middleware/authentication");
 const validate = require('../middleware/validation')
-const { addQuestionSchema, updateQuestionSchema, updateCommonContentSchema, raiseTicket } = require('../validations/common')
+const { updateCommonContentSchema, raiseTicket } = require('../validations/common')
 
 //without Token Routes 
 router.post('/store_param', commonController.storeParameterToAWS);
@@ -14,19 +14,17 @@ router.get('/getAllStates', verifyTokenBoth, commonController.getAllStates);
 router.get('/getMaterials', verifyTokenBoth, commonController.getMaterials);
 router.get('/getWaitingListStatus', verifyTokenBoth, commonController.getWaitingListStatus);
 router.get('/getCommonContent', verifyTokenBoth, commonController.getCommonContent);
-router.get('/getQuestions', verifyTokenBoth, commonController.getQuestions);
 router.get('/getFaqCategories', verifyTokenBoth, commonController.getFaqCategories);
 router.get('/getCategoriesArticle', verifyTokenBoth, commonController.getCategoriesArticle);
 router.get('/getSingleCategoryArticle', verifyTokenBoth, commonController.getSingleCategoryArticle);
 router.get('/getSearchArticle', verifyTokenBoth, commonController.getSearchArticle);
 router.post('/raiseTicket', verifyTokenBoth, validate(raiseTicket), commonController.raiseTicket);
+// router.get('/getQuestions', verifyTokenBoth, commonController.getQuestions);
 
 // with admin token routes 
-router.post('/addNewQuestion', verifyTokenAdmin, validate(addQuestionSchema), commonController.addNewQuestion);
-router.post('/updateQuestion', verifyTokenAdmin, validate(updateQuestionSchema), commonController.updateQuestion);
+// router.post('/addNewQuestion', verifyTokenAdmin, validate(addQuestionSchema), commonController.addNewQuestion);
+// router.post('/updateQuestion', verifyTokenAdmin, validate(updateQuestionSchema), commonController.updateQuestion);
 router.post('/updateCommonContent', verifyTokenAdmin, validate(updateCommonContentSchema), commonController.updateCommonContent);
-router.get('/fetchZendeskFAQs', commonController.fetchZendeskFAQs);
-router.get('/TwofetchZendeskFAQs', commonController.TwofetchZendeskFAQs);
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

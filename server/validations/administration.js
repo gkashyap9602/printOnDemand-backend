@@ -1,5 +1,4 @@
 const joi = require("joi");
-
 module.exports.updateWaitingList = {
     body: joi.object({
         value: joi.boolean().required()
@@ -16,7 +15,7 @@ module.exports.addMaterial = {
 };
 module.exports.updateMaterial = {
     body: joi.object({
-        materialId: joi.string().required(),
+        materialId: joi.string().length(24).message("Invalid Id please check").required(),
         name: joi.string(),
         status: joi.number()
     })
@@ -47,14 +46,14 @@ module.exports.addSubAdmin = {
 module.exports.activeInactiveuser = {
     body: joi.object({
         status: joi.any().required(),
-        userId: joi.string().required()
+        userId: joi.string().length(24).message("Invalid Id please check").required(),
 
     })
 
 };
 module.exports.updateSubAdmin = {
     body: joi.object({
-        subAdminId: joi.string().required(),
+        subAdminId: joi.string().length(24).message("Invalid Id please check").required(),
         firstName: joi.string(),
         lastName: joi.string(),
         access: joi.array(),
@@ -64,7 +63,7 @@ module.exports.updateSubAdmin = {
 };
 module.exports.deleteNotification = {
     body: joi.object({
-        notificationId: joi.string().required(),
+        notificationId: joi.string().length(24).message("Invalid Id please check").required(),
         type: joi.string().valid('MWW_Global', 'users').required(),
 
     })
@@ -80,7 +79,7 @@ module.exports.addToGallery = {
 };
 module.exports.deleteFromGallery = {
     body: joi.object({
-        galleryId: joi.string().required(),
+        galleryId: joi.string().length(24).message("Invalid Id please check").required(),
         type: joi.number().valid(1, 2).required(), //1 for images 2 for videos
 
     })

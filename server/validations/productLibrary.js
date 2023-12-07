@@ -19,7 +19,7 @@ module.exports.createProductLibrary = {
 };
 module.exports.updateProductLibrary = {
     body: joi.object({
-        productLibraryId: joi.string().required(),
+        productLibraryId: joi.string().length(24).message("Invalid Id please check").required(),
         description: joi.string(),
         title: joi.string(),
     })
@@ -27,9 +27,9 @@ module.exports.updateProductLibrary = {
 };
 module.exports.updateLibraryVarient = {
     body: joi.object({
-        productLibraryVariantId: joi.string().required(),
-        price: joi.number().required(),
-        profit: joi.number().required(),
+        productLibraryVariantId: joi.string().length(24).message("Invalid Id please check").required(),
+        price: joi.number().max(6).required(),
+        profit: joi.number().max(6).required(),
     })
 
 };

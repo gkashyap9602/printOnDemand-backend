@@ -39,10 +39,6 @@ const commonController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
 
-    getQuestions: async (req, res) => {
-        let result = await Common.getQuestions(req.query);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
     getFaqCategories: async (req, res) => {
         let result = await Common.getFaqCategories(req.query);
         return helpers.showOutput(res, result, result.statusCode);
@@ -71,25 +67,18 @@ const commonController = {
         let result = await Common.getCommonContent();
         return helpers.showOutput(res, result, result.statusCode);
     },
-    addNewQuestion: async (req, res) => {
-        let result = await Common.addNewQuestion(req.body);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    fetchZendeskFAQs: async (req, res) => {
-        let result = await Common.fetchZendeskFAQs(req.body);
-        console.log(result, "resullsss");
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    TwofetchZendeskFAQs: async (req, res) => {
-        let result = await Common.TwofetchZendeskFAQs(req.body);
-        console.log(result, "resullsss");
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-
-    updateQuestion: async (req, res) => {
-        let result = await Common.updateQuestion(req.body);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
+    // addNewQuestion: async (req, res) => {
+    //     let result = await Common.addNewQuestion(req.body);
+    //     return helpers.showOutput(res, result, result.statusCode);
+    // },
+    // getQuestions: async (req, res) => {
+    //     let result = await Common.getQuestions(req.query);
+    //     return helpers.showOutput(res, result, result.statusCode);
+    // },
+    // updateQuestion: async (req, res) => {
+    //     let result = await Common.updateQuestion(req.body);
+    //     return helpers.showOutput(res, result, result.statusCode);
+    // },
     updateCommonContent: async (req, res) => {
         let admin_id = req.decoded.admin_id;
         if (!admin_id) {

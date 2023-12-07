@@ -3,13 +3,14 @@ var orderController = require('../controllers/Order');
 var router = express.Router();
 var { verifyTokenUser, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
-const { addToCart } = require('../validations/order')
+const { addToCart, updateCart ,deleteCart} = require('../validations/order')
 
 // user token acces routes
 router.post('/addToCart', verifyTokenUser, validate(addToCart), orderController.addToCart);
+router.post('/updateCartItem', verifyTokenUser, validate(updateCart), orderController.updateCartItem);
 router.get('/getCartItems', verifyTokenUser, orderController.getCartItems);
 
-// router.delete('/deleteFromGallery', verifyTokenAdmin, validate(deleteFromGallery), orderController.deleteFromGallery);
+router.delete('/deleteCart', verifyTokenUser, validate(deleteCart), orderController.deleteCart);
 
 
 // Common Routes 

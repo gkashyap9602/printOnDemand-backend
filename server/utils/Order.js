@@ -99,7 +99,7 @@ const orderUtil = {
                                                         // Add other fields you want to include in the result
                                                         variableTypeName: '$variableTypeData.typeName' // Example of creating a new field
                                                     }
-                    
+
                                                 }
 
                                             ]
@@ -110,7 +110,7 @@ const orderUtil = {
                                             _id: 1,
                                             costPrice: "$price",
                                             productCode: 1,
-                                            variableOptionData:1
+                                            variableOptionData: 1
                                             // varientOptions: 1,
                                         }
                                     }
@@ -163,35 +163,55 @@ const orderUtil = {
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
     },
 
-    // deleteFromGallery: async (data) => {
-    //     try {
-    //         const { title, galleryId, type } = data
+    updateCartItem: async (data) => {
+        try {
+            let { cartId, quantity } = data
+            let updateDataObj = {
+                quantity,
+                updatedOn: helpers.getCurrentDate()
+            }
 
-    //         const find = await getSingleData(Gallery, { status: { $ne: 2 }, _id: galleryId, type })
-    //         if (!find.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
-    //         }
+            let matchObj = {
+                _id: cartId,
+            }
 
-    //         let obj = {
-    //             title,
-    //             status: 2,
-    //             updatedOn: helpers.getCurrentDate(),
-    //         }
 
-    //         const result = await updateSingleData(Gallery, obj, { _id: galleryId, status: { $ne: 2 }, type })
+            const response = await updateSingleData(Cart, updateDataObj, matchObj)
+            if (!response.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
+            }
+            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, {}, null, 200);
+        }
+        catch (err) {
+            console.log(err, "error sideeee");
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+    },
 
-    //         if (!result.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
-    //         }
+    deleteCart: async (data) => {
+        try {
+            const { cartId, } = data
 
-    //         return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
-    //     }
-    //     catch (err) {
-    //         return helpers.showResponse(false, err?.message, null, null, 400);
+            const find = await getSingleData(Cart, { _id: cartId })
+            if (!find.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
+            }
 
-    //     }
 
-    // },
+            const result = await deleteById(Cart, { _id: cartId })
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
 
 
 }
