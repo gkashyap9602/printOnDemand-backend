@@ -28,8 +28,8 @@ module.exports.updateProductLibrary = {
 module.exports.updateLibraryVarient = {
     body: joi.object({
         productLibraryVariantId: joi.string().length(24).message("Invalid Id please check").required(),
-        price: joi.number().max(6).required(),
-        profit: joi.number().max(6).required(),
+        price: joi.number().max(999999).required(),
+        profit: joi.number().max(999999).required(),
     })
 
 };
