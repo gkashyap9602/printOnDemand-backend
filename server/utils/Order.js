@@ -30,7 +30,7 @@ const orderUtil = {
 
         // let totalCount = await getCount(Gallery, { status: { $ne: 2 }, type: Number(type) })
 
-
+///////
         const aggregationPipeline = [
             {
                 $match: {
@@ -64,20 +64,20 @@ const orderUtil = {
                         },
                         {
                             $lookup: {
-                                from: "productLibrary",
-                                localField: "productLibraryId",
+                                from: "productVarient",
+                                localField: "productVarientId",
                                 foreignField: "_id",
-                                as: "productLibraryData",
-                                // pipeline: [{
-                                //     $project: {
-                                //         _id: 1,
-                                //         productId: 1,
-                                //         title: 1,
-                                //         description: 1,
+                                as: "productVarientData",
+                                pipeline: [{
+                                    $project: {
+                                        _id: 1,
+                                        price: 1,
+                                        varientOptions: 1,
+                                        description: 1,
 
 
-                                //     }
-                                // }]
+                                    }
+                                }]
                             }
                         }
                     ]

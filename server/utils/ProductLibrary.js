@@ -275,7 +275,7 @@ const productLibrary = {
                 },
                 {
                     $addFields: {
-                        priceStartFrom: { $min: "$varientData.price" }
+                        priceStartsFrom: { $min: "$varientData.price" }
                     }
                 },
 
