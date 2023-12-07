@@ -90,6 +90,17 @@ const orderUtil = {
                                                 {
                                                     $unwind: "$variableTypeData"
                                                 },
+                                                {
+
+                                                    $project: {
+                                                        _id: 1,
+                                                        variableTypeId: 1,
+                                                        value: 1,
+                                                        // Add other fields you want to include in the result
+                                                        variableTypeName: '$variableTypeData.typeName' // Example of creating a new field
+                                                    }
+                    
+                                                }
 
                                             ]
                                         }
@@ -98,7 +109,8 @@ const orderUtil = {
                                         $project: {
                                             _id: 1,
                                             costPrice: "$price",
-                                            productCode: 1
+                                            productCode: 1,
+                                            variableOptionData:1
                                             // varientOptions: 1,
                                         }
                                     }
@@ -106,19 +118,44 @@ const orderUtil = {
                             }
                         },
                         {
-                            $unwind:"$productVarientData"
+                            $unwind: "$productVarientData"
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                productLibraryId: 1,
+                                productVarientId: 1,
+                                retailPrice: "$price",
+                                profit: 1,
+                                productLibraryVarientImages: 1,
+                                status: 1,
+                                title: "$productLibraryData.title",
+                                description: "$productLibraryData.description",
+                                productCode: "$productVarientData.productCode",
+                                costPrice: "$productVarientData.costPrice",
+                                productVarientOption: "$productVarientData.variableOptionData"
+
+                            }
                         }
-// ???
                     ]
 
                 }
-            }
+            },
+            {
+                $unwind: "$productLibraryVarientData"
+            },
             // {
             //     $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
             // },
             // {
             //     $limit: pageSize // Limit the number of records per page
             // },
+
+            // {
+            //     $project: {
+
+            //     }
+            // }
         ];
 
         const result = await Cart.aggregate(aggregationPipeline);
