@@ -52,5 +52,10 @@ var ProductLibraryVarient = new Schema({
     },
 });
 
+ProductLibraryVarient.pre('aggregate', function () {
+    // Add a $match state to the beginning of each pipeline.
+    this.pipeline().unshift({ $match: { status: { $ne: 2 } } });
+})
+
 
 module.exports = mongoose.model("ProductLibraryVarient", ProductLibraryVarient, "productLibraryVarient");

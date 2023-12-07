@@ -271,6 +271,13 @@ const productLibrary = {
                         localField: '_id',
                         foreignField: 'productLibraryId',
                         as: 'varientData',
+                        pipeline: [
+                            {
+                                $match: {
+                                    status: { $ne: 2 }
+                                }
+                            }
+                        ]
                     }
                 },
                 {
@@ -429,7 +436,13 @@ const productLibrary = {
                         localField: "_id",
                         foreignField: "productLibraryId",
                         as: "productLibraryVarients",
-                        pipeline: [ //choose specific feilds to show
+                        pipeline: [
+                            //choose specific feilds to show
+                            {
+                                $match: {
+                                    status: { $ne: 2 },
+                                }
+                            },
                             {
                                 $project: {
                                     _id: 1,
@@ -538,10 +551,12 @@ const productLibrary = {
                                             $multiply: [
                                                 {
                                                     $divide: [
-                                                        { $subtract: [
-                                                            { $toDouble: "$productLibraryVarients.retailPrice" },
-                                                            { $toDouble: "$productVarients.costPrice" }
-                                                        ] },
+                                                        {
+                                                            $subtract: [
+                                                                { $toDouble: "$productLibraryVarients.retailPrice" },
+                                                                { $toDouble: "$productVarients.costPrice" }
+                                                            ]
+                                                        },
                                                         { $toDouble: "$productVarients.costPrice" }
                                                     ]
                                                 },
