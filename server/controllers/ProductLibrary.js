@@ -31,6 +31,10 @@ const productLibraryController = {
         let result = await ProductLibrary.updateProductLibraryVarient(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    deleteProductLibrary: async (req, res) => {
+        let result = await ProductLibrary.deleteProductLibraryOrVarient(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     getProductLibrary: async (req, res) => {
         let result = await ProductLibrary.getProductLibrary(req.body);
         return helpers.showOutput(res, result, result.statusCode);

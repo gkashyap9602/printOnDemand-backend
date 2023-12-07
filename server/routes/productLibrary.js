@@ -5,7 +5,7 @@ var productLibraryController = require('../controllers/ProductLibrary');
 var { verifyTokenUser, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
 const { addToMulter } = require('../services/helper/index')
-const { updateProductLibrary, updateLibraryVarient, ProductLibraryDetails } = require('../validations/productLibrary')
+const { updateProductLibrary, updateLibraryVarient, ProductLibraryDetails, deleteProductLibrary } = require('../validations/productLibrary')
 
 //user token routes
 router.post('/saveLibraryImage', validateCSRFToken, verifyTokenUser, addToMulter.single('libraryImage'), productLibraryController.saveLibraryImage);
@@ -13,6 +13,7 @@ router.get('/getLibraryImages', verifyTokenUser, productLibraryController.getLib
 router.post('/create', verifyTokenUser, addToMulter.array('productLibrary'), productLibraryController.createProductLibrary);
 router.post('/update', verifyTokenUser, validate(updateProductLibrary), productLibraryController.updateProductLibrary);
 router.post('/updateVarient', verifyTokenUser, validate(updateLibraryVarient), productLibraryController.updateProductLibraryVarient);
+router.delete('/deleteProductLibrary', verifyTokenUser, validate(deleteProductLibrary), productLibraryController.deleteProductLibrary);
 router.post('/getLibrary', verifyTokenUser, productLibraryController.getProductLibrary);
 router.get('/getLibraryDetails', verifyTokenUser, validate(ProductLibraryDetails), productLibraryController.getProductLibraryDetails);
 

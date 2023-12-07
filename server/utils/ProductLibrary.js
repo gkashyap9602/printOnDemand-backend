@@ -61,6 +61,8 @@ const productLibrary = {
                 return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 400);
             }
 
+            productLibraryImages?.map((value) => value._id = mongoose.Types.ObjectId())
+
             let obj = {
                 userId,
                 productId,
@@ -170,6 +172,55 @@ const productLibrary = {
             }
 
             return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result.data, null, 200);
+
+        }
+        catch (err) {
+            console.log(err, "error sideeee");
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+    },
+    deleteProductLibraryOrVarient: async (data) => {
+        try {
+            let { productLibraryId, productLibraryVariantId } = data
+
+            let matchObjLibrary = {
+                _id: productLibraryId,
+                status: { $ne: 2 }
+            }
+            let updateData = {
+                status: 2
+            }
+            if (productLibraryId && productLibraryVariantId) {
+
+                let matchObjVarient = {
+                    _id: productLibraryVariantId,
+                    productLibraryId: productLibraryId,
+                    status: { $ne: 2 }
+                }
+
+                const findVarient = await getSingleData(ProductLibraryVarient, matchObjVarient)
+                if (!findVarient.status) {
+                    return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
+                }
+                const resultVarient = await updateSingleData(ProductLibraryVarient, updateData, matchObjVarient)
+                if (!resultVarient.status) {
+                    return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+                }
+                return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
+
+            } else if (productLibraryId) {
+                const find = await getSingleData(ProductLibrary, matchObjLibrary)
+                if (!find.status) {
+                    return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
+                }
+
+                const result = await updateSingleData(ProductLibrary, updateData, matchObjLibrary)
+                if (!result.status) {
+                    return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+                }
+
+                return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, result.data, null, 200);
+            }
 
         }
         catch (err) {
@@ -382,6 +433,7 @@ const productLibrary = {
                                     productVarientId: 1,
                                     retailPrice: "$price",
                                     profit: 1,
+                                    productLibraryVarientImages: 1,
                                     status: 1,
                                     createdOn: 1
 
@@ -467,8 +519,6 @@ const productLibrary = {
                         userId: { $first: "$userId" },
                         productId: { $first: "$productId" },
                         createdOn: { $first: "$createdOn" },
-
-                        // entireObject: { $first: "$$ROOT" },
                         productLibraryVarients: {
                             $push: {
                                 $mergeObjects: [

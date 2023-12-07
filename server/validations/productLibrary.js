@@ -33,6 +33,13 @@ module.exports.updateLibraryVarient = {
     })
 
 };
+module.exports.deleteProductLibrary= {
+    body: joi.object({
+        productLibraryId: joi.string().required(),
+        productLibraryVariantId: joi.string(),
+    })
+
+};
 module.exports.ProductLibraryDetails = {
     body: joi.object({
         productLibraryId: joi.string().required(),
