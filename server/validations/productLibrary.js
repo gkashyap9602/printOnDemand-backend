@@ -20,7 +20,7 @@ module.exports.createProductLibrary = {
 module.exports.updateProductLibrary = {
     body: joi.object({
         productLibraryId: joi.string().required(),
-        description: joi.array(),
+        description: joi.string(),
         title: joi.string(),
     })
 

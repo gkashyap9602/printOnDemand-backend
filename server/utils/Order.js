@@ -63,22 +63,52 @@ const orderUtil = {
                             }
                         },
                         {
+                            $unwind: "$productLibraryData"
+                        },
+                        {
                             $lookup: {
                                 from: "productVarient",
                                 localField: "productVarientId",
                                 foreignField: "_id",
                                 as: "productVarientData",
-                                pipeline: [{
-                                    $project: {
-                                        _id: 1,
-                                        costPrice: "$price",
-                                        varientOptions: 1,
+                                pipeline: [
+                                    {
+                                        $lookup: {
+                                            from: "variableOptions",
+                                            localField: "varientOptions.variableOptionId",
+                                            foreignField: "_id",
+                                            as: "variableOptionData",
+                                            pipeline: [
+                                                {
+                                                    $lookup: {
+                                                        from: "variableTypes",
+                                                        localField: "variableTypeId",
+                                                        foreignField: "_id",
+                                                        as: "variableTypeData",
+                                                    }
+                                                },
+                                                {
+                                                    $unwind: "$variableTypeData"
+                                                },
 
-
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            _id: 1,
+                                            costPrice: "$price",
+                                            productCode: 1
+                                            // varientOptions: 1,
+                                        }
                                     }
-                                }]
+                                ]
                             }
+                        },
+                        {
+                            $unwind:"$productVarientData"
                         }
+// ???
                     ]
 
                 }
