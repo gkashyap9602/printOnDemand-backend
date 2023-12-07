@@ -540,66 +540,10 @@ const productLibrary = {
                         }
                     }
                 },
-                // {
-                //     $project: {
-                //         title: 1,
-                //         description: 1,
-                //         status: 1,
-                //         addToStore: 1,
-                //         designDetails: 1,
-                //         productLibraryImages: 1,
-                //         userId: 1,
-                //         productId: 1,
-                //         createdOn: 1,
-                //         productLibraryVarients: {
-                //             $map: {
-                //                 input: "$productLibraryVarients",
-                //                 as: "variant",
-                //                 in: {
-                //                     $mergeObjects: [
-                //                         {
-                //                             // productVarients: {
-                //                                 _id: "$$variant.productVarients._id",
-                //                                 productCode: "$$variant.productVarients.productCode",
-                //                                 // varientOptions: "$$variant.productVarients.varientOptions",
-                //                                 createdOn: "$$variant.productVarients.createdOn",
-                //                                 costPrice: "$$variant.productVarients.costPrice",
-                //                                 retailPrice: "$$variant.price",
-                //                                 profit: "$$variant.profit",
-                //                                 status: "$$variant.status",
 
-
-                //                                 // Add other fields you want to include
-                //                             // },
-                //                             productVarientOptions: "$$variant.productVarientOptions"
-                //                         }
-                //                     ]
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
             ]);
 
-
-
-            // let query = {
-            //     _id: mongoose.Types.ObjectId(productLibraryId),
-            //     status: { $ne: 2 }
-            // }
-            // let populate = [{
-            // path: 'productLibraryId',
-            // // populate: {
-            // //     path: 'productVarientId',
-            // // },
-
-            // // select: 'productVarientId.varientOptions'
-            // }]
-
-            // let result = await getSingleData(ProductLibraryVarient, query, '', populate);
-            // console.log(result, 'result')
-
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result.length > 0 ? result[0] : result, null, 200);
 
         } catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

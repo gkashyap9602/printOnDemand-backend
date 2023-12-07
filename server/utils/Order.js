@@ -43,7 +43,45 @@ const orderUtil = {
                     localField: "productLibraryVariantId",
                     foreignField: "_id",
                     as: "productLibraryVarientData",
-                
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "productLibrary",
+                                localField: "productLibraryId",
+                                foreignField: "_id",
+                                as: "productLibraryData",
+                                pipeline: [{
+                                    $project: {
+                                        _id: 1,
+                                        productId: 1,
+                                        title: 1,
+                                        description: 1,
+
+
+                                    }
+                                }]
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "productLibrary",
+                                localField: "productLibraryId",
+                                foreignField: "_id",
+                                as: "productLibraryData",
+                                // pipeline: [{
+                                //     $project: {
+                                //         _id: 1,
+                                //         productId: 1,
+                                //         title: 1,
+                                //         description: 1,
+
+
+                                //     }
+                                // }]
+                            }
+                        }
+                    ]
+
                 }
             }
             // {
