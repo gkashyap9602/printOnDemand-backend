@@ -14,7 +14,6 @@ module.exports = function (schema) {
                 const { error, value } = schema.query.validate(req.query);
                 if (error) throw error;
                 req.query = value;
-                console.log(value, "value validatee---");
                 next()
             }
             else {
