@@ -9,14 +9,14 @@ const orderController = {
         let result = await Order.addToCart(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    // deleteFromGallery: async (req, res) => {
-    //     let result = await Gallery.deleteFromGallery(req.body);
-    //     return helpers.showOutput(res, result, result.statusCode);
-    // },
     getCartItems: async (req, res) => {
         let result = await Order.getCartItems(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    // deleteFromGallery: async (req, res) => {
+    //     let result = await Gallery.deleteFromGallery(req.body);
+    //     return helpers.showOutput(res, result, result.statusCode);
+    // },
 
 }
 

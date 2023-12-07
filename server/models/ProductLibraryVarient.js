@@ -20,11 +20,6 @@ var ProductLibraryVarient = new Schema({
         default: null
 
     },
-    retailPrice: {
-        type: Number,
-        default: null
-
-    },
     productLibraryVarientImages: [{
         _id: {
             type: mongoose.Types.ObjectId,

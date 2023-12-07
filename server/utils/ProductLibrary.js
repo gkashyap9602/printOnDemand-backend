@@ -190,6 +190,7 @@ const productLibrary = {
             let updateData = {
                 status: 2
             }
+
             if (productLibraryId && productLibraryVariantId) {
 
                 let matchObjVarient = {
@@ -209,6 +210,7 @@ const productLibrary = {
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
 
             } else if (productLibraryId) {
+
                 const find = await getSingleData(ProductLibrary, matchObjLibrary)
                 if (!find.status) {
                     return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
@@ -218,13 +220,15 @@ const productLibrary = {
                 if (!result.status) {
                     return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
                 }
+                // const resultVarient = await updateSingleData(ProductLibraryVarient, updateData, matchObjVarient)
+                await updateByQuery(ProductLibraryVarient, { status: 2 }, { productLibraryId: productLibraryId })
 
-                return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, result.data, null, 200);
+                return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
 
         }
         catch (err) {
-            console.log(err, "error sideeee");
+            console.log(err, "error delete side");
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
@@ -271,7 +275,7 @@ const productLibrary = {
                 },
                 {
                     $addFields: {
-                        priceStartsFrom: { $min: "$varientData.price" }
+                        priceStartFrom: { $min: "$varientData.price" }
                     }
                 },
 
@@ -301,7 +305,112 @@ const productLibrary = {
         }
 
     },
+    // getProductLibrary: async (data) => {
+    //     try {
+    //         let { pageSize = 10, page = 1, sortDirection = "asc", sortColumn = "title", materialFilter, searchKey = '' } = data;
+    //         pageSize = Number(pageSize)
+    //         page = Number(page)
 
+    //         let matchObj = {
+    //             status: { $ne: 2 },
+    //         }
+    //         if (searchKey) {
+    //             matchObj.title = { $regex: searchKey, $options: 'i' }
+    //         }
+
+
+    //         console.log(matchObj, "matchObj");
+
+    //         if (materialFilter) {
+
+    //             materialFilter = materialFilter.map((id) => new ObjectId(id))
+    //         }
+
+    //         let countAggregate = [
+    //             {
+    //                 $match: {
+    //                     ...matchObj,
+    //                 }
+    //             },
+
+    //         ];
+
+    //         let aggregate = [
+    //             {
+    //                 $match: {
+    //                     ...matchObj,
+    //                 }
+    //             },
+    //             {
+    //                 $skip: (page - 1) * pageSize // Skip records based on the page number
+    //             },
+    //             {
+    //                 $limit: pageSize // Limit the number of records per page
+    //             },
+    //             {
+    //                 $addFields: {
+    //                     priceStartFrom: { $min: "$productLibraryVarients.retailPrice" }
+    //                 }
+    //             },
+
+    //             {
+    //                 $sort: {
+    //                     [sortColumn]: sortDirection === "asc" ? 1 : -1
+    //                 }
+    //             },
+
+    //         ]
+
+    //         console.log(materialFilter, "material8889090");
+    //         if (materialFilter && materialFilter !== 'null') {
+    //             let lookupObj = {
+    //                 $lookup: {
+    //                     from: "product",
+    //                     localField: "productId",
+    //                     foreignField: "_id",
+    //                     as: "ProductData",
+
+    //                 }
+    //             }
+    //             let matchObj = {
+    //                 $match: {
+    //                     "ProductData.materialId": { $in: materialFilter }
+    //                 }
+    //             }
+    //             let unsetObj = {
+    //                 $unset: "ProductData"
+    //             }
+
+
+    //             aggregate.push(
+    //                 { ...lookupObj }, { ...matchObj }, { ...unsetObj }
+    //             )
+    //             countAggregate.push({ ...lookupObj }, { ...matchObj }, { ...unsetObj },)
+
+
+    //         }
+
+    //         console.log(countAggregate, "countAggregate");
+    //         console.log(aggregate, "aggregate");
+
+    //         const result = await ProductLibrary.aggregate(aggregate);
+
+    //         countAggregate.push({
+    //             $count: "totalCount"
+    //         })
+    //         let count = await ProductLibrary.aggregate(countAggregate)
+    //         console.log(count, "count");
+
+    //         let totalCount = count[0]?.totalCount ? count[0].totalCount : 0
+    //         return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount }, null, 200);
+    //     }
+    //     catch (err) {
+    //         console.log(err, "error catch");
+    //         return helpers.showResponse(false, err?.message, null, null, 400);
+
+    //     }
+
+    // },
     getProductLibraryDetails: async (data) => {
         try {
             const { productLibraryId } = data;

@@ -1,16 +1,16 @@
 var express = require('express');
 var orderController = require('../controllers/Order');
 var router = express.Router();
-var { verifyTokenAdmin, verifyTokenBoth, validateCSRFToken } = require("../middleware/authentication");
-// var validate = require('../middleware/validation')
-// const { addToGallery, deleteFromGallery } = require('../validations/administration')
+var { verifyTokenUser, validateCSRFToken } = require("../middleware/authentication");
+var validate = require('../middleware/validation')
+const { addToCart } = require('../validations/order')
 
-// with Admin Token RoutesaddToGallery
-router.post('/addToCart', orderController.addToCart);
+// user token acces routes
+router.post('/addToCart', verifyTokenUser, validate(addToCart), orderController.addToCart);
+router.get('/getCartItems', verifyTokenUser, orderController.getCartItems);
+
 // router.delete('/deleteFromGallery', verifyTokenAdmin, validate(deleteFromGallery), orderController.deleteFromGallery);
 
-// with User and Admin both Token routes
-router.get('/getCartItems', verifyTokenBoth, orderController.getCartItems);
 
 // Common Routes 
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

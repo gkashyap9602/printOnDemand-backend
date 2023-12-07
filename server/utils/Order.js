@@ -7,7 +7,6 @@ const Cart = require('../models/Cart')
 const orderUtil = {
 
     addToCart: async (data) => {
-
         try {
             let { cartItems } = data
 
@@ -24,6 +23,42 @@ const orderUtil = {
         }
 
     },
+    getCartItems: async (data) => {
+        let { pageIndex = 1, pageSize = 5 } = data
+        pageIndex = Number(pageIndex)
+        pageSize = Number(pageSize)
+
+        // let totalCount = await getCount(Gallery, { status: { $ne: 2 }, type: Number(type) })
+
+
+        const aggregationPipeline = [
+            {
+                $match: {
+                    status: { $ne: 2 },
+                },
+            },
+            {
+                $lookup: {
+                    from: "productLibraryVarient",
+                    localField: "productLibraryVariantId",
+                    foreignField: "_id",
+                    as: "productLibraryVarientData",
+                
+                }
+            }
+            // {
+            //     $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+            // },
+            // {
+            //     $limit: pageSize // Limit the number of records per page
+            // },
+        ];
+
+        const result = await Cart.aggregate(aggregationPipeline);
+
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
+    },
+
     // deleteFromGallery: async (data) => {
     //     try {
     //         const { title, galleryId, type } = data
@@ -54,62 +89,6 @@ const orderUtil = {
 
     // },
 
-    getCartItems: async (data) => {
-        let { pageIndex = 1, pageSize = 5 } = data
-        pageIndex = Number(pageIndex)
-        pageSize = Number(pageSize)
-
-        // let totalCount = await getCount(Gallery, { status: { $ne: 2 }, type: Number(type) })
-
-
-        const aggregationPipeline = [
-
-            // {
-            //     $match: {
-            //         status: { $ne: 2 },
-            //     },
-            // },
-            {
-                $lookup: {
-                    from: "ProductLibrary",
-                    localField: "productLibraryId",
-                    foreignField: "_id",
-                    as: "ProductLibraryData"
-                }
-            }
-            // {
-            //     $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-            // },
-            // {
-            //     $limit: pageSize // Limit the number of records per page
-            // },
-        ];
-
-
-        // const result = await Cart.aggregate(aggregationPipeline);
-
-        // let query = {
-        //     // _id: mongoose.Types.ObjectId(productLibraryId),
-        //     status: { $ne: 2 }
-        // }
-        let populate = [
-            {
-                path: 'productLibraryVariantId', // Use the actual field name in your Cart schema
-                // populate: {
-                //     path: 'productVarientId', // Add any other fields you want to populate
-                // },
-            },
-        ];
-
-        let result = await getSingleData(Cart, {}, '', populate);
-        console.log(result, 'result')
-
-        // if (result.length === 0) {
-        //     return helpers.showResponse(false, ResponseMessages?.common.data_not_found, {}, null, 400);
-        // }
-
-        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.data, null, 200);
-    },
 
 }
 
