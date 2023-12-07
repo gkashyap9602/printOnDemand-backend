@@ -30,7 +30,7 @@ const orderUtil = {
 
         // let totalCount = await getCount(Gallery, { status: { $ne: 2 }, type: Number(type) })
 
-///////
+        ///////
         const aggregationPipeline = [
             {
                 $match: {
@@ -71,9 +71,8 @@ const orderUtil = {
                                 pipeline: [{
                                     $project: {
                                         _id: 1,
-                                        price: 1,
+                                        costPrice: "$price",
                                         varientOptions: 1,
-                                        description: 1,
 
 
                                     }

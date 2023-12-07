@@ -66,7 +66,8 @@ var ProductVarient = new Schema({
     //     required: true
     // },
     price: {
-        type: String,
+        type: Number,
+        default:0
     },
     msrp: {
         type: String,

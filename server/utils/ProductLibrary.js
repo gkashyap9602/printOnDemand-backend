@@ -533,7 +533,21 @@ const productLibrary = {
                                             productCode: "$productVarients.productCode",
                                             costPrice: "$productVarients.costPrice"
                                         },
-                                        productVarientOptions: "$productVarientOptions"
+                                        productVarientOptions: "$productVarientOptions",
+                                        profitPercent: {
+                                            $multiply: [
+                                                {
+                                                    $divide: [
+                                                        { $subtract: [
+                                                            { $toDouble: "$productLibraryVarients.retailPrice" },
+                                                            { $toDouble: "$productVarients.costPrice" }
+                                                        ] },
+                                                        { $toDouble: "$productVarients.costPrice" }
+                                                    ]
+                                                },
+                                                100
+                                            ]
+                                        }
                                     }
                                 ]
                             }
