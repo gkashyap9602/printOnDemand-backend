@@ -23,8 +23,9 @@ module.exports.deleteCart = {
 };
 module.exports.placeOrder = {
     body: joi.object({
-        amount: joi.number().required(),
-        customerId: joi.string().length(24).message("invalid id").required(),
+        totalAmount: joi.number().required(),
+        orderItems: joi.array().required(),
+        // customerId: joi.string().length(24).message("invalid id").required(),
         orderType: joi.number().valid(1, 2).required(),//1 for live order 2 for testOrder
         cartItems: joi.array().allow(null),
         ioss: joi.string().allow(null),

@@ -48,16 +48,54 @@ const orderUtil = {
         }
 
     },
-    placeOrder: async (data) => {
+    placeOrder: async (data, customerId) => {
         try {
-            let { submitImmediately, customerId, shippingMethodId, orderType, billingAddress, shippingAddress, cartItems, ioss, receipt, preship, shippingAccountNumber, } = data
+            let { totalAmount, orderItems, submitImmediately, shippingMethodId, orderType, billingAddress, shippingAddress, cartItems, ioss, receipt, preship, shippingAccountNumber, } = data
 
             const fixedPrefix = 'MWW1000';
             const randomId = helpers.generateRandom4DigitNumber(fixedPrefix);
-            console.log(randomId, "prefix value");
+
+            // let populate = "productLibraryVariantId"
+            const findCart = await getDataArray(Cart, { userId: customerId }, "", null, null, null)
+            if (!findCart.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
+            }
+            // let orderAmount = findCart.data.map((value) => {
+            //     let qty = value.quantity
+            //     let price = value.productLibraryVariantId.price
+            //     let amount = Number(qty) * Number(price)
+            //     return amount
+            // })
+            // // console.log(orderAmount, "orderAmount");
+            // let totalAmount = orderAmount.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+            // console.log(totalAmount, "totalAmount");
+
+            let productVarientIds = findCart.data.map((value) => value.productLibraryVariantId)
+            console.log(productVarientIds, "idssss");
+
+            let newOrderItem = orderItems.map((value) => {
+                let obj = value
+                let itm = value.productVarientOptions.map((val) => {
+                    return {
+                        productVariableOptionId: val._id,
+                        optionValue: val.value,
+                        productVariableTypeId: val.variableTypeId,
+                        typeName: val.variableTypeName
+                    }
+                })
+                obj.productVarientOptions = itm
+
+                return obj
+
+            })
+
+            console.log(newOrderItem, "newOrderItem");
+
 
             let obj = {
                 customerId: customerId,
+                // productLibraryVarientIds: productVarientIds,
+                amount: totalAmount,
                 displayId: randomId,
                 submitImmediately,
                 shippingMethodId,
@@ -65,6 +103,7 @@ const orderUtil = {
                 billingAddress,
                 shippingAddress,
                 cartItems,
+                orderItems: newOrderItem,
                 ioss,
                 receipt,
                 preship,

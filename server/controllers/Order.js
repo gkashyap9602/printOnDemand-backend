@@ -10,11 +10,15 @@ const orderController = {
         if (!user_id) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
-        let result = await Order.addToCart(req.body,user_id);
+        let result = await Order.addToCart(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
     placeOrder: async (req, res) => {
-        let result = await Order.placeOrder(req.body);
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Order.placeOrder(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
     getAllOrders: async (req, res) => {

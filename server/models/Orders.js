@@ -12,6 +12,47 @@ var Orders = new Schema({
         ref: "ShipMethod",
         index: true
     },
+    orderItems: [{
+        productLibraryVarientId: {
+            type: mongoose.Types.ObjectId,
+            ref: "ProductLibraryVarient",
+            index: true
+        },
+        quantity: {
+            type: Number,
+        },
+        productCode: {
+            type: String,
+        },
+        productTitle: {
+            type: String,
+        },
+        productImages: {
+            type: String,
+        },
+        orderedPrice: {
+            type: String,
+        },
+        productVarientOptions: [
+            {
+                productVariableOptionId: {
+                    type: mongoose.Types.ObjectId,
+                    ref: "variableOptions",
+                    index: true
+                },
+                optionValue: {
+                    type: String,
+                },
+                productVariableTypeId: {
+                    type: mongoose.Types.ObjectId,
+                    ref: "variableTypes",
+                    index: true
+                },
+                typeName: {
+                    type: String,
+                }
+            }],
+    }],
     displayId: {
         type: String,
         index: true,
