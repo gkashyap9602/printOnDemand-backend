@@ -23,6 +23,7 @@ router.post('/updatePersonalDetails', validateCSRFToken, verifyTokenUser, valida
 router.post('/updateShippingDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateShippingDetails);
 router.post('/updateBillingAddress', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateBillingAddress);
 router.post('/updatePaymentDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updatePaymentDetails);
+router.post('/generateStoreToken', validateCSRFToken, verifyTokenUser, authController.generateStoreToken);
 router.get('/getUser/:user_id', verifyTokenUser, authController.getUserDetail);
 router.get('/getUserStatus/:user_id', verifyTokenUser, authController.getUserStatus);
 router.get('/getBulkImport', verifyTokenUser, authController.getBulkImport);

@@ -95,6 +95,14 @@ const authController = {
         let result = await Users.updatePaymentDetails(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    generateStoreToken: async (req, res) => {
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+        }
+        let result = await Users.generateStoreToken(req.body, user_id);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
 
     getUserDetail: async (req, res) => {
         let result = await Users.getUserDetail(req?.params);

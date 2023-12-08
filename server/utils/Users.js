@@ -13,6 +13,7 @@ const { randomUUID } = require('crypto')
 const middleware = require('../middleware/authentication');
 const Orders = require('../models/Orders')
 const Material = require("../models/Material")
+const axios = require("axios")
 
 const UserUtils = {
 
@@ -176,7 +177,7 @@ const UserUtils = {
             let access_token = jwt.sign({ user_type: user_type, type: "access", _id: userData._id }, API_SECRET, {
                 expiresIn: consts.ACCESS_EXPIRY
             });
-              
+
             //save fcmToken in users collection 
             if (fcmToken && userData.userType == 3) {
                 const result = await updateSingleData(Users, { fcmToken }, { _id: userData._id, status: { $ne: 3 } })
@@ -641,6 +642,38 @@ const UserUtils = {
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+    },
+    generateStoreToken: async (data, userId) => {
+        try {
+            const clientId = "ef6a3b54af0bd843a040ccdabc47edae";
+            const clientSecret = "279508be83ce3b4bc0323e399685bbe8";
+            let { shop, code } = data
+            let queryObject = { _id: userId }
+
+
+            const response = await axios.post(`https://${shop}/admin/oauth/access_token`, {
+                client_id: clientId,
+                client_secret: clientSecret,
+                code: code,
+            });
+            // Store the access token
+            const accessToken = response.data.access_token;
+            console.log('Access Token:', accessToken);
+            let updateData = {
+                storeAccessToken: accessToken,
+                updatedOn: helpers.getCurrentDate()
+            }
+            let result = await updateSingleData(Users, updateData, { _id: userId })
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
+            }
+            return helpers.showResponse(true, "Generate Successfully", null, null, 200);
+
+        } catch (error) {
+            return helpers.showResponse(false, error.message, null, null, 400);
+
+        }
     },
 
 }

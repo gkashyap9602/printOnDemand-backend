@@ -103,8 +103,11 @@ var Users = new Schema({
     traceId: {
         type: String,
         default: '0HMRHAOHIAHIS:0004003'
-    }
-    ,
+    },
+    storeAccessToken: {
+        type: String,
+        default: ''
+    },
     createdOn: {
         type: String,
         default: null

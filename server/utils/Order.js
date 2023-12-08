@@ -58,7 +58,7 @@ const orderUtil = {
             // let populate = "productLibraryVariantId"
             const findCart = await getDataArray(Cart, { userId: customerId }, "", null, null, null)
             if (!findCart.status) {
-                return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
+                return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
             }
             // let orderAmount = findCart.data.map((value) => {
             //     let qty = value.quantity
@@ -107,7 +107,8 @@ const orderUtil = {
                 ioss,
                 receipt,
                 preship,
-                shippingAccountNumber
+                shippingAccountNumber,
+                orderDate: helpers.getCurrentDate()
             }
 
             let orderRef = new Order(obj)
@@ -274,9 +275,6 @@ const orderUtil = {
             }
         ]);
 
-        let cancelledOrder = await getDataArray(Order, { customerId: userId }, "status")
-        console.log(cancelledOrder.data, "cancleddd");
-
         let newOrder = await Order.aggregate([
             {
                 $match: {
@@ -291,18 +289,92 @@ const orderUtil = {
                 }
             }
         ])
+        let cancelledOrder = await Order.aggregate([
+            {
+                $match: {
+                    customerId: userId,
+                    status: 5
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    cancelledOrder: { $sum: 1 }
+                }
+            }
+        ])
+        let errorOrder = await Order.aggregate([
+            {
+                $match: {
+                    customerId: userId,
+                    status: 5
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    errorOrder: { $sum: 1 }
+                }
+            }
+        ])
+        let inProductionOrder = await Order.aggregate([
+            {
+                $match: {
+                    customerId: userId,
+                    status: 2
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    inProductionOrder: { $sum: 1 }
+                }
+            }
+        ])
+        let receivedOrder = await Order.aggregate([
+            {
+                $match: {
+                    customerId: userId,
+                    status: 6
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    receivedOrder: { $sum: 1 }
+                }
+            }
+        ])
+        let shippedOrder = await Order.aggregate([
+            {
+                $match: {
+                    customerId: userId,
+                    status: 3
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    shippedOrder: { $sum: 1 }
+                }
+            }
+        ])
 
         console.log(newOrder, "newOrderr");
+        console.log(cancelledOrder, "cancceledorder");
 
         let statusSummary = {
-            cancelled: 0,
-            error: 1,
-            inProduction: 0,
-            new: 2,
-            received: 0,
-            shipped: 1
+            cancelled: cancelledOrder.length > 0 ? cancelledOrder[0].cancelledOrder : 0,
+            error: errorOrder.length > 0 ? errorOrder[0].errorOrder : 0,
+            inProduction: inProductionOrder.length > 0 ? inProductionOrder[0].inProductionOrder : 0,
+            new: newOrder.length > 0 ? newOrder[0].newOrder : 0,
+            received: receivedOrder.length > 0 ? receivedOrder[0].receivedOrder : 0,
+            shipped: shippedOrder.length > 0 ? shippedOrder[0].shippedOrder : 0
         }
-        totalCount = 5
+
+        let total = await getCount(Order, { customerId: userId })
+        console.log(total, "totallll");
+        let totalCount = total.data
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
     },
