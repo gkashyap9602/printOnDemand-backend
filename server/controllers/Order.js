@@ -34,7 +34,11 @@ const orderController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     getCartItems: async (req, res) => {
-        let result = await Order.getCartItems(req.query);
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Order.getCartItems(req.query, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
     deleteCart: async (req, res) => {

@@ -286,7 +286,7 @@ const orderUtil = {
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
     },
-    getCartItems: async (data) => {
+    getCartItems: async (data, userId) => {
         let { pageIndex = 1, pageSize = 5 } = data
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
@@ -298,6 +298,7 @@ const orderUtil = {
             {
                 $match: {
                     status: { $ne: 2 },
+                    userId: mongoose.Types.ObjectId(userId)
                 },
             },
             {
