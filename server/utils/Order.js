@@ -255,14 +255,24 @@ const orderUtil = {
             },
             {
                 $unwind: "$userData"
+            },
+
+            {
+                $project: {
+                    amount: 1,
+                    customerName:"$userData.firstName",
+                    displayId:1,
+                    isSubmitImmediately:1,
+                    mwwOrderId:1,
+                    orderDate:1,
+                    orderType:1,
+                    source:1,
+                    status:1,
+                    storeName:1,
+                    submissionDueDate:1
+
+                }
             }
-
-            // {
-            //     $project: {
-            //         amount: 1,
-
-            //     }
-            // }
         ]);
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
