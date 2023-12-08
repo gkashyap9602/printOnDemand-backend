@@ -125,7 +125,7 @@ const orderUtil = {
         }
 
     },
-    getAllOrders: async (data) => {
+    getAllOrderss: async (data) => {
         let { pageIndex = 1, pageSize = 10, customerId, sortColumn = "orderDate", sortDirection = "asc", status, storeIds = [] } = data
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
@@ -199,7 +199,7 @@ const orderUtil = {
         let totalCount = 4
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
     },
-    getAllOrdersTest: async (data) => {
+    getAllOrders: async (data) => {
         let { pageIndex = 1, pageSize = 10, customerId, sortColumn = "orderDate", sortDirection = "asc", status, storeIds = [] } = data
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
@@ -232,20 +232,37 @@ const orderUtil = {
 
             },
             {
+                $unwind: "$ShipMethodData"
+            },
+            {
                 $lookup: {
                     from: 'users',
                     localField: 'customerId',
                     foreignField: '_id',
-                    as: 'userdata',
+                    as: 'userData',
+                    pipeline: [
+                        {
+                            $project: {
+                                firstName: 1,
+                                lastName: 1,
+                                payTraceId: 1,
+                                // traceId:1,
+
+                            }
+                        }
+                    ]
                 }
             },
-
             {
-                $project: {
-                    amount: 1,
-
-                }
+                $unwind: "$userData"
             }
+
+            // {
+            //     $project: {
+            //         amount: 1,
+
+            //     }
+            // }
         ]);
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
@@ -377,6 +394,15 @@ const orderUtil = {
         const result = await Cart.aggregate(aggregationPipeline);
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
+    },
+    removeItemsFromCart: async (data) => {
+        let { userId } = data
+
+        let removeItem = await deleteData(Cart, { userId: userId })
+        if (removeItem.status) {
+            return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages.common.database_error, {}, null, 400);
     },
 
 

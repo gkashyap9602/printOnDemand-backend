@@ -11,6 +11,7 @@ router.post('/placeOrder', verifyTokenUser, validate(placeOrder), orderControlle
 router.post('/updateCartItem', verifyTokenUser, validate(updateCart), orderController.updateCartItem);
 router.get('/getCartItems', verifyTokenUser, orderController.getCartItems);
 router.get('/getAllOrders', verifyTokenUser, orderController.getAllOrders);
+router.delete('/removeItemsFromCart', verifyTokenUser, orderController.removeItemsFromCart);
 
 router.delete('/deleteCart', verifyTokenUser, validate(deleteCart), orderController.deleteCart);
 

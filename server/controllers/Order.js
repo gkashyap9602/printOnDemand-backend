@@ -25,6 +25,10 @@ const orderController = {
         let result = await Order.getAllOrders(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    removeItemsFromCart: async (req, res) => {
+        let result = await Order.removeItemsFromCart(req.post);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     updateCartItem: async (req, res) => {
         let result = await Order.updateCartItem(req.body);
         return helpers.showOutput(res, result, result.statusCode);
