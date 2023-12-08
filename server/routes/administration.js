@@ -13,6 +13,7 @@ router.post('/activeInactiveUser', validateCSRFToken, verifyTokenAdmin, validate
 router.post('/updateWaitingList', validateCSRFToken, verifyTokenAdmin, validate(updateWaitingList), adminController.updateWaitingList);
 router.post('/saveNotification', validateCSRFToken, verifyTokenAdmin, validate(saveNotification), adminController.saveNotification);
 router.post('/addSubAdmin', validateCSRFToken, verifyTokenAdmin, validate(addSubAdmin), adminController.addSubAdmin);
+router.post('/addShipMethod', validateCSRFToken, verifyTokenAdmin, adminController.addShipMethod);
 router.post('/updateSubAdmin', validateCSRFToken, verifyTokenAdmin, validate(updateSubAdmin), adminController.updateSubAdmin);
 router.delete('/deleteNotification', validateCSRFToken, verifyTokenAdmin, validate(deleteNotification), adminController.deleteNotification);
 router.get('/getAllUsers', verifyTokenAdmin, adminController.getAllUsers);

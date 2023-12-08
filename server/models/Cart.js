@@ -2,6 +2,11 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var Cart = new Schema({
+    userId: {
+        type: mongoose.Types.ObjectId,
+        ref: "Users",
+        index: true
+    },
     productLibraryVariantId: {
         type: mongoose.Types.ObjectId,
         ref: "ProductLibraryVarient",

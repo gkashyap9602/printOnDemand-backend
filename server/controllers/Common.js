@@ -30,6 +30,10 @@ const commonController = {
         let result = await Common.getMaterials(req?.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    getAllShippingMethods: async (req, res) => {
+        let result = await Common.getAllShippingMethods(req?.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     getAllStates: async (req, res) => {
         let result = await Common.getAllStates(req.query);
         return helpers.showOutput(res, result, result.statusCode);

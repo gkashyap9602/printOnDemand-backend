@@ -12,6 +12,7 @@ router.post('/store_param', commonController.storeParameterToAWS);
 router.get('/getAllCountries', verifyTokenBoth, commonController.getAllCountries);
 router.get('/getAllStates', verifyTokenBoth, commonController.getAllStates);
 router.get('/getMaterials', verifyTokenBoth, commonController.getMaterials);
+router.get('/getAllShippingMethods', verifyTokenBoth, commonController.getAllShippingMethods);
 router.get('/getWaitingListStatus', verifyTokenBoth, commonController.getWaitingListStatus);
 router.get('/getCommonContent', verifyTokenBoth, commonController.getCommonContent);
 router.get('/getFaqCategories', verifyTokenBoth, commonController.getFaqCategories);

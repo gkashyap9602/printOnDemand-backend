@@ -4,24 +4,212 @@ const ResponseMessages = require('../constants/ResponseMessages');
 const Gallery = require('../models/Gallery')
 const Order = require('../models/Orders')
 const Cart = require('../models/Cart')
+const { default: mongoose } = require('mongoose');
+
 const orderUtil = {
 
-    addToCart: async (data) => {
+    addToCart: async (data, userId) => {
         try {
             let { cartItems } = data
 
+            // let alreadyCartItem
+            // let newCartItem
             cartItems.map((value) => value.createdOn = helpers.getCurrentDate())
+            cartItems.map((value) => value.userId = userId)
 
-            let response = await insertMany(Cart, cartItems);
-            if (response.status) {
-                return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
+            for (let item of cartItems) {
+
+                let find = await getSingleData(Cart, { productLibraryVariantId: item.productLibraryVariantId });
+                if (find.status) {
+                    let quantity = find.data.quantity
+                    let updateItem = await updateSingleData(Cart, { quantity: quantity + 1 });
+                    if (!updateItem.status) {
+                        return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
+                    }
+                } else {
+                    let cartRef = new Cart(item)
+                    let response = await postData(cartRef);
+                    if (!response.status) {
+                        return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
+                    }
+                }
+
+
             }
-            return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
+            return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
+            // let response = await insertMany(Cart, cartItems);
+            // if (response.status) {
+            //     return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
+            // }
+            // return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
         } catch (error) {
             return helpers.showResponse(false, error?.message, null, null, 400);
 
         }
 
+    },
+    placeOrder: async (data) => {
+        try {
+            let { submitImmediately, customerId, shippingMethodId, orderType, billingAddress, shippingAddress, cartItems, ioss, receipt, preship, shippingAccountNumber, } = data
+
+            const fixedPrefix = 'MWW1000';
+            const randomId = helpers.generateRandom4DigitNumber(fixedPrefix);
+            console.log(randomId, "prefix value");
+
+            let obj = {
+                customerId: customerId,
+                displayId: randomId,
+                submitImmediately,
+                shippingMethodId,
+                orderType,
+                billingAddress,
+                shippingAddress,
+                cartItems,
+                ioss,
+                receipt,
+                preship,
+                shippingAccountNumber
+
+            }
+            let orderRef = new Order(obj)
+
+            let response = await postData(orderRef);
+            console.log(response, "responsee");
+            if (response.status) {
+                return helpers.showResponse(true, ResponseMessages.order.order_created, null, null, 200);
+            }
+            return helpers.showResponse(false, ResponseMessages.order.order_failed, null, null, 400);
+        } catch (error) {
+            console.log(error, "error side");
+            return helpers.showResponse(false, error?.message, null, null, 400);
+
+        }
+
+    },
+    getAllOrders: async (data) => {
+        let { pageIndex = 1, pageSize = 10, customerId, sortColumn = "orderDate", sortDirection = "asc", status, storeIds = [] } = data
+        pageIndex = Number(pageIndex)
+        pageSize = Number(pageSize)
+
+        let result = [
+            {
+                _id: "12345465",
+                amount: 25.19,
+                customerName: "Sunil",
+                displayId: "MWW10004517",
+                isSubmitImmediately: true,
+                mwwOrderId: "",
+                orderDate: "2023-12-08T07:18:12.977000",
+                orderType: 2,
+                status: 1,
+                storeName: null,
+                source: "",
+                submissionDueDate: "2023-12-08T07:18:12.977000"
+            },
+            {
+                _id: "12345465",
+                amount: 21.19,
+                customerName: "Sunil",
+                displayId: "MWW10004537",
+                isSubmitImmediately: true,
+                mwwOrderId: "",
+                orderDate: "2023-12-08T07:18:12.977000",
+                orderType: 2,
+                status: 1,
+                storeName: null,
+                source: "",
+                submissionDueDate: "2023-12-08T07:18:12.977000"
+            },
+            {
+                _id: "12345465",
+                amount: 452.19,
+                customerName: "Sunil",
+                displayId: "MWW10004599",
+                isSubmitImmediately: true,
+                mwwOrderId: "",
+                orderDate: "2023-12-08T07:18:12.977000",
+                orderType: 2,
+                status: 1,
+                storeName: null,
+                source: "",
+                submissionDueDate: "2023-12-08T07:18:12.977000"
+            },
+            {
+                _id: "12345465",
+                amount: 81.19,
+                customerName: "Sunil",
+                displayId: "MWW10004522",
+                isSubmitImmediately: true,
+                mwwOrderId: "",
+                orderDate: "2023-12-08T07:18:12.977000",
+                orderType: 2,
+                status: 1,
+                storeName: null,
+                source: "",
+                submissionDueDate: "2023-12-08T07:18:12.977000"
+            }
+        ]
+        let statusSummary = {
+            cancelled: 0,
+            error: 1,
+            inProduction: 0,
+            new: 2,
+            received: 0,
+            shipped: 1
+        }
+        let totalCount = 4
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
+    },
+    getAllOrdersTest: async (data) => {
+        let { pageIndex = 1, pageSize = 10, customerId, sortColumn = "orderDate", sortDirection = "asc", status, storeIds = [] } = data
+        pageIndex = Number(pageIndex)
+        pageSize = Number(pageSize)
+
+        const result = await Order.aggregate([
+            {
+                $match: {
+                    customerId: mongoose.Types.ObjectId(customerId)
+                }
+            },
+
+            {
+                $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+            },
+            {
+                $limit: pageSize // Limit the number of records per page
+            },
+            {
+                $sort: {
+                    [sortColumn]: sortDirection === "asc" ? 1 : -1
+                }
+            },
+            {
+                $lookup: {
+                    from: 'shipMethod',
+                    localField: 'shippingMethodId',
+                    foreignField: '_id',
+                    as: 'ShipMethodData',
+                }
+
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'customerId',
+                    foreignField: '_id',
+                    as: 'userdata',
+                }
+            },
+
+            {
+                $project: {
+                    amount: 1,
+
+                }
+            }
+        ]);
+
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
     },
     getCartItems: async (data) => {
         let { pageIndex = 1, pageSize = 5 } = data
@@ -144,24 +332,14 @@ const orderUtil = {
             {
                 $unwind: "$productLibraryVarientData"
             },
-            // {
-            //     $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-            // },
-            // {
-            //     $limit: pageSize // Limit the number of records per page
-            // },
 
-            // {
-            //     $project: {
-
-            //     }
-            // }
         ];
 
         const result = await Cart.aggregate(aggregationPipeline);
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
     },
+
 
     updateCartItem: async (data) => {
         try {

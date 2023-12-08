@@ -11,7 +11,7 @@ const Users = require('../models/Users');
 const UserProfile = require('../models/UserProfile')
 const WaitingList = require('../models/WaitingList')
 const Notification = require('../models/notification')
-
+const ShipMethod = require("../models/ShipMethod")
 const adminUtils = {
 
     // login: async (data) => {
@@ -68,6 +68,35 @@ const adminUtils = {
             }
 
             return helpers.showResponse(true, ResponseMessages?.material.material_created, result?.data, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
+    },
+    addShipMethod: async (data) => {
+        try {
+            const { name, shipMethod } = data
+
+            const findMaterial = await getSingleData(ShipMethod, { name: name, shipMethod })
+            if (findMaterial.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.already_existed, {}, null, 400);
+            }
+
+            let obj = {
+                name,
+                shipMethod,
+                createdOn: helpers.getCurrentDate(),
+            }
+            let shipMethodRef = new ShipMethod(obj)
+            let result = await postData(shipMethodRef)
+
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.save_failed, result?.data, null, 400);
+            }
+
+            return helpers.showResponse(true, ResponseMessages?.common.added_success, result?.data, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

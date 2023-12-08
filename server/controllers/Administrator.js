@@ -30,6 +30,10 @@ const adminController = {
         let result = await Administration.getAllUsers(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    addShipMethod: async (req, res) => {
+        let result = await Administration.addShipMethod(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     createCustomer: async (req, res) => {
         let adminId = req.decoded?.admin_id
         if (!adminId) {
