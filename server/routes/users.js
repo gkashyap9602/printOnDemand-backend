@@ -28,7 +28,7 @@ router.get('/getUserStatus/:user_id', verifyTokenUser, authController.getUserSta
 router.get('/getBulkImport', verifyTokenUser, authController.getBulkImport);
 router.post('/refreshCsrfToken', verifyTokenUser, authController.refreshCsrfToken);
 
-router.post('/generateStoreToken', validateCSRFToken, verifyTokenUser, authController.generateStoreToken);
+router.post('/generateStoreToken', verifyTokenUser, authController.generateStoreToken);
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
 router.post('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Post Request" }) });

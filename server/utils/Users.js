@@ -387,6 +387,7 @@ const UserUtils = {
                                 fullName: {
                                     $concat: ['$firstName', ' ', '$lastName']
                                 },
+                                storeAccessToken: "$storeAccessToken",
                                 ncResaleInfo: {
                                     isExemptionEligible: "$userProfileData.isExemptionEligible",
                                     ncResaleCertificate: "$userProfileData.ncResaleCertificate"
@@ -648,21 +649,22 @@ const UserUtils = {
             const clientId = "ef6a3b54af0bd843a040ccdabc47edae";
             const clientSecret = "279508be83ce3b4bc0323e399685bbe8";
             let { shop, code } = data
-            let queryObject = { _id: userId }
-
+            console.log(code, "code-------");
 
             const response = await axios.post(`https://${shop}/admin/oauth/access_token`, {
                 client_id: clientId,
                 client_secret: clientSecret,
                 code: code,
             });
+
+            console.log(response, "responseresponse");
             // Store the access token
             const accessToken = response.data.access_token;
-
+            // let accessToken = "e"
+            console.log('Access Token:', accessToken);
             if (!accessToken) {
                 return helpers.showResponse(false, "Token Generation Failed", {}, null, 400);
             }
-            console.log('Access Token:', accessToken);
             let updateData = {
                 storeAccessToken: accessToken,
                 updatedOn: helpers.getCurrentDate()
@@ -675,6 +677,7 @@ const UserUtils = {
             return helpers.showResponse(true, "Generate Successfully", null, null, 200);
 
         } catch (error) {
+            console.log(error, "errorrrr");
             return helpers.showResponse(false, error.message, null, null, 400);
 
         }
