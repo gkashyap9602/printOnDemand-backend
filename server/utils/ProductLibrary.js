@@ -548,24 +548,32 @@ const productLibrary = {
                                         },
                                         productVarientOptions: "$productVarientOptions",
                                         profitPercent: {
-                                            $multiply: [
-                                                {
-                                                    $divide: [
-                                                        {
-                                                            $subtract: [
-                                                                { $toDouble: "$productLibraryVarients.retailPrice" },
-                                                                { $toDouble: "$productVarients.costPrice" }
-                                                            ]
-                                                        },
-                                                        { $toDouble: "$productVarients.costPrice" }
-                                                    ]
-                                                },
-                                                100
-                                            ]
-                                        }
-                                    }
+                                            $round: [{
+                                                $multiply: [
+                                                    {
+                                                        $divide: [
+                                                            {
+                                                                $subtract: [
+                                                                    { $toDouble: "$productLibraryVarients.retailPrice" },
+                                                                    { $toDouble: "$productVarients.costPrice" }
+                                                                ]
+                                                            },
+                                                            { $toDouble: "$productVarients.costPrice" }
+                                                        ],
+                                                    },
+                                                    100
+                                                ],
+                                            },
+                                                2
+                                            ],
+
+                                        },
+
+                                    },
+
                                 ]
-                            }
+                            },
+
                         }
                     }
                 },
