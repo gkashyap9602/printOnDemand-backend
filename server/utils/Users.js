@@ -668,7 +668,7 @@ const UserUtils = {
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
             }
-            return helpers.showResponse(true, "Generate Successfully", null, null, 200);
+            return helpers.showResponse(true, "Generate Successfully", accessToken, null, 200);
 
         } catch (error) {
             return helpers.showResponse(false, error.message, null, null, 400);
