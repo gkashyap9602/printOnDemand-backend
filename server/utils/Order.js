@@ -260,22 +260,31 @@ const orderUtil = {
             {
                 $project: {
                     amount: 1,
-                    customerName:"$userData.firstName",
-                    displayId:1,
-                    isSubmitImmediately:1,
-                    mwwOrderId:1,
-                    orderDate:1,
-                    orderType:1,
-                    source:1,
-                    status:1,
-                    storeName:1,
-                    submissionDueDate:1
+                    customerName: "$userData.firstName",
+                    displayId: 1,
+                    isSubmitImmediately: 1,
+                    mwwOrderId: 1,
+                    orderDate: 1,
+                    orderType: 1,
+                    source: 1,
+                    status: 1,
+                    storeName: 1,
+                    submissionDueDate: 1
 
                 }
             }
         ]);
+        let statusSummary = {
+            cancelled: 0,
+            error: 1,
+            inProduction: 0,
+            new: 2,
+            received: 0,
+            shipped: 1
+        }
+        totalCount = 5
 
-        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
     },
     getCartItems: async (data) => {
         let { pageIndex = 1, pageSize = 5 } = data
