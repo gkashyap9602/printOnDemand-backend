@@ -658,6 +658,10 @@ const UserUtils = {
             });
             // Store the access token
             const accessToken = response.data.access_token;
+
+            if (!accessToken) {
+                return helpers.showResponse(false, "Token Generation Failed", {}, null, 400);
+            }
             console.log('Access Token:', accessToken);
             let updateData = {
                 storeAccessToken: accessToken,
@@ -668,7 +672,7 @@ const UserUtils = {
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
             }
-            return helpers.showResponse(true, "Generate Successfully", accessToken, null, 200);
+            return helpers.showResponse(true, "Generate Successfully", null, null, 200);
 
         } catch (error) {
             return helpers.showResponse(false, error.message, null, null, 400);
