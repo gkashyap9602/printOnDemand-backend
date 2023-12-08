@@ -108,8 +108,8 @@ const orderUtil = {
                 receipt,
                 preship,
                 shippingAccountNumber
-
             }
+
             let orderRef = new Order(obj)
 
             let response = await postData(orderRef);
@@ -117,7 +117,7 @@ const orderUtil = {
             if (response.status) {
                 return helpers.showResponse(true, ResponseMessages.order.order_created, null, null, 200);
             }
-            return helpers.showResponse(false, ResponseMessages.order.order_failed, null, null, 400);
+            return helpers.showResponse(false, ResponseMessages.order.order_failed, response?.data, null, 400);
         } catch (error) {
             console.log(error, "error side");
             return helpers.showResponse(false, error?.message, null, null, 400);
@@ -199,7 +199,7 @@ const orderUtil = {
         let totalCount = 4
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
     },
-    getAllOrders: async (data) => {
+    getAllOrders: async (data, userId) => {
         let { pageIndex = 1, pageSize = 10, customerId, sortColumn = "orderDate", sortDirection = "asc", status, storeIds = [] } = data
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
@@ -207,7 +207,7 @@ const orderUtil = {
         const result = await Order.aggregate([
             {
                 $match: {
-                    customerId: mongoose.Types.ObjectId(customerId)
+                    customerId: mongoose.Types.ObjectId(userId)
                 }
             },
 
@@ -256,7 +256,6 @@ const orderUtil = {
             {
                 $unwind: "$userData"
             },
-
             {
                 $project: {
                     amount: 1,
@@ -274,6 +273,27 @@ const orderUtil = {
                 }
             }
         ]);
+
+        let cancelledOrder = await getDataArray(Order, { customerId: userId }, "status")
+        console.log(cancelledOrder.data, "cancleddd");
+
+        let newOrder = await Order.aggregate([
+            {
+                $match: {
+                    customerId: userId,
+                    status: 1
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    newOrder: { $sum: 1 }
+                }
+            }
+        ])
+
+        console.log(newOrder, "newOrderr");
+
         let statusSummary = {
             cancelled: 0,
             error: 1,

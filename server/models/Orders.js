@@ -87,7 +87,7 @@ var Orders = new Schema({
         type: Number,
     },
     status: {
-        type: String,
+        type: Number,
         default: 1,
         Comment: "1 for new 2 for inProduction 3 for shipped 4 for error  6 for recieved 5 for cancelled"
     },
