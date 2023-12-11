@@ -305,18 +305,18 @@ const middleware = {
 		console.log(_csrfToken, "CsrfToken session  validateCSRFToken");
 
 		if (!_csrfToken) {
-			return res.status(403).json({ message: "Token is not present in the server" })
+			return res.status(403).json({ message: "Token is not present in the server", statusCode: 403 })
 		}
 		//get csrf token from headers
 		let userCsrfToken = req.get('xCsrf_Token') || req.get('x-csrf-token')
 		console.log(userCsrfToken, "userCsrfToken validateCSRFToken");
 
 		if (!userCsrfToken) {
-			return res.status(403).json({ message: "Token is not provided by user " })
+			return res.status(403).json({ message: "Token is not provided by user ", statusCode: 403 })
 		}
 
 		if (_csrfToken !== userCsrfToken) {
-			return res.status(403).json({ message: "Invalid Csrf Token" })
+			return res.status(403).json({ message: "Invalid Csrf Token", statusCode: 403 })
 
 		}
 

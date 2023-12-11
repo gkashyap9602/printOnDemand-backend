@@ -20,7 +20,7 @@ const productLibraryController = {
         if (!userId) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
-        let result = await ProductLibrary.createProductLibrary(req.body,userId);
+        let result = await ProductLibrary.createProductLibrary(req.body, userId);
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateProductLibrary: async (req, res) => {

@@ -32,7 +32,7 @@ const authController = {
     changePasswordWithOld: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.users.invalid_user), 403);
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.users.invalid_user), 401);
         }
         let result = await Users.changePasswordWithOld(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
@@ -41,7 +41,7 @@ const authController = {
     logout: async (req, res) => {
         let userId = req.decoded?._id;
         if (!userId) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
         let result = await Users.logout(req.body, userId);
         if (result.status) {
@@ -90,7 +90,7 @@ const authController = {
     updatePaymentDetails: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
         let result = await Users.updatePaymentDetails(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
@@ -98,7 +98,7 @@ const authController = {
     generateStoreToken: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
         let result = await Users.generateStoreToken(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
@@ -112,14 +112,7 @@ const authController = {
         let result = await Users.getUserStatus(req?.params);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    // createOrder: async (req, res) => {
-    //     let user_id = req.decoded.user_id;
-    //     if (!user_id) {
-    //         return helpers.showOutputNew(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 403);
-    //     }
-    //     let result = await Users.createOrder(req?.body,user_id);
-    //     return helpers.showOutputNew(res, result, result.code);
-    // },
+
     getAllOrders: async (req, res) => {
         let result = await Users.getAllOrders(req?.query);
         return helpers.showOutput(res, result, result.statusCode);
@@ -129,7 +122,11 @@ const authController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     refreshCsrfToken: async (req, res) => {
-        let result = await Users.refreshCsrfToken(req);
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Users.refreshCsrfToken(req, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
 }

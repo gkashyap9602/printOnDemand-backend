@@ -214,8 +214,10 @@ const UserUtils = {
         let userData = result?.data
         return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
     },
-    refreshCsrfToken: async (request) => {
+    refreshCsrfToken: async (request, userId) => {
         try {
+            // let data = await getSingleData(Users, { _id: userId, status: { $ne: 2 } })
+            // let userData = data.data
             if (request?.session?._csrfToken) {
                 let newCsrfToken = helpers.generateCsrfToken();
                 request.session._csrfToken = newCsrfToken;

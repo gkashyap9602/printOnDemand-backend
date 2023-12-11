@@ -64,7 +64,7 @@ const commonController = {
         if (!userId) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
-        let result = await Common.raiseTicket(req.body,userId);
+        let result = await Common.raiseTicket(req.body, userId);
         return helpers.showOutput(res, result, result.statusCode);
     },
     getCommonContent: async (req, res) => {
@@ -86,7 +86,7 @@ const commonController = {
     updateCommonContent: async (req, res) => {
         let admin_id = req.decoded.admin_id;
         if (!admin_id) {
-            return helpers.showOutput(res, helpers.showResponse(false, ControllerMessages.INVALID_ADMIN), 403);
+            return helpers.showOutput(res, helpers.showResponse(false, ControllerMessages.INVALID_ADMIN), 401);
         }
         let result = await Common.updateCommonContent(req.body);
         return helpers.showOutput(res, result, result.statusCode);
