@@ -145,23 +145,19 @@ const orderUtil = {
             matchObj.orderType = orderType
         }
         console.log(searchKey, "searchKeysearchKey");
-        let searchObj = []
+        let searchObj = {}
         if (searchKey) {
             searchKey = searchKey.toString()
-            searchObj.push(
-                { displayId: { $regex: searchKey, $options: 'i' } },
-                { mwwOrderId: { $regex: searchKey, $options: 'i' } },
-                // { "userData.firstName": { $regex: searchKey, $options: 'i' } }
-                // { "userData.firstName": { $regexMatch: { input: "$userData.firstName", searchKey, $options: 'i' } } }
-            );
+            searchObj = {
+                $or: [
+                    { displayId: { $regex: searchKey, $options: 'i' } },
+                    { mwwOrderId: { $regex: searchKey, $options: 'i' } },
+                ]
+            }
 
         }
 
-        let startDate
-        let endDate
         if (createdFrom && createdTill) {
-            // startDate = new Date(createdFrom); // replace with your start date
-            // endDate = new Date(createdTill);
             matchObj.orderDate = { $gte: createdFrom, $lte: createdTill }
         }
 
@@ -171,8 +167,7 @@ const orderUtil = {
             {
                 $match: {
                     ...matchObj,
-                    // $or: searchObj,
-                    // orderDate: { $gte: startDate, $lte: endDate }
+                    ...searchObj
 
                 }
             },
