@@ -26,7 +26,7 @@ const orderController = {
         if (!user_id) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
-        let result = await Order.getAllOrders(req.query, user_id);
+        let result = await Order.getAllOrders(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
     removeItemsFromCart: async (req, res) => {

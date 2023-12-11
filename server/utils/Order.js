@@ -127,7 +127,7 @@ const orderUtil = {
 
     },
     getAllOrders: async (data, userId) => {
-        let { pageIndex = 1, pageSize = 10, sortColumn = "orderDate", orderType = null, sortDirection = "asc", createdFrom = null, createdTill = null, status = null, storeIds = [] } = data
+        let { pageIndex = 1, pageSize = 10, searchKey = '', sortColumn = "orderDate", orderType = null, sortDirection = "asc", createdFrom = null, createdTill = null, status = null, storeIds = [] } = data
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
 
@@ -144,20 +144,36 @@ const orderUtil = {
             orderType = Number(orderType)
             matchObj.orderType = orderType
         }
+        console.log(searchKey, "searchKeysearchKey");
+        let searchObj = []
+        if (searchKey) {
+            searchKey = searchKey.toString()
+            searchObj.push(
+                { displayId: { $regex: searchKey, $options: 'i' } },
+                { mwwOrderId: { $regex: searchKey, $options: 'i' } },
+                // { "userData.firstName": { $regex: searchKey, $options: 'i' } }
+                // { "userData.firstName": { $regexMatch: { input: "$userData.firstName", searchKey, $options: 'i' } } }
+            );
 
+        }
+
+        let startDate
+        let endDate
         if (createdFrom && createdTill) {
-            const startDate = new Date(createdFrom); // replace with your start date
-            const endDate = new Date(createdTill);
-
-            matchObj.orderDate = { $gte: startDate, $lte: endDate }
+            // startDate = new Date(createdFrom); // replace with your start date
+            // endDate = new Date(createdTill);
+            matchObj.orderDate = { $gte: createdFrom, $lte: createdTill }
         }
 
         console.log(matchObj, "matchObjjj");
+        console.log(searchObj, "searchObj");
         const result = await Order.aggregate([
             {
                 $match: {
-                    // customerId: mongoose.Types.ObjectId(userId)
-                    ...matchObj
+                    ...matchObj,
+                    // $or: searchObj,
+                    // orderDate: { $gte: startDate, $lte: endDate }
+
                 }
             },
 
@@ -191,6 +207,11 @@ const orderUtil = {
                     foreignField: '_id',
                     as: 'userData',
                     pipeline: [
+                        // {
+                        //     $match: {
+                        //         $or: [{ firstName: { $regex: searchKey, $options: 'i' } }]
+                        //     }
+                        // },
                         {
                             $project: {
                                 firstName: 1,
@@ -206,6 +227,11 @@ const orderUtil = {
             {
                 $unwind: "$userData"
             },
+            // {
+            //     $match: {
+            //         $or: [{ "userData.firstName": { $regex: searchKey, $options: 'i' } }]
+            //     }
+            // },
             {
                 $project: {
                     amount: 1,
@@ -222,7 +248,8 @@ const orderUtil = {
 
                 }
             }
-        ]);
+        ]
+        );
 
 
         //status summary aggregation starts
@@ -324,8 +351,6 @@ const orderUtil = {
             }
         ])
         //status summary aggregation ends
-        console.log(newOrder, "newOrderr");
-        console.log(cancelledOrder, "cancceledorder");
 
         let statusSummary = {
             cancelled: cancelledOrder.length > 0 ? cancelledOrder[0].cancelledOrder : 0,
@@ -337,7 +362,6 @@ const orderUtil = {
             totalOrders: totalOrder.length > 0 ? totalOrder[0].totalOrder : 0,
         }
         let total = await getCount(Order, matchObj)
-        console.log(total, "totallll");
         let totalCount = total.data
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
