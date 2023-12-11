@@ -48,20 +48,52 @@ const productLibrary = {
         }
 
     },
-    createProductLibrary: async (data, userId) => {
+    createProductLibrary: async (data, userId, files) => {
         try {
-            let { productId, title, description, productLibraryImages, productLibraryVarients, price } = data
+            let { productId, title, description, productLibraryImages = [], productLibraryVarients, price } = data
 
             console.log(productLibraryImages, "productLibraryImages");
             console.log(productLibraryVarients, "productLibraryVarients");
+            // console.log(files, "fileass");
+            let productlibImages
 
+            if (files?.length > 0 && productLibraryImages.length === 0) {
+                console.log("under multer iff");
+                const s3Upload = await helpers.uploadFileToS3(files)
+                if (!s3Upload.status) {
+                    return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
+                }
+                console.log(s3Upload.data, "s3uploaddd");
+                productlibImages = s3Upload.data.map((img) => {
+                    let obj = {}
+                    obj._id = mongoose.Types.ObjectId()
+                    obj.imageUrl = img
+                    return obj
+
+                })
+
+            }
+
+            if (productLibraryImages.length > 0 && files?.length === 0) {
+                console.log("under image Static url iff");
+                console.log(productLibraryImages, "-------------");
+
+                productlibImages = productLibraryImages.map((value) => {
+                    let obj = { ...value }
+                    obj._id = mongoose.Types.ObjectId()
+                    // obj.imageUrl = value.valueimageUrl
+                    return obj
+                })
+
+            }
 
             const findProduct = await getSingleData(ProductLibrary, { title: title, status: { $ne: 2 } })
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 400);
             }
 
-            productLibraryImages?.map((value) => value._id = mongoose.Types.ObjectId())
+
+            console.log(productlibImages, "productlibImages");
 
             let obj = {
                 userId,
@@ -70,7 +102,7 @@ const productLibrary = {
                 title,
                 retailPrice: Number(price) * 2,
                 createdOn: helpers.getCurrentDate(),
-                productLibraryImages,
+                productLibraryImages: productlibImages,
                 productLibraryVarients
             }
             const prodRef = new ProductLibrary(obj)
@@ -88,7 +120,7 @@ const productLibrary = {
                     // retailPrice: value.price,
                     profit: Number(Number(value.price) * 2 - Number(value.price)),
                     price: Number(value.price) * 2,
-                    productLibraryVarientImages: productLibraryImages,
+                    productLibraryVarientImages: productlibImages,
                     createdOn: helpers.getCurrentDate()
                 }
                 return obj
@@ -102,7 +134,6 @@ const productLibrary = {
                 await deleteById(ProductLibrary, result.data._id)
                 return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
             }
-
 
             // }
 

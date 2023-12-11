@@ -20,7 +20,11 @@ const productLibraryController = {
         if (!userId) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
-        let result = await ProductLibrary.createProductLibrary(req.body, userId);
+        // if (req.files.length === 0) {
+        //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
+        // }
+
+        let result = await ProductLibrary.createProductLibrary(req.body, userId, req.files);
         return helpers.showOutput(res, result, result.statusCode);
     },
     updateProductLibrary: async (req, res) => {

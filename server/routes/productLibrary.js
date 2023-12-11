@@ -10,7 +10,7 @@ const { updateProductLibrary, updateLibraryVarient, ProductLibraryDetails, delet
 //user token routes
 router.post('/saveLibraryImage', validateCSRFToken, verifyTokenUser, addToMulter.single('libraryImage'), productLibraryController.saveLibraryImage);
 router.get('/getLibraryImages', verifyTokenUser, productLibraryController.getLibraryImages);
-router.post('/create', verifyTokenUser, addToMulter.array('productLibrary'), productLibraryController.createProductLibrary);
+router.post('/create', verifyTokenUser, addToMulter.array('productLibraryImg'), productLibraryController.createProductLibrary);
 router.post('/update', verifyTokenUser, validate(updateProductLibrary), productLibraryController.updateProductLibrary);
 router.post('/updateVarient', verifyTokenUser, validate(updateLibraryVarient), productLibraryController.updateProductLibraryVarient);
 router.delete('/deleteProductLibrary', verifyTokenUser, validate(deleteProductLibrary), productLibraryController.deleteProductLibrary);

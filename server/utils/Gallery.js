@@ -8,11 +8,15 @@ const galleryUtil = {
         let { title, type } = data
         let name = type == 1 ? 'Images' : 'Videos'
         file.fieldname = `${file.fieldname}${name}`
+
+        
         //upload image to aws s3 bucket
         const s3Upload = await helpers.uploadFileToS3([file])
+
         if (!s3Upload.status) {
             return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
         }
+
         let newObj = {
             title,
             type,
