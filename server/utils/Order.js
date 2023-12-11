@@ -131,10 +131,31 @@ const orderUtil = {
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
 
+
+        let matchObj = {
+            customerId: mongoose.Types.ObjectId(userId),
+
+        }
+        if (status) {
+            matchObj.status = status
+        }
+        if (orderType) {
+            matchObj.orderType = orderType
+        }
+
+        if (createdFrom && createdTill) {
+            const startDate = new Date(createdFrom); // replace with your start date
+            const endDate = new Date(createdTill);
+
+            matchObj.orderDate = { $gte: startDate, $lte: endDate }
+        }
+
+
         const result = await Order.aggregate([
             {
                 $match: {
-                    customerId: mongoose.Types.ObjectId(userId)
+                    // customerId: mongoose.Types.ObjectId(userId)
+                    ...matchObj
                 }
             },
 
@@ -201,6 +222,8 @@ const orderUtil = {
             }
         ]);
 
+
+        //status summary aggregation starts
         let newOrder = await Order.aggregate([
             {
                 $match: {
@@ -298,7 +321,7 @@ const orderUtil = {
                 }
             }
         ])
-
+        //status summary aggregation ends
         console.log(newOrder, "newOrderr");
         console.log(cancelledOrder, "cancceledorder");
 
@@ -311,7 +334,7 @@ const orderUtil = {
             shipped: shippedOrder.length > 0 ? shippedOrder[0].shippedOrder : 0,
             totalOrders: totalOrder.length > 0 ? totalOrder[0].totalOrder : 0,
         }
-        let total = await getCount(Order, { customerId: userId })
+        let total = await getCount(Order, matchObj)
         console.log(total, "totallll");
         let totalCount = total.data
 
