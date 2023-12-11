@@ -12,6 +12,10 @@ var Orders = new Schema({
         ref: "ShipMethod",
         index: true
     },
+    shippingAccountNumber: {
+        type: String,
+        default: ''
+    },
     orderItems: [{
         productLibraryVarientId: {
             type: mongoose.Types.ObjectId,
@@ -76,6 +80,10 @@ var Orders = new Schema({
         default: ""
     },
     ioss: {
+        type: String,
+        default: null
+    },
+    hsCode: {
         type: String,
         default: null
     },

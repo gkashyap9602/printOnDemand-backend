@@ -29,6 +29,14 @@ const orderController = {
         let result = await Order.getAllOrders(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    getOrderDetails: async (req, res) => {
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Order.getOrderDetails(req.query, user_id);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     removeItemsFromCart: async (req, res) => {
         let result = await Order.removeItemsFromCart(req.body);
         return helpers.showOutput(res, result, result.statusCode);

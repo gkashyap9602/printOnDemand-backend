@@ -361,14 +361,72 @@ const orderUtil = {
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
     },
+    getOrderDetails: async (data, userId) => {
+        let { orderId } = data
+
+        const result = await Order.aggregate([
+            {
+                $match: {
+                    customerId: mongoose.Types.ObjectId(userId),
+                    _id: mongoose.Types.ObjectId(orderId),
+                }
+            },
+            {
+                $lookup: {
+                    from: 'shipMethod',
+                    localField: 'shippingMethodId',
+                    foreignField: '_id',
+                    as: 'ShipMethodData',
+                }
+
+            },
+            {
+                $unwind: "$ShipMethodData"
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'customerId',
+                    foreignField: '_id',
+                    as: 'userData',
+                    pipeline: [
+                        {
+                            $project: {
+                                firstName: 1,
+                                lastName: 1,
+                                payTraceId: 1,
+                                // traceId:1,
+
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $unwind: "$userData"
+            },
+            {
+                $addFields: {
+                    customerName: "$userData.firstName",
+                    shipMethodName: "$ShipMethodData.name"
+                }
+            },
+            {
+                $project: {
+                    userData: 0, // Exclude the userData array from the result
+                    ShipMethodData: 0 // Exclude the ShipMethodData array from the result
+                }
+            }
+        ]
+        );
+
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length>0?result[0]:result, null, 200);
+    },
     getCartItems: async (data, userId) => {
         let { pageIndex = 1, pageSize = 5 } = data
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
 
-        // let totalCount = await getCount(Gallery, { status: { $ne: 2 }, type: Number(type) })
-
-        ///////
         const aggregationPipeline = [
             {
                 $match: {
