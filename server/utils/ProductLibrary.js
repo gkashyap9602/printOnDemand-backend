@@ -54,6 +54,7 @@ const productLibrary = {
 
             console.log(productLibraryImages, "productLibraryImages");
             console.log(productLibraryVarients, "productLibraryVarients");
+            productLibraryImages = JSON.parse(productLibraryImages)
             // console.log(files, "fileass");
             let productlibImages
 
