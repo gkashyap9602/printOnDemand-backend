@@ -126,82 +126,8 @@ const orderUtil = {
         }
 
     },
-    getAllOrderss: async (data) => {
-        let { pageIndex = 1, pageSize = 10, customerId, sortColumn = "orderDate", sortDirection = "asc", status, storeIds = [] } = data
-        pageIndex = Number(pageIndex)
-        pageSize = Number(pageSize)
-
-        let result = [
-            {
-                _id: "12345465",
-                amount: 25.19,
-                customerName: "Sunil",
-                displayId: "MWW10004517",
-                isSubmitImmediately: true,
-                mwwOrderId: "",
-                orderDate: "2023-12-08T07:18:12.977000",
-                orderType: 2,
-                status: 1,
-                storeName: null,
-                source: "",
-                submissionDueDate: "2023-12-08T07:18:12.977000"
-            },
-            {
-                _id: "12345465",
-                amount: 21.19,
-                customerName: "Sunil",
-                displayId: "MWW10004537",
-                isSubmitImmediately: true,
-                mwwOrderId: "",
-                orderDate: "2023-12-08T07:18:12.977000",
-                orderType: 2,
-                status: 1,
-                storeName: null,
-                source: "",
-                submissionDueDate: "2023-12-08T07:18:12.977000"
-            },
-            {
-                _id: "12345465",
-                amount: 452.19,
-                customerName: "Sunil",
-                displayId: "MWW10004599",
-                isSubmitImmediately: true,
-                mwwOrderId: "",
-                orderDate: "2023-12-08T07:18:12.977000",
-                orderType: 2,
-                status: 1,
-                storeName: null,
-                source: "",
-                submissionDueDate: "2023-12-08T07:18:12.977000"
-            },
-            {
-                _id: "12345465",
-                amount: 81.19,
-                customerName: "Sunil",
-                displayId: "MWW10004522",
-                isSubmitImmediately: true,
-                mwwOrderId: "",
-                orderDate: "2023-12-08T07:18:12.977000",
-                orderType: 2,
-                status: 1,
-                storeName: null,
-                source: "",
-                submissionDueDate: "2023-12-08T07:18:12.977000"
-            }
-        ]
-        let statusSummary = {
-            cancelled: 0,
-            error: 1,
-            inProduction: 0,
-            new: 2,
-            received: 0,
-            shipped: 1
-        }
-        let totalCount = 4
-        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
-    },
     getAllOrders: async (data, userId) => {
-        let { pageIndex = 1, pageSize = 10, customerId, sortColumn = "orderDate", sortDirection = "asc", status, storeIds = [] } = data
+        let { pageIndex = 1, pageSize = 10, customerId, sortColumn = "orderDate", orderType, sortDirection = "asc", createdFrom, createdTill, status = null, storeIds = [] } = data
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
 
@@ -359,6 +285,19 @@ const orderUtil = {
                 }
             }
         ])
+        let totalOrder = await Order.aggregate([
+            {
+                $match: {
+                    customerId: userId,
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalOrder: { $sum: 1 }
+                }
+            }
+        ])
 
         console.log(newOrder, "newOrderr");
         console.log(cancelledOrder, "cancceledorder");
@@ -369,9 +308,9 @@ const orderUtil = {
             inProduction: inProductionOrder.length > 0 ? inProductionOrder[0].inProductionOrder : 0,
             new: newOrder.length > 0 ? newOrder[0].newOrder : 0,
             received: receivedOrder.length > 0 ? receivedOrder[0].receivedOrder : 0,
-            shipped: shippedOrder.length > 0 ? shippedOrder[0].shippedOrder : 0
+            shipped: shippedOrder.length > 0 ? shippedOrder[0].shippedOrder : 0,
+            totalOrders: totalOrder.length > 0 ? totalOrder[0].totalOrder : 0,
         }
-
         let total = await getCount(Order, { customerId: userId })
         console.log(total, "totallll");
         let totalCount = total.data
