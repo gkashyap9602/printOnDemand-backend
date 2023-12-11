@@ -127,7 +127,7 @@ const orderUtil = {
 
     },
     getAllOrders: async (data, userId) => {
-        let { pageIndex = 1, pageSize = 10, customerId, sortColumn = "orderDate", orderType, sortDirection = "asc", createdFrom, createdTill, status = null, storeIds = [] } = data
+        let { pageIndex = 1, pageSize = 10, sortColumn = "orderDate", orderType = null, sortDirection = "asc", createdFrom = null, createdTill = null, status = null, storeIds = [] } = data
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
 
@@ -137,9 +137,11 @@ const orderUtil = {
 
         }
         if (status) {
+            status = Number(status)
             matchObj.status = status
         }
         if (orderType) {
+            orderType = Number(orderType)
             matchObj.orderType = orderType
         }
 
@@ -150,7 +152,7 @@ const orderUtil = {
             matchObj.orderDate = { $gte: startDate, $lte: endDate }
         }
 
-
+        console.log(matchObj, "matchObjjj");
         const result = await Order.aggregate([
             {
                 $match: {
