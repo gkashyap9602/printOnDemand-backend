@@ -75,6 +75,13 @@ module.exports.registrationSchema = {
     })
 };
 
+module.exports.updateSubmissionDelay = {
+    body: joi.object({
+        orderSubmissionDelay: joi.string()
+
+    })
+};
+
 module.exports.loginSchema = {
     body: joi.object({
         isLoginFromShopify: joi.boolean().required(),

@@ -582,6 +582,22 @@ const UserUtils = {
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
     },
+    updateOrderSubmissionDelay: async (data, user_id) => {
+
+        let {orderSubmissionDelay} = data
+         
+        let updateObj = {
+            updatedOn:helpers.getCurrentDate(),
+            orderSubmissionDelay
+        }
+      
+        let result = await updateSingleData(Users, updateObj, { _id: user_id })
+
+        if (result.status) {
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+    },
     updatePersonalDetails: async (data, user_id) => {
         let queryObject = { _id: user_id }
         let checkUser = await getSingleData(Users, queryObject, '');

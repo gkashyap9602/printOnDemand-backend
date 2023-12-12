@@ -3,7 +3,7 @@ var router = express.Router();
 var authController = require('../controllers/Users');
 var { verifyTokenUser, verifyTokenBoth, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
-const { registrationSchema, loginSchema, forgotSchema, resetPasswordSchema, changePasswordSchema, profileSchema } = require('../validations/user')
+const { registrationSchema, loginSchema, forgotSchema, resetPasswordSchema, changePasswordSchema, profileSchema ,updateSubmissionDelay} = require('../validations/user')
 const { addToMulter } = require('../services/helper')
 // Users admin both routes with token
 router.post('/logout', verifyTokenBoth, authController.logout);
@@ -19,6 +19,7 @@ router.post('/resetPassword', validate(resetPasswordSchema), authController.rese
 router.post('/changePassword', validateCSRFToken, verifyTokenUser, validate(changePasswordSchema), authController.changePasswordWithOld);
 router.post('/getAllOrders', validateCSRFToken, verifyTokenUser, authController.getAllOrders);
 router.post('/updateBasicDetails', validateCSRFToken, verifyTokenUser, addToMulter.single('profileImg'), validate(profileSchema), authController.updateBasicDetails);
+router.post('/updateOrderSubmissionDelay', validateCSRFToken, verifyTokenUser, validate(updateSubmissionDelay), authController.updateOrderSubmissionDelay);
 router.post('/updatePersonalDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updatePersonalDetails);
 router.post('/updateShippingDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateShippingDetails);
 router.post('/updateBillingAddress', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateBillingAddress);

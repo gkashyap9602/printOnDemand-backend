@@ -130,7 +130,28 @@ const orderUtil = {
         try {
             let { orderId, orderStatus } = data
 
-            const result = await updateSingleData(Order, { status: orderStatus }, { _id: orderId, customerId: userId })
+            let updateObj = {
+                updatedOn:helpers.getCurrentDate(),
+                status:orderStatus
+            }
+
+            const result = await updateSingleData(Order, updateObj, { _id: orderId, customerId: userId })
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
+            }
+            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, {}, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+    },
+    downloadOrderDetails: async (data, userId) => {
+        try {
+            let { orderIds } = data
+
+            orderIds.map((id) => mongoose.Types.ObjectId(id))
+
+            const result = await getDataArray(Order, { _id: { $in: orderIds } },"")
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }

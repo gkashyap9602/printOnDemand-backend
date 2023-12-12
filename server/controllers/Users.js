@@ -61,6 +61,14 @@ const authController = {
         let result = await Users.updateBasicDetails(req.body, user_id, req?.file);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    updateOrderSubmissionDelay: async (req, res) => {
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Users.updateOrderSubmissionDelay(req.body, user_id);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     updatePersonalDetails: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
