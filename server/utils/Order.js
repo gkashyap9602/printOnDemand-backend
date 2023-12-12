@@ -131,7 +131,7 @@ const orderUtil = {
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
 
-
+         console.log(userId,"userIddddd");
         let matchObj = {
             customerId: mongoose.Types.ObjectId(userId),
 
@@ -228,6 +228,12 @@ const orderUtil = {
             //     }
             // },
             {
+                $addFields:{
+                    productNames:"$orderItems.productTitle"
+                }
+            },
+            
+            {
                 $project: {
                     amount: 1,
                     customerName: "$userData.firstName",
@@ -239,7 +245,8 @@ const orderUtil = {
                     source: 1,
                     status: 1,
                     storeName: 1,
-                    submissionDueDate: 1
+                    submissionDueDate: 1,
+                    productNames:1
 
                 }
             }

@@ -6,7 +6,7 @@ const { createAdmin, createWaitingList, createCommonContent } = require('./seed-
 
 helpers.getParameterFromAWS({ name: 'MONGODB_URI' }).then((MONGODB_URI) => {
     var mongoDB = `${MONGODB_URI}&authSource=${helpers.changeEnv(process.env.ENV_MODE).db}`
-
+    console.log(mongoDB,"mongooooo");
     mongoose.Promise = global.Promise;
     mongoose.connect(mongoDB, {
         useNewUrlParser: true,

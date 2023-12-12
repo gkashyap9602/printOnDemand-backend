@@ -560,7 +560,7 @@ const addToMulter = multer({
     fileFilter: (req, file, callback) => {
         callback(null, true); // Accept the file
     },
-    limits: { fileSize: 5 * 1048576 }, // 5 mb
+    limits:  { fileSize: 20 * 1024 * 1024 } // 20 MB
 })
 const uploadVideoToS3 = async (files) => {
     try {

@@ -15,7 +15,7 @@ var Orders = new Schema({
     shippingAccountNumber: {
         type: String,
         default: ''
-    },
+    },  
     orderItems: [{
         productLibraryVarientId: {
             type: mongoose.Types.ObjectId,
