@@ -3,11 +3,12 @@ var orderController = require('../controllers/Order');
 var router = express.Router();
 var { verifyTokenUser, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
-const { addToCart, updateCart, deleteCart, placeOrder } = require('../validations/order')
+const { addToCart, updateCart, deleteCart, placeOrder,updateOrder } = require('../validations/order')
 
 // user token acces routes
 router.post('/addToCart', verifyTokenUser, validate(addToCart), orderController.addToCart);
 router.post('/placeOrder', verifyTokenUser, validate(placeOrder), orderController.placeOrder);
+router.post('/updateOrderStatus', verifyTokenUser, validate(updateOrder), orderController.updateOrderStatus);
 router.post('/updateCartItem', verifyTokenUser, validate(updateCart), orderController.updateCartItem);
 router.get('/getCartItems', verifyTokenUser, orderController.getCartItems);
 router.post('/getAllOrders', verifyTokenUser, orderController.getAllOrders);

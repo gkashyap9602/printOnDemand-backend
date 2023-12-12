@@ -126,12 +126,26 @@ const orderUtil = {
         }
 
     },
+    updateOrderStatus: async (data, userId) => {
+        try {
+            let { orderId, orderStatus } = data
+
+            const result = await updateSingleData(Order, { status: orderStatus }, { _id: orderId, customerId: userId })
+            if (!result.status) {
+                return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
+            }
+            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, {}, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+    },
     getAllOrders: async (data, userId) => {
         let { pageIndex = 1, pageSize = 10, searchKey = '', sortColumn = "orderDate", orderType = null, sortDirection = "asc", createdFrom = null, createdTill = null, status = null, storeIds = [] } = data
         pageIndex = Number(pageIndex)
         pageSize = Number(pageSize)
 
-         console.log(userId,"userIddddd");
+        console.log(userId, "userIddddd");
         let matchObj = {
             customerId: mongoose.Types.ObjectId(userId),
 
@@ -228,11 +242,11 @@ const orderUtil = {
             //     }
             // },
             {
-                $addFields:{
-                    productNames:"$orderItems.productTitle"
+                $addFields: {
+                    productNames: "$orderItems.productTitle"
                 }
             },
-            
+
             {
                 $project: {
                     amount: 1,
@@ -246,7 +260,7 @@ const orderUtil = {
                     status: 1,
                     storeName: 1,
                     submissionDueDate: 1,
-                    productNames:1
+                    productNames: 1
 
                 }
             }
@@ -427,7 +441,7 @@ const orderUtil = {
         ]
         );
 
-        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length>0?result[0]:result, null, 200);
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result[0] : result, null, 200);
     },
     getCartItems: async (data, userId) => {
         let { pageIndex = 1, pageSize = 5 } = data
