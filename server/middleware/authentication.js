@@ -312,7 +312,7 @@ const middleware = {
 		console.log(userCsrfToken, "userCsrfToken validateCSRFToken");
 
 		if (!userCsrfToken) {
-			return res.status(403).json({ message: "Token is not provided by user ", statusCode: 403 })
+			return res.status(403).json({ message: "Csrf Token is not present in header ", statusCode: 403 })
 		}
 
 		if (_csrfToken !== userCsrfToken) {
