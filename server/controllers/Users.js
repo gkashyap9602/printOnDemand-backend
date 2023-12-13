@@ -138,7 +138,7 @@ const authController = {
         // if (!user_id) {
         //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         // }
-        let result = await Users.refreshCsrfToken(req, user_id);
+        let result = await Users.refreshCsrfToken(req);
         return helpers.showOutput(res, result, result.statusCode);
     },
 }
