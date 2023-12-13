@@ -484,8 +484,8 @@ const UserUtils = {
     },
     updateShippingDetails: async (data, userId) => {
         let queryObject = { _id: userId }
-            
-        console.log(data,"dataaaShip");
+
+        console.log(data, "dataaaShip");
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
@@ -614,31 +614,30 @@ const UserUtils = {
     redirectShopify: async (data, userId) => {
         try {
             let { shop, code } = data
-            console.log(code, "code-------redirect");
+            console.log(code, shop, "code- shop------redirect");
 
-            // const response = await axios.post(`https://${shop}/admin/oauth/access_token`, {
-            //     client_id: clientId,
-            //     client_secret: clientSecret,
-            //     code: code,
-            // });
+            let query = {
+                client_id: "ef6a3b54af0bd843a040ccdabc47edae",
+                client_secret: "279508be83ce3b4bc0323e399685bbe8",
+                code: "ac6c881e2f3d6e744ee9c4592e0e9839"
+                //   scope:process.env.SHOPIFY_SCOPES,
+            }
+            // let query = {
+            //     client_id: process.env.SHOPIFY_CLIENT_ID,
+            //     client_secret: process.env.SHOPIFY_SECRET,
+            //     //   scope:process.env.SHOPIFY_SCOPES,
+            // }
 
-            // console.log(response, "responseresponse");
-            // // Store the access token
-            // const accessToken = response.data.access_token;
-            // // let accessToken = "e"
-            // console.log('Access Token:', accessToken);
-            // if (!accessToken) {
-            //     return helpers.showResponse(false, "Token Generation Failed", {}, null, 400);
-            // }
-            // let updateData = {
-            //     storeAccessToken: accessToken,
-            //     updatedOn: helpers.getCurrentDate()
-            // }
-            // let result = await updateSingleData(Users, updateData, { _id: userId })
+            const access_token_url = `https://${shop}/admin/oauth/access_token?client_id=${query.client_id}&client_secret=${query.client_secret}&code=${query.code}`;
+            let response = await axios.post(access_token_url,
+                {
+                    headers: { "Content-Type": "application/json" }
+                })
 
-            // if (!result.status) {
-            //     return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
-            // }
+
+            console.log(response, "responseresponse redirectShopify");
+
+
 
             return helpers.showResponse(true, "redirect Successfully", null, null, 200);
 

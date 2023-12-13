@@ -200,6 +200,7 @@ const adminUtils = {
                         localField: "_id",
                         foreignField: "userId",
                         as: "userProfileData",
+
                     }
                 },
                 {
@@ -210,13 +211,41 @@ const adminUtils = {
 
                 },
                 {
+                    $lookup: {
+                        from: "orders",
+                        localField: "_id",
+                        foreignField: "customerId",
+                        as: "ordersData",
+                        pipeline: [
+                            {
+                                $group: {
+                                    _id: null,
+                                    totalOrder: { $sum: 1 }
+                                }
+                            }
+                        ]
+
+                    }
+                },
+                {
+                    $unwind: "$ordersData"
+                },
+                {
                     $addFields: {
                         shippingAddress: '$userProfileData.shippingAddress'
                     }
                 },
                 {
-                    $unset: 'userProfileData'
+                    $addFields: {
+                        numberOfOrders:"$ordersData.totalOrder"
+                    }
                 },
+                {
+                    $project: {
+                        userProfileData: 0,
+                        ordersData: 0,
+                    }
+                }
             ])
 
             const activeUsers = await getCount(Users, { status: 1, userType: 3 })
