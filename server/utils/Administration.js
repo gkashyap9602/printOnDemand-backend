@@ -152,15 +152,23 @@ const adminUtils = {
 
     getAllUsers: async (data) => {
         try {
-            let { sortColumn = 'createdOn', sortDirection = 'asc', pageIndex = 1, pageSize = 5, searchKey = '' } = data
+            let { sortColumn = 'createdOn', sortDirection = 'asc', pageIndex = 1, pageSize = 5, searchKey = '', status } = data
             pageIndex = Number(pageIndex)
             pageSize = Number(pageSize)
 
+            let matchObj = {
+                userType: 3,
+
+            }
+
+            if (status) {
+                matchObj.status = status
+            }
 
             const result = await Users.aggregate([
                 {
                     $match: {
-                        userType: 3,
+                        ...matchObj,
 
                         $or: [
                             {

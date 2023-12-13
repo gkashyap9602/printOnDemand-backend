@@ -484,7 +484,8 @@ const UserUtils = {
     },
     updateShippingDetails: async (data, userId) => {
         let queryObject = { _id: userId }
-
+            
+        console.log(data,"dataaaShip");
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
@@ -578,13 +579,16 @@ const UserUtils = {
             };
 
             const access_token_url = `https://${shop}/admin/oauth/access_token?client_id=${query.client_id}&client_secret=${query.client_secret}&code=${query.code}`;
-            let response = await axios.post(access_token_url)
+            let response = await axios.post(access_token_url,
+                {
+                    headers: { "Content-Type": "application/json" }
+                })
 
 
-            // console.log(response, "responseresponse");
+            console.log(response, "responseresponse");
             // Store the access token
-            const accessToken = response.data
-            console.log(accessToken, "accessToken");
+            // const accessToken = response.data
+            // console.log(accessToken, "accessToken");
             // // let accessToken = "e"
             // console.log('Access Token:', accessToken);
             // if (!accessToken) {
