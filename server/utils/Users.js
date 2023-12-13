@@ -599,7 +599,7 @@ const UserUtils = {
             return helpers.showResponse(true, "Generate Successfully", null, null, 200);
 
         } catch (error) {
-            // console.log(error, "errorrrr");
+            console.log(error, "errorrrr");
             return helpers.showResponse(false, error.message, null, null, 400);
 
         }
