@@ -108,12 +108,19 @@ const authController = {
         // if (!user_id) {
         //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         // }
-        let result = await Users.generateStoreToken(req.body);
-        return helpers.showOutput(res, result, result.statusCode);
+        let result = await Users.generateStoreToken(req.query,res);
+        // return helpers.showOutput(res, result, result.statusCode);
+    },
+    shopifyAccess: async (req, res) => {
+        // let user_id = req.decoded.user_id;
+        // if (!user_id) {
+        //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        // }
+        let result = await Users.shopifyAccess(req.query,res);
+        // return helpers.showOutput(res, result, result.statusCode);
     },
     redirectShopify: async (req, res) => {
-    
-        let result = await Users.redirectShopify(req.body, user_id);
+        let result = await Users.redirectShopify(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
 

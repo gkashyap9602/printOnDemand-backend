@@ -13,7 +13,8 @@ const { randomUUID } = require('crypto')
 const middleware = require('../middleware/authentication');
 const Orders = require('../models/Orders')
 const Material = require("../models/Material")
-const axios = require("axios")
+const axios = require("axios");
+const { urlencoded } = require('express');
 
 const UserUtils = {
 
@@ -528,14 +529,16 @@ const UserUtils = {
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
     },
-    generateStoreToken: async (data, userId) => {
+    generateStoreToken: async (data, res) => {
         try {
             let { shop, code } = data
-            console.log(code, "code-------");
+            console.log(shop, "shop-------");
 
-            const response = await axios.get(`https://${shop}.myshopify.com/admin/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=${process.env.SHOPIFY_SCOPES}&redirect_uri=${process.env.SHOPIFY_REDIRECT}`);
+            res.redirect(`https://${shop}.myshopify.com/admin/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=${process.env.SHOPIFY_SCOPES}&redirect_uri=${process.env.SHOPIFY_REDIRECT}`);
 
-            console.log(response, "responseresponse");
+            // const response = await axios.get(`https://${shop}.myshopify.com/admin/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=${process.env.SHOPIFY_SCOPES}&redirect_uri=${process.env.SHOPIFY_REDIRECT}`);
+
+            // console.log(response, "responseresponse");
             // Store the access token
             // const accessToken = response.data.access_token;
             // // let accessToken = "e"
@@ -552,7 +555,47 @@ const UserUtils = {
             // if (!result.status) {
             //     return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
             // }
-            return helpers.showResponse(true, "Generate Successfully", null, null, 200);
+            // return helpers.showResponse(true, "Generate Successfully", null, null, 200);
+
+        } catch (error) {
+            console.log(error, "errorrrr");
+            return helpers.showResponse(false, error.message, null, null, 400);
+
+        }
+    },
+    shopifyAccess: async (data, res) => {
+        try {
+            let { shop, code } = data
+            console.log(shop, "shop-------");
+
+            const query = {
+                client_id: "ef6a3b54af0bd843a040ccdabc47edae", // Your API key
+                client_secret: "279508be83ce3b4bc0323e399685bbe8", // Your app credentials (secret key)
+                code: code // Grab the access key from the URL
+            };
+
+            const access_token_url = `https://${shop}/admin/oauth/access_token`;
+            let response  = await axios.post(access_token_url, query)
+                
+
+            // console.log(response, "responseresponse");
+            // Store the access token
+            // const accessToken = response.data.access_token;
+            // // let accessToken = "e"
+            // console.log('Access Token:', accessToken);
+            // if (!accessToken) {
+            //     return helpers.showResponse(false, "Token Generation Failed", {}, null, 400);
+            // }
+            // let updateData = {
+            //     storeAccessToken: accessToken,
+            //     updatedOn: helpers.getCurrentDate()
+            // }
+            // let result = await updateSingleData(Users, updateData, { _id: userId })
+
+            // if (!result.status) {
+            //     return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
+            // }
+            // return helpers.showResponse(true, "Generate Successfully", null, null, 200);
 
         } catch (error) {
             console.log(error, "errorrrr");
@@ -562,35 +605,34 @@ const UserUtils = {
     },
     redirectShopify: async (data, userId) => {
         try {
-            const clientId = "ef6a3b54af0bd843a040ccdabc47edae";
-            const clientSecret = "279508be83ce3b4bc0323e399685bbe8";
             let { shop, code } = data
-            console.log(code, "code-------");
+            console.log(code, "code-------redirect");
 
-            const response = await axios.post(`https://${shop}/admin/oauth/access_token`, {
-                client_id: clientId,
-                client_secret: clientSecret,
-                code: code,
-            });
+            // const response = await axios.post(`https://${shop}/admin/oauth/access_token`, {
+            //     client_id: clientId,
+            //     client_secret: clientSecret,
+            //     code: code,
+            // });
 
-            console.log(response, "responseresponse");
-            // Store the access token
-            const accessToken = response.data.access_token;
-            // let accessToken = "e"
-            console.log('Access Token:', accessToken);
-            if (!accessToken) {
-                return helpers.showResponse(false, "Token Generation Failed", {}, null, 400);
-            }
-            let updateData = {
-                storeAccessToken: accessToken,
-                updatedOn: helpers.getCurrentDate()
-            }
-            let result = await updateSingleData(Users, updateData, { _id: userId })
+            // console.log(response, "responseresponse");
+            // // Store the access token
+            // const accessToken = response.data.access_token;
+            // // let accessToken = "e"
+            // console.log('Access Token:', accessToken);
+            // if (!accessToken) {
+            //     return helpers.showResponse(false, "Token Generation Failed", {}, null, 400);
+            // }
+            // let updateData = {
+            //     storeAccessToken: accessToken,
+            //     updatedOn: helpers.getCurrentDate()
+            // }
+            // let result = await updateSingleData(Users, updateData, { _id: userId })
 
-            if (!result.status) {
-                return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
-            }
-            return helpers.showResponse(true, "Generate Successfully", null, null, 200);
+            // if (!result.status) {
+            //     return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
+            // }
+
+            return helpers.showResponse(true, "redirect Successfully", null, null, 200);
 
         } catch (error) {
             console.log(error, "errorrrr");

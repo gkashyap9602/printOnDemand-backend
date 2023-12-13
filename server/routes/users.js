@@ -31,8 +31,9 @@ router.get('/getUser/:user_id', verifyTokenUser, authController.getUserDetail);
 router.get('/getUserStatus/:user_id', verifyTokenUser, authController.getUserStatus);
 
 router.post('/refreshCsrfToken', verifyTokenUser, authController.refreshCsrfToken);
-router.post('/generateStoreToken', verifyTokenUser, authController.generateStoreToken);
-router.post('/redirectShopify', verifyTokenUser, authController.redirectShopify);
+router.get('/generateStoreToken', authController.generateStoreToken);
+router.post('/shopifyAccess', authController.shopifyAccess);
+router.get('/auth', authController.redirectShopify);
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
 router.post('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Post Request" }) });
