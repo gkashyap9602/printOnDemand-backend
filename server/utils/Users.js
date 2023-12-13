@@ -220,12 +220,15 @@ const UserUtils = {
             // let data = await getSingleData(Users, { _id: userId, status: { $ne: 2 } })
             // let userData = data.data
             if (request?.session?._csrfToken) {
+                // let newCsrfToken = helpers.generateCsrfToken();
+                // request.session._csrfToken = newCsrfToken;
+
+                return helpers.showResponse(true, 'Token Generated Successfully', { csrfToken: request?.session?._csrfToken }, null, 200);
+            } else {
                 let newCsrfToken = helpers.generateCsrfToken();
                 request.session._csrfToken = newCsrfToken;
-
                 return helpers.showResponse(true, 'Token Generated Successfully', { csrfToken: newCsrfToken }, null, 200);
-            } else {
-                return helpers.showResponse(false, 'Session not available', null, null, 500);
+                // return helpers.showResponse(false, 'Session not available', null, null, 500);
             }
         } catch (error) {
             console.error('Error refreshing CSRF token:', error);
@@ -574,14 +577,14 @@ const UserUtils = {
                 code: code // Grab the access key from the URL
             };
 
-            const access_token_url = `https://${shop}/admin/oauth/access_token`;
-            let response  = await axios.post(access_token_url, query)
-                
+            const access_token_url = `https://${shop}/admin/oauth/access_token?client_id=${query.client_id}&client_secret=${query.client_secret}&code=${query.code}`;
+            let response = await axios.post(access_token_url)
+
 
             // console.log(response, "responseresponse");
             // Store the access token
             const accessToken = response.data
-            console.log(accessToken,"accessToken");
+            console.log(accessToken, "accessToken");
             // // let accessToken = "e"
             // console.log('Access Token:', accessToken);
             // if (!accessToken) {
