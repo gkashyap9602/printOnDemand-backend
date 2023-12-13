@@ -162,9 +162,9 @@ const adminUtils = {
             }
 
             if (status) {
-                matchObj.status = status
+                matchObj.status = Number(status)
             }
-
+            console.log({ ...matchObj }, "matchhhh");
             const result = await Users.aggregate([
                 {
                     $match: {
@@ -228,7 +228,11 @@ const adminUtils = {
                     }
                 },
                 {
-                    $unwind: "$ordersData"
+                    $unwind: {
+                        path: "$ordersData",
+                        preserveNullAndEmptyArrays: true
+                    },
+
                 },
                 {
                     $addFields: {
@@ -237,7 +241,7 @@ const adminUtils = {
                 },
                 {
                     $addFields: {
-                        numberOfOrders:"$ordersData.totalOrder"
+                        numberOfOrders: "$ordersData.totalOrder"
                     }
                 },
                 {
@@ -249,8 +253,8 @@ const adminUtils = {
             ])
 
             const activeUsers = await getCount(Users, { status: 1, userType: 3 })
-            const pendingUsers = await getCount(Users, { status: 2, userType: 3 })
-            const deactivateUsers = await getCount(Users, { status: 3, userType: 3 })
+            const pendingUsers = await getCount(Users, { status: 3, userType: 3 })
+            const deactivateUsers = await getCount(Users, { status: 2, userType: 3 })
             const totalUsers = await getCount(Users, { userType: 3 })
 
             let statusSummary = {
