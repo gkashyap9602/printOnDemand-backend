@@ -503,6 +503,8 @@ const UserUtils = {
 
     updateBillingAddress: async (data, userId) => {
         let queryObject = { _id: userId }
+
+        console.log(data,"databill");
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
@@ -628,12 +630,11 @@ const UserUtils = {
             //     //   scope:process.env.SHOPIFY_SCOPES,
             // }
 
-            const access_token_url = `https://${shop}/admin/oauth/access_token?client_id=${query.client_id}&client_secret=${query.client_secret}&code=${query.code}`;
-            let response = await axios.post(access_token_url,
-                {
-                    headers: { "Content-Type": "application/json" }
-                })
-
+            const access_token_url = `https://${shop}/admin/oauth/access_token`;
+            const response = await axios.post(access_token_url, null, {
+                params: query,
+                headers: { "Content-Type": "application/json" },
+            });
 
             console.log(response, "responseresponse redirectShopify");
 

@@ -273,11 +273,20 @@ const productLibrary = {
             pageSize = Number(pageSize)
             page = Number(page)
 
+
+            const searchTerms = searchKey.split(' ');
+            const titleSearch = searchTerms[0];
+            const valueSearch = searchTerms.slice(1).join(' ');
+
+            console.log(titleSearch, "titleSearch ");
+            console.log(valueSearch, "valueSearch");
+
             let matchObj = {
                 status: { $ne: 2 },
             }
-            if (searchKey) {
-                matchObj.title = { $regex: searchKey, $options: 'i' }
+
+            if (titleSearch) {
+                matchObj.title = { $regex: titleSearch, $options: 'i' }
             }
 
 
@@ -311,6 +320,24 @@ const productLibrary = {
                                 $match: {
                                     status: { $ne: 2 }
                                 }
+                            },
+                            {
+                                $lookup: {
+                                    from: 'productVarient',
+                                    localField: 'productVarientId',
+                                    foreignField: '_id',
+                                    as: 'productVarientData',
+                                    pipeline: [
+                                        {
+                                            $lookup: {
+                                                from: 'variableOptions',
+                                                localField: 'varientOptions.variableOptionId',
+                                                foreignField: '_id',
+                                                as: 'variableOption',
+                                            }
+                                        }
+                                    ]
+                                }
                             }
                         ]
                     }
@@ -328,11 +355,25 @@ const productLibrary = {
                 },
                 {
                     $project: {
-                        varientData: 0
+                        // varientData: 0
                     }
                 }
 
             ]
+
+
+
+            if (valueSearch) {
+                console.log("under value search");
+
+                let match = {
+                    $match: {
+                        "Variable.value": { $regex: valueSearch, $options: 'i' },
+                    }
+                }
+                aggregate.push(match)
+
+            }
 
             console.log(aggregate, "aggregate");
 
