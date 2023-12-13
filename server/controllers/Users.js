@@ -116,8 +116,8 @@ const authController = {
         // if (!user_id) {
         //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         // }
-        let result = await Users.shopifyAccess(req.query,res);
-        // return helpers.showOutput(res, result, result.statusCode);
+        let result = await Users.shopifyAccess(req.body,res);
+        return helpers.showOutput(res, result, result.statusCode);
     },
     redirectShopify: async (req, res) => {
         let result = await Users.redirectShopify(req.query);

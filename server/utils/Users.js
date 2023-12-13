@@ -578,9 +578,10 @@ const UserUtils = {
             let response  = await axios.post(access_token_url, query)
                 
 
-            console.log(response, "responseresponse");
+            // console.log(response, "responseresponse");
             // Store the access token
-            // const accessToken = response.data.access_token;
+            const accessToken = response.data
+            console.log(accessToken,"accessToken");
             // // let accessToken = "e"
             // console.log('Access Token:', accessToken);
             // if (!accessToken) {
@@ -598,7 +599,7 @@ const UserUtils = {
             return helpers.showResponse(true, "Generate Successfully", null, null, 200);
 
         } catch (error) {
-            console.log(error, "errorrrr");
+            // console.log(error, "errorrrr");
             return helpers.showResponse(false, error.message, null, null, 400);
 
         }

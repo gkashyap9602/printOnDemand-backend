@@ -30,7 +30,7 @@ router.post('/updateOrderSubmissionDelay', verifyTokenUser, validate(updateSubmi
 router.get('/getUser/:user_id', verifyTokenUser, authController.getUserDetail);
 router.get('/getUserStatus/:user_id', verifyTokenUser, authController.getUserStatus);
 
-router.post('/refreshCsrfToken', verifyTokenUser, authController.refreshCsrfToken);
+router.post('/refreshCsrfToken', authController.refreshCsrfToken);
 router.get('/generateStoreToken', authController.generateStoreToken);
 router.post('/shopifyAccess', authController.shopifyAccess);
 router.get('/auth', authController.redirectShopify);
