@@ -578,7 +578,7 @@ const UserUtils = {
             let response  = await axios.post(access_token_url, query)
                 
 
-            // console.log(response, "responseresponse");
+            console.log(response, "responseresponse");
             // Store the access token
             // const accessToken = response.data.access_token;
             // // let accessToken = "e"
@@ -595,7 +595,7 @@ const UserUtils = {
             // if (!result.status) {
             //     return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
             // }
-            // return helpers.showResponse(true, "Generate Successfully", null, null, 200);
+            return helpers.showResponse(true, "Generate Successfully", null, null, 200);
 
         } catch (error) {
             console.log(error, "errorrrr");
