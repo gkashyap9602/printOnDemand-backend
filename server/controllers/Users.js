@@ -121,14 +121,6 @@ const authController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
 
-    getAllOrders: async (req, res) => {
-        let result = await Users.getAllOrders(req?.query);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    getBulkImport: async (req, res) => {
-        let result = await Users.getBulkImport(req?.query);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
     refreshCsrfToken: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {

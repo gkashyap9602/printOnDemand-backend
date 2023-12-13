@@ -19,7 +19,7 @@ router.get('/getFaqCategories', verifyTokenBoth, commonController.getFaqCategori
 router.get('/getCategoriesArticle', verifyTokenBoth, commonController.getCategoriesArticle);
 router.get('/getSingleCategoryArticle', verifyTokenBoth, commonController.getSingleCategoryArticle);
 router.get('/getSearchArticle', verifyTokenBoth, commonController.getSearchArticle);
-router.post('/raiseTicket', verifyTokenBoth, validate(raiseTicket), commonController.raiseTicket);
+router.post('/raiseTicket', validateCSRFToken, verifyTokenBoth, validate(raiseTicket), commonController.raiseTicket);
 // router.get('/getQuestions', verifyTokenBoth, commonController.getQuestions);
 
 // with admin token routes 

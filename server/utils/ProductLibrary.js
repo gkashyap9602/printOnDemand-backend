@@ -61,8 +61,6 @@ const productLibrary = {
 
 
 
-            console.log(productLibraryImages, "after productLibraryImages");
-            console.log(productLibraryVarients, "after productLibraryVarients");
             if (files?.length > 0 && productLibraryImages.length === 0) {
                 console.log("under multer iff");
                 const s3Upload = await helpers.uploadFileToS3(files)

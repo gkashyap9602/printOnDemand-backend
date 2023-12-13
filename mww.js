@@ -11,6 +11,9 @@ const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const MongoStore = require("connect-mongo");
 const helpers = require('./server/services/helper')
+const isProduction = process.env.ENV_MODE === 'PROD';
+
+console.log(isProduction, "isProduction===");
 app.use(helmet())
 app.enable('trust proxy', true);
 
@@ -46,7 +49,7 @@ app.use(cors({
 
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24 hours in miliseconds
-      // secure: false
+      secure: isProduction
       // maxAge: 5000, //5sec
     },
   }));

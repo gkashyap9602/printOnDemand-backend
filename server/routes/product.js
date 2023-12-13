@@ -10,11 +10,10 @@ const { addProduct, addProductVarient, addProductImage, updateProduct, updatePro
 
 // with user and admin Both token routes
 router.get('/getProductDetails', verifyTokenBoth, productController.getProductDetails);
-router.post('/getAllProducts', verifyTokenBoth, productController.getAllProduct);
+router.post('/getAllProducts',validateCSRFToken, verifyTokenBoth, productController.getAllProduct);
 
 // with admin token routes
 router.post('/addProduct', validateCSRFToken, verifyTokenAdmin, validate(addProduct), productController.addProduct);
-router.post('/updateProductMany', verifyTokenAdmin, productController.updateProductMany);
 router.post('/addProductVarient', validateCSRFToken, verifyTokenAdmin, addToMulter.array('productVarientTemplates'), validate(addProductVarient), productController.addProductVarient);
 router.post('/saveProductImage', validateCSRFToken, verifyTokenAdmin, addToMulter.single('productImage'), validate(addProductImage), productController.saveProductImage);
 router.post('/updateProduct', validateCSRFToken, verifyTokenAdmin, addToMulter.single('productImage'), validate(updateProduct), productController.updateProduct);

@@ -131,8 +131,8 @@ const orderUtil = {
             let { orderId, orderStatus } = data
 
             let updateObj = {
-                updatedOn:helpers.getCurrentDate(),
-                status:orderStatus
+                updatedOn: helpers.getCurrentDate(),
+                status: orderStatus
             }
 
             const result = await updateSingleData(Order, updateObj, { _id: orderId, customerId: userId })
@@ -151,7 +151,7 @@ const orderUtil = {
 
             orderIds.map((id) => mongoose.Types.ObjectId(id))
 
-            const result = await getDataArray(Order, { _id: { $in: orderIds } },"")
+            const result = await getDataArray(Order, { _id: { $in: orderIds } }, "")
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }

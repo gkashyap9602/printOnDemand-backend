@@ -73,20 +73,6 @@ const productUtils = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
-    updateProductMany: async (data) => {
-        try {
-            let result  = await Product.updateMany({}, { $set: { isCustomizable: false, isPersonalizable: false } })
-            // const result = await updateSingleData(Product, obj, { _id: productId, title: findProduct?.data?.title })
-            if (!result) {
-                return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
-            }
-            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, result, null, 200);
-        }
-        catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 400);
-        }
-    },
-
     updateProduct: async (data) => {
         try {
             let { careInstructions, longDescription, subCategoryIds, materialIds, productId,

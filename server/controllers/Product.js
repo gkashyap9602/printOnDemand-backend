@@ -45,10 +45,6 @@ const adminController = {
         let result = await Product.deleteProductImage(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    updateProductMany: async (req, res) => {
-        let result = await Product.updateProductMany(req.body);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
     saveProductImage: async (req, res) => {
         if (!req.file) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
