@@ -21,17 +21,18 @@ router.post('/changePassword', validateCSRFToken, verifyTokenUser, validate(chan
 
 
 //profile routes 
-router.post('/updateBasicDetails', validateCSRFToken, verifyTokenUser, addToMulter.single('profileImg'), validate(profileSchema), authController.updateBasicDetails);
-router.post('/updatePersonalDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updatePersonalDetails);
-router.post('/updateShippingDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateShippingDetails);
-router.post('/updateBillingAddress', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateBillingAddress);
-router.post('/updatePaymentDetails', validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updatePaymentDetails);
-router.post('/updateOrderSubmissionDelay', validateCSRFToken, verifyTokenUser, validate(updateSubmissionDelay), authController.updateOrderSubmissionDelay);
+router.post('/updateBasicDetails', verifyTokenUser, addToMulter.single('profileImg'), validate(profileSchema), authController.updateBasicDetails);
+router.post('/updatePersonalDetails', verifyTokenUser, validate(profileSchema), authController.updatePersonalDetails);
+router.post('/updateShippingDetails', verifyTokenUser, validate(profileSchema), authController.updateShippingDetails);
+router.post('/updateBillingAddress', verifyTokenUser, validate(profileSchema), authController.updateBillingAddress);
+router.post('/updatePaymentDetails', verifyTokenUser, validate(profileSchema), authController.updatePaymentDetails);
+router.post('/updateOrderSubmissionDelay', verifyTokenUser, validate(updateSubmissionDelay), authController.updateOrderSubmissionDelay);
 router.get('/getUser/:user_id', verifyTokenUser, authController.getUserDetail);
 router.get('/getUserStatus/:user_id', verifyTokenUser, authController.getUserStatus);
 
-router.post('/refreshCsrfToken', validateCSRFToken, verifyTokenUser, authController.refreshCsrfToken);
+router.post('/refreshCsrfToken', verifyTokenUser, authController.refreshCsrfToken);
 router.post('/generateStoreToken', verifyTokenUser, authController.generateStoreToken);
+router.post('/redirectShopify', verifyTokenUser, authController.redirectShopify);
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
 router.post('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Post Request" }) });

@@ -104,11 +104,16 @@ const authController = {
         return helpers.showOutput(res, result, result.statusCode);
     },
     generateStoreToken: async (req, res) => {
-        let user_id = req.decoded.user_id;
-        if (!user_id) {
-            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
-        }
-        let result = await Users.generateStoreToken(req.body, user_id);
+        // let user_id = req.decoded.user_id;
+        // if (!user_id) {
+        //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        // }
+        let result = await Users.generateStoreToken(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    redirectShopify: async (req, res) => {
+    
+        let result = await Users.redirectShopify(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
 
