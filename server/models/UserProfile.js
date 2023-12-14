@@ -64,7 +64,7 @@ var UserProfile = new Schema({
       default: "",
     },
     taxId: {
-      type: Number,
+      type: String,
       default: null,
     },
     city: {
@@ -73,7 +73,7 @@ var UserProfile = new Schema({
     },
     zipCode: {
       type: Number,
-      default: 1,
+      default: null,
     },
     companyEmail: {
       type: String,
@@ -116,7 +116,7 @@ var UserProfile = new Schema({
     },
     zipCode: {
       type: Number,
-      default: 1,
+      default: null,
     },
     companyEmail: {
       type: String,
