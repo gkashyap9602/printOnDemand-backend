@@ -311,35 +311,52 @@ const productLibrary = {
                 },
                 {
                     $lookup: {
+                        from: 'product',
+                        localField: 'productId',
+                        foreignField: '_id',
+                        as: 'productData',
+                        pipeline: [
+                            {
+                                $match: {
+                                    _id: { $in: materialFilter }
+                                }
+                            },
+
+                        ]
+
+                    }
+                },
+                {
+                    $lookup: {
                         from: 'productLibraryVarient',
                         localField: '_id',
                         foreignField: 'productLibraryId',
                         as: 'varientData',
+
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'productVarient',
+                        localField: 'varientData.productVarientId',
+                        foreignField: '_id',
+                        as: 'productVarientData',
                         pipeline: [
                             {
                                 $match: {
                                     status: { $ne: 2 }
                                 }
                             },
-                            {
-                                $lookup: {
-                                    from: 'productVarient',
-                                    localField: 'productVarientId',
-                                    foreignField: '_id',
-                                    as: 'productVarientData',
-                                    pipeline: [
-                                        {
-                                            $lookup: {
-                                                from: 'variableOptions',
-                                                localField: 'varientOptions.variableOptionId',
-                                                foreignField: '_id',
-                                                as: 'variableOption',
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
+
                         ]
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'variableOptions',
+                        localField: 'productVarientData.varientOptions.variableOptionId',
+                        foreignField: '_id',
+                        as: 'variableOptionData',
                     }
                 },
                 {
@@ -353,25 +370,24 @@ const productLibrary = {
                         [sortColumn]: sortDirection === "asc" ? 1 : -1
                     }
                 },
-                {
-                    $project: {
-                        // varientData: 0
-                    }
-                }
-
             ]
 
-
-
             if (valueSearch) {
-                console.log("under value search");
+                console.log(valueSearch, "valueSearch value search");
 
                 let match = {
                     $match: {
-                        "Variable.value": { $regex: valueSearch, $options: 'i' },
+                        "variableOptionData.value": { $regex: valueSearch, $options: 'i' },
                     }
                 }
-                aggregate.push(match)
+                let project = {
+                    $project: {
+                        varientData: 0,
+                        variableOptionData: 0,
+                        productVarientData: 0
+                    }
+                }
+                aggregate.push(match, project)
 
             }
 

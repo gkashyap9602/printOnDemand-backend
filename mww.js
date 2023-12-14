@@ -49,9 +49,9 @@ app.use(cors({
 
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24 hours in miliseconds
-      secure: isProduction,
-      httpOnly:false,
-      sameSite:"none"
+      // secure: isProduction,
+      // httpOnly:false,
+      // sameSite:"none"
       // maxAge: 5000, //5sec
     },
   }));
