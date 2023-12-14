@@ -12,7 +12,7 @@ module.exports.profileSchema = {
                 stateName: joi.string(),
                 name: joi.string(),
                 streetAddress: joi.string(),
-                zipCode: joi.string().max(5).message("Zip Code Length Must be 5"),
+                zipCode: joi.number().max(99999).message("Zip Code Must be 5 Digit"),
             },
             creditCardData: {
                 ccNumber: joi.string(),
@@ -32,7 +32,7 @@ module.exports.profileSchema = {
             contactName: joi.string(),
             country: joi.string(),
             stateName: joi.string(),
-            zipCode: joi.string().max(5).message("Zip Code Length Must be 5"),
+            zipCode: joi.number().max(99999).message("Zip Code Must be 5 Digit"),
         },
         personalDetails: {
             height: joi.string().required(),
@@ -57,7 +57,7 @@ module.exports.profileSchema = {
             country: joi.string(),
             stateName: joi.string(),
             taxId: joi.string(),
-            zipCode: joi.string().max(5).message("Zip Code Must be 5 Digit"),
+            zipCode: joi.number().max(99999).message("Zip Code Must be 5 Digit"),
         },
         // userGuid: joi.string().required(),
     }),

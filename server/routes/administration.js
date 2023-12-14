@@ -3,7 +3,7 @@ var router = express.Router();
 var adminController = require('../controllers/Administrator');
 var { verifyTokenAdmin, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
-const { saveNotification, addMaterial, updateMaterial, updateWaitingList, deleteNotification, addSubAdmin, activeInactiveuser, updateSubAdmin } = require('../validations/administration')
+const { saveNotification, addMaterial, updateMaterial, updateWaitingList, deleteNotification, updateCustomer, addSubAdmin, activeInactiveuser, updateSubAdmin, createCustomer } = require('../validations/administration')
 
 // Admin Routes with Token----------------------
 
@@ -12,8 +12,8 @@ router.post('/addMaterial', validateCSRFToken, verifyTokenAdmin, validate(addMat
 router.post('/updateMaterial', validateCSRFToken, verifyTokenAdmin, validate(updateMaterial), adminController.updateMaterial);
 
 //customer routes
-router.post('/createCustomer', verifyTokenAdmin, adminController.createCustomer);
-router.post('/updateCustomer', verifyTokenAdmin, adminController.updateCustomer);
+router.post('/createCustomer', verifyTokenAdmin, validate(createCustomer), adminController.createCustomer);
+router.post('/updateCustomer', verifyTokenAdmin, validate(updateCustomer), adminController.updateCustomer);
 router.post('/activeInactiveUser', verifyTokenAdmin, validate(activeInactiveuser), adminController.activeInactiveUser);
 router.get('/getAllUsers', verifyTokenAdmin, adminController.getAllUsers);
 

@@ -56,7 +56,7 @@ module.exports.createCustomer = {
                 stateName: joi.string(),
                 name: joi.string(),
                 streetAddress: joi.string(),
-                zipCode: joi.string().max(5).message("Zip Code Length Must be 5"),
+                zipCode: joi.number().max(99999).message("Zip Code Must be 5 Digit"),
             },
             creditCardData: {
                 ccNumber: joi.string(),
@@ -76,7 +76,7 @@ module.exports.createCustomer = {
             contactName: joi.string(),
             country: joi.string(),
             stateName: joi.string(),
-            zipCode: joi.string().max(5).message("Zip Code Length Must be 5"),
+            zipCode: joi.number().max(99999).message("Zip Code Must be 5 Digit"),
         },
         // personalDetails: {
         //     height: joi.string().required(),
@@ -101,9 +101,74 @@ module.exports.createCustomer = {
             country: joi.string(),
             stateName: joi.string(),
             taxId: joi.string(),
-            zipCode: joi.string().max(5).message("Zip Code Must be 5 Digit"),
+            zipCode: joi.number().max(99999).message("Zip Code Must be 5 Digit"),
         },
-      
+        payTraceId: joi.string().allow("")
+
+
+    })
+
+};
+module.exports.updateCustomer = {
+    body: joi.object({
+        firstName: joi.string().required(),
+        lastName: joi.string(),
+        // password: joi.string().required(),
+        paymentDetails: {
+            billingAddressData: {
+                city: joi.string(),
+                country: joi.string(),
+                stateName: joi.string(),
+                name: joi.string(),
+                streetAddress: joi.string(),
+                zipCode: joi.number().max(99999).message("Zip Code Must be 5 Digit"),
+            },
+            creditCardData: {
+                ccNumber: joi.string(),
+                expirationMonth: joi.string(),
+                expirationYear: joi.string(),
+            },
+            customerId: joi.string().allow(''),
+            phone: joi.string().max(13).message("Phone length must be 10").min(10).message("Phone length must be 10"),
+        },
+        billingAddress: {
+            address1: joi.string(),
+            address2: joi.string().allow(''),
+            city: joi.string(),
+            companyEmail: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+            companyName: joi.string(),
+            companyPhone: joi.string().max(13).message("Phone length must be 10").min(10).message("Phone length must be 10"),
+            contactName: joi.string(),
+            country: joi.string(),
+            stateName: joi.string(),
+            zipCode: joi.number().max(99999).message("Zip Code Must be 5 Digit"),
+        },
+        // personalDetails: {
+        //     height: joi.string().required(),
+        //     weight: joi.string().required(),
+        //     race: joi.string().required(),
+        //     age: joi.number().required(),
+        //     gender: joi.string().valid('male', 'female').required(),
+        //     authenticity: joi.string().required(),
+        //     waist: joi.string().required(),
+        // },
+        isExemptionEligible: joi.boolean(),
+        ncResaleCertificate: joi.string().allow(''),
+
+        shippingAddress: {
+            address1: joi.string(),
+            address2: joi.string().allow(''),
+            city: joi.string(),
+            companyEmail: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
+            companyName: joi.string(),
+            companyPhone: joi.string().max(13).message("Phone length must be 10").min(10).message("Phone length must be 10"),
+            contactName: joi.string(),
+            country: joi.string(),
+            stateName: joi.string(),
+            taxId: joi.string(),
+            zipCode: joi.number().max(99999).message("Zip Code Must be 5 Digit"),
+        },
+
 
     })
 

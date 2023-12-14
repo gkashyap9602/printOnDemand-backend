@@ -93,7 +93,7 @@ var Users = new Schema({
         }
     }],
     payTraceId: {
-        type: String,
+        type: Number,
         default: null
     },
     phoneNumber: {
