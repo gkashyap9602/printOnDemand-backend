@@ -238,9 +238,20 @@ const productLibrary = {
                 if (!findVarient.status) {
                     return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
                 }
+
                 const resultVarient = await updateSingleData(ProductLibraryVarient, updateData, matchObjVarient)
                 if (!resultVarient.status) {
                     return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+                }
+                
+                let findAllVarient = await getCount(ProductLibraryVarient, { productLibraryId, status: { $ne: 2 } })
+                 if (findAllVarient.data === 0) {
+                    const deleteProductLibrary = await updateSingleData(ProductLibrary, updateData, { _id: productLibraryId })
+                    if (!deleteProductLibrary.status) {
+                        return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
+                    }
+                    return helpers.showResponse(true, "Product Library Deleted", {}, null, 200);
+
                 }
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
 
@@ -322,6 +333,26 @@ const productLibrary = {
 
                     }
                 },
+                // {
+                //     $match: {
+                //         "productData.materialId": { $in: materialFilter }
+                //     }
+                // },
+                // {
+                //     $addFields: {
+                //         productData: {
+                //             $filter: {
+                //                 input: '$productData',
+                //                 as: 'product',
+                //                 cond: {
+                //                     $regexMatch: {
+                //                         input: '$$product.name', regex: searchKey, options: 'i'
+                //                     },
+                //                 },
+                //             },
+                //         },
+                //     },
+                // },
                 {
                     $lookup: {
                         from: 'productLibraryVarient',

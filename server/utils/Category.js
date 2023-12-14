@@ -57,6 +57,7 @@ const categoryUtil = {
             )
             //ends if
             if (searchKey) {
+                //apply regex on array of objects
                 aggregationPipeline.push(
                     {
                         $addFields: {
@@ -77,6 +78,7 @@ const categoryUtil = {
             }
 
         } else {
+            //regex for parent collection category
             aggregationPipeline.push(
                 {
                     $match: {
