@@ -42,6 +42,14 @@ const adminController = {
         let result = await Administration.createCustomer(req.body, adminId);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    updateCustomer: async (req, res) => {
+        let adminId = req.decoded?.admin_id
+        if (!adminId) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Administration.updateCustomer(req.body, adminId);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     addSubAdmin: async (req, res) => {
         let adminId = req.decoded?.admin_id
         if (!adminId) {

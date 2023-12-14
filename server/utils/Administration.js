@@ -261,7 +261,7 @@ const adminUtils = {
 
             aggregate.push(
                 {
-                    $skip: (pageIndex - 1) * pageSize 
+                    $skip: (pageIndex - 1) * pageSize
                 },
                 {
                     $limit: pageSize
@@ -368,23 +368,13 @@ const adminUtils = {
         }
 
     },
-    updateCustomer: async (data, adminId) => {
+    updateCustomer: async (data) => {
         try {
             let { firstName, lastName, billingAddress, paymentDetails, shippingAddress, userId } = data;
 
             // let findUser = await getSingleData(Users, { _id: userId })
             // if (!findUser.status) {
             //     return helpers.showResponse(false, ResponseMessages?.users.email_already, null, null, 400);
-            // }
-            // const usersCount = await getCount(Users, { userType: 3 })
-            // if (!usersCount.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
-            // }
-            // const idGenerated = helpers.generateIDs(usersCount?.data)
-
-            // let adminData = await getSingleData(Users, { _id: adminId, userType: 1 })
-            // if (!adminData.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
             // }
 
             let newObj = {
@@ -394,9 +384,6 @@ const adminUtils = {
             }
 
             let result = await updateSingleData(Users, newObj, { _id: userId });
-
-            // if (result.status) {
-            // delete data.password
 
             let ObjUpdateProfile = {
                 updatedOn: helpers.getCurrentDate()
@@ -413,10 +400,10 @@ const adminUtils = {
             }
 
             let updateUserProfile = await updateSingleData(UserProfile, ObjUpdateProfile, { userId: userId })
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, data, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
 
         } catch (err) {
-            return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
+            return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, err, null, 400);
         }
 
     },
