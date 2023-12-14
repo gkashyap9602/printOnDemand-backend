@@ -12,7 +12,7 @@ const categoryUtil = {
         const { includeSubCategory = false, searchKey = '', parentCategoryId } = data
 
 
-        console.log(searchKey,"searchKey===");
+        console.log(searchKey, "searchKey===");
         const aggregationPipeline = [
 
             {
@@ -35,11 +35,7 @@ const categoryUtil = {
                 );
             }
             aggregationPipeline.push(
-                // {
-                //     $match: {
-                //         'subCategories.status': { $ne: 2 },
-                //     },
-                // },
+
                 {
                     $lookup: {
                         from: 'subCategory',
@@ -57,24 +53,29 @@ const categoryUtil = {
                     },
 
                 },
-                {
-                    $addFields: {
-                        subCategories: {
-                            $filter: {
-                                input: '$subCategories',
-                                as: 'subCategory',
-                                cond: {
-                                    $or: [
-                                        { $regexMatch: { input: '$$subCategory.name', regex: searchKey, options: 'i' } },
-                                        {}
-                                    ],
+
+            )
+            //ends if
+            if (searchKey) {
+                aggregationPipeline.push(
+                    {
+                        $addFields: {
+                            subCategories: {
+                                $filter: {
+                                    input: '$subCategories',
+                                    as: 'subCategory',
+                                    cond: {
+                                        $regexMatch: {
+                                            input: '$$subCategory.name', regex: searchKey, options: 'i'
+                                        },
+                                    },
                                 },
                             },
                         },
-                    },
-                },
-            )
-            //ends if
+                    }
+                )
+            }
+
         } else {
             aggregationPipeline.push(
                 {
@@ -85,6 +86,8 @@ const categoryUtil = {
             )
         }
         //ends if
+
+        console.log(aggregationPipeline, "aggregation pipeline");
         const result = await Category.aggregate(aggregationPipeline);
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result, null, 200);
