@@ -6,6 +6,7 @@ AWS.config.update({
     region: "us-east-1",
     credentials: new AWS.SharedIniFileCredentials({ profile: "default" }),
 });
+const XLSX = require("xlsx")
 const moment = require('moment')
 const ssm = new AWS.SSM();
 const nodemailer = require("nodemailer");
@@ -191,175 +192,150 @@ const generateCsrfToken = () => {
     return crypto.randomUUID()
 }
 
-const exportExcel = async (result, years, patientFile) => {
+const exportExcel = async (filteredData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let filePath = `worksheet/${patientFile}-${new Date().getTime()}.xlsx`;
+            let filePath = `worksheet/${"Order"}-${new Date().getTime()}.xlsx`;
+            let local_path = path.resolve(`./server/uploads/${filePath}`);
             const workbook = XLSX.utils.book_new();
+
             let sheetArray = [
-                'Year', 'User Name', 'First Name', 'Middle Name', 'Last Name', 'Email', 'Identified Name', 'Suffix', 'DOB',
-                'Age', 'Pronoun', 'Gender', 'Race', 'Initials', 'Sex Offender', 'Added By', 'Marital Status', 'Gardianship', 'Employment',
-                'Housing', 'StateId', 'SSN', 'Patient Insurance Id', 'Home Phone', 'Cell Phone', 'Pharmacy Phone', 'Private Key',
-                'Public Key', 'Profile Pic', 'Follow Up Form', 'Fax', 'Relationship To Insured', 'Patient Account', 'Notes'
+                'Customer Name', 'Display Id'
             ];
-            / Add more Fields to sheet Array /
-            let addressArraySize = 0;
-            let contactDetailArraySize = 0;
-            result?.forEach(item => {
-                if (Array.isArray(item?.data)) {
-                    item?.data?.forEach(obj => {
-                        if (obj?.address?.length > addressArraySize) {
-                            addressArraySize = obj?.address?.length;
-                        }
-                        if (obj?.emergency_contact_details?.length > contactDetailArraySize) {
-                            contactDetailArraySize = obj?.emergency_contact_details?.length;
-                        }
-                    });
-                }
-            });
-            for (let a = 0; a < addressArraySize; a++) {
-                sheetArray.push(
-                    `Location-${a + 1}`, `State-${a + 1}`,
-                    `City-${a + 1}`, `Zipcode-${a + 1}`,
-                    `Latitude-${a + 1}`, `Longitude-${a + 1}`
-                );
-            }
-            for (let c = 0; c < contactDetailArraySize; c++) {
-                sheetArray.push(
-                    `Emergency Contact Name-${c + 1}`,
-                    `Emergency Contact Email-${c + 1}`,
-                    `Emergency Contact Number-${c + 1}`
-                );
-            }
-            / Ends here /
+            // / Add more Fields to sheet Array /
+            // let addressArraySize = 0;
+            // let contactDetailArraySize = 0;
+
+            // result?.forEach(item => {
+            //     if (Array.isArray(item?.data)) {
+            //         item?.data?.forEach(obj => {
+            //             if (obj?.address?.length > addressArraySize) {
+            //                 addressArraySize = obj?.address?.length;
+            //             }
+            //             if (obj?.emergency_contact_details?.length > contactDetailArraySize) {
+            //                 contactDetailArraySize = obj?.emergency_contact_details?.length;
+            //             }
+            //         });
+            //     }
+            // });
+            // for (let a = 0; a < addressArraySize; a++) {
+            //     sheetArray.push(
+            //         `Location-${a + 1}`, `State-${a + 1}`,
+            //         `City-${a + 1}`, `Zipcode-${a + 1}`,
+            //         `Latitude-${a + 1}`, `Longitude-${a + 1}`
+            //     );
+            // }
+            // for (let c = 0; c < contactDetailArraySize; c++) {
+            //     sheetArray.push(
+            //         `Emergency Contact Name-${c + 1}`,
+            //         `Emergency Contact Email-${c + 1}`,
+            //         `Emergency Contact Number-${c + 1}`
+            //     );
+            // }
+            // / Ends here /
             const sheet = XLSX.utils.aoa_to_sheet([sheetArray]);
-            let filteredData = [];
-            for (let item of result) {
-                let itemName = item['_id'];
-                let arrayData = item['data'];
-                let newArray = []
-                for (let i = 0; i < years.length; i++) {
-                    const startOfYear = moment.utc(`${years[i]}-01-01 00:00:00`);
-                    const startOfYearUnix = startOfYear.unix();
-                    const endOfYearUnix = startOfYear.clone().endOf('year').unix();
-                    const yearFilteredData = arrayData.filter(item => {
-                        return ((item.created_on >= startOfYearUnix) && (item.created_on <= endOfYearUnix));
-                    });
-                    newArray.push({ year: years[i], data: yearFilteredData });
-                }
-                let obj = {
-                    race: itemName,
-                    yearData: newArray
-                }
-                filteredData.push(obj);
-            }
+            // let filteredData = [];
+            // for (let item of result) {
+            //     let itemName = item['_id'];
+            //     let arrayData = item['data'];
+            //     let newArray = []
+            //     for (let i = 0; i < years.length; i++) {
+            //         const startOfYear = moment.utc(`${years[i]}-01-01 00:00:00`);
+            //         const startOfYearUnix = startOfYear.unix();
+            //         const endOfYearUnix = startOfYear.clone().endOf('year').unix();
+            //         const yearFilteredData = arrayData.filter(item => {
+            //             return ((item.created_on >= startOfYearUnix) && (item.created_on <= endOfYearUnix));
+            //         });
+            //         newArray.push({ year: years[i], data: yearFilteredData });
+            //     }
+            //     let obj = {
+            //         race: itemName,
+            //         yearData: newArray
+            //     }
+            //     filteredData.push(obj);
+            // }
             let rowData = [];
-            for (let i = 1; i < filteredData?.length; i++) {
-                let yearsArray = filteredData[i]?.yearData;
-                for (let j = 0; j < yearsArray?.length; j++) {
-                    let dataArray = yearsArray[j];
-                    for (let k = 0; k < dataArray?.data?.length; k++) {
-                        let row = [];
-                        row.push(dataArray?.year);
-                        row.push(dataArray?.data[k]?.user_name ?? '');
-                        row.push(dataArray?.data[k]?.first_name ?? '');
-                        row.push(dataArray?.data[k]?.middle_name ?? '');
-                        row.push(dataArray?.data[k]?.last_name ?? '');
-                        row.push(dataArray?.data[k]?.email ?? '');
-                        row.push(dataArray?.data[k]?.identified_name ?? '');
-                        row.push(dataArray?.data[k]?.suffix ?? '');
-                        row.push(dataArray?.data[k]?.dob ?? '');
-                        row.push(dataArray?.data[k]?.age ?? '');
-                        row.push(dataArray?.data[k]?.pronoun ?? '');
-                        row.push(dataArray?.data[k]?.gender ?? '');
-                        row.push(dataArray?.data[k]?.race ?? '');
-                        row.push(dataArray?.data[k]?.initials ?? '');
-                        row.push(dataArray?.data[k]?.sex_offender ?? '');
-                        row.push(dataArray?.data[k]?.added_by ?? '');
-                        row.push(dataArray?.data[k]?.marital_status ?? '');
-                        row.push(dataArray?.data[k]?.gardianship ?? '');
-                        row.push(dataArray?.data[k]?.employment ?? '');
-                        row.push(dataArray?.data[k]?.housing ?? '');
-                        row.push(dataArray?.data[k]?.state_id ?? '');
-                        row.push(dataArray?.data[k]?.ssn ?? '');
-                        row.push(dataArray?.data[k]?.patient_insurance_id ?? '');
-                        row.push(dataArray?.data[k]?.home_phone ?? '');
-                        row.push(dataArray?.data[k]?.cell_phone ?? '');
-                        row.push(dataArray?.data[k]?.pharmacy_phone ?? '');
-                        row.push(dataArray?.data[k]?.private_key ?? '');
-                        row.push(dataArray?.data[k]?.public_key ?? '');
-                        row.push(`https://api.ilcca.com/files/${dataArray?.data[k]?.profile_pic}` ?? '');
-                        row.push(dataArray?.data[k]?.follow_up_form ?? '');
-                        row.push(dataArray?.data[k]?.fax ?? '');
-                        row.push(dataArray?.data[k]?.relationship_to_insured ?? '');
-                        row.push(dataArray?.data[k]?.patient_account ?? '');
-                        row.push(dataArray?.data[k]?.notes ?? '');
-                        if (dataArray?.data[k]?.address && dataArray?.data[k]?.address?.length > 0) {
-                            for (let l = 0; l < dataArray?.data[k]?.address?.length; l++) {
-                                if (!dataArray?.data[k]?.address[l]?.location || dataArray?.data[k]?.address[l]?.location == '') {
-                                    row.push('');
-                                } else {
-                                    row.push(dataArray?.data[k]?.address[l]?.location ?? '');
-                                }
-                                if (!dataArray?.data[k]?.address[l]?.state || dataArray?.data[k]?.address[l]?.state == '') {
-                                    row.push('');
-                                } else {
-                                    row.push(dataArray?.data[k]?.address[l]?.state ?? '');
-                                }
-                                if (!dataArray?.data[k]?.address[l]?.city || dataArray?.data[k]?.address[l]?.city == '') {
-                                    row.push('');
-                                } else {
-                                    row.push(dataArray?.data[k]?.address[l]?.city ?? '');
-                                }
-                                if (!dataArray?.data[k]?.address[l]?.zip || dataArray?.data[k]?.address[l]?.zip == '') {
-                                    row.push('');
-                                } else {
-                                    row.push(dataArray?.data[k]?.address[l]?.zip ?? '');
-                                }
-                                if (!dataArray?.data[k]?.address[l]?.lat || dataArray?.data[k]?.address[l]?.lat == '') {
-                                    row.push('');
-                                } else {
-                                    row.push(dataArray?.data[k]?.address[l]?.lat ?? '');
-                                }
-                                if (!dataArray?.data[k]?.address[l]?.lon || dataArray?.data[k]?.address[l]?.lon == '') {
-                                    row.push('');
-                                } else {
-                                    row.push(dataArray?.data[k]?.address[l]?.lon ?? '');
-                                }
-                            }
-                        }
-                        if (dataArray?.data[k]?.emergency_contact_details && dataArray?.data[k]?.emergency_contact_details?.length > 0) {
-                            for (let m = 0; m < dataArray?.data[k]?.emergency_contact_details?.length; m++) {
-                                if (!dataArray?.data[k]?.emergency_contact_details[m]?.contact_name || dataArray?.data[k]?.emergency_contact_details[m]?.contact_name == '') {
-                                    row.push('');
-                                } else {
-                                    row.push(dataArray?.data[k]?.emergency_contact_details[m]?.contact_name ?? '');
-                                }
-                                if (!dataArray?.data[k]?.emergency_contact_details[m]?.contact_email || dataArray?.data[k]?.emergency_contact_details[m]?.contact_email == '') {
-                                    row.push('');
-                                } else {
-                                    row.push(dataArray?.data[k]?.emergency_contact_details[m]?.contact_email ?? '');
-                                }
-                                if (!dataArray?.data[k]?.emergency_contact_details[m]?.contact_number || dataArray?.data[k]?.emergency_contact_details[m]?.contact_number == '') {
-                                    row.push('');
-                                } else {
-                                    row.push(dataArray?.data[k]?.emergency_contact_details[m]?.contact_number ?? '');
-                                }
-                            }
-                        }
-                        rowData.push(row);
-                    }
-                }
+            // for (let i = 1; i < filteredData?.length; i++) {
+            //     let yearsArray = filteredData[i]?.yearData;
+            //     for (let j = 0; j < yearsArray?.length; j++) {
+            //         let dataArray = yearsArray[j];
+            for (let k = 0; k < filteredData?.length; k++) {
+                let row = [];
+                row.push(filteredData[k].userData.firstName ?? '');
+                row.push(filteredData[k].displayId ?? '');
+
+                // if (dataArray?.data[k]?.address && dataArray?.data[k]?.address?.length > 0) {
+                //     for (let l = 0; l < dataArray?.data[k]?.address?.length; l++) {
+                //         if (!dataArray?.data[k]?.address[l]?.location || dataArray?.data[k]?.address[l]?.location == '') {
+                //             row.push('');
+                //         } else {
+                //             row.push(dataArray?.data[k]?.address[l]?.location ?? '');
+                //         }
+                //         if (!dataArray?.data[k]?.address[l]?.state || dataArray?.data[k]?.address[l]?.state == '') {
+                //             row.push('');
+                //         } else {
+                //             row.push(dataArray?.data[k]?.address[l]?.state ?? '');
+                //         }
+                //         if (!dataArray?.data[k]?.address[l]?.city || dataArray?.data[k]?.address[l]?.city == '') {
+                //             row.push('');
+                //         } else {
+                //             row.push(dataArray?.data[k]?.address[l]?.city ?? '');
+                //         }
+                //         if (!dataArray?.data[k]?.address[l]?.zip || dataArray?.data[k]?.address[l]?.zip == '') {
+                //             row.push('');
+                //         } else {
+                //             row.push(dataArray?.data[k]?.address[l]?.zip ?? '');
+                //         }
+                //         if (!dataArray?.data[k]?.address[l]?.lat || dataArray?.data[k]?.address[l]?.lat == '') {
+                //             row.push('');
+                //         } else {
+                //             row.push(dataArray?.data[k]?.address[l]?.lat ?? '');
+                //         }
+                //         if (!dataArray?.data[k]?.address[l]?.lon || dataArray?.data[k]?.address[l]?.lon == '') {
+                //             row.push('');
+                //         } else {
+                //             row.push(dataArray?.data[k]?.address[l]?.lon ?? '');
+                //         }
+                //     }
+                // }
+                // if (dataArray?.data[k]?.emergency_contact_details && dataArray?.data[k]?.emergency_contact_details?.length > 0) {
+                //     for (let m = 0; m < dataArray?.data[k]?.emergency_contact_details?.length; m++) {
+                //         if (!dataArray?.data[k]?.emergency_contact_details[m]?.contact_name || dataArray?.data[k]?.emergency_contact_details[m]?.contact_name == '') {
+                //             row.push('');
+                //         } else {
+                //             row.push(dataArray?.data[k]?.emergency_contact_details[m]?.contact_name ?? '');
+                //         }
+                //         if (!dataArray?.data[k]?.emergency_contact_details[m]?.contact_email || dataArray?.data[k]?.emergency_contact_details[m]?.contact_email == '') {
+                //             row.push('');
+                //         } else {
+                //             row.push(dataArray?.data[k]?.emergency_contact_details[m]?.contact_email ?? '');
+                //         }
+                //         if (!dataArray?.data[k]?.emergency_contact_details[m]?.contact_number || dataArray?.data[k]?.emergency_contact_details[m]?.contact_number == '') {
+                //             row.push('');
+                //         } else {
+                //             row.push(dataArray?.data[k]?.emergency_contact_details[m]?.contact_number ?? '');
+                //         }
+                //     }
+                // }
+                rowData.push(row);
             }
+            // }
+            // }
             let counter = 1;
             for (let k = 0; k < rowData.length; k++) {
                 XLSX.utils.sheet_add_aoa(sheet, [rowData[k]], { origin: counter + 1, skipHeader: true });
                 counter++;
             }
-            XLSX.utils.book_append_sheet(workbook, sheet, 'Patients Date Of Birth Data');
+            XLSX.utils.book_append_sheet(workbook, sheet, 'Orders Data');
             const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
-            let excelLink = await uploadToS3ExcelSheet(buffer, filePath);
-            return resolve({ status: true, message: "Excel for members created Successfully!", data: excelLink, code: 200 });
+            // return resolve({ status: true, message: "Excel for members created Successfully!", data: excelLink, code: 200 });
+            fs.writeFile(local_path, buffer, (err) => {
+                if (err) {
+                    return resolve({ status: false, message: "Error Occured in exporting patients age distribution excel", data: err.message, code: 200 });
+                } else {
+                    return resolve({ status: true, message: "Excel for members created Successfully!", data: filePath, code: 200 });
+                }
+            });
 
         } catch (err) {
             console.log(err)

@@ -148,7 +148,7 @@ const orderUtil = {
         }
     },
 
-    downloadOrderDetails: async (data, userId, res) => {
+    downloadOrderDetail: async (data, userId, res) => {
         try {
             let { orderIds } = data
 
@@ -164,6 +164,17 @@ const orderUtil = {
                         // customerId: mongoose.Types.ObjectId(userId),
                         _id: { $in: orderIds }
                     }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'customerId',
+                        foreignField: '_id',
+                        as: 'userData',
+                    }
+                },
+                {
+                    $unwind: "$userData"
                 }
             ])
 
@@ -174,17 +185,18 @@ const orderUtil = {
             }
 
 
+            const sheet = await helpers.exportExcel(result)
+
+            console.log(sheet, "sheet")
 
 
-
-
-            return helpers.showResponse(true, "Download Success", {}, null, 200);
+            return helpers.showResponse(true, "Download Success", sheet, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
-    downloadOrderDetail: async (data, userId, res) => {
+    downloadOrderDetails: async (data, userId, res) => {
         try {
             let { orderIds } = data
 
