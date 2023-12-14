@@ -243,9 +243,9 @@ const productLibrary = {
                 if (!resultVarient.status) {
                     return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
                 }
-                
+
                 let findAllVarient = await getCount(ProductLibraryVarient, { productLibraryId, status: { $ne: 2 } })
-                 if (findAllVarient.data === 0) {
+                if (findAllVarient.data === 0) {
                     const deleteProductLibrary = await updateSingleData(ProductLibrary, updateData, { _id: productLibraryId })
                     if (!deleteProductLibrary.status) {
                         return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
@@ -315,44 +315,6 @@ const productLibrary = {
                 {
                     $limit: pageSize // Limit the number of records per page
                 },
-                //material filter check 
-                {
-                    $lookup: {
-                        from: 'product',
-                        localField: 'productId',
-                        foreignField: '_id',
-                        as: 'productData',
-                        // pipeline: [
-                        //     {
-                        //         $match: {
-                        //             materialId: { $in: materialFilter }
-                        //         }
-                        //     },
-
-                        // ]
-
-                    }
-                },
-                // {
-                //     $match: {
-                //         "productData.materialId": { $in: materialFilter }
-                //     }
-                // },
-                // {
-                //     $addFields: {
-                //         productData: {
-                //             $filter: {
-                //                 input: '$productData',
-                //                 as: 'product',
-                //                 cond: {
-                //                     $regexMatch: {
-                //                         input: '$$product.name', regex: searchKey, options: 'i'
-                //                     },
-                //                 },
-                //             },
-                //         },
-                //     },
-                // },
                 {
                     $lookup: {
                         from: 'productLibraryVarient',
@@ -411,16 +373,24 @@ const productLibrary = {
                             localField: 'productId',
                             foreignField: '_id',
                             as: 'productData',
+
                         }
                     },
                     {
                         $match: {
                             "productData.materialId": { $in: materialFilter }
                         }
-                    },)
+                    },
+                    {
+                        $project: {
+                            productData: 0
+                        }
+                    }
+                )
 
             }
             if (valueSearch) {
+                //search in vareint option value deep search 
                 console.log(valueSearch, "valueSearch value search");
 
                 let match = {
@@ -428,16 +398,20 @@ const productLibrary = {
                         "variableOptionData.value": { $regex: valueSearch, $options: 'i' },
                     }
                 }
-                let project = {
-                    $project: {
-                        varientData: 0,
-                        variableOptionData: 0,
-                        productVarientData: 0
-                    }
-                }
-                aggregate.push(match, project)
+
+                aggregate.push(match)
 
             }
+
+            //remove extra feilds that is get after lookup
+            let project = {
+                $project: {
+                    varientData: 0,
+                    variableOptionData: 0,
+                    productVarientData: 0
+                }
+            }
+            aggregate.push(project)
 
             console.log(aggregate, "aggregate");
 
