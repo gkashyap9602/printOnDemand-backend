@@ -327,6 +327,7 @@ const adminUtils = {
 
             let userRef = new Users(newObj)
             let result = await postData(userRef);
+            console.log(result,"result user save");
             if (result.status) {
                 // delete data.password
 
@@ -353,6 +354,8 @@ const adminUtils = {
 
                 let userProfileRef = new UserProfile(ObjProfile)
                 let resultProfile = await postData(userProfileRef);
+
+                console.log(resultProfile,"resultProfile save");
                 if (!resultProfile.status) {
                     //if userProfile save err then handle user is saved but throw error for profile update issue?
                     await deleteData(Users, { _id: userRef._id })
@@ -364,6 +367,7 @@ const adminUtils = {
 
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
         } catch (err) {
+            console.log(err,"errorrr create user");
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
         }
 

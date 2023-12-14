@@ -10,6 +10,9 @@ const categoryUtil = {
     //admin and user both
     getCategories: async (data) => {
         const { includeSubCategory = false, searchKey = '', parentCategoryId } = data
+
+
+        console.log(searchKey,"searchKey===");
         const aggregationPipeline = [
 
             {
