@@ -9,7 +9,7 @@ module.exports.profileSchema = {
             billingAddressData: {
                 city: joi.string(),
                 country: joi.string(),
-                stateName: joi.string().max(2).message("State Code Length Must be 2"),
+                stateName: joi.string(),
                 name: joi.string(),
                 streetAddress: joi.string(),
                 zipCode: joi.string().max(5).message("Zip Code Length Must be 5"),
