@@ -261,7 +261,7 @@ const adminUtils = {
 
             aggregate.push(
                 {
-                    $skip: (pageIndex - 1)
+                    $skip: (pageIndex - 1) * pageSize 
                 },
                 {
                     $limit: pageSize
@@ -293,7 +293,7 @@ const adminUtils = {
     },
     createCustomer: async (data, adminId) => {
         try {
-            let { firstName, lastName, email, billingAddress, paymentDetails, shippingAddress } = data;
+            let { firstName, lastName, email, billingAddress, paymentDetails, shippingAddress, payTraceId } = data;
 
             let existUser = await getSingleData(Users, { email })
             if (existUser.status) {
@@ -321,6 +321,7 @@ const adminUtils = {
                 createdUser: `${adminData?.data?.firstName} ${adminData?.data?.lastName}`,
                 // customerGuid: randomUUID(),
                 // password: md5(password),
+                payTraceId: payTraceId,
                 createdOn: helpers.getCurrentDate()
             }
 
@@ -362,6 +363,58 @@ const adminUtils = {
             }
 
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
+        } catch (err) {
+            return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
+        }
+
+    },
+    updateCustomer: async (data, adminId) => {
+        try {
+            let { firstName, lastName, billingAddress, paymentDetails, shippingAddress, userId } = data;
+
+            // let findUser = await getSingleData(Users, { _id: userId })
+            // if (!findUser.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.users.email_already, null, null, 400);
+            // }
+            // const usersCount = await getCount(Users, { userType: 3 })
+            // if (!usersCount.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
+            // }
+            // const idGenerated = helpers.generateIDs(usersCount?.data)
+
+            // let adminData = await getSingleData(Users, { _id: adminId, userType: 1 })
+            // if (!adminData.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
+            // }
+
+            let newObj = {
+                firstName,
+                lastName,
+                updatedOn: helpers.getCurrentDate()
+            }
+
+            let result = await updateSingleData(Users, newObj, { _id: userId });
+
+            // if (result.status) {
+            // delete data.password
+
+            let ObjUpdateProfile = {
+                updatedOn: helpers.getCurrentDate()
+            }
+            if (billingAddress) {
+                ObjUpdateProfile.billingAddress = billingAddress
+
+            }
+            if (shippingAddress) {
+                ObjUpdateProfile.shippingAddress = shippingAddress
+            }
+            if (paymentDetails) {
+                ObjUpdateProfile.paymentDetails = paymentDetails
+            }
+
+            let updateUserProfile = await updateSingleData(UserProfile, ObjUpdateProfile, { userId: userId })
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, data, null, 200);
+
         } catch (err) {
             return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
         }
