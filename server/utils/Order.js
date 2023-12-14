@@ -5,6 +5,8 @@ const Gallery = require('../models/Gallery')
 const Order = require('../models/Orders')
 const Cart = require('../models/Cart')
 const { default: mongoose } = require('mongoose');
+const json2csv = require('json2csv').parse;
+
 
 const orderUtil = {
 
@@ -145,17 +147,27 @@ const orderUtil = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
-    downloadOrderDetails: async (data, userId) => {
+    downloadOrderDetails: async (data, userId, res) => {
         try {
             let { orderIds } = data
 
             orderIds.map((id) => mongoose.Types.ObjectId(id))
 
             const result = await getDataArray(Order, { _id: { $in: orderIds } }, "")
+
+            console.log(result, "resulttt");
+
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }
-            return helpers.showResponse(true, ResponseMessages?.common.update_sucess, {}, null, 200);
+
+            // Convert JSON data to CSV
+            const csvData = json2csv(result.data, { header: true });
+
+            // Set response headers for CSV file download
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', 'attachment; filename="orders.csv"');
+            return helpers.showResponse(true, "Download Success", csvData, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
