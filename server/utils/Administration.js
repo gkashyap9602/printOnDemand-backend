@@ -152,7 +152,7 @@ const adminUtils = {
 
     getAllUsers: async (data) => {
         try {
-            let { sortColumn = 'createdOn', sortDirection = 'asc', pageIndex = 1, pageSize = 5, searchKey = '', status } = data
+            let { sortColumn = 'createdOn', sortDirection = 'asc', pageIndex = 1, pageSize = 10, searchKey = '', status } = data
             pageIndex = Number(pageIndex)
             pageSize = Number(pageSize)
 
@@ -165,92 +165,101 @@ const adminUtils = {
                 matchObj.status = Number(status)
             }
             console.log({ ...matchObj }, "matchhhh");
-            const result = await Users.aggregate([
-                {
-                    $match: {
-                        ...matchObj,
+            let aggregate =
+                [
+                    {
+                        $match: {
+                            ...matchObj,
 
-                        $or: [
-                            {
-                                email: { $regex: searchKey, $options: 'i' },
-                            },
-                            {
-                                firstName: { $regex: searchKey, $options: 'i' }
-                            },
+                            $or: [
+                                {
+                                    email: { $regex: searchKey, $options: 'i' },
+                                },
+                                // {
+                                //     firstName: { $regex: searchKey, $options: 'i' }
+                                // },
 
-                        ]
-                    }
-                },
-                {
-                    $skip: (pageIndex - 1) * pageSize
-
-                },
-                {
-                    $limit: pageSize
-
-                },
-                {
-                    $sort: {
-                        [sortColumn]: sortDirection == 'asc' ? 1 : -1
-                    }
-                },
-                {
-                    $lookup: {
-                        from: "userProfile",
-                        localField: "_id",
-                        foreignField: "userId",
-                        as: "userProfileData",
-
-                    }
-                },
-                {
-                    $unwind: {
-                        path: "$userProfileData",
-                        preserveNullAndEmptyArrays: false
+                            ]
+                        }
                     },
+                    {
+                        $sort: {
+                            [sortColumn]: sortDirection == 'asc' ? 1 : -1
+                        }
+                    },
+                    {
+                        $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+                    },
+                    {
+                        $limit: pageSize // Limit the number of records per page
+                    },
+                    {
+                        $lookup: {
+                            from: "userProfile",
+                            localField: "_id",
+                            foreignField: "userId",
+                            as: "userProfileData",
 
-                },
-                {
-                    $lookup: {
-                        from: "orders",
-                        localField: "_id",
-                        foreignField: "customerId",
-                        as: "ordersData",
-                        pipeline: [
-                            {
-                                $group: {
-                                    _id: null,
-                                    totalOrder: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $unwind: {
+                            path: "$userProfileData",
+                            preserveNullAndEmptyArrays: false
+                        },
+
+                    },
+                    {
+                        $lookup: {
+                            from: "orders",
+                            localField: "_id",
+                            foreignField: "customerId",
+                            as: "ordersData",
+                            pipeline: [
+                                {
+                                    $group: {
+                                        _id: null,
+                                        totalOrder: { $sum: 1 }
+                                    }
                                 }
-                            }
-                        ]
+                            ]
 
-                    }
-                },
-                {
-                    $unwind: {
-                        path: "$ordersData",
-                        preserveNullAndEmptyArrays: true
+                        }
                     },
+                    {
+                        $unwind: {
+                            path: "$ordersData",
+                            preserveNullAndEmptyArrays: true
+                        },
 
-                },
-                {
-                    $addFields: {
-                        shippingAddress: '$userProfileData.shippingAddress'
+                    },
+                    {
+                        $addFields: {
+                            shippingAddress: '$userProfileData.shippingAddress'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            numberOfOrders: "$ordersData.totalOrder"
+                        }
+                    },
+                    {
+                        $project: {
+                            userProfileData: 0,
+                            ordersData: 0,
+                        }
                     }
-                },
-                {
-                    $addFields: {
-                        numberOfOrders: "$ordersData.totalOrder"
-                    }
-                },
-                {
-                    $project: {
-                        userProfileData: 0,
-                        ordersData: 0,
-                    }
-                }
-            ])
+                ]
+
+            let pagePipelineCount = [...aggregate];
+
+            pagePipelineCount.push({ $count: 'totalEntries' })
+
+            let countResult = await Users.aggregate(pagePipelineCount)
+
+            let totalCount = countResult?.[0]?.totalEntries || 0;
+
+            const result = await Users.aggregate(aggregate)
 
             const activeUsers = await getCount(Users, { status: 1, userType: 3 })
             const pendingUsers = await getCount(Users, { status: 3, userType: 3 })
@@ -264,7 +273,8 @@ const adminUtils = {
                 total: totalUsers.data
             }
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { statusSummary, users: result }, null, 200);
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { statusSummary, users: result, totalCount }, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

@@ -11,6 +11,7 @@ const axios = require('axios')
 const { ZENDESK_AUTH, ZENDESK_BASE_URL } = require('../constants/const')
 const Users = require('../models/Users')
 const ShipMethod = require("../models/ShipMethod")
+
 const commonUtil = {
 
   getMaterials: async (data) => {
@@ -109,9 +110,19 @@ const commonUtil = {
     // if (!result.status) {
     //   return helpers.showResponse(true, ResponseMessages?.common.database_error, {}, null, 400);
     // }
-    console.log(result,"reulttt");
+    console.log(result, "reulttt");
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result?.data, null, 200);
   },
+  // saveCurrentLanguage: async (data) => {
+  //  let {currentLanguage} = data
+
+  //   let saveLang = await updateSingleData(Users, { currentLanguage },{});
+  //   // if (!result.status) {
+  //   //   return helpers.showResponse(true, ResponseMessages?.common.database_error, {}, null, 400);
+  //   // }
+  //   console.log(result, "reulttt");
+  //   return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result?.data, null, 200);
+  // },
 
   storeParameterToAWS: async (data) => {
     let response = await helpers.postParameterToAWS({

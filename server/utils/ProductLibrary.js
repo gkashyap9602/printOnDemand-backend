@@ -292,11 +292,6 @@ const productLibrary = {
 
             console.log(matchObj, "matchObj");
 
-            if (materialFilter) {
-
-                materialFilter = materialFilter.map((id) => new ObjectId(id))
-            }
-
             let aggregate = [
                 {
                     $match: {
@@ -309,20 +304,21 @@ const productLibrary = {
                 {
                     $limit: pageSize // Limit the number of records per page
                 },
+                //material filter check 
                 {
                     $lookup: {
                         from: 'product',
                         localField: 'productId',
                         foreignField: '_id',
                         as: 'productData',
-                        pipeline: [
-                            {
-                                $match: {
-                                    _id: { $in: materialFilter }
-                                }
-                            },
+                        // pipeline: [
+                        //     {
+                        //         $match: {
+                        //             materialId: { $in: materialFilter }
+                        //         }
+                        //     },
 
-                        ]
+                        // ]
 
                     }
                 },
@@ -372,6 +368,27 @@ const productLibrary = {
                 },
             ]
 
+
+            if (materialFilter) {
+
+                materialFilter = materialFilter.map((id) => new ObjectId(id))
+
+                aggregate.push(
+                    {
+                        $lookup: {
+                            from: 'product',
+                            localField: 'productId',
+                            foreignField: '_id',
+                            as: 'productData',
+                        }
+                    },
+                    {
+                        $match: {
+                            "productData.materialId": { $in: materialFilter }
+                        }
+                    },)
+
+            }
             if (valueSearch) {
                 console.log(valueSearch, "valueSearch value search");
 
