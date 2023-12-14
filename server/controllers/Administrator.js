@@ -30,6 +30,10 @@ const adminController = {
         let result = await Administration.getAllUsers(req.query);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    getCustomerDetails: async (req, res) => {
+        let result = await Administration.getCustomerDetails(req.params);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     addShipMethod: async (req, res) => {
         let result = await Administration.addShipMethod(req.body);
         return helpers.showOutput(res, result, result.statusCode);

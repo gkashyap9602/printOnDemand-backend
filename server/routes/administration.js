@@ -16,6 +16,7 @@ router.post('/createCustomer', verifyTokenAdmin, validate(createCustomer), admin
 router.post('/updateCustomer', verifyTokenAdmin, validate(updateCustomer), adminController.updateCustomer);
 router.post('/activeInactiveUser', verifyTokenAdmin, validate(activeInactiveuser), adminController.activeInactiveUser);
 router.get('/getAllUsers', verifyTokenAdmin, adminController.getAllUsers);
+router.get('/getCustomerDetails/:customerId', verifyTokenAdmin, adminController.getCustomerDetails);
 
 //ship method routes
 router.post('/addShipMethod', validateCSRFToken, verifyTokenAdmin, adminController.addShipMethod);
