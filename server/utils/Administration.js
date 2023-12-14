@@ -187,12 +187,12 @@ const adminUtils = {
                             [sortColumn]: sortDirection == 'asc' ? 1 : -1
                         }
                     },
-                    {
-                        $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-                    },
-                    {
-                        $limit: pageSize // Limit the number of records per page
-                    },
+                    // {
+                    //     $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+                    // },
+                    // {
+                    //     $limit: pageSize // Limit the number of records per page
+                    // },
                     {
                         $lookup: {
                             from: "userProfile",
@@ -258,6 +258,15 @@ const adminUtils = {
             let countResult = await Users.aggregate(pagePipelineCount)
 
             let totalCount = countResult?.[0]?.totalEntries || 0;
+
+            aggregate.push(
+                {
+                    $skip: (pageIndex - 1)
+                },
+                {
+                    $limit: pageSize
+                }
+            );
 
             const result = await Users.aggregate(aggregate)
 
