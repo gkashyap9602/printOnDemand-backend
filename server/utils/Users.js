@@ -535,7 +535,20 @@ const UserUtils = {
         if (result.status) {
             await updateSingleData(UserProfile, { 'completionStaus.paymentInfo': true }, { userId })
 
-            
+            let credential = `grant_type=password&username=${consts.PAYTRACE_USERNAME}&password=${consts.PAYTRACE_PASSWORD}`
+
+            const geenratePayTraceAccessToken = await axios.post(`${consts.PAYTRACE_URL}/oauth/token`, credential, {
+                headers: {
+                    'Accept': '*/*',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }).then((res) => {
+                console.log('Response:', res.data);
+            }).catch((error) => {
+                console.error('Error:', error.response ? error.response.data : error.message);
+            })
+
+
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
