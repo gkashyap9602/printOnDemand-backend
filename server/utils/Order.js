@@ -205,7 +205,7 @@ const orderUtil = {
 
             console.log(sheet, "sheet")
 
-            return helpers.showResponse(true, "Download Success", sheet, null, 200);
+            return helpers.showResponse(true, "Download Success", sheet?.data, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
