@@ -131,6 +131,7 @@ const orderUtil = {
         }
 
     },
+    //pending api 
     updateOrder: async (data, customerId) => {
         try {
             let { orderId, totalAmount, orderItems, shippingMethodId, orderType, billingAddress, shippingAddress, ioss, receipt, preship, shippingAccountNumber, } = data

@@ -347,7 +347,7 @@ const UserUtils = {
     // // with token 
     getUserDetail: async (data) => {
         let { user_id } = data;
-        console.log(user_id, "useridd");
+
         let result = await Users.aggregate([
             { $match: { _id: mongoose.Types.ObjectId(user_id), status: { $ne: 2 } } },  // Match the specific user by _id and status
 
@@ -360,7 +360,10 @@ const UserUtils = {
                 }
             },
             {
-                $unwind: "$userProfileData"
+                $unwind: {
+                    path: "$userProfileData",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $addFields: {
@@ -408,7 +411,7 @@ const UserUtils = {
             //     $unset: "userProfileData" // Exclude the 'password' field
             // },
         ]);
-
+        console.log(result, "resulttttuser");
         if (result.length === 0) {
             return helpers.showResponse(false, 'User Not found ', null, null, 400);
         }
@@ -504,7 +507,7 @@ const UserUtils = {
     updateBillingAddress: async (data, userId) => {
         let queryObject = { _id: userId }
 
-        console.log(data,"databill");
+        console.log(data, "databill");
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
