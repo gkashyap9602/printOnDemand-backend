@@ -13,7 +13,8 @@ const orderUtil = {
     addToCart: async (data, userId) => {
         try {
             let { cartItems } = data
-
+            
+            console.log(cartItems,"cartItemsss");
             //default cart item quantity is 1
             cartItems.map((value) => value.createdOn = helpers.getCurrentDate())
             cartItems.map((value) => value.userId = userId)
