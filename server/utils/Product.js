@@ -64,7 +64,7 @@ const productUtils = {
             const prodRef = new Product(obj)
             const result = await postData(prodRef)
 
-            console.log(result,"resultProductt");
+            console.log(result, "resultProductt");
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
             }
@@ -142,7 +142,8 @@ const productUtils = {
             if (!findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_not_exist, {}, null, 400);
             }
-            const findProductCode = await getSingleData(ProductVarient, { productCode, status: { $ne: 2 } })
+            unique: true
+            const findProductCode = await getSingleData(ProductVarient, { productCode, productId, status: { $ne: 2 } })
             if (findProductCode.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_code_already, {}, null, 400);
             }
@@ -444,8 +445,8 @@ const productUtils = {
                         productionDuration: 1,
                         shortDescription: 1,
                         sizeChart: 1,
-                        isCustomizable:1,
-                        isPersonalizable:1,
+                        isCustomizable: 1,
+                        isPersonalizable: 1,
                         status: 1,
                         title: 1,
                         variantCount: 1,

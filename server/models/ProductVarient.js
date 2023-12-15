@@ -16,7 +16,6 @@ var ProductVarient = new Schema({
     productCode: {
         type: String,
         required: true,
-        unique: true
     },
     dpi: {
         type: String,

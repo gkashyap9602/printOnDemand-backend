@@ -4,7 +4,6 @@ var Schema = mongoose.Schema;
 var Category = new Schema({
     name: {
         type: String,
-        required: true,
         index: true
     },
     description: {
