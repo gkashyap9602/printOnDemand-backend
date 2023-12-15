@@ -11,6 +11,7 @@ const { updateProductLibrary, updateLibraryVarient, ProductLibraryDetails, delet
 router.post('/saveLibraryImage', validateCSRFToken, verifyTokenUser, addToMulter.single('libraryImage'), productLibraryController.saveLibraryImage);
 router.get('/getLibraryImages', verifyTokenUser, productLibraryController.getLibraryImages);
 
+////check
 //product library routes
 router.post('/create', verifyTokenUser, addToMulter.array('productLibraryImg'), productLibraryController.createProductLibrary);
 router.post('/update', verifyTokenUser, validate(updateProductLibrary), productLibraryController.updateProductLibrary);
