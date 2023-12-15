@@ -101,7 +101,7 @@ const UserUtils = {
                     return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
                 }
 
-                let link = `${consts.FRONTEND_URL}/login`
+                let link = `${consts.FRONTEND_URL}/#/login`
                 let to = email
                 let subject = `Welcome to the MWW on Demand Merch Maker!`
                 const logoPath = path.join(__dirname, '../views', 'logo.png');

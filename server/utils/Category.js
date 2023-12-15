@@ -11,8 +11,10 @@ const categoryUtil = {
     getCategories: async (data) => {
         const { includeSubCategory = false, searchKey = '', parentCategoryId } = data
 
-
+          
         console.log(searchKey, "searchKey===");
+        console.log(includeSubCategory, "includeSubCategory===");
+        console.log(parentCategoryId, "parentCategoryId===");
         const aggregationPipeline = [
 
             {
