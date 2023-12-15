@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var ShipMethod = new Schema({
     name: {
         type: String,
-        required: true,
+        default: ''
     },
     shipMethod: {
         type: String,

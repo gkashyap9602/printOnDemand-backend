@@ -15,7 +15,7 @@ var ProductVarient = new Schema({
     // },
     productCode: {
         type: String,
-        required: true,
+        default:null
     },
     dpi: {
         type: String,
@@ -66,7 +66,7 @@ var ProductVarient = new Schema({
     // },
     price: {
         type: Number,
-        default:0
+        default: 0
     },
     msrp: {
         type: String,

@@ -4,13 +4,11 @@ var Schema = mongoose.Schema;
 var Notification = new Schema({
     type: {
         type: String,
-        required: true,
         Comment: "MWW_Global,users"
 
     },
     title: {
         type: String,
-        required: true
     },
     userIds: [
         {
@@ -21,7 +19,6 @@ var Notification = new Schema({
     ],
     description: {
         type: String,
-        required: true
     },
     status: {
         type: Number,

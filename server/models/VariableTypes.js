@@ -4,13 +4,13 @@ var Schema = mongoose.Schema;
 var VariableTypes = new Schema({
     typeName: {
         type: String,
-        required: true,
+        default: '',
         index: true
     },
     status: {
         type: Number,
         default: 1,
-        Comment:"1 for active 2 for delete "
+        Comment: "1 for active 2 for delete "
 
     },
     createdOn: {

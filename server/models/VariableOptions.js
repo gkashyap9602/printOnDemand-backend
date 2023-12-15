@@ -4,7 +4,6 @@ var Schema = mongoose.Schema;
 var VariableOptions = new Schema({
     variableTypeId: {
         type: mongoose.Types.ObjectId,
-        required: true,
         ref: 'variableTypes',
         index: true
     },
