@@ -11,7 +11,7 @@ router.post('/placeOrder', validateCSRFToken, verifyTokenUser, validate(placeOrd
 router.post('/updateOrderStatus', validateCSRFToken, verifyTokenUser, validate(updateOrder), orderController.updateOrderStatus);
 router.post('/getAllOrders', verifyTokenUser, orderController.getAllOrders);
 router.get('/getOrderDetails', verifyTokenUser, orderController.getOrderDetails);
-router.post('/downloadOrderDetails', validateCSRFToken, verifyTokenUser, orderController.downloadOrderDetails);
+router.post('/downloadOrderDetails', verifyTokenUser, orderController.downloadOrderDetails);
 router.post('/updateCartItem', validateCSRFToken, verifyTokenUser, validate(updateCart), orderController.updateCartItem);
 router.get('/getCartItems', verifyTokenUser, orderController.getCartItems);
 router.delete('/removeItemsFromCart', validateCSRFToken, verifyTokenUser, orderController.removeItemsFromCart);
