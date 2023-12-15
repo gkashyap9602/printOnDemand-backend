@@ -49,7 +49,9 @@ const UserUtils = {
             if (!emailExistanceResponse?.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 403);
             }
-
+            let count = await getCount(Users, { userType: 3 })
+            let idGenerated = helpers.generateIDs(count?.data)
+            console.log(idGenerated,"id generateddd");
             let newObj = {
                 firstName,
                 lastName,
@@ -58,7 +60,7 @@ const UserUtils = {
                 phoneNumber,
                 // id: idGenerated.idNumber,
                 // guid: randomUUID(),
-                // customerId: idGenerated.customerID,
+                customerId: idGenerated.customerID,
                 // customerGuid: randomUUID(),
                 password: md5(password),
                 createdOn: helpers.getCurrentDate()

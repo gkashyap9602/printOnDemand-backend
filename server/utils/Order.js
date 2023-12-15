@@ -210,7 +210,7 @@ const orderUtil = {
         }
 
     },
-    updateOrderStatus: async (data, userId) => {
+    updateOrderStatus: async (data) => {
         try {
             let { orderId, orderStatus } = data
 
@@ -219,7 +219,7 @@ const orderUtil = {
                 status: orderStatus
             }
 
-            const result = await updateSingleData(Order, updateObj, { _id: orderId, customerId: userId })
+            const result = await updateSingleData(Order, updateObj, { _id: orderId })
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }

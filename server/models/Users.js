@@ -4,11 +4,11 @@ var Schema = mongoose.Schema;
 var Users = new Schema({
     firstName: {
         type: String,
-        default:""
+        default: ""
     },
     lastName: {
         type: String,
-        default:''
+        default: ''
     },
     email: {
         type: String,
@@ -41,10 +41,10 @@ var Users = new Schema({
     //     type: Number,
     //     default: 0
     // },
-    // customerId: {
-    //     type: Number,
-    //     default: 0
-    // },
+    customerId: {
+        type: Number,
+        default: null
+    },
     orderSubmissionDelay: {
         type: String,
         default: '00:01:00'
