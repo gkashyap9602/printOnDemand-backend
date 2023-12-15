@@ -148,7 +148,7 @@ const orderUtil = {
         }
     },
 
-    downloadOrderDetail: async (data, userId, res) => {
+    downloadOrderDetails: async (data, userId, res) => {
         try {
             let { orderIds } = data
 
@@ -171,6 +171,17 @@ const orderUtil = {
                         localField: 'customerId',
                         foreignField: '_id',
                         as: 'userData',
+                        pipeline: [
+                            {
+                                $project: {
+                                    firstName: 1,
+                                    lastName: 1,
+                                    email: 1,
+                                    phoneNumber: 1
+
+                                }
+                            }
+                        ]
                     }
                 },
                 {
@@ -196,7 +207,7 @@ const orderUtil = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
-    downloadOrderDetails: async (data, userId, res) => {
+    downloadOrderDetail: async (data, userId, res) => {
         try {
             let { orderIds } = data
 

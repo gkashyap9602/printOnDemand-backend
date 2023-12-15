@@ -200,7 +200,10 @@ const exportExcel = async (filteredData) => {
             const workbook = XLSX.utils.book_new();
 
             let sheetArray = [
-                'Customer Name', 'Display Id'
+                'Merch Maker ID', 'Order Id', 'Customer Name', 'Customer Email', 'Customer Phone',
+                'Order Amount', 'Order Date', 'Order Status', "Shipping Method", 'Shipping Address',
+                "Shipping State", 'Shipping Country', "Freight Amount", "Tracking", "Ship Date",
+                "Shipment Weight", "Dimensions", "SKU", "Product Name", 'Quantity',
             ];
             // / Add more Fields to sheet Array /
             // let addressArraySize = 0;
@@ -261,8 +264,12 @@ const exportExcel = async (filteredData) => {
             //         let dataArray = yearsArray[j];
             for (let k = 0; k < filteredData?.length; k++) {
                 let row = [];
-                row.push(filteredData[k].userData.firstName ?? '');
                 row.push(filteredData[k].displayId ?? '');
+                row.push(filteredData[k].mwwOrderId ?? '');
+                row.push(filteredData[k].userData.firstName ?? '');
+                row.push(filteredData[k].userData.email ?? '');
+                row.push(filteredData[k].shippingAddress.companyPhone ?? '');
+                row.push(filteredData[k].amount ?? '');
 
                 // if (dataArray?.data[k]?.address && dataArray?.data[k]?.address?.length > 0) {
                 //     for (let l = 0; l < dataArray?.data[k]?.address?.length; l++) {

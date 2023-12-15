@@ -111,6 +111,7 @@ module.exports.createCustomer = {
 };
 module.exports.updateCustomer = {
     body: joi.object({
+        userId: joi.string().length(24).message("Invalid Id please check").required(),
         firstName: joi.string().required(),
         lastName: joi.string(),
         // password: joi.string().required(),
