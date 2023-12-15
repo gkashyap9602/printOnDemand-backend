@@ -534,6 +534,8 @@ const UserUtils = {
         let result = await updateSingleData(UserProfile, data, { userId })
         if (result.status) {
             await updateSingleData(UserProfile, { 'completionStaus.paymentInfo': true }, { userId })
+
+            
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
