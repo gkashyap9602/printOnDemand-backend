@@ -31,12 +31,10 @@ var Product = new Schema({
     },
     title: {
         type: String,
-        required: true,
-        unique: true
+        default: ""
     },
     longDescription: {
         type: String,
-        required: true
     },
     productionDuration: {
         type: String,

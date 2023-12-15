@@ -46,6 +46,7 @@ const productUtils = {
             // if (!findMaterial.status) {
             //     return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
             // }
+            ///
             let obj = {
                 careInstructions,
                 longDescription,
@@ -63,7 +64,7 @@ const productUtils = {
             const prodRef = new Product(obj)
             const result = await postData(prodRef)
 
-
+            console.log(result,"resultProductt");
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
             }
