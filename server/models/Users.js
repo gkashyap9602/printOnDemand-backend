@@ -4,15 +4,14 @@ var Schema = mongoose.Schema;
 var Users = new Schema({
     firstName: {
         type: String,
-        required: true
+        default:""
     },
     lastName: {
         type: String,
-        required: true
+        default:''
     },
     email: {
         type: String,
-        required: true
     },
     userName: {
         type: String,

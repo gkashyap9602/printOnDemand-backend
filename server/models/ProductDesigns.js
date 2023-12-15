@@ -8,7 +8,6 @@ var ProductDesign = new Schema({
     },
     designName: {
         type: String,
-        required: true
     },
     product_design_files: [{
         fileName: {
