@@ -10,7 +10,7 @@ router.post('/addToCart', verifyTokenUser, validate(addToCart), orderController.
 router.post('/placeOrder', verifyTokenUser, validate(placeOrder), orderController.placeOrder);
 router.post('/updateOrderStatus', verifyTokenBoth, validate(updateOrder), orderController.updateOrderStatus);
 router.post('/getAllOrders', verifyTokenUser, orderController.getAllOrders);
-router.get('/getOrderDetails', verifyTokenBoth, orderController.getOrderDetails);
+router.get('/getOrderDetails', verifyTokenUser, orderController.getOrderDetails);
 router.post('/downloadOrderDetails', verifyTokenUser, orderController.downloadOrderDetails);
 router.post('/updateCartItem', verifyTokenUser, validate(updateCart), orderController.updateCartItem);
 router.get('/getCartItems', verifyTokenUser, orderController.getCartItems);
@@ -19,6 +19,7 @@ router.delete('/deleteCart', verifyTokenUser, validate(deleteCart), orderControl
 
 //admin routes
 router.post('/getAllUserOrders', verifyTokenAdmin, orderController.getAllUserOrders);
+router.get('/getUserOrderDetails', verifyTokenAdmin, orderController.getUserOrderDetails);
 ////
 // Common Routes 
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

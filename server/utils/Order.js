@@ -13,8 +13,8 @@ const orderUtil = {
     addToCart: async (data, userId) => {
         try {
             let { cartItems } = data
-            
-            console.log(cartItems,"cartItemsss");
+
+            console.log(cartItems, "cartItemsss");
             //default cart item quantity is 1
             cartItems.map((value) => value.createdOn = helpers.getCurrentDate())
             cartItems.map((value) => value.userId = userId)
@@ -663,6 +663,67 @@ const orderUtil = {
     },
     getOrderDetails: async (data, userId) => {
         let { orderId } = data
+
+        const result = await Order.aggregate([
+            {
+                $match: {
+                    customerId: mongoose.Types.ObjectId(userId),
+                    _id: mongoose.Types.ObjectId(orderId),
+                }
+            },
+            {
+                $lookup: {
+                    from: 'shipMethod',
+                    localField: 'shippingMethodId',
+                    foreignField: '_id',
+                    as: 'ShipMethodData',
+                }
+
+            },
+            {
+                $unwind: "$ShipMethodData"
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'customerId',
+                    foreignField: '_id',
+                    as: 'userData',
+                    pipeline: [
+                        {
+                            $project: {
+                                firstName: 1,
+                                lastName: 1,
+                                payTraceId: 1,
+                                // traceId:1,
+
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $unwind: "$userData"
+            },
+            {
+                $addFields: {
+                    customerName: "$userData.firstName",
+                    shipMethodName: "$ShipMethodData.name"
+                }
+            },
+            {
+                $project: {
+                    userData: 0, // Exclude the userData array from the result
+                    ShipMethodData: 0 // Exclude the ShipMethodData array from the result
+                }
+            }
+        ]
+        );
+
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result[0] : result, null, 200);
+    },
+    getUserOrderDetails: async (data, userId) => {
+        let { orderId, userId } = data
 
         const result = await Order.aggregate([
             {

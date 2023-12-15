@@ -57,6 +57,10 @@ const orderController = {
         let result = await Order.getOrderDetails(req.query, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    getUserOrderDetails: async (req, res) => {
+        let result = await Order.getUserOrderDetails(req.query);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     removeItemsFromCart: async (req, res) => {
         let result = await Order.removeItemsFromCart(req.body);
         return helpers.showOutput(res, result, result.statusCode);
