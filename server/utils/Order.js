@@ -723,12 +723,12 @@ const orderUtil = {
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result[0] : result, null, 200);
     },
     getUserOrderDetails: async (data, userId) => {
-        let { orderId, userId } = data
+        let { orderId } = data
 
         const result = await Order.aggregate([
             {
                 $match: {
-                    customerId: mongoose.Types.ObjectId(userId),
+                    // customerId: mongoose.Types.ObjectId(userId),
                     _id: mongoose.Types.ObjectId(orderId),
                 }
             },
