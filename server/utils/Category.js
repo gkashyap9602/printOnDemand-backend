@@ -11,7 +11,7 @@ const categoryUtil = {
     getCategories: async (data) => {
         const { includeSubCategory = false, searchKey = '', parentCategoryId } = data
 
-          
+
         console.log(searchKey, "searchKey===");
         console.log(includeSubCategory, "includeSubCategory===");
         console.log(parentCategoryId, "parentCategoryId===");
@@ -142,7 +142,12 @@ const categoryUtil = {
             if (!findCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.category_not_exist, {}, null, 400);
             }
-            const findSubCategory = await getSingleData(SubCategory, { status: { $ne: 2 }, name: name })
+            let findSubCatMatchObj = {
+                status: { $ne: 2 },
+                name: name,
+                categoryId
+            }
+            const findSubCategory = await getSingleData(SubCategory, findSubCatMatchObj)
             if (findSubCategory.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.subcategory_already_existed, {}, null, 400);
             }

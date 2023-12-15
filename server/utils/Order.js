@@ -14,8 +14,7 @@ const orderUtil = {
         try {
             let { cartItems } = data
 
-            // let alreadyCartItem
-            // let newCartItem
+            //default cart item quantity is 1
             cartItems.map((value) => value.createdOn = helpers.getCurrentDate())
             cartItems.map((value) => value.userId = userId)
 
