@@ -8,12 +8,12 @@ module.exports.addProduct = {
         materialIds: joi.array().required(),
         title: joi.string().required(),
         longDescription: joi.string().required(),
-        careInstructions: joi.string(),
-        productionDuration: joi.string(),
+        careInstructions: joi.string().allow(''),
+        productionDuration: joi.string().allow(''),
         shortDescription: joi.string(),
-        construction: joi.string(),
-        features: joi.string(),
-        process: joi.string(),
+        construction: joi.string().allow(''),
+        features: joi.string().allow(''),
+        process: joi.string().allow(''),
     })
 
 };
@@ -33,7 +33,7 @@ module.exports.updateProduct = {
     })
 
 };
-module.exports.addProductVarient= {
+module.exports.addProductVarient = {
     body: joi.object({
         productCode: joi.string().required(),
         price: joi.string().required(),
@@ -45,7 +45,7 @@ module.exports.addProductVarient= {
     })
 
 };
-module.exports.updateProductVarient= {
+module.exports.updateProductVarient = {
     body: joi.object({
         productCode: joi.string().required(),
         price: joi.string().required(),
@@ -56,7 +56,7 @@ module.exports.updateProductVarient= {
     })
 
 };
-module.exports.addProductImage= {
+module.exports.addProductImage = {
     body: joi.object({
         displayOrder: joi.number().required(),
         imageType: joi.number().required().valid(1, 2, 3),//1 for productimage 2 for varientImage 3 for Size chart
@@ -65,7 +65,7 @@ module.exports.addProductImage= {
 
 };
 
-module.exports.updateVarientTemplate= {
+module.exports.updateVarientTemplate = {
     body: joi.object({
         templateType: joi.number().required().valid(1, 2, 3), //1 for pdf 2 for psd 3 for ai file type
         productVarientId: joi.string().length(24).message("Invalid Id please check").required(),

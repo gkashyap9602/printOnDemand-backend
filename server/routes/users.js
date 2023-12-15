@@ -27,7 +27,7 @@ router.post('/updateShippingDetails',validateCSRFToken, verifyTokenUser, validat
 router.post('/updateBillingAddress',validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updateBillingAddress);
 router.post('/updatePaymentDetails',validateCSRFToken, verifyTokenUser, validate(profileSchema), authController.updatePaymentDetails);
 router.post('/updateOrderSubmissionDelay',validateCSRFToken, verifyTokenUser, validate(updateSubmissionDelay), authController.updateOrderSubmissionDelay);
-router.get('/getUser/:user_id', verifyTokenUser, authController.getUserDetail);
+router.get('/getUser/:user_id', verifyTokenBoth, authController.getUserDetail);
 router.get('/getUserStatus/:user_id', verifyTokenUser, authController.getUserStatus);
 
 //csrf route
