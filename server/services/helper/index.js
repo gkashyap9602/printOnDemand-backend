@@ -192,12 +192,23 @@ const generateCsrfToken = () => {
     return crypto.randomUUID()
 }
 
+
+
 const exportExcel = async (filteredData) => {
     return new Promise(async (resolve, reject) => {
         try {
             let filePath = `worksheet/${"Order"}-${new Date().getTime()}.xlsx`;
-            let local_path = path.resolve(`./server/uploads/${filePath}`);
+            // let local_path = path.resolve(`./server/uploads/${filePath}`);
             const workbook = XLSX.utils.book_new();
+
+            let orderStatus = {
+                1: "new",
+                2: "inProduction",
+                3: "shipped",
+                4: "error",
+                5: "recieved",
+                6: "cancelled"
+            }
 
             let sheetArray = [
                 'Merch Maker ID', 'Order Id', 'Customer Name', 'Customer Email', 'Customer Phone',
@@ -237,31 +248,9 @@ const exportExcel = async (filteredData) => {
             // }
             // / Ends here /
             const sheet = XLSX.utils.aoa_to_sheet([sheetArray]);
-            // let filteredData = [];
-            // for (let item of result) {
-            //     let itemName = item['_id'];
-            //     let arrayData = item['data'];
-            //     let newArray = []
-            //     for (let i = 0; i < years.length; i++) {
-            //         const startOfYear = moment.utc(`${years[i]}-01-01 00:00:00`);
-            //         const startOfYearUnix = startOfYear.unix();
-            //         const endOfYearUnix = startOfYear.clone().endOf('year').unix();
-            //         const yearFilteredData = arrayData.filter(item => {
-            //             return ((item.created_on >= startOfYearUnix) && (item.created_on <= endOfYearUnix));
-            //         });
-            //         newArray.push({ year: years[i], data: yearFilteredData });
-            //     }
-            //     let obj = {
-            //         race: itemName,
-            //         yearData: newArray
-            //     }
-            //     filteredData.push(obj);
-            // }
+
             let rowData = [];
-            // for (let i = 1; i < filteredData?.length; i++) {
-            //     let yearsArray = filteredData[i]?.yearData;
-            //     for (let j = 0; j < yearsArray?.length; j++) {
-            //         let dataArray = yearsArray[j];
+
             for (let k = 0; k < filteredData?.length; k++) {
                 let row = [];
                 row.push(filteredData[k].displayId ?? '');
@@ -270,64 +259,33 @@ const exportExcel = async (filteredData) => {
                 row.push(filteredData[k].userData.email ?? '');
                 row.push(filteredData[k].shippingAddress.companyPhone ?? '');
                 row.push(filteredData[k].amount ?? '');
+                row.push(filteredData[k].orderDate ?? '');
+                row.push(orderStatus[filteredData[k].status] ?? '');
+                row.push(filteredData[k].shipMethodData.name ?? '');
+                row.push(filteredData[k].shippingAddress.address1 ?? '');
+                row.push(filteredData[k].shippingAddress.stateName ?? '');
+                row.push(filteredData[k].shippingAddress.country ?? '');
 
-                // if (dataArray?.data[k]?.address && dataArray?.data[k]?.address?.length > 0) {
-                //     for (let l = 0; l < dataArray?.data[k]?.address?.length; l++) {
-                //         if (!dataArray?.data[k]?.address[l]?.location || dataArray?.data[k]?.address[l]?.location == '') {
-                //             row.push('');
-                //         } else {
-                //             row.push(dataArray?.data[k]?.address[l]?.location ?? '');
-                //         }
-                //         if (!dataArray?.data[k]?.address[l]?.state || dataArray?.data[k]?.address[l]?.state == '') {
-                //             row.push('');
-                //         } else {
-                //             row.push(dataArray?.data[k]?.address[l]?.state ?? '');
-                //         }
-                //         if (!dataArray?.data[k]?.address[l]?.city || dataArray?.data[k]?.address[l]?.city == '') {
-                //             row.push('');
-                //         } else {
-                //             row.push(dataArray?.data[k]?.address[l]?.city ?? '');
-                //         }
-                //         if (!dataArray?.data[k]?.address[l]?.zip || dataArray?.data[k]?.address[l]?.zip == '') {
-                //             row.push('');
-                //         } else {
-                //             row.push(dataArray?.data[k]?.address[l]?.zip ?? '');
-                //         }
-                //         if (!dataArray?.data[k]?.address[l]?.lat || dataArray?.data[k]?.address[l]?.lat == '') {
-                //             row.push('');
-                //         } else {
-                //             row.push(dataArray?.data[k]?.address[l]?.lat ?? '');
-                //         }
-                //         if (!dataArray?.data[k]?.address[l]?.lon || dataArray?.data[k]?.address[l]?.lon == '') {
-                //             row.push('');
-                //         } else {
-                //             row.push(dataArray?.data[k]?.address[l]?.lon ?? '');
-                //         }
-                //     }
-                // }
-                // if (dataArray?.data[k]?.emergency_contact_details && dataArray?.data[k]?.emergency_contact_details?.length > 0) {
-                //     for (let m = 0; m < dataArray?.data[k]?.emergency_contact_details?.length; m++) {
-                //         if (!dataArray?.data[k]?.emergency_contact_details[m]?.contact_name || dataArray?.data[k]?.emergency_contact_details[m]?.contact_name == '') {
-                //             row.push('');
-                //         } else {
-                //             row.push(dataArray?.data[k]?.emergency_contact_details[m]?.contact_name ?? '');
-                //         }
-                //         if (!dataArray?.data[k]?.emergency_contact_details[m]?.contact_email || dataArray?.data[k]?.emergency_contact_details[m]?.contact_email == '') {
-                //             row.push('');
-                //         } else {
-                //             row.push(dataArray?.data[k]?.emergency_contact_details[m]?.contact_email ?? '');
-                //         }
-                //         if (!dataArray?.data[k]?.emergency_contact_details[m]?.contact_number || dataArray?.data[k]?.emergency_contact_details[m]?.contact_number == '') {
-                //             row.push('');
-                //         } else {
-                //             row.push(dataArray?.data[k]?.emergency_contact_details[m]?.contact_number ?? '');
-                //         }
-                //     }
-                // }
+                row.push(filteredData[k].freightAmount ?? '');
+                row.push(filteredData[k].tracking ?? '');
+                row.push(filteredData[k].shipDate ?? '');
+                row.push(filteredData[k].shipmentWeight ?? '');
+                row.push(filteredData[k].dimensions ?? '');
+                row.push(filteredData[k].sku ?? '');
+
+                if (filteredData[k]?.orderItems && filteredData[k]?.orderItems.length > 0) {
+
+                    for (let j = 0; j < filteredData[k]?.orderItems?.length; j++) {
+                        console.log(filteredData[k]?.orderItems, "orderItems");
+                        row.push(filteredData[k]?.orderItems[j]?.productTitle ?? '');
+                        row.push(filteredData[k]?.orderItems[j]?.quantity ?? '');
+
+                    }
+                }
+
                 rowData.push(row);
             }
-            // }
-            // }
+
             let counter = 1;
             for (let k = 0; k < rowData.length; k++) {
                 XLSX.utils.sheet_add_aoa(sheet, [rowData[k]], { origin: counter + 1, skipHeader: true });
@@ -335,14 +293,17 @@ const exportExcel = async (filteredData) => {
             }
             XLSX.utils.book_append_sheet(workbook, sheet, 'Orders Data');
             const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
-            // return resolve({ status: true, message: "Excel for members created Successfully!", data: excelLink, code: 200 });
-            fs.writeFile(local_path, buffer, (err) => {
-                if (err) {
-                    return resolve({ status: false, message: "Error Occured in exporting patients age distribution excel", data: err.message, code: 200 });
-                } else {
-                    return resolve({ status: true, message: "Excel for members created Successfully!", data: filePath, code: 200 });
-                }
-            });
+            let excelLink = await uploadToS3ExcelSheet(buffer, filePath);
+            return resolve({ status: true, message: "Excel for members created Successfully!", data: excelLink, code: 200 });
+
+            //for local check use this 
+            // fs.writeFile(local_path, buffer, (err) => {
+            //     if (err) {
+            //         return resolve({ status: false, message: "Error Occured in exporting patients age distribution excel", data: err.message, code: 200 });
+            //     } else {
+            //         return resolve({ status: true, message: "Excel for members created Successfully!", data: filePath, code: 200 });
+            //     }
+            // });
 
         } catch (err) {
             console.log(err)
@@ -1058,6 +1019,39 @@ const uploadFileToS3 = async (files) => {
         }
     });
 };
+const uploadToS3ExcelSheet = async (excelBuffer, fileName) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let SecretResponse = await getSecretFromAWS("mww-secret");
+            let region = await getParameterFromAWS({ name: "REGION" });
+
+            const s3 = new AWS.S3({
+                accessKeyId: await getParameterFromAWS({ name: "ACCESSID" }),
+                secretAccessKey: JSON.parse(SecretResponse?.SecretString)['mww-secret'],
+                region,
+            });
+
+            let bucketName = await getParameterFromAWS({ name: `MWW-BUCKET` });
+            bucketName = bucketName + `${changeEnv(process.env.ENV_MODE).bucket}`
+
+            const params = {
+                Bucket: bucketName,
+                ContentType: 'application/xlsx',
+                Key: fileName,
+                Body: excelBuffer
+            };
+            s3.upload(params, (error, data) => {
+                if (error) {
+                    resolve(null)
+                } else {
+                    resolve(data.key ? data?.key : data.Key);
+                }
+            });
+        } catch (err) {
+            resolve({ status: false, message: 'Error Occured!!', data: err.message, code: 200 });
+        }
+    });
+}
 
 
 const uploadToS3 = async (files, key) => {

@@ -152,16 +152,13 @@ const orderUtil = {
         try {
             let { orderIds } = data
 
-            orderIds = orderIds.map((id) => mongoose.Types.ObjectId(id))
-
-            // const result = await getDataArray(Order, { _id: { $in: orderIds } }, "")
-
+            orderIds = orderIds?.map((id) => mongoose.Types.ObjectId(id))
 
             console.log(orderIds, "orderIds");
             const result = await Order.aggregate([
                 {
                     $match: {
-                        // customerId: mongoose.Types.ObjectId(userId),
+                        customerId: mongoose.Types.ObjectId(userId),
                         _id: { $in: orderIds }
                     }
                 },
@@ -185,6 +182,15 @@ const orderUtil = {
                     }
                 },
                 {
+                    $lookup: {
+                        from: 'shipMethod',
+                        localField: 'shippingMethodId',
+                        foreignField: '_id',
+                        as: 'shipMethodData',
+
+                    }
+                },
+                {
                     $unwind: "$userData"
                 }
             ])
@@ -195,11 +201,9 @@ const orderUtil = {
                 return helpers.showResponse(false, "Details Not available", {}, null, 400);
             }
 
-
             const sheet = await helpers.exportExcel(result)
 
             console.log(sheet, "sheet")
-
 
             return helpers.showResponse(true, "Download Success", sheet, null, 200);
         }
@@ -207,43 +211,7 @@ const orderUtil = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
-    downloadOrderDetail: async (data, userId, res) => {
-        try {
-            let { orderIds } = data
 
-            orderIds = orderIds.map((id) => mongoose.Types.ObjectId(id))
-
-            // const result = await getDataArray(Order, { _id: { $in: orderIds } }, "")
-
-
-            console.log(orderIds, "orderIds");
-            const result = await Order.aggregate([
-                {
-                    $match: {
-                        // customerId: mongoose.Types.ObjectId(userId),
-                        _id: { $in: orderIds }
-                    }
-                }
-            ])
-
-            console.log(result, "resulttt");
-
-            if (result.length === 0) {
-                return helpers.showResponse(false, "Details Not available", {}, null, 400);
-            }
-
-            // Convert JSON data to CSV
-            const csvData = json2csv(result, { header: true });
-
-            // Set response headers for CSV file download
-            res.setHeader('Content-Type', 'text/csv');
-            res.setHeader('Content-Disposition', 'attachment; filename="orders.csv"');
-            return helpers.showResponse(true, "Download Success", csvData, null, 200);
-        }
-        catch (err) {
-            return helpers.showResponse(false, err?.message, null, null, 400);
-        }
-    },
     getAllOrders: async (data, userId) => {
         let { pageIndex = 1, pageSize = 10, searchKey = '', sortColumn = "orderDate", orderType = null, sortDirection = "asc", createdFrom = null, createdTill = null, status = null, storeIds = [] } = data
         pageIndex = Number(pageIndex)

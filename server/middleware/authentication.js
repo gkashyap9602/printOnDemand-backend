@@ -116,9 +116,9 @@ const middleware = {
 						return res.status(403).json({ status: false, message: ResponseMessages?.middleware?.use_access_token, StatusCode: 401 });
 					}
 					if (decoded?.user_type == "admin") {
-
+                            
 						let response = await getSingleData(Users, { _id: decoded._id }, { password: 0 });
-
+                       
 						if (!response.status) {
 							return res.status(401).json({ status: false, message: ResponseMessages?.admin.invalid_admin, StatusCode: 401 });
 						}
