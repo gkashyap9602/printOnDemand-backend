@@ -8,7 +8,7 @@ const { addToCart, updateCart, deleteCart, placeOrder, updateOrder } = require('
 // user token access routes
 router.post('/addToCart', verifyTokenUser, validate(addToCart), orderController.addToCart);
 router.post('/placeOrder', verifyTokenUser, validate(placeOrder), orderController.placeOrder);
-router.post('/updateOrderStatus', verifyTokenUser, validate(updateOrder), orderController.updateOrderStatus);
+router.post('/updateOrderStatus', verifyTokenBoth, validate(updateOrder), orderController.updateOrderStatus);
 router.post('/getAllOrders', verifyTokenUser, orderController.getAllOrders);
 router.get('/getOrderDetails', verifyTokenBoth, orderController.getOrderDetails);
 router.post('/downloadOrderDetails', verifyTokenUser, orderController.downloadOrderDetails);
