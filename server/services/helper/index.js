@@ -311,6 +311,101 @@ const exportExcel = async (filteredData) => {
         }
     });
 }
+const sendExcelAttachement = async (filteredData) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let filePath = `worksheet/${"Order"}-${new Date().getTime()}.xlsx`;
+            // let local_path = path.resolve(`./server/uploads/${filePath}`);
+            const workbook = XLSX.utils.book_new();
+
+
+            let sheetArray = [
+                'cust_Id', 'company_name', 'customer_name', 'address1', 'address2',
+                'city', 'state', 'country', "zip", 'email',
+                "phone", 'tax_id', "paytrace_token",
+            ];
+            // / Add more Fields to sheet Array /
+            // let addressArraySize = 0;
+            // let contactDetailArraySize = 0;
+
+            // result?.forEach(item => {
+            //     if (Array.isArray(item?.data)) {
+            //         item?.data?.forEach(obj => {
+            //             if (obj?.address?.length > addressArraySize) {
+            //                 addressArraySize = obj?.address?.length;
+            //             }
+            //             if (obj?.emergency_contact_details?.length > contactDetailArraySize) {
+            //                 contactDetailArraySize = obj?.emergency_contact_details?.length;
+            //             }
+            //         });
+            //     }
+            // });
+            // for (let a = 0; a < addressArraySize; a++) {
+            //     sheetArray.push(
+            //         `Location-${a + 1}`, `State-${a + 1}`,
+            //         `City-${a + 1}`, `Zipcode-${a + 1}`,
+            //         `Latitude-${a + 1}`, `Longitude-${a + 1}`
+            //     );
+            // }
+            // for (let c = 0; c < contactDetailArraySize; c++) {
+            //     sheetArray.push(
+            //         `Emergency Contact Name-${c + 1}`,
+            //         `Emergency Contact Email-${c + 1}`,
+            //         `Emergency Contact Number-${c + 1}`
+            //     );
+            // }
+            // / Ends here /
+            const sheet = XLSX.utils.aoa_to_sheet([sheetArray]);
+
+            let rowData = [];
+
+            for (let k = 0; k < filteredData?.length; k++) {
+                let row = [];
+                row.push(filteredData[k].cust_Id ?? '');
+                row.push(filteredData[k].company_name ?? '');
+                row.push(filteredData[k].customer_name ?? '');
+                row.push(filteredData[k].email ?? '');
+                row.push(filteredData[k].address1 ?? '');
+                row.push(filteredData[k].address2 ?? '');
+                row.push(filteredData[k].city ?? '');
+                row.push(filteredData[k].state ?? '');
+                row.push(filteredData[k].country ?? '');
+                row.push(filteredData[k].zip ?? '');
+                row.push(filteredData[k].email ?? '');
+                row.push(filteredData[k].phone ?? '');
+
+                row.push(filteredData[k].tax_id ?? '');
+                row.push(filteredData[k].paytrace_token ?? '');
+
+
+                rowData.push(row);
+            }
+
+            let counter = 1;
+            for (let k = 0; k < rowData.length; k++) {
+                XLSX.utils.sheet_add_aoa(sheet, [rowData[k]], { origin: counter + 1, skipHeader: true });
+                counter++;
+            }
+            XLSX.utils.book_append_sheet(workbook, sheet, 'Orders Data');
+            const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+            let excelLink = await uploadToS3ExcelSheet(buffer, filePath);
+            return resolve({ status: true, message: "Excel for members created Successfully!", data: excelLink, code: 200 });
+
+            //for local check use this 
+            // fs.writeFile(local_path, buffer, (err) => {
+            //     if (err) {
+            //         return resolve({ status: false, message: "Error Occured in exporting patients age distribution excel", data: err.message, code: 200 });
+            //     } else {
+            //         return resolve({ status: true, message: "Excel for members created Successfully!", data: filePath, code: 200 });
+            //     }
+            // });
+
+        } catch (err) {
+            console.log(err)
+            return resolve({ status: false, message: "Error Occured, please try again", data: err.message, code: 200 });
+        }
+    });
+}
 
 const validateParamsArray = (data, feilds) => {
     var postKeys = [];
@@ -1289,6 +1384,7 @@ module.exports = {
     uploadFileToS3,
     convertImageToWebp,
     exportExcel,
+    sendExcelAttachement,
     // createVideoThumbnail,
     addToMulter,
     generateUsernames,

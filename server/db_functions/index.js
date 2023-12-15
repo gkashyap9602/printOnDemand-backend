@@ -120,7 +120,7 @@ module.export = removeItemFromArray = (Model, mainIdObj, arrayKey, itemId) => {
 module.export = updateSingleData = (Model, DataObject, matchObj) => {
     return new Promise((resolve, reject) => {
         Model.findOneAndUpdate(matchObj, { $set: DataObject }, { new: true }, (err, updatedData) => {
-            console.log(updatedData, "updatedData");
+            // console.log(updatedData, "updatedData");
             if (err) {
                 let response = helpers.showResponse(false, err);
                 return resolve(response);
