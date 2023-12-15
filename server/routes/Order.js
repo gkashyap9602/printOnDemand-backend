@@ -1,7 +1,7 @@
 var express = require('express');
 var orderController = require('../controllers/Order');
 var router = express.Router();
-var { verifyTokenUser, validateCSRFToken } = require("../middleware/authentication");
+var { verifyTokenUser, validateCSRFToken,verifyTokenAdmin } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
 const { addToCart, updateCart, deleteCart, placeOrder, updateOrder } = require('../validations/order')
 
@@ -17,6 +17,8 @@ router.get('/getCartItems', verifyTokenUser, orderController.getCartItems);
 router.delete('/removeItemsFromCart', validateCSRFToken, verifyTokenUser, orderController.removeItemsFromCart);
 router.delete('/deleteCart', validateCSRFToken, verifyTokenUser, validate(deleteCart), orderController.deleteCart);
 
+//admin routes
+router.post('/getAllUserOrders', verifyTokenAdmin, orderController.getAllUserOrders);
 
 // Common Routes 
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

@@ -45,6 +45,10 @@ const orderController = {
         let result = await Order.getAllOrders(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    getAllUserOrders: async (req, res) => {
+        let result = await Order.getAllUserOrders(req.body);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     getOrderDetails: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {

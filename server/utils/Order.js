@@ -536,6 +536,131 @@ const orderUtil = {
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
     },
+    getAllUserOrders: async (data) => {
+        let { pageIndex = 1, pageSize = 10, searchKey = '', sortColumn = "orderDate", orderType = null, sortDirection = "asc", createdFrom = null, createdTill = null, source = '' } = data
+        pageIndex = Number(pageIndex)
+        pageSize = Number(pageSize)
+
+        let matchObj = {}
+
+        if (orderType) {
+            orderType = Number(orderType)
+            matchObj.orderType = orderType
+        }
+        console.log(searchKey, "searchKeysearchKey");
+        let searchObj = {}
+        if (searchKey) {
+            searchKey = searchKey.toString()
+            searchObj = {
+                $or: [
+                    { displayId: { $regex: searchKey, $options: 'i' } },
+                    { mwwOrderId: { $regex: searchKey, $options: 'i' } },
+                ]
+            }
+
+        }
+
+        if (createdFrom && createdTill) {
+            matchObj.orderDate = { $gte: createdFrom, $lte: createdTill }
+        }
+
+        console.log(matchObj, "matchObjjj");
+        console.log(searchObj, "searchObj");
+        const result = await Order.aggregate([
+            {
+                $match: {
+                    ...matchObj,
+                    ...searchObj
+
+                }
+            },
+
+            {
+                $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+            },
+            {
+                $limit: pageSize // Limit the number of records per page
+            },
+            {
+                $sort: {
+                    [sortColumn]: sortDirection === "asc" ? 1 : -1
+                }
+            },
+            {
+                $lookup: {
+                    from: 'shipMethod',
+                    localField: 'shippingMethodId',
+                    foreignField: '_id',
+                    as: 'ShipMethodData',
+                }
+
+            },
+            {
+                $unwind: "$ShipMethodData"
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'customerId',
+                    foreignField: '_id',
+                    as: 'userData',
+                    pipeline: [
+                        // {
+                        //     $match: {
+                        //         $or: [{ firstName: { $regex: searchKey, $options: 'i' } }]
+                        //     }
+                        // },
+                        {
+                            $project: {
+                                firstName: 1,
+                                lastName: 1,
+                                payTraceId: 1,
+                                // traceId:1,
+
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $unwind: "$userData"
+            },
+            // {
+            //     $match: {
+            //         $or: [{ "userData.firstName": { $regex: searchKey, $options: 'i' } }]
+            //     }
+            // },
+            {
+                $addFields: {
+                    productNames: "$orderItems.productTitle"
+                }
+            },
+
+            {
+                $project: {
+                    amount: 1,
+                    customerName: "$userData.firstName",
+                    displayId: 1,
+                    isSubmitImmediately: 1,
+                    mwwOrderId: 1,
+                    orderDate: 1,
+                    orderType: 1,
+                    source: 1,
+                    status: 1,
+                    storeName: 1,
+                    submissionDueDate: 1,
+                    productNames: 1
+
+                }
+            }
+        ]
+        );
+
+        let total = await getCount(Order, matchObj)
+        let totalCount = total.data
+
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, totalCount }, null, 200);
+    },
     getOrderDetails: async (data, userId) => {
         let { orderId } = data
 
