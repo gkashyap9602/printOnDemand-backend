@@ -54,12 +54,17 @@ const productLibrary = {
 
             console.log(productLibraryImages, "productLibraryImages");
             console.log(productLibraryVarients, "productLibraryVarients");
-            productLibraryImages = JSON.parse(productLibraryImages)
-            productLibraryVarients = JSON.parse(productLibraryVarients)
+
+            if (typeof productLibraryImages == 'string') {
+                productLibraryImages = JSON.parse(productLibraryImages)
+
+            }
+            if (typeof productLibraryVarients == 'string') {
+                productLibraryVarients = JSON.parse(productLibraryVarients)
+
+            }
             // console.log(files, "fileass");
             let productlibImages
-
-
 
             if (files?.length > 0 && productLibraryImages.length === 0) {
                 console.log("under multer iff");
@@ -367,11 +372,10 @@ const productLibrary = {
                 if (typeof materialFilter == 'string') {
                     materialFilter = JSON.parse(materialFilter)
                 }
-                console.log(typeof materialFilter, "materialFilter");
 
                 materialFilter = materialFilter.map((id) => new ObjectId(id))
-                 
-                console.log(materialFilter,"materialFilter111");
+
+                console.log(materialFilter, "materialFilter after");
                 //add aggregation for material filter match 
                 aggregate.push(
                     {

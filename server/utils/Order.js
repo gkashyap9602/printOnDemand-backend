@@ -59,6 +59,21 @@ const orderUtil = {
             const randomId = helpers.generateRandom4DigitNumber(fixedPrefix);
 
             // let populate = "productLibraryVariantId"
+            const cart = await Cart.findOne({ userId: customerId })
+                .populate({
+                    path: "productLibraryVariantId",
+                    // populate: {
+                    //     path: 'productLibraryId', // Replace 'nestedField1' with the actual nested field
+                    // }
+                })
+            console.log(cart, "carttt");
+
+            if (!cart) {
+                return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
+            }
+
+            let image = cart?.productLibraryVariantId?.productLibraryVarientImages[0]?.imageUrl ?? ""
+
             // const findCart = await getDataArray(Cart, { userId: customerId }, "", null, null, null)
             // if (!findCart.status) {
             //     return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
@@ -101,6 +116,7 @@ const orderUtil = {
                 ioss,
                 receipt,
                 preship,
+                image: image,
                 shippingAccountNumber,
                 orderDate: helpers.getCurrentDate()
             }
@@ -108,7 +124,7 @@ const orderUtil = {
             let orderRef = new Order(obj)
 
             let response = await postData(orderRef);
-            // console.log(response, "responsee");
+            console.log(response, "responsee");
             if (response.status) {
 
                 let removeItem = await deleteData(Cart, { userId: customerId })

@@ -83,6 +83,11 @@ var Orders = new Schema({
         type: Number,
         default: null
     },
+    image: {
+        type: String,
+        default: null,
+        Comment:"image url of main product which ProductVerient ordered "
+    },
     receipt: {
         type: String,
         default: ""

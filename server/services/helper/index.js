@@ -320,43 +320,16 @@ const sendExcelAttachement = async (filteredData) => {
             // let local_path = path.resolve(`./server/uploads/${filePath}`);
             const workbook = XLSX.utils.book_new();
 
-
             let sheetArray = [
                 'cust_Id', 'company_name', 'customer_name', 'address1', 'address2',
                 'city', 'state', 'country', "zip", 'email',
                 "phone", 'tax_id', "paytrace_token",
-            ];
-            // / Add more Fields to sheet Array /
-            // let addressArraySize = 0;
-            // let contactDetailArraySize = 0;
+                "billing_name,", "billing_address1", "billing_address2", "billing_city", "billing_state",
+                "billing_country", "billing_zip", "credit_name", "credit_address1", "credit_city", "credit_state",
+                "credit_country", "credit_zip"
 
-            // result?.forEach(item => {
-            //     if (Array.isArray(item?.data)) {
-            //         item?.data?.forEach(obj => {
-            //             if (obj?.address?.length > addressArraySize) {
-            //                 addressArraySize = obj?.address?.length;
-            //             }
-            //             if (obj?.emergency_contact_details?.length > contactDetailArraySize) {
-            //                 contactDetailArraySize = obj?.emergency_contact_details?.length;
-            //             }
-            //         });
-            //     }
-            // });
-            // for (let a = 0; a < addressArraySize; a++) {
-            //     sheetArray.push(
-            //         `Location-${a + 1}`, `State-${a + 1}`,
-            //         `City-${a + 1}`, `Zipcode-${a + 1}`,
-            //         `Latitude-${a + 1}`, `Longitude-${a + 1}`
-            //     );
-            // }
-            // for (let c = 0; c < contactDetailArraySize; c++) {
-            //     sheetArray.push(
-            //         `Emergency Contact Name-${c + 1}`,
-            //         `Emergency Contact Email-${c + 1}`,
-            //         `Emergency Contact Number-${c + 1}`
-            //     );
-            // }
-            // / Ends here /
+            ];
+
             const sheet = XLSX.utils.aoa_to_sheet([sheetArray]);
 
             let rowData = [];
@@ -375,10 +348,22 @@ const sendExcelAttachement = async (filteredData) => {
                 row.push(filteredData[k].zip ?? '');
                 row.push(filteredData[k].email ?? '');
                 row.push(filteredData[k].phone ?? '');
-
                 row.push(filteredData[k].tax_id ?? '');
                 row.push(filteredData[k].paytrace_token ?? '');
 
+                row.push(filteredData[k].billing_name ?? '');
+                row.push(filteredData[k].billing_address1 ?? '');
+                row.push(filteredData[k].billing_address2 ?? '');
+                row.push(filteredData[k].billing_city ?? '');
+                row.push(filteredData[k].billing_state ?? '');
+                row.push(filteredData[k].billing_country ?? '');
+                row.push(filteredData[k].billing_zip ?? '');
+                row.push(filteredData[k].credit_name ?? '');
+                row.push(filteredData[k].credit_address1 ?? '');
+                row.push(filteredData[k].credit_city ?? '');
+                row.push(filteredData[k].credit_state ?? '');
+                row.push(filteredData[k].credit_country ?? '');
+                row.push(filteredData[k].credit_zip ?? '');
 
                 rowData.push(row);
             }
@@ -700,17 +685,14 @@ const generatePaytraceId = async (dataPayTrace, access_token,) => {
             let errorPayTrace = error.response.data.errors
 
             const firstErrorKey = Object.keys(errorPayTrace)[0];
-            const firstErrorMessage = errorPayTrace[firstErrorKey][0];
+            const firstErrorMessage = errorPayTrace[firstErrorKey];
+            console.log(firstErrorKey, "firstErrorKey");
+            console.log(firstErrorMessage, "firstErrorMessage");
 
-            const errorr = new Error(`PayTrace Error ${5256}: ${"fjh"} - ${firstErrorMessage}`);
-               
-            console.log(errorr,"errorrerrorr");
-            return showResponse(false, error?.message, error, null, 400)
+            return showResponse(false, `PayTrace Error Code ${firstErrorKey}`, firstErrorMessage, null, 400)
 
         }
-        console.log(error.response.data, "errorresponse Paytrace");
-        console.log(error.data?.errors, "errorserrors Paytrace");
-        return showResponse(false, error?.message, error, null, 400)
+        return showResponse(false, error?.message, null, null, 400)
     }
 
 }

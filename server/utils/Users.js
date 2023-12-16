@@ -15,6 +15,8 @@ const Orders = require('../models/Orders')
 const Material = require("../models/Material")
 const axios = require("axios");
 const { urlencoded } = require('express');
+const { Parser } = require('json2csv')
+const ejs = require('ejs');
 
 const UserUtils = {
 
@@ -530,182 +532,192 @@ const UserUtils = {
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
     },
-    updatePaymentDetailsss: async (data, userId) => {
-        try {
-            data.updatedOn = helpers.getCurrentDate();
+    // updatePaymentDetailsss: async (data, userId) => {
+    //     try {
+    //         data.updatedOn = helpers.getCurrentDate();
 
-            let result = await updateSingleData(UserProfile, data, { userId })
-            if (result.status) {
-                await updateSingleData(UserProfile, { 'completionStaus.paymentInfo': true }, { userId })
+    //         let result = await updateSingleData(UserProfile, data, { userId })
+    //         if (result.status) {
+    //             await updateSingleData(UserProfile, { 'completionStaus.paymentInfo': true }, { userId })
 
-                // let credential = `grant_type=password&username=${consts.PAYTRACE_USERNAME}&password=${consts.PAYTRACE_PASSWORD}`
+    //             // let credential = `grant_type=password&username=${consts.PAYTRACE_USERNAME}&password=${consts.PAYTRACE_PASSWORD}`
 
-                // const geenratePayTraceToken = await axios.post(`${consts.PAYTRACE_URL}/oauth/token`, credential, {
-                //     headers: {
-                //         'Accept': '*/*',
-                //         'Content-Type': 'application/x-www-form-urlencoded',
-                //     },
-                // })
-                // console.log(geenratePayTraceToken, "geenratePayTraceToken");
+    //             // const geenratePayTraceToken = await axios.post(`${consts.PAYTRACE_URL}/oauth/token`, credential, {
+    //             //     headers: {
+    //             //         'Accept': '*/*',
+    //             //         'Content-Type': 'application/x-www-form-urlencoded',
+    //             //     },
+    //             // })
+    //             // console.log(geenratePayTraceToken, "geenratePayTraceToken");
 
-                console.log(checkUser, "checkUser");
-                console.log(data, "data");
+    //             console.log(checkUser, "checkUser");
+    //             console.log(data, "data");
 
-                if (geenratePayTraceToken?.data?.access_token) {
+    //             if (geenratePayTraceToken?.data?.access_token) {
 
-                    let userProfile = await getSingleData(UserProfile, { userId });
-
-
-                    const dataPaytrace = {
-                        customer_id: checkUser?.data?.customerId,
-                        credit_card: {
-                            number: data.paymentDetails.creditCardData.ccNumber,
-                            expiration_month: data.paymentDetails.creditCardData.expirationMonth,
-                            expiration_year: data.paymentDetails.creditCardData.expirationYear,
-                        },
-                        integrator_id: consts.PAYTRACE_IntegratorID,
-                        billing_address: {
-                            name: 'Sunil Bhatia',
-                            street_address: 'Six forks rd',
-                            city: 'Raleigh',
-                            state: 'NC',
-                            zip: '27591',
-                            country: 'US',
-                        },
-                        // billing_address: {
-                        //     name: userProfile.billingAddress.contactName,
-                        //     street_address: userProfile.billingAddress.address1,
-                        //     city: userProfile.billingAddress.city,
-                        //     state: userProfile.billingAddress.stateName,
-                        //     zip: userProfile.billingAddress.zipCode,
-                        //     country: userProfile.billingAddress.country,
-                        // },
-                    };
-                    const headers = {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${geenratePayTraceToken?.data?.access_token}`,
-                    };
-
-                    const generatePaytraceId = await axios.post(`${consts.PAYTRACE_URL}/v1/customer/create`, dataPaytrace, { headers })
-
-                    console.log(generatePaytraceId, "generatePaytraceId");
-
-                    if (generatePaytraceId.data.response_code === 160) {
-                        // { 'completionStaus.paymentInfo': true }
-
-                        let updateObj = {
-                            'paymentDetails.creditCardData.ccNumber': generatePaytraceId.data.masked_card_number,
-
-                        }
-                        console.log(generatePaytraceId.data.customer_id, "payyyy");
-                        let updateProfilee = await updateSingleData(UserProfile, updateObj, { userId })
-
-                        let updatePaytrace = await updateSingleData(Users, { payTraceId: Number(generatePaytraceId.data.customer_id) }, { _id: userId })
-
-                        //===========payyyy
-
-                        //create excel 
-                        let array = [
-                            {
-                                cust_Id: checkUser?.data?.customerId,
-                                company_name: userProfile?.shippingAddress?.companyName ?? "",
-                                customer_name: userProfile?.shippingAddress?.companyName ?? "",
-                                address1: userProfile?.shippingAddress?.address1 ?? "",
-                                address2: userProfile?.shippingAddress?.address2 ?? "",
-                                city: userProfile?.shippingAddress?.city ?? "",
-                                state: userProfile?.shippingAddress?.stateName ?? "",
-                                country: userProfile?.shippingAddress?.country ?? "",
-                                zip: userProfile?.shippingAddress?.zipCode ?? "",
-                                email: userProfile?.shippingAddress?.companyEmail ?? "",
-                                phone: userProfile.shippingAddress?.companyPhone ?? "",
-                                tax_id: userProfile.shippingAddress?.taxId ?? "",
-                                paytrace_token: geenratePayTraceToken?.data?.access_token ?? "",
-
-                                billing_name: userProfile?.billingAddress?.contactName ?? "",
-                                billing_address1: userProfile?.billingAddress?.address1 ?? "",
-                                billing_address2: "",
-                                billing_city: userProfile?.billingAddress?.city ?? "",
-                                billing_state: userProfile?.billingAddress?.stateName ?? "",
-                                billing_country: userProfile?.billingAddress?.country ?? "",
-                                billing_zip: userProfile?.billingAddress?.zipCode ?? "",
-                                credit_name: userProfile?.paymentDetails?.billingAddressData?.name ?? "",
-                                credit_address1: userProfile?.paymentDetails?.billingAddressData?.streetAddress ?? "",
-                                credit_city: userProfile?.paymentDetails?.billingAddressData?.city ?? "",
-                                credit_state: userProfile?.paymentDetails?.billingAddressData?.stateName ?? "",
-                                credit_country: userProfile?.paymentDetails?.billingAddressData?.country ?? "",
-                                credit_zip: userProfile?.paymentDetails?.billingAddressData?.zipCode ?? "",
-                            }
-
-                        ]
-                        const sheet = await helpers.sendExcelAttachement(array)
+    //                 let userProfile = await getSingleData(UserProfile, { userId });
 
 
-                        //send email of attachment 
-                        let link = `${consts.BITBUCKET_URL}/${sheet.data}`
-                        let to = 'checkkk@yopmail.com'
-                        // `${consts.ADMIN_EMAIL}`
-                        let subject = `New user registered`
-                        const logoPath = path.join(__dirname, '../views', 'logo.png');
-                        let attachments = [{
-                            filename: 'logo.png',
-                            path: logoPath,
-                            cid: 'unique@mwwLogo',
-                            path: link,
+    //                 const dataPaytrace = {
+    //                     customer_id: checkUser?.data?.customerId,
+    //                     credit_card: {
+    //                         number: data.paymentDetails.creditCardData.ccNumber,
+    //                         expiration_month: data.paymentDetails.creditCardData.expirationMonth,
+    //                         expiration_year: data.paymentDetails.creditCardData.expirationYear,
+    //                     },
+    //                     integrator_id: consts.PAYTRACE_IntegratorID,
+    //                     billing_address: {
+    //                         name: 'Sunil Bhatia',
+    //                         street_address: 'Six forks rd',
+    //                         city: 'Raleigh',
+    //                         state: 'NC',
+    //                         zip: '27591',
+    //                         country: 'US',
+    //                     },
+    //                     // billing_address: {
+    //                     //     name: userProfile.billingAddress.contactName,
+    //                     //     street_address: userProfile.billingAddress.address1,
+    //                     //     city: userProfile.billingAddress.city,
+    //                     //     state: userProfile.billingAddress.stateName,
+    //                     //     zip: userProfile.billingAddress.zipCode,
+    //                     //     country: userProfile.billingAddress.country,
+    //                     // },
+    //                 };
+    //                 const headers = {
+    //                     'Content-Type': 'application/json',
+    //                     'Authorization': `Bearer ${geenratePayTraceToken?.data?.access_token}`,
+    //                 };
 
-                        }]
+    //                 const generatePaytraceId = await axios.post(`${consts.PAYTRACE_URL}/v1/customer/create`, dataPaytrace, { headers })
 
-                        let body = `
-             <!DOCTYPE html>
-                     <html>
-                     <head>
-                     </head>
-                     <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
- 
-                         <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
- 
-                             <div style="text-align: center; padding: 10px;">
-                                 <img src="cid:unique@mwwLogo" alt="logo" style="max-height: 75px;" />
-                             </div>
- 
-                             <span style="font-weight: 700; font-size: 22px; text-align: center; margin-top: 20px;">Welcome to the MWW on Demand Merch Maker!</span>
- 
-                             <p style="font-weight: bold; font-family: Arial; font-size: 16px; text-align: center; margin-top: 20px;">
-                                 Here is The Attacthment Of User Details
-                             </p>
- 
-                             <p style="font-family: Arial; font-size: 14px; text-align: center; margin-top: 20px;">
-                             Click On Attachments to get Information <br/><br/>
-                                 <a style="color: blue;" href="${link}" target="_blank">
-                                  ${link} > My Profile
-                                 </a><br/>
-                             </p>
-                         
-                         </div>
- 
-                     </body>
-                     </html>
- 
-             `
-                        let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
+    //                 console.log(generatePaytraceId, "generatePaytraceId");
 
-                    }
+    //                 if (generatePaytraceId.data.response_code === 160) {
+    //                     // { 'completionStaus.paymentInfo': true }
+
+    //                     let updateObj = {
+    //                         'paymentDetails.creditCardData.ccNumber': generatePaytraceId.data.masked_card_number,
+
+    //                     }
+    //                     console.log(generatePaytraceId.data.customer_id, "payyyy");
+    //                     let updateProfilee = await updateSingleData(UserProfile, updateObj, { userId })
+
+    //                     let updatePaytrace = await updateSingleData(Users, { payTraceId: Number(generatePaytraceId.data.customer_id) }, { _id: userId })
+
+    //                     //===========payyyy
+
+    //                     //create excel 
+    //                     let array = [
+    //                         {
+    //                             cust_Id: checkUser?.data?.customerId,
+    //                             company_name: userProfile?.shippingAddress?.companyName ?? "",
+    //                             customer_name: userProfile?.shippingAddress?.companyName ?? "",
+    //                             address1: userProfile?.shippingAddress?.address1 ?? "",
+    //                             address2: userProfile?.shippingAddress?.address2 ?? "",
+    //                             city: userProfile?.shippingAddress?.city ?? "",
+    //                             state: userProfile?.shippingAddress?.stateName ?? "",
+    //                             country: userProfile?.shippingAddress?.country ?? "",
+    //                             zip: userProfile?.shippingAddress?.zipCode ?? "",
+    //                             email: userProfile?.shippingAddress?.companyEmail ?? "",
+    //                             phone: userProfile.shippingAddress?.companyPhone ?? "",
+    //                             tax_id: userProfile.shippingAddress?.taxId ?? "",
+    //                             paytrace_token: geenratePayTraceToken?.data?.access_token ?? "",
+
+    //                             billing_name: userProfile?.billingAddress?.contactName ?? "",
+    //                             billing_address1: userProfile?.billingAddress?.address1 ?? "",
+    //                             billing_address2: "",
+    //                             billing_city: userProfile?.billingAddress?.city ?? "",
+    //                             billing_state: userProfile?.billingAddress?.stateName ?? "",
+    //                             billing_country: userProfile?.billingAddress?.country ?? "",
+    //                             billing_zip: userProfile?.billingAddress?.zipCode ?? "",
+    //                             credit_name: userProfile?.paymentDetails?.billingAddressData?.name ?? "",
+    //                             credit_address1: userProfile?.paymentDetails?.billingAddressData?.streetAddress ?? "",
+    //                             credit_city: userProfile?.paymentDetails?.billingAddressData?.city ?? "",
+    //                             credit_state: userProfile?.paymentDetails?.billingAddressData?.stateName ?? "",
+    //                             credit_country: userProfile?.paymentDetails?.billingAddressData?.country ?? "",
+    //                             credit_zip: userProfile?.paymentDetails?.billingAddressData?.zipCode ?? "",
+    //                         }
+
+    //                     ]
+
+    //                     let fields = ["custId", "CompName", "CustomName"];
+
+    //                     const parser = new Parser({
+    //                         fields,
+    //                         // unwind: ["car.name", "car.price", "car.color"]
+    //                     });
+
+    //                     const csv = parser.parse(array);
+
+    //                     const sheet = await helpers.sendExcelAttachement(array)
 
 
-                } else {
-                    return helpers.showResponse(false, "PaytraceId Token Not Generated", null, null, 400);
+    //                     //send email of attachment 
+    //                     let link = `${consts.BITBUCKET_URL}/${sheet.data}`
+    //                     let to = 'checkkk@yopmail.com'
+    //                     // `${consts.ADMIN_EMAIL}`
+    //                     let subject = `New user registered`
+    //                     const logoPath = path.join(__dirname, '../views', 'logo.png');
+    //                     let attachments = [{
+    //                         filename: 'logo.png',
+    //                         path: logoPath,
+    //                         cid: 'unique@mwwLogo',
+    //                         path: link,
 
-                }
+    //                     }]
 
-                return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
-            }
-            return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
-        } catch (error) {
-            console.log(error, "erorrrrPayment");
-            return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+    //                     let body = `
+    //          <!DOCTYPE html>
+    //                  <html>
+    //                  <head>
+    //                  </head>
+    //                  <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
 
-        }
+    //                      <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
 
-    },
+    //                          <div style="text-align: center; padding: 10px;">
+    //                              <img src="cid:unique@mwwLogo" alt="logo" style="max-height: 75px;" />
+    //                          </div>
+
+    //                          <span style="font-weight: 700; font-size: 22px; text-align: center; margin-top: 20px;">Welcome to the MWW on Demand Merch Maker!</span>
+
+    //                          <p style="font-weight: bold; font-family: Arial; font-size: 16px; text-align: center; margin-top: 20px;">
+    //                              Here is The Attacthment Of User Details
+    //                          </p>
+
+    //                          <p style="font-family: Arial; font-size: 14px; text-align: center; margin-top: 20px;">
+    //                          Click On Attachments to get Information <br/><br/>
+    //                              <a style="color: blue;" href="${link}" target="_blank">
+    //                               ${link} > My Profile
+    //                              </a><br/>
+    //                          </p>
+
+    //                      </div>
+
+    //                  </body>
+    //                  </html>
+
+    //          `
+    //                     let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
+
+    //                 }
+
+
+    //             } else {
+    //                 return helpers.showResponse(false, "PaytraceId Token Not Generated", null, null, 400);
+
+    //             }
+
+    //             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
+    //         }
+    //         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+    //     } catch (error) {
+    //         console.log(error, "erorrrrPayment");
+    //         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+
+    //     }
+
+    // },
     updatePaymentDetails: async (data, userId) => {
         try {
             let { paymentDetails } = data
@@ -714,14 +726,15 @@ const UserUtils = {
             const payTraceToken = await helpers.generatePayTraceToken();
 
             if (!payTraceToken.status) {
-                return helpers.showResponse(false, payTraceToken.message, payTraceToken.data, null, 400)
+                return helpers.showResponse(false, "PayTrace Token Not Generated", payTraceToken.data, null, 400)
             }
             let count = await getCount(Users, { userType: 3 })
             let idGenerated = helpers.generateIDs(count?.data)
             console.log(idGenerated, "id generateddd");
 
             const dataPaytrace = {
-                customer_id: idGenerated.customerID,
+                customer_id: 8522651,
+                // customer_id: idGenerated.customerID,
                 credit_card: {
                     number: paymentDetails.creditCardData.ccNumber,
                     expiration_month: paymentDetails.creditCardData.expirationMonth,
@@ -742,18 +755,23 @@ const UserUtils = {
 
             // console.log(getPaytraceId, "getPaytraceId");
             if (!getPaytraceId.status) {
+
+                console.log(getPaytraceId, "getPaytraceId");
                 return helpers.showResponse(false, getPaytraceId.message, getPaytraceId.data, null, 400)
             }
             let { customer_id, masked_card_number } = getPaytraceId.data
             //  ????????????????''''''''
 
-            let paymentdetailsData = paymentDetails
-            paymentdetailsData.creditCardData.ccNumber = masked_card_number
-            paymentdetailsData.customerId = customer_id
+            let paymentdetailsData = data
 
-            let updatePaymentInfo = await updateSingleData(UserProfile, paymentdetailsData, { userId })
+            console.log(paymentdetailsData, "45455455");
+            paymentdetailsData.paymentDetails.creditCardData.ccNumber = masked_card_number
+            paymentdetailsData.paymentDetails.customerId = customer_id
 
-            if (!updatePaymentInfo.status) {
+            console.log(paymentdetailsData, "dddsdsd");
+            let userProfile = await updateSingleData(UserProfile, paymentdetailsData, { userId })
+
+            if (!userProfile.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
             }
 
@@ -765,99 +783,119 @@ const UserUtils = {
             //---------------email send to admin that new user has been regsitered
 
 
-            console.log(updatePaymentInfo, "updatePaymentInfo");
-            let userProfile = await getSingleData(UserProfile, { userId })
+            console.log(userProfile, "userProfile");
+            // let userProfile = await getSingleData(UserProfile, { userId })
 
-            if (!userProfile.status) {
-                console.log("errodr");
-                return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+            // if (!userProfile.status) {
+            //     console.log("errodr");
+            //     return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+            // }
+            let basicInfo = userProfile?.data.completionStaus?.basicInfo
+            let billingInfo = userProfile?.data.completionStaus?.billingInfo
+            let paymentInfo = userProfile?.data.completionStaus?.paymentInfo
+            let shippingInfo = userProfile?.data.completionStaus?.shippingInfo
+
+
+            //if user complete its profile then send email to user and admin with details
+            if (basicInfo && billingInfo && paymentInfo && shippingInfo) {
+                console.log("under complete profile iff");
+
+                //---------------
+                //create excel 
+
+                let newUserCsvData = [
+                    {
+                        cust_Id: userProfile?.data?.paymentDetails?.customerId,
+                        company_name: userProfile?.data?.shippingAddress?.companyName ?? "",
+                        customer_name: userProfile?.data?.shippingAddress?.companyName ?? "",
+                        address1: userProfile?.data?.shippingAddress?.address1 ?? "",
+                        address2: userProfile?.data?.shippingAddress?.address2 ?? "",
+                        city: userProfile?.data?.shippingAddress?.city ?? "",
+                        state: userProfile?.data?.shippingAddress?.stateName ?? "",
+                        country: userProfile?.data?.shippingAddress?.country ?? "",
+                        zip: userProfile?.data?.shippingAddress?.zipCode ?? "",
+                        email: userProfile?.data?.shippingAddress?.companyEmail ?? "",
+                        phone: userProfile.data?.shippingAddress?.companyPhone ?? "",
+                        tax_id: userProfile.data?.shippingAddress?.taxId ?? "",
+
+                        paytrace_token: payTraceToken?.data?.access_token ?? "",
+
+                        billing_name: userProfile?.data?.billingAddress?.contactName ?? "",
+                        billing_address1: userProfile?.data?.billingAddress?.address1 ?? "",
+                        billing_address2: "",
+                        billing_city: userProfile?.data?.billingAddress?.city ?? "",
+                        billing_state: userProfile?.data?.billingAddress?.stateName ?? "",
+                        billing_country: userProfile?.data?.billingAddress?.country ?? "",
+                        billing_zip: userProfile?.data?.billingAddress?.zipCode ?? "",
+
+                        credit_name: userProfile?.data?.paymentDetails?.billingAddressData?.name ?? "",
+                        credit_address1: userProfile?.data?.paymentDetails?.billingAddressData?.streetAddress ?? "",
+                        credit_city: userProfile?.data?.paymentDetails?.billingAddressData?.city ?? "",
+                        credit_state: userProfile?.data?.paymentDetails?.billingAddressData?.stateName ?? "",
+                        credit_country: userProfile?.data?.paymentDetails?.billingAddressData?.country ?? "",
+                        credit_zip: userProfile?.data?.paymentDetails?.billingAddressData?.zipCode ?? "",
+                    }
+
+                ]
+
+                // let fields = ["cust_Id", "company_name", "customer_name"];
+                // const parser = new Parser({
+                //     fields,
+                //     // unwind: ["car.name", "car.price", "car.color"]
+                // });
+                // const csv = parser.parse(newUserCsvData);
+                // console.log('output',csv)
+                const sheet = await helpers.sendExcelAttachement(newUserCsvData)
+
+                let link = `${consts.BITBUCKET_URL}/${sheet.data}`
+
+                const htmlContent = ejs.render(path.join(__dirname, '../views', 'newRegistration.ejs'), { link });
+
+
+                //send email of attachment 
+                let to = 'checkkk@yopmail.com'
+                // `${consts.ADMIN_EMAIL}`
+                let subject = `New user registered`
+                const logoPath = path.join(__dirname, '../views', 'logo.png');
+                let attachments = [{
+                    filename: 'userDetail.xlsx',
+                    path: logoPath,
+                    cid: 'unique@mwwLogo',
+                    path: link,
+
+                }]
+
+//                 let body = `
+//  <!DOCTYPE html>
+//          <html>
+//          <head>
+//          </head>
+//          <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+
+//              <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+
+//                  <div style="text-align: center; padding: 10px;">
+//                      <img src="cid:unique@mwwLogo" alt="logo" style="max-height: 75px;" />
+//                  </div>
+
+//                  <span style="font-weight: 700; font-size: 22px; text-align: center; margin-top: 20px;">Welcome to the MWW on Demand Merch Maker!</span>
+
+//                  <p style="font-weight: bold; font-family: Arial; font-size: 16px; text-align: center; margin-top: 20px;">
+//                      Here is The Attacthment Of User Details
+//                  </p>
+
+                
+
+//              </div>
+
+//          </body>
+//          </html>
+
+//  `
+                let emailResponse = await helpers.sendEmailService(to, subject, htmlContent, attachments)
+                //----------
             }
 
-            //create excel 
-            let newUserCsvData = [
-                {
-                    cust_Id: userProfile?.data?.paymentDetails?.customerId,
-                    company_name: userProfile?.data?.shippingAddress?.companyName ?? "",
-                    customer_name: userProfile?.data?.shippingAddress?.companyName ?? "",
-                    address1: userProfile?.data?.shippingAddress?.address1 ?? "",
-                    address2: userProfile?.data?.shippingAddress?.address2 ?? "",
-                    city: userProfile?.data?.shippingAddress?.city ?? "",
-                    state: userProfile?.data?.shippingAddress?.stateName ?? "",
-                    country: userProfile?.data?.shippingAddress?.country ?? "",
-                    zip: userProfile?.data?.shippingAddress?.zipCode ?? "",
-                    email: userProfile?.data?.shippingAddress?.companyEmail ?? "",
-                    phone: userProfile.data?.shippingAddress?.companyPhone ?? "",
-                    tax_id: userProfile.data?.shippingAddress?.taxId ?? "",
-
-                    paytrace_token: payTraceToken?.data?.access_token ?? "",
-
-                    billing_name: userProfile?.data?.billingAddress?.contactName ?? "",
-                    billing_address1: userProfile?.data?.billingAddress?.address1 ?? "",
-                    billing_address2: "",
-                    billing_city: userProfile?.data?.billingAddress?.city ?? "",
-                    billing_state: userProfile?.data?.billingAddress?.stateName ?? "",
-                    billing_country: userProfile?.data?.billingAddress?.country ?? "",
-                    billing_zip: userProfile?.data?.billingAddress?.zipCode ?? "",
-
-                    credit_name: userProfile?.data?.paymentDetails?.billingAddressData?.name ?? "",
-                    credit_address1: userProfile?.data?.paymentDetails?.billingAddressData?.streetAddress ?? "",
-                    credit_city: userProfile?.data?.paymentDetails?.billingAddressData?.city ?? "",
-                    credit_state: userProfile?.data?.paymentDetails?.billingAddressData?.stateName ?? "",
-                    credit_country: userProfile?.data?.paymentDetails?.billingAddressData?.country ?? "",
-                    credit_zip: userProfile?.data?.paymentDetails?.billingAddressData?.zipCode ?? "",
-                }
-
-            ]
-
-            // const sheet = await helpers.sendExcelAttachement(newUserCsvData)
-
-            //send email of attachment 
-            let link = `${consts.BITBUCKET_URL}/${sheet.data}`
-            let to = 'checkkk@yopmail.com'
-            // `${consts.ADMIN_EMAIL}`
-            let subject = `New user registered`
-            const logoPath = path.join(__dirname, '../views', 'logo.png');
-            let attachments = [{
-                filename: 'logo.png',
-                path: logoPath,
-                cid: 'unique@mwwLogo',
-                path: link,
-
-            }]
-
-            let body = `
- <!DOCTYPE html>
-         <html>
-         <head>
-         </head>
-         <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
-
-             <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
-
-                 <div style="text-align: center; padding: 10px;">
-                     <img src="cid:unique@mwwLogo" alt="logo" style="max-height: 75px;" />
-                 </div>
-
-                 <span style="font-weight: 700; font-size: 22px; text-align: center; margin-top: 20px;">Welcome to the MWW on Demand Merch Maker!</span>
-
-                 <p style="font-weight: bold; font-family: Arial; font-size: 16px; text-align: center; margin-top: 20px;">
-                     Here is The Attacthment Of User Details
-                 </p>
-
-                 <p style="font-family: Arial; font-size: 14px; text-align: center; margin-top: 20px;">
-                 Click On Attachments to get Information <br/><br/>
-                     <a style="color: blue;" href="${link}" target="_blank">
-                      ${link} > My Profile
-                     </a><br/>
-                 </p>
-             
-             </div>
-
-         </body>
-         </html>
-
- `
-            // let emailResponse = await helpers.sendEmailService(to, subject, body, attachments)
 
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, null, null, 200);
         } catch (error) {
