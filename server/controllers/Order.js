@@ -29,6 +29,14 @@ const orderController = {
         let result = await Order.updateOrderStatus(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    updateOrder: async (req, res) => {
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Order.updateOrder(req.body,user_id);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     downloadOrderDetails: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {

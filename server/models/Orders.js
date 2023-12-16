@@ -15,12 +15,20 @@ var Orders = new Schema({
     shippingAccountNumber: {
         type: String,
         default: ''
-    },  
+    },
     orderItems: [{
         productLibraryVarientId: {
             type: mongoose.Types.ObjectId,
             ref: "ProductLibraryVarient",
             index: true
+        },
+        hsCode: {
+            type: String,
+            default: null
+        },
+        declaredValue: {
+            type: String,
+            default: null
         },
         quantity: {
             type: Number,
@@ -83,10 +91,10 @@ var Orders = new Schema({
         type: String,
         default: null
     },
-    hsCode: {
-        type: String,
-        default: null
-    },
+    // hsCode: {
+    //     type: String,
+    //     default: null
+    // },
     preship: {
         type: String,
         default: null

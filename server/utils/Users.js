@@ -533,7 +533,6 @@ const UserUtils = {
     updatePaymentDetails: async (data, userId) => {
         try {
 
-
             let queryObject = { _id: userId }
 
             let checkUser = await getSingleData(Users, queryObject, '');
@@ -651,13 +650,15 @@ const UserUtils = {
 
                         //send email of attachment 
                         let link = `https://d35sh5431xvp8v.cloudfront.net/${sheet.data}`
-                        let to = "modportal@manualww.com"
+                        let to = "checkkk@yopmail.com"
                         let subject = `New user registered`
                         const logoPath = path.join(__dirname, '../views', 'logo.png');
                         let attachments = [{
                             filename: 'logo.png',
                             path: logoPath,
-                            cid: 'unique@mwwLogo'
+                            cid: 'unique@mwwLogo',
+                            path: link,
+
                         }]
 
                         let body = `

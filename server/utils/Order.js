@@ -5,6 +5,7 @@ const Gallery = require('../models/Gallery')
 const Order = require('../models/Orders')
 const Cart = require('../models/Cart')
 const { default: mongoose } = require('mongoose');
+const Orders = require('../models/Orders');
 const json2csv = require('json2csv').parse;
 
 
@@ -62,15 +63,6 @@ const orderUtil = {
             if (!findCart.status) {
                 return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
             }
-            // let orderAmount = findCart.data.map((value) => {
-            //     let qty = value.quantity
-            //     let price = value.productLibraryVariantId.price
-            //     let amount = Number(qty) * Number(price)
-            //     return amount
-            // })
-            // // console.log(orderAmount, "orderAmount");
-            // let totalAmount = orderAmount.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-            // console.log(totalAmount, "totalAmount");
 
             let productVarientIds = findCart.data.map((value) => value.productLibraryVariantId)
             console.log(productVarientIds, "idssss");
@@ -131,78 +123,36 @@ const orderUtil = {
         }
 
     },
-    //pending api 
     updateOrder: async (data, customerId) => {
         try {
-            let { orderId, totalAmount, orderItems, shippingMethodId, orderType, billingAddress, shippingAddress, ioss, receipt, preship, shippingAccountNumber, } = data
+            let { orderId, totalAmount, orderItems, shippingMethodId, orderType, billingAddress, shippingAddress, ioss, receipt, preship, shippingAccountNumber } = data
 
-            const fixedPrefix = 'MWW1000';
-            const randomId = helpers.generateRandom4DigitNumber(fixedPrefix);
-
-            // let populate = "productLibraryVariantId"
-            const findCart = await getDataArray(Cart, { userId: customerId }, "", null, null, null)
-            if (!findCart.status) {
-                return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
+            const findOrder = await getSingleData(Orders, { _id: orderId, customerId: customerId })
+            if (!findOrder.status) {
+                return helpers.showResponse(false, "Order Not Exist", {}, null, 400);
             }
-            // let orderAmount = findCart.data.map((value) => {
-            //     let qty = value.quantity
-            //     let price = value.productLibraryVariantId.price
-            //     let amount = Number(qty) * Number(price)
-            //     return amount
-            // })
-            // // console.log(orderAmount, "orderAmount");
-            // let totalAmount = orderAmount.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-            // console.log(totalAmount, "totalAmount");
 
-            let productVarientIds = findCart.data.map((value) => value.productLibraryVariantId)
-            console.log(productVarientIds, "idssss");
-
-            let newOrderItem = orderItems.map((value) => {
-                let obj = value
-                let itm = value.productVarientOptions.map((val) => {
-                    return {
-                        productVariableOptionId: val._id,
-                        optionValue: val.value,
-                        productVariableTypeId: val.variableTypeId,
-                        typeName: val.variableTypeName
-                    }
-                })
-                obj.productVarientOptions = itm
-
-                return obj
-
-            })
-
-            console.log(newOrderItem, "newOrderItem");
-
-
-            let obj = {
-                customerId: customerId,
-                // productLibraryVarientIds: productVarientIds,
+            let updatedData = {
                 amount: totalAmount,
-                displayId: randomId,
-                submitImmediately,
                 shippingMethodId,
                 orderType,
                 billingAddress,
                 shippingAddress,
-                cartItems,
-                orderItems: newOrderItem,
-                ioss,
+                orderItems: orderItems,
+                // ioss,
                 receipt,
                 preship,
                 shippingAccountNumber,
-                orderDate: helpers.getCurrentDate()
+                updatedOn: helpers.getCurrentDate()
             }
 
-            let orderRef = new Order(obj)
-
-            let response = await postData(orderRef);
+            let response = await updateSingleData(Orders, updatedData, { _id: orderId, customerId: customerId });
             console.log(response, "responsee");
+
             if (response.status) {
-                return helpers.showResponse(true, ResponseMessages.order.order_created, null, null, 200);
+                return helpers.showResponse(true, ResponseMessages.order.order_updated, null, null, 200);
             }
-            return helpers.showResponse(false, ResponseMessages.order.order_failed, response?.data, null, 400);
+            return helpers.showResponse(false, ResponseMessages.order.order_update_error, response?.data, null, 400);
         } catch (error) {
             console.log(error, "error side");
             return helpers.showResponse(false, error?.message, null, null, 400);
