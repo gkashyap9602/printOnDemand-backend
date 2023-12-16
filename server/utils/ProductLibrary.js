@@ -363,9 +363,15 @@ const productLibrary = {
 
 
             if (materialFilter) {
-                materialFilter = JSON.parse(materialFilter)
-                materialFilter = materialFilter.map((id) => new ObjectId(id))
 
+                if (typeof materialFilter == 'string') {
+                    materialFilter = JSON.parse(materialFilter)
+                }
+                console.log(typeof materialFilter, "materialFilter");
+
+                materialFilter = materialFilter.map((id) => new ObjectId(id))
+                 
+                console.log(materialFilter,"materialFilter111");
                 //add aggregation for material filter match 
                 aggregate.push(
                     {
@@ -382,11 +388,11 @@ const productLibrary = {
                             "productData.materialId": { $in: materialFilter }
                         }
                     },
-                    {
-                        $project: {
-                            productData: 0
-                        }
-                    }
+                    // {
+                    //     $project: {
+                    //         productData: 0
+                    //     }
+                    // }
                 )
 
             }
@@ -412,7 +418,7 @@ const productLibrary = {
                     productVarientData: 0
                 }
             }
-            aggregate.push(project)
+            // aggregate.push(project)
 
             console.log(aggregate, "aggregate");
 

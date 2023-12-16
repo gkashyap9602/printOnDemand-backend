@@ -13,6 +13,12 @@ module.exports.addMaterial = {
     })
 
 };
+module.exports.getMaterial = {
+    query: joi.object({
+        subCategoryId: joi.string().length(24).message("Invalid Id please check").allow(''),
+    })
+
+};
 module.exports.updateMaterial = {
     body: joi.object({
         materialId: joi.string().length(24).message("Invalid Id please check").required(),

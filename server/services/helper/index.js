@@ -147,7 +147,7 @@ const randomStr = (len, arr) => {
 };
 
 function generateIDs(customerIDCount) {
-    customerIDCount = 100000 + customerIDCount + 1;
+    customerIDCount = 110000 + customerIDCount + 1;
 
     // Generate the customer ID (4-digit number)
     const customerID = customerIDCount.toString().padStart(6, '0');
@@ -689,13 +689,27 @@ const generatePaytraceId = async (dataPayTrace, access_token,) => {
                 'Authorization': `Bearer ${access_token}`,
             },
         })
-
+        console.log(result, "result==Generateside");
         if (result?.data?.response_code === 160) {
-            return showResponse(true, "payTrace Id generated Successfully", { customer_id: result?.data?.customer_id }, null, 200)
+            return showResponse(true, "payTrace Id generated Successfully", result.data, null, 200)
         }
         return showResponse(false, result?.data?.message ? result?.data?.message : "PaytraceId Token Not Generated", null, null, 400);
 
     } catch (error) {
+        if (error.response.data.success == false) {
+            let errorPayTrace = error.response.data.errors
+
+            const firstErrorKey = Object.keys(errorPayTrace)[0];
+            const firstErrorMessage = errorPayTrace[firstErrorKey][0];
+
+            const errorr = new Error(`PayTrace Error ${5256}: ${"fjh"} - ${firstErrorMessage}`);
+               
+            console.log(errorr,"errorrerrorr");
+            return showResponse(false, error?.message, error, null, 400)
+
+        }
+        console.log(error.response.data, "errorresponse Paytrace");
+        console.log(error.data?.errors, "errorserrors Paytrace");
         return showResponse(false, error?.message, error, null, 400)
     }
 
