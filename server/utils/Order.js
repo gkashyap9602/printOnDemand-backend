@@ -380,7 +380,8 @@ const orderUtil = {
                     status: 1,
                     storeName: 1,
                     submissionDueDate: 1,
-                    productNames: 1
+                    productNames: 1,
+                    image:1
 
                 }
             }
