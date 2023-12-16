@@ -59,13 +59,13 @@ const orderUtil = {
             const randomId = helpers.generateRandom4DigitNumber(fixedPrefix);
 
             // let populate = "productLibraryVariantId"
-            const findCart = await getDataArray(Cart, { userId: customerId }, "", null, null, null)
-            if (!findCart.status) {
-                return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
-            }
+            // const findCart = await getDataArray(Cart, { userId: customerId }, "", null, null, null)
+            // if (!findCart.status) {
+            //     return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
+            // }
 
-            let productVarientIds = findCart.data.map((value) => value.productLibraryVariantId)
-            console.log(productVarientIds, "idssss");
+            // let productVarientIds = findCart.data.map((value) => value.productLibraryVariantId)
+            // console.log(productVarientIds, "idssss");
 
             let newOrderItem = orderItems.map((value) => {
                 let obj = value
