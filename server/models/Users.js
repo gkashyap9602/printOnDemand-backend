@@ -76,6 +76,10 @@ var Users = new Schema({
             type: String,
             default: ''
         },
+        key: {
+            type: String,
+            default: ''
+        },
         accessUrl: [{
             type: String
         }],

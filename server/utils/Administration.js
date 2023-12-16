@@ -486,7 +486,6 @@ const adminUtils = {
         try {
             let { firstName, lastName, email, password, access } = data;
 
-
             let checkSubAdmin = await getSingleData(Users, { email, userType: { $in: [1, 2] } })
             //if subadmin exist with status2 means delete then activate that admin as new subadmin
             if (checkSubAdmin.status) {

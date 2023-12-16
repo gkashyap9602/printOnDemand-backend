@@ -708,6 +708,7 @@ const UserUtils = {
     },
     updatePaymentDetails: async (data, userId) => {
         try {
+            let { paymentDetails} = data
             data.updatedOn = helpers.getCurrentDate();
 
             const payTraceToken = await helpers.generatePayTraceToken();
@@ -748,7 +749,7 @@ const UserUtils = {
             if (!getPaytraceId.status) {
                 return helpers.showResponse(false, getPaytraceId.message, getPaytraceId.data, null, 400)
             }
-//  ????????????????''''''''
+            //  ????????????????''''''''
             let updateProfileObj = {
                 'paymentDetails.creditCardData.ccNumber': generatePaytraceId.data.masked_card_number,
 
