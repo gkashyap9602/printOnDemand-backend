@@ -159,11 +159,18 @@ const UserUtils = {
     login: async (data, request, response) => {
         try {
             let { isLoginFromShopify, password, email, fcmToken } = data
-            let queryObject = { email: email, status: { $ne: 2 } }
+            let queryObject = { email: email }
 
             let result = await getSingleData(Users, queryObject, '');
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
+            }
+
+            let CheckUserStatus = await getSingleData(Users, { email, status: { $in: [2, 4] } }, '');
+
+            if (CheckUserStatus.status) {
+                let status = CheckUserStatus.data.status
+                return helpers.showResponse(false, status == 2 ? "Account Deleted !! Contact Support" : "Account Deactivated !! Contact Support", null, null, 400);
             }
 
             let userData = result?.data

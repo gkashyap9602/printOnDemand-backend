@@ -67,8 +67,8 @@ var Users = new Schema({
     status: {
         type: Number,
         default: 3,
-        Comment: "1 for active 2 for delete/deactivate  3 for pending ",
-        enum: [1, 2, 3],
+        Comment: "1 for active 2 for delete  3 for pending 4 for deactivate",
+        // enum: [1, 2, 3, 4],
         index: true
     },
     access: [{

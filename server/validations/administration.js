@@ -176,7 +176,7 @@ module.exports.updateCustomer = {
 };
 module.exports.activeInactiveuser = {
     body: joi.object({
-        status: joi.any().required(),
+        status: joi.number().valid(4).required(),
         userId: joi.string().length(24).message("Invalid Id please check").required(),
 
     })

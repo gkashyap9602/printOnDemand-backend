@@ -18,7 +18,7 @@ module.exports.updateCart = {
 module.exports.updateOrder = {
     body: joi.object({
         orderId: joi.string().length(24).message("Invalid Id please check").required(),
-        orderStatus: joi.number().valid(1,2,3,4,5,6).required()
+        orderStatus: joi.number().valid(1, 2, 3, 4, 5, 6).required()
     })
 
 };
