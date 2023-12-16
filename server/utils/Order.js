@@ -83,7 +83,7 @@ const orderUtil = {
 
             })
 
-            console.log(newOrderItem, "newOrderItem");
+            // console.log(newOrderItem, "newOrderItem");
 
 
             let obj = {
@@ -108,7 +108,7 @@ const orderUtil = {
             let orderRef = new Order(obj)
 
             let response = await postData(orderRef);
-            console.log(response, "responsee");
+            // console.log(response, "responsee");
             if (response.status) {
 
                 let removeItem = await deleteData(Cart, { userId: customerId })
@@ -147,14 +147,14 @@ const orderUtil = {
             }
 
             let response = await updateSingleData(Orders, updatedData, { _id: orderId, customerId: customerId });
-            console.log(response, "responsee");
+            // console.log(response, "responsee");
 
             if (response.status) {
                 return helpers.showResponse(true, ResponseMessages.order.order_updated, null, null, 200);
             }
             return helpers.showResponse(false, ResponseMessages.order.order_update_error, response?.data, null, 400);
         } catch (error) {
-            console.log(error, "error side");
+            // console.log(error, "error side");
             return helpers.showResponse(false, error?.message, null, null, 400);
 
         }

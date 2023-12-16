@@ -6,6 +6,8 @@ AWS.config.update({
     region: "us-east-1",
     credentials: new AWS.SharedIniFileCredentials({ profile: "default" }),
 });
+const consts = require('../../constants/const')
+const axios = require('axios')
 const XLSX = require("xlsx")
 const moment = require('moment')
 const ssm = new AWS.SSM();
@@ -107,7 +109,7 @@ function generateRandomNumeric(length) {
     }
     return result;
 }
-function generateUniquePayTraceID() {
+function generateUniqueCustomerId() {
     // Generate an alphanumeric part (e.g., using random characters)
     const alphanumericPart = generateRandomAlphanumeric(14); // 14 characters long
 
@@ -658,6 +660,46 @@ const getSecretFromAWS = (secret_key_param) => {
     });
 };
 
+const generatePayTraceToken = async () => {
+    try {
+        let credential = `grant_type=password&username=${consts.PAYTRACE_USERNAME}&password=${consts.PAYTRACE_PASSWORD}`
+
+        const result = await axios.post(`${consts.PAYTRACE_URL}/oauth/token`, credential, {
+            headers: {
+                'Accept': '*/*',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        })
+        if (result?.data?.access_token) {
+            return showResponse(true, "payTrace Access Token Generate Successfully", { access_token: result?.data?.access_token }, null, 200)
+        }
+        return showResponse(false, "payTrace Access Token Generation Failed", error, null, 400)
+
+    } catch (error) {
+        return showResponse(false, error?.message, error, null, 400)
+    }
+
+}
+const generatePaytraceId = async (dataPayTrace, access_token,) => {
+    try {
+
+        const result = await axios.post(`${consts.PAYTRACE_URL}/v1/customer/create`, dataPayTrace, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${access_token}`,
+            },
+        })
+
+        if (result?.data?.response_code === 160) {
+            return showResponse(true, "payTrace Id generated Successfully", { customer_id: result?.data?.customer_id }, null, 200)
+        }
+        return showResponse(false, result?.data?.message ? result?.data?.message : "PaytraceId Token Not Generated", null, null, 400);
+
+    } catch (error) {
+        return showResponse(false, error?.message, error, null, 400)
+    }
+
+}
 
 const sendEmailService = async (to, subject, body, attachments = null) => {
     return new Promise(async (resolve, reject) => {
@@ -1396,7 +1438,9 @@ module.exports = {
     generateIDs,
     getCurrentDate,
     validationError,
-    generateUniquePayTraceID,
+    generateUniqueCustomerId,
+    generatePaytraceId,
+    generatePayTraceToken,
     getFileType,
     generateRandom4DigitNumber,
     mongoError

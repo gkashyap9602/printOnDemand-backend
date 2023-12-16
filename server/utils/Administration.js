@@ -486,32 +486,57 @@ const adminUtils = {
         try {
             let { firstName, lastName, email, password, access } = data;
 
-            let subAdminData = await getSingleData(Users, { email, userType: { $in: [1, 2] }, status: { $ne: 2 } })
-            if (subAdminData.status) {
-                return helpers.showResponse(false, ResponseMessages?.admin.email_already, null, null, 400);
+
+            let checkSubAdmin = await getSingleData(Users, { email, userType: { $in: [1, 2] } })
+            //if subadmin exist with status2 means delete then activate that admin as new subadmin
+            if (checkSubAdmin.status) {
+
+                if (checkSubAdmin.data.status == 2) {
+                    let updateObj = {
+                        firstName: firstName,
+                        lastName: lastName,
+                        password: md5(password),
+                        access: access,
+                        status: 3
+                    }
+                    let subAdmin = await updateSingleData(Users, updateObj, { email: email })
+                    if (subAdmin.status) {
+                        return helpers.showResponse(true, ResponseMessages?.admin.subAdmin_added, null, null, 200);
+
+                    }
+                    return helpers.showResponse(false, ResponseMessages?.admin.subAdmin_save_fail, null, null, 400);
+
+                } else {
+                    return helpers.showResponse(false, ResponseMessages?.admin.email_already, null, null, 400);
+                }
+
+                // return helpers.showResponse(false, ResponseMessages?.admin.email_already, null, null, 400);
+            } else {
+
+                let newObj = {
+                    firstName,
+                    lastName,
+                    email: email,
+                    userName: email,
+                    password: md5(password),
+                    userType: 2,
+                    access,
+                    createdOn: helpers.getCurrentDate()
+                }
+
+                let subAdminRef = new Users(newObj)
+                let result = await postData(subAdminRef);
+                if (result.status) {
+                    delete data.password
+                    return helpers.showResponse(true, ResponseMessages?.admin.subAdmin_added, data, null, 200);
+                }
+
+                return helpers.showResponse(false, ResponseMessages?.admin.subAdmin_save_fail, null, null, 400);
+
             }
 
-            let newObj = {
-                firstName,
-                lastName,
-                email: email,
-                userName: email,
-                password: md5(password),
-                userType: 2,
-                access,
-                createdOn: helpers.getCurrentDate()
-            }
-
-            let subAdminRef = new Users(newObj)
-            let result = await postData(subAdminRef);
-            if (result.status) {
-                delete data.password
-                return helpers.showResponse(true, ResponseMessages?.admin.subAdmin_added, data, null, 200);
-            }
-
-            return helpers.showResponse(false, ResponseMessages?.admin.subAdmin_save_fail, null, null, 400);
         } catch (err) {
-            return helpers.showResponse(false, ResponseMessages?.users?.register_error, err, null, 400);
+            return helpers.showResponse(false, ResponseMessages?.admin.subAdmin_save_fail, err, null, 400);
         }
 
     },
