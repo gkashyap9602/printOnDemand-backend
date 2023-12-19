@@ -339,7 +339,6 @@ const sendExcelAttachement = async (filteredData) => {
                 row.push(filteredData[k].cust_Id ?? '');
                 row.push(filteredData[k].company_name ?? '');
                 row.push(filteredData[k].customer_name ?? '');
-                row.push(filteredData[k].email ?? '');
                 row.push(filteredData[k].address1 ?? '');
                 row.push(filteredData[k].address2 ?? '');
                 row.push(filteredData[k].city ?? '');

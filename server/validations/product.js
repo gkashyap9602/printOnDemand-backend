@@ -35,9 +35,9 @@ module.exports.updateProduct = {
 };
 module.exports.addProductVarient = {
     body: joi.object({
-        productCode: joi.string().required(),
-        price: joi.string().required(),
         productId: joi.string().length(24).message("Invalid Id please check").required(),
+        productCode: joi.string().required(),
+        price: joi.number().required(),
         productVarientTemplates: joi.any().allow(''),
         varientOptions: joi.any().required(),
         dpi: joi.string(),
@@ -48,7 +48,7 @@ module.exports.addProductVarient = {
 module.exports.updateProductVarient = {
     body: joi.object({
         productCode: joi.string().required(),
-        price: joi.string().required(),
+        price: joi.number().required(),
         productVarientId: joi.string().length(24).message("Invalid Id please check").required(),
         //  :joi.any().allow(''),
         // dpi:joi.string(),

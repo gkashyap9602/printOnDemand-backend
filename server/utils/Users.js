@@ -723,6 +723,10 @@ const UserUtils = {
             let { paymentDetails } = data
             // data.updatedOn = helpers.getCurrentDate();
 
+            const findUser = await getSingleData(Users, { _id: userId })
+            if (!findUser.status) {
+                return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400)
+            }
             const payTraceToken = await helpers.generatePayTraceToken();
 
             if (!payTraceToken.status) {
@@ -733,7 +737,7 @@ const UserUtils = {
             console.log(idGenerated, "id generateddd");
 
             const dataPaytrace = {
-                customer_id: 8522651,
+                customer_id: 7861652,
                 // customer_id: idGenerated.customerID,
                 credit_card: {
                     number: paymentDetails.creditCardData.ccNumber,
@@ -762,6 +766,7 @@ const UserUtils = {
             let { customer_id, masked_card_number } = getPaytraceId.data
             //  ????????????????''''''''
 
+            //assign payload data to variable 
             let paymentdetailsData = data
 
             console.log(paymentdetailsData, "45455455");
@@ -848,51 +853,42 @@ const UserUtils = {
                 const sheet = await helpers.sendExcelAttachement(newUserCsvData)
 
                 let link = `${consts.BITBUCKET_URL}/${sheet.data}`
+                const logoPath = path.join(__dirname, '../views', 'logo.png');
 
-                const htmlContent = ejs.render(path.join(__dirname, '../views', 'newRegistration.ejs'), { link });
+                const htmlAdmin = await ejs.renderFile(path.join(__dirname, '../views', 'newRegistration.ejs'), { link, cidLogo: 'unique@mwwLogo' });
+                const htmlUser = await ejs.renderFile(path.join(__dirname, '../views', 'userProfileUpdated.ejs'), { cidLogo: 'unique@mwwLogo' });
 
-
-                //send email of attachment 
+                //send email of attachment to admin
                 let to = 'checkkk@yopmail.com'
                 // `${consts.ADMIN_EMAIL}`
                 let subject = `New user registered`
-                const logoPath = path.join(__dirname, '../views', 'logo.png');
-                let attachments = [{
-                    filename: 'userDetail.xlsx',
-                    path: logoPath,
-                    cid: 'unique@mwwLogo',
-                    path: link,
+                let attachments = [
+                    {
+                        filename: 'userDetail.xlsx',
+                        path: link,
 
-                }]
+                    },
+                    {
+                        filename: 'logo.png',
+                        path: logoPath,
+                        cid: 'unique@mwwLogo',
+                    }
+                ]
+                //send email to user
+                let toUser = findUser?.data?.email
+                // `${consts.ADMIN_EMAIL}`
+                let subjectUser = `Profile Updated`
+                let attachmentsUser = [
 
-//                 let body = `
-//  <!DOCTYPE html>
-//          <html>
-//          <head>
-//          </head>
-//          <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+                    {
+                        filename: 'logo.png',
+                        path: logoPath,
+                        cid: 'unique@mwwLogo',
+                    }
+                ]
 
-//              <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
-
-//                  <div style="text-align: center; padding: 10px;">
-//                      <img src="cid:unique@mwwLogo" alt="logo" style="max-height: 75px;" />
-//                  </div>
-
-//                  <span style="font-weight: 700; font-size: 22px; text-align: center; margin-top: 20px;">Welcome to the MWW on Demand Merch Maker!</span>
-
-//                  <p style="font-weight: bold; font-family: Arial; font-size: 16px; text-align: center; margin-top: 20px;">
-//                      Here is The Attacthment Of User Details
-//                  </p>
-
-                
-
-//              </div>
-
-//          </body>
-//          </html>
-
-//  `
-                let emailResponse = await helpers.sendEmailService(to, subject, htmlContent, attachments)
+                let emailToAdmin = await helpers.sendEmailService(to, subject, htmlAdmin, attachments)
+                let emailToUser = await helpers.sendEmailService(toUser, subjectUser, htmlUser, attachmentsUser)
                 //----------
             }
 
