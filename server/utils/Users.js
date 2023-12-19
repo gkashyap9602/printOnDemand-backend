@@ -737,8 +737,8 @@ const UserUtils = {
             console.log(idGenerated, "id generateddd");
 
             const dataPaytrace = {
-                customer_id: 7861652,
-                // customer_id: idGenerated.customerID,
+                // customer_id: 7861652,
+                customer_id: idGenerated.customerID,
                 credit_card: {
                     number: paymentDetails.creditCardData.ccNumber,
                     expiration_month: paymentDetails.creditCardData.expirationMonth,
@@ -764,37 +764,30 @@ const UserUtils = {
                 return helpers.showResponse(false, getPaytraceId.message, getPaytraceId.data, null, 400)
             }
             let { customer_id, masked_card_number } = getPaytraceId.data
-            //  ????????????????''''''''
 
             //assign payload data to variable 
             let paymentdetailsData = data
 
-            console.log(paymentdetailsData, "45455455");
+            // console.log(paymentdetailsData, "45455455");
             paymentdetailsData.paymentDetails.creditCardData.ccNumber = masked_card_number
             paymentdetailsData.paymentDetails.customerId = customer_id
+            paymentdetailsData.updatedOn = helpers.getCurrentDate();
 
-            console.log(paymentdetailsData, "dddsdsd");
+            // console.log(paymentdetailsData, "dddsdsd");
             let userProfile = await updateSingleData(UserProfile, paymentdetailsData, { userId })
 
             if (!userProfile.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
             }
 
-            let addUserPaytraceId = await updateSingleData(Users, { payTraceId: Number(customer_id) }, { _id: userId })
+            let addUserPaytraceId = await updateSingleData(Users, { payTraceId: Number(customer_id), updatedOn: helpers.getCurrentDate() }, { _id: userId })
 
             if (!addUserPaytraceId.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
             }
+            // console.log(userProfile, "userProfile");
+
             //---------------email send to admin that new user has been regsitered
-
-
-            console.log(userProfile, "userProfile");
-            // let userProfile = await getSingleData(UserProfile, { userId })
-
-            // if (!userProfile.status) {
-            //     console.log("errodr");
-            //     return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
-            // }
             let basicInfo = userProfile?.data.completionStaus?.basicInfo
             let billingInfo = userProfile?.data.completionStaus?.billingInfo
             let paymentInfo = userProfile?.data.completionStaus?.paymentInfo
@@ -805,9 +798,7 @@ const UserUtils = {
             if (basicInfo && billingInfo && paymentInfo && shippingInfo) {
                 console.log("under complete profile iff");
 
-                //---------------
                 //create excel 
-
                 let newUserCsvData = [
                     {
                         cust_Id: userProfile?.data?.paymentDetails?.customerId,
@@ -859,8 +850,7 @@ const UserUtils = {
                 const htmlUser = await ejs.renderFile(path.join(__dirname, '../views', 'userProfileUpdated.ejs'), { cidLogo: 'unique@mwwLogo' });
 
                 //send email of attachment to admin
-                let to = 'checkkk@yopmail.com'
-                // `${consts.ADMIN_EMAIL}`
+                let to = `${consts.ADMIN_EMAIL}`
                 let subject = `New user registered`
                 let attachments = [
                     {
@@ -876,7 +866,6 @@ const UserUtils = {
                 ]
                 //send email to user
                 let toUser = findUser?.data?.email
-                // `${consts.ADMIN_EMAIL}`
                 let subjectUser = `Profile Updated`
                 let attachmentsUser = [
 

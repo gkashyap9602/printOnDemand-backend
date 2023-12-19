@@ -147,7 +147,7 @@ const randomStr = (len, arr) => {
 };
 
 function generateIDs(customerIDCount) {
-    customerIDCount = 110000 + customerIDCount + 1;
+    customerIDCount = 200000 + customerIDCount + 1;
 
     // Generate the customer ID (4-digit number)
     const customerID = customerIDCount.toString().padStart(6, '0');
