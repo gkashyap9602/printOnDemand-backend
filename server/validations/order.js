@@ -67,6 +67,20 @@ module.exports.deleteCart = {
     })
 
 };
+module.exports.getAllOrders = {
+    body: joi.object({
+        pageIndex: joi.string(),
+        pageSize: joi.number(),
+        sortColumn: joi.string(),
+        sortDirection: joi.string(),
+        createdFrom: joi.string().allow(''),
+        createdTill: joi.string().allow(''),
+        status: joi.number(),
+        orderType: joi.number().allow(''),
+        searchKey: joi.string().allow('')
+    })
+
+};
 module.exports.placeOrder = {
     body: joi.object({
         totalAmount: joi.number().required(),

@@ -7,7 +7,7 @@ const Cart = require('../models/Cart')
 const { default: mongoose } = require('mongoose');
 const Orders = require('../models/Orders');
 const json2csv = require('json2csv').parse;
-
+const XLSX = require('xlsx')
 
 const orderUtil = {
 
@@ -139,6 +139,7 @@ const orderUtil = {
         }
 
     },
+
     updateOrder: async (data, customerId) => {
         try {
             let { orderId, totalAmount, orderItems, shippingMethodId, orderType, billingAddress, shippingAddress, ioss, receipt, preship, shippingAccountNumber } = data
@@ -195,7 +196,51 @@ const orderUtil = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
+    ordersBulkImport: async (data, userId, file) => {
+        try {
+            let { SubmitImmediately } = data
 
+            const buffer = file.buffer;
+            const workbook = XLSX.read(buffer, { type: 'buffer' });
+
+            const sheetName = workbook.SheetNames[0]; // Assuming the data is in the first sheet
+            const worksheet = workbook.Sheets[sheetName];
+
+            // console.log(workbook, "workbook");
+            // console.log(sheetName, "sheetName");
+            // console.log(worksheet, "worksheet");
+            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
+
+            console.log(rows,"rowsss==");
+            // Assuming the columns are in order: product, quantity, price, etc.
+            rows.forEach((row, rowIndex) => {
+
+                // console.log(row, "rowwwwwwww");
+                const cust_Id = row[0];
+                const company_name = row[1];
+                const customer_name = row[2];
+
+                // Create an order or perform other actions with the data
+                const order = {
+                    cust_Id,
+                    company_name,
+                    customer_name,
+                    // total: quantity * price,
+                };
+
+                // You can perform further actions with the order, such as saving to a database
+                console.log(`Order ${rowIndex + 1}:`, order);
+            });
+
+
+            return helpers.showResponse(false, "Excel Upload Failed", null, null, 400);
+        } catch (error) {
+            console.log(error, "error side");
+            return helpers.showResponse(false, error?.message, null, null, 400);
+
+        }
+
+    },
     downloadOrderDetails: async (data, userId, res) => {
         try {
             let { orderIds } = data
@@ -381,7 +426,7 @@ const orderUtil = {
                     storeName: 1,
                     submissionDueDate: 1,
                     productNames: 1,
-                    image:1
+                    image: 1
 
                 }
             }

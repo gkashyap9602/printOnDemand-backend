@@ -34,7 +34,7 @@ const orderController = {
         if (!user_id) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
-        let result = await Order.updateOrder(req.body,user_id);
+        let result = await Order.updateOrder(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
     downloadOrderDetails: async (req, res) => {
@@ -42,7 +42,19 @@ const orderController = {
         if (!user_id) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
-        let result = await Order.downloadOrderDetails(req.body, user_id,res);
+        let result = await Order.downloadOrderDetails(req.body, user_id, res);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    ordersBulkImport: async (req, res) => {
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        console.log(req.file, "req filee==");
+        if (!req.file) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages.common.no_file), 203);
+        }
+        let result = await Order.ordersBulkImport(req.body, user_id, req.file);
         return helpers.showOutput(res, result, result.statusCode);
     },
     getAllOrders: async (req, res) => {
