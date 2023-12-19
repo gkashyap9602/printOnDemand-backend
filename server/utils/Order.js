@@ -220,19 +220,34 @@ const orderUtil = {
             const headers = rows[0];
             const xlsx_data = rows.slice(1);
 
-            console.log(xlsx_data[0], "xlxssss");
-            console.log(headers, "headers");
+            console.log(xlsx_data[0], "xlxssss", xlsx_data[0].length);
+            console.log(headers, "headers", headers.length);
+
+            let result = headers.map((header, index) => {
+                let obj = {}
+                let itm =  xlsx_data[0].forEach((value) => {
+
+                    return obj[header] = value
+                })
+                return obj
+            })
             // Create an array of objects using headers and data
-            const result = xlsx_data[0].map(row => {
-                const obj = {};
-                headers.forEach((header, index) => {
-                    obj[header] = row[index];
-                });
-                return obj;
-            });
+            // const result = xlsx_data[0].map(row => {
+
+            //     const obj = {};
+            //     headers.forEach((header, index) => {
+            //         console.log(header,"headerre");
+            //         console.log(row,"rowrow");
+            //         obj[header] = row[index];
+            //         return
+            //     });
+            //     // console.log(obj, "objjjjj");
+            //     return obj;
+
+            // });
 
             // Print the resulting JSON data
-            console.log(result);
+            console.log(result, "result======");
 
             // console.log(rows, "rowsss==");
             // Assuming the columns are in order: product, quantity, price, etc.

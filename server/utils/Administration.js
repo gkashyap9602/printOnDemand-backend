@@ -272,7 +272,7 @@ const adminUtils = {
 
             const activeUsers = await getCount(Users, { status: 1, userType: 3 })
             const pendingUsers = await getCount(Users, { status: 3, userType: 3 })
-            const deactivateUsers = await getCount(Users, { status: 2, userType: 3 })
+            const deactivateUsers = await getCount(Users, { status: 4, userType: 3 })
             const totalUsers = await getCount(Users, { userType: 3 })
 
             let statusSummary = {
