@@ -595,11 +595,15 @@ const adminUtils = {
             let { status, userId } = data
             status = Number(status)
 
-            // let findUser = await 
+            let findUser = await getSingleData(UserProfile, { userId: userId })
 
+            if (!findUser.status) {
+                return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
+            }
+              
+            console.log(findUser.data,"userData");
             let result = await updateSingleData(Users, { status }, { _id: userId })
             if (result.status) {
-
                 return helpers.showResponse(true, ResponseMessages?.common.update_sucess, null, null, 200);
             }
 
