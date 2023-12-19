@@ -594,6 +594,9 @@ const adminUtils = {
         try {
             let { status, userId } = data
             status = Number(status)
+
+            // let findUser = await 
+
             let result = await updateSingleData(Users, { status }, { _id: userId })
             if (result.status) {
 
