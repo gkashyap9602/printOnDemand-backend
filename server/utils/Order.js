@@ -211,10 +211,10 @@ const orderUtil = {
             // console.log(worksheet, "worksheet");
             const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
 
-            console.log(rows,"rowsss==");
+            console.log(rows, "rowsss==");
             // Assuming the columns are in order: product, quantity, price, etc.
             rows.forEach((row, rowIndex) => {
-/////gfuidfedf
+                /////gfuidfedf
                 // console.log(row, "rowwwwwwww");
                 const cust_Id = row[0];
                 const company_name = row[1];

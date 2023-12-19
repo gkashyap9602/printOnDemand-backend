@@ -576,7 +576,7 @@ const UserUtils = {
             if (!getPaytraceId.status) {
 
                 console.log(getPaytraceId, "getPaytraceId");
-                return helpers.showResponse(false, getPaytraceId.message, getPaytraceId.data, null, 400)
+                return helpers.showResponse(false, getPaytraceId.data, getPaytraceId.message, null, 400)
             }
             let { customer_id, masked_card_number } = getPaytraceId.data
 

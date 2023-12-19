@@ -684,7 +684,7 @@ const generatePaytraceId = async (dataPayTrace, access_token,) => {
             let errorPayTrace = error.response.data.errors
 
             const firstErrorKey = Object.keys(errorPayTrace)[0];
-            const firstErrorMessage = errorPayTrace[firstErrorKey];
+            const firstErrorMessage = errorPayTrace[firstErrorKey].join(", ")
             console.log(firstErrorKey, "firstErrorKey");
             console.log(firstErrorMessage, "firstErrorMessage");
 
