@@ -89,6 +89,10 @@ module.exports = {
         comment_unliked_failed: "comment unliked failed",
         error_following: "error while following this user",
         user_verified: "user verified successfully",
+        basic_info_not_available: "Your Basic Info is not available",
+        billing_info_not_available: "Your billing Info is not available",
+        shipping_info_not_available: "Your shipping Info is not available",
+        payment_info_not_available: "Your payment Info is not available",
 
     },
     product: {

@@ -600,8 +600,27 @@ const adminUtils = {
             if (!findUser.status) {
                 return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
             }
-              
-            console.log(findUser.data,"userData");
+
+            console.log(findUser.data, "userData");
+            let basicInfo = findUser?.data?.completionStaus?.basicInfo
+            let billingInfo = findUser?.data?.completionStaus?.billingInfo
+            let paymentInfo = findUser?.data?.completionStaus?.paymentInfo
+            let shippingInfo = findUser?.data?.completionStaus?.shippingInfo
+
+
+            if (!basicInfo) {
+                return helpers.showResponse(false, ResponseMessages?.users.basic_info_not_available, null, null, 400);
+            }
+            if (!billingInfo) {
+                return helpers.showResponse(false, ResponseMessages?.users.billing_info_not_available, null, null, 400);
+            }
+            if (!paymentInfo) {
+                return helpers.showResponse(false, ResponseMessages?.users.payment_info_not_available, null, null, 400);
+            }
+            if (!shippingInfo) {
+                return helpers.showResponse(false, ResponseMessages?.users.shipping_info_not_available, null, null, 400);
+            }
+
             let result = await updateSingleData(Users, { status }, { _id: userId })
             if (result.status) {
                 return helpers.showResponse(true, ResponseMessages?.common.update_sucess, null, null, 200);

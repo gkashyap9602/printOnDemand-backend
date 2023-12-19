@@ -12,9 +12,9 @@ router.post('/addMaterial', validateCSRFToken, verifyTokenAdmin, validate(addMat
 router.post('/updateMaterial', validateCSRFToken, verifyTokenAdmin, validate(updateMaterial), adminController.updateMaterial);
 
 //customer routes
-router.post('/createCustomer', verifyTokenAdmin, validate(createCustomer), adminController.createCustomer);
-router.post('/updateCustomer', verifyTokenAdmin, validate(updateCustomer), adminController.updateCustomer);
-router.post('/activeInactiveUser', verifyTokenAdmin, validate(activeInactiveuser), adminController.activeInactiveUser);
+router.post('/createCustomer', validateCSRFToken, verifyTokenAdmin, validate(createCustomer), adminController.createCustomer);
+router.post('/updateCustomer', validateCSRFToken, verifyTokenAdmin, validate(updateCustomer), adminController.updateCustomer);
+router.post('/activeInactiveUser', validateCSRFToken, verifyTokenAdmin, validate(activeInactiveuser), adminController.activeInactiveUser);
 router.get('/getAllUsers', verifyTokenAdmin, adminController.getAllUsers);
 router.get('/getCustomerDetails/:customerId', verifyTokenAdmin, adminController.getCustomerDetails);
 

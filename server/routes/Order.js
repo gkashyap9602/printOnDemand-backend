@@ -3,7 +3,7 @@ var orderController = require('../controllers/Order');
 var router = express.Router();
 var { verifyTokenUser, validateCSRFToken, verifyTokenAdmin, verifyTokenBoth } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
-const { addToCart, updateCart, deleteCart, placeOrder, updateOrder, updateOrderStatus ,getAllOrders} = require('../validations/order');
+const { addToCart, updateCart, deleteCart, placeOrder, updateOrder, updateOrderStatus, getAllOrders } = require('../validations/order');
 const { addToMulter } = require('../services/helper');
 
 // user token access routes

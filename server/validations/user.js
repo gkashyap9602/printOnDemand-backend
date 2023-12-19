@@ -4,7 +4,7 @@ module.exports.profileSchema = {
     body: joi.object({
         firstName: joi.string(),
         lastName: joi.string(),
-        phoneNumber: joi.string(),
+        phoneNumber: joi.string().length(10).message('Number must be 10 digits '),
         paymentDetails: {
             billingAddressData: {
                 city: joi.string(),
@@ -20,7 +20,7 @@ module.exports.profileSchema = {
                 expirationYear: joi.string(),
             },
             customerId: joi.string().allow(''),
-            phone: joi.string().required(),
+            phone: joi.string().required().length(10).message('Number must be 10 digits '),
         },
         billingAddress: {
             address1: joi.string(),
@@ -28,7 +28,7 @@ module.exports.profileSchema = {
             city: joi.string(),
             companyEmail: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
             companyName: joi.string(),
-            companyPhone: joi.string().required(),
+            companyPhone: joi.string().required().length(10).message('Number must be 10 digits '),
             contactName: joi.string(),
             country: joi.string(),
             stateName: joi.string(),
@@ -52,7 +52,7 @@ module.exports.profileSchema = {
             city: joi.string(),
             companyEmail: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required().lowercase(),
             companyName: joi.string(),
-            companyPhone: joi.string().required(),
+            companyPhone: joi.string().required().length(10).message('Number must be 10 digits '),
             contactName: joi.string(),
             country: joi.string(),
             stateName: joi.string(),

@@ -8,6 +8,7 @@ const { default: mongoose } = require('mongoose');
 const Orders = require('../models/Orders');
 const json2csv = require('json2csv').parse;
 const XLSX = require('xlsx')
+const fs = require('fs')
 
 const orderUtil = {
 
@@ -106,7 +107,7 @@ const orderUtil = {
                 // productLibraryVarientIds: productVarientIds,
                 amount: totalAmount,
                 displayId: randomId,
-                submitImmediately,
+                isSubmitImmediately: submitImmediately,
                 shippingMethodId,
                 orderType,
                 billingAddress,
@@ -210,27 +211,49 @@ const orderUtil = {
             // console.log(sheetName, "sheetName");
             // console.log(worksheet, "worksheet");
             const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
+            // Save the JSON data to a file (optional)
+            // const jsonFilePath = 'output.json';
+            // fs.writeFileSync(jsonFilePath, JSON.stringify(rows, null, 2));
+            // console.log(`JSON data saved to ${jsonFilePath}`);
 
-            console.log(rows, "rowsss==");
-            // Assuming the columns are in order: product, quantity, price, etc.
-            rows.forEach((row, rowIndex) => {
-                /////gfuidfedf
-                // console.log(row, "rowwwwwwww");
-                const cust_Id = row[0];
-                const company_name = row[1];
-                const customer_name = row[2];
+            // Extract headers and data
+            const headers = rows[0];
+            const xlsx_data = rows.slice(1);
 
-                // Create an order or perform other actions with the data
-                const order = {
-                    cust_Id,
-                    company_name,
-                    customer_name,
-                    // total: quantity * price,
-                };
-
-                // You can perform further actions with the order, such as saving to a database
-                console.log(`Order ${rowIndex + 1}:`, order);
+            console.log(xlsx_data[0], "xlxssss");
+            console.log(headers, "headers");
+            // Create an array of objects using headers and data
+            const result = xlsx_data[0].map(row => {
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = row[index];
+                });
+                return obj;
             });
+
+            // Print the resulting JSON data
+            console.log(result);
+
+            // console.log(rows, "rowsss==");
+            // Assuming the columns are in order: product, quantity, price, etc.
+            // rows.forEach((row, rowIndex) => {
+            //     /////gfuidfedf
+            //     // console.log(row, "rowwwwwwww");
+            //     const cust_Id = row[0];
+            //     const company_name = row[1];
+            //     const customer_name = row[2];
+
+            //     // Create an order or perform other actions with the data
+            //     const order = {
+            //         cust_Id,
+            //         company_name,
+            //         customer_name,
+            //         // total: quantity * price,
+            //     };
+
+            //     // You can perform further actions with the order, such as saving to a database
+            //     console.log(`Order ${rowIndex + 1}:`, order);
+            // });
 
 
             return helpers.showResponse(false, "Excel Upload Failed", null, null, 400);
