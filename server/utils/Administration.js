@@ -240,6 +240,11 @@ const adminUtils = {
                     },
                     {
                         $addFields: {
+                            customerId: '$userProfileData.paymentDetails.customerId'
+                        }
+                    },
+                    {
+                        $addFields: {
                             numberOfOrders: "$ordersData.totalOrder"
                         }
                     },

@@ -207,69 +207,25 @@ const orderUtil = {
             const sheetName = workbook.SheetNames[0]; // Assuming the data is in the first sheet
             const worksheet = workbook.Sheets[sheetName];
 
-            // console.log(workbook, "workbook");
-            // console.log(sheetName, "sheetName");
-            // console.log(worksheet, "worksheet");
             const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
-            // Save the JSON data to a file (optional)
-            // const jsonFilePath = 'output.json';
-            // fs.writeFileSync(jsonFilePath, JSON.stringify(rows, null, 2));
-            // console.log(`JSON data saved to ${jsonFilePath}`);
+
 
             // Extract headers and data
             const headers = rows[0];
-            const xlsx_data = rows.slice(1);
+            const xlsx_data = rows.slice(1)?.[0];
 
-            console.log(xlsx_data[0], "xlxssss", xlsx_data[0].length);
-            console.log(headers, "headers", headers.length);
+            // console.log(xlsx_data, "xlxssss", xlsx_data.length);
+            // console.log(headers, "headers", headers.length);
 
-            let result = headers.map((header, index) => {
-                let obj = {}
-                let itm =  xlsx_data[0].forEach((value) => {
-
-                    return obj[header] = value
-                })
-                return obj
+            let bulkOrders = []
+            let result = headers.forEach((header, index) => {
+                bulkOrders.push(
+                    {
+                        [header]: xlsx_data[index] ?? ""
+                    }
+                )
             })
-            // Create an array of objects using headers and data
-            // const result = xlsx_data[0].map(row => {
-
-            //     const obj = {};
-            //     headers.forEach((header, index) => {
-            //         console.log(header,"headerre");
-            //         console.log(row,"rowrow");
-            //         obj[header] = row[index];
-            //         return
-            //     });
-            //     // console.log(obj, "objjjjj");
-            //     return obj;
-
-            // });
-
-            // Print the resulting JSON data
-            console.log(result, "result======");
-
-            // console.log(rows, "rowsss==");
-            // Assuming the columns are in order: product, quantity, price, etc.
-            // rows.forEach((row, rowIndex) => {
-            //     /////gfuidfedf
-            //     // console.log(row, "rowwwwwwww");
-            //     const cust_Id = row[0];
-            //     const company_name = row[1];
-            //     const customer_name = row[2];
-
-            //     // Create an order or perform other actions with the data
-            //     const order = {
-            //         cust_Id,
-            //         company_name,
-            //         customer_name,
-            //         // total: quantity * price,
-            //     };
-
-            //     // You can perform further actions with the order, such as saving to a database
-            //     console.log(`Order ${rowIndex + 1}:`, order);
-            // });
-
+            console.log(bulkOrders, "bulkOrders");
 
             return helpers.showResponse(false, "Excel Upload Failed", null, null, 400);
         } catch (error) {
