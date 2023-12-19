@@ -214,7 +214,7 @@ const orderUtil = {
             console.log(rows,"rowsss==");
             // Assuming the columns are in order: product, quantity, price, etc.
             rows.forEach((row, rowIndex) => {
-
+/////gfuidfedf
                 // console.log(row, "rowwwwwwww");
                 const cust_Id = row[0];
                 const company_name = row[1];
