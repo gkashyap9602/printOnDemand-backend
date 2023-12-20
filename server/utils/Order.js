@@ -36,22 +36,27 @@ const orderUtil = {
 
                 let find = await getSingleData(Cart, { productLibraryVariantId: item.productLibraryVariantId });
                 if (find.status) {
+                    console.log("iff cart side");
+
                     let quantity = find.data.quantity
                     let updateItem = await updateSingleData(Cart, { quantity: quantity + 1 });
-                    if (!updateItem.status) {
-                        return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
+                    if (updateItem.status) {
+                        return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
+                        // return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
                     }
                 } else {
+                    console.log("else cart side");
                     let cartRef = new Cart(item)
                     let response = await postData(cartRef);
-                    if (!response.status) {
-                        return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
+                    if (response.status) {
+                        return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
+                        // return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
                     }
                 }
 
 
             }
-            return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
+            // return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
 
         } catch (error) {
             return helpers.showResponse(false, error?.message, null, null, 400);
