@@ -54,7 +54,8 @@ const orderUtil = {
             console.log(newItems, "newItems");
 
             if (updateItems.length > 0) {
-
+                
+                console.log(updateItems, "if length updateItems");
                 const bulkOperations = updateItems.map(({ productLibraryVariantId, quantity }) => ({
                     updateOne: {
                         filter: { productLibraryVariantId: productLibraryVariantId },
@@ -76,7 +77,7 @@ const orderUtil = {
             }
             if (newItems.length > 0) {
                 let response = await insertMany(Cart, newItems);
-                // console.log(response, "responseresponse");
+                console.log(response, "responseresponse");
                 if (!response.status) {
                     return helpers.showResponse(false, ResponseMessages.order.addToCart_failed, null, null, 400);
                 }
