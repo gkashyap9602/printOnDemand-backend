@@ -6,6 +6,7 @@ const Order = require('../models/Orders')
 const Cart = require('../models/Cart')
 const { default: mongoose } = require('mongoose');
 const Orders = require('../models/Orders');
+const Users = require('../models/Users')
 const json2csv = require('json2csv').parse;
 const XLSX = require('xlsx')
 const fs = require('fs')
@@ -60,7 +61,8 @@ const orderUtil = {
 
             if (!findUser.status) {
                 return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
-            }
+            } 
+            console.log(findUser.data,"dayyyyy");
             if (findUser?.data?.status === 3) {
                 return helpers.showResponse(false, ResponseMessages.users.account_not_active, null, null, 400);
             }
@@ -133,14 +135,14 @@ const orderUtil = {
 
             let orderRef = new Order(obj)
 
-            // let response = await postData(orderRef);
-            // console.log(response, "responsee");
-            // if (response.status) {
+            let response = await postData(orderRef);
+            console.log(response, "responsee");
+            if (response.status) {
 
-            //     let removeItem = await deleteData(Cart, { userId: customerId })
+                let removeItem = await deleteData(Cart, { userId: customerId })
 
-            //     return helpers.showResponse(true, ResponseMessages.order.order_created, null, null, 200);
-            // }
+                return helpers.showResponse(true, ResponseMessages.order.order_created, null, null, 200);
+            }
             return helpers.showResponse(false, ResponseMessages.order.order_failed, {}, null, 400);
         } catch (error) {
             console.log(error, "error side");
@@ -318,6 +320,8 @@ const orderUtil = {
             customerId: mongoose.Types.ObjectId(userId),
 
         }
+
+        console.log(status,"statuss");
         if (status) {
             status = Number(status)
             matchObj.status = status
@@ -472,7 +476,7 @@ const orderUtil = {
             {
                 $match: {
                     customerId: userId,
-                    status: 5
+                    status: 4
                 }
             },
             {

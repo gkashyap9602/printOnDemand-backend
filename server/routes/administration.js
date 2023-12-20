@@ -12,9 +12,9 @@ router.post('/addMaterial', validateCSRFToken, verifyTokenAdmin, validate(addMat
 router.post('/updateMaterial', validateCSRFToken, verifyTokenAdmin, validate(updateMaterial), adminController.updateMaterial);
 
 //customer routes
-router.post('/createCustomer', validateCSRFToken, verifyTokenAdmin, validate(createCustomer), adminController.createCustomer);
-router.post('/updateCustomer', validateCSRFToken, verifyTokenAdmin, validate(updateCustomer), adminController.updateCustomer);
-router.post('/activeInactiveUser', validateCSRFToken, verifyTokenAdmin, validate(activeInactiveuser), adminController.activeInactiveUser);
+router.post('/createCustomer', verifyTokenAdmin, validate(createCustomer), adminController.createCustomer);
+router.post('/updateCustomer', verifyTokenAdmin, validate(updateCustomer), adminController.updateCustomer);
+router.post('/activeInactiveUser', verifyTokenAdmin, validate(activeInactiveuser), adminController.activeInactiveUser);
 router.get('/getAllUsers', verifyTokenAdmin, adminController.getAllUsers);
 router.get('/getCustomerDetails/:customerId', verifyTokenAdmin, adminController.getCustomerDetails);
 
@@ -23,17 +23,17 @@ router.post('/addShipMethod', validateCSRFToken, verifyTokenAdmin, adminControll
 
 
 //notification routes
-router.post('/saveNotification', validateCSRFToken, verifyTokenAdmin, validate(saveNotification), adminController.saveNotification);
-router.delete('/deleteNotification', validateCSRFToken, verifyTokenAdmin, validate(deleteNotification), adminController.deleteNotification);
+router.post('/saveNotification', verifyTokenAdmin, validate(saveNotification), adminController.saveNotification);
+router.delete('/deleteNotification', verifyTokenAdmin, validate(deleteNotification), adminController.deleteNotification);
 router.get('/getNotifications', verifyTokenAdmin, adminController.getNotifications);
 
 //subadmin routes
-router.post('/addSubAdmin', validateCSRFToken, verifyTokenAdmin, validate(addSubAdmin), adminController.addSubAdmin);
-router.post('/updateSubAdmin', validateCSRFToken, verifyTokenAdmin, validate(updateSubAdmin), adminController.updateSubAdmin);
+router.post('/addSubAdmin', verifyTokenAdmin, validate(addSubAdmin), adminController.addSubAdmin);
+router.post('/updateSubAdmin', verifyTokenAdmin, validate(updateSubAdmin), adminController.updateSubAdmin);
 router.get('/getAllSubAdmins', verifyTokenAdmin, adminController.getAllSubAdmins);
 
 //waiting list routes 
-router.post('/updateWaitingList', validateCSRFToken, verifyTokenAdmin, validate(updateWaitingList), adminController.updateWaitingList);
+router.post('/updateWaitingList', verifyTokenAdmin, validate(updateWaitingList), adminController.updateWaitingList);
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
