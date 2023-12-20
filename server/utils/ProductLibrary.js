@@ -289,10 +289,18 @@ const productLibrary = {
             pageSize = Number(pageSize)
             page = Number(page)
 
+            let searchTerms
+            let titleSearch
+            let valueSearch
+            
+            if (searchKey) {
+                searchTerms = searchKey.split(' ');
+                titleSearch = searchTerms[0];
+                valueSearch = searchTerms.slice(1).join(' ');
+            }
 
-            const searchTerms = searchKey.split(' ');
-            const titleSearch = searchTerms[0];
-            const valueSearch = searchTerms.slice(1).join(' ');
+
+
 
             console.log(titleSearch, "titleSearch ");
             console.log(valueSearch, "valueSearch");

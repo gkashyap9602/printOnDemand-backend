@@ -352,11 +352,19 @@ const productUtils = {
             let id = new ObjectId(subCategoryId)
             pageSize = Number(pageSize)
             page = Number(page)
-            searchKey = searchKey.trim()
 
-            const searchTerms = searchKey.split(' ');
-            const titleSearch = searchTerms[0];
-            const valueSearch = searchTerms.slice(1).join(' ');
+            let searchTerms
+            let titleSearch
+            let valueSearch
+
+            if (searchKey) {
+                searchKey = searchKey.trim()
+
+                searchTerms = searchKey.split(' ');
+                titleSearch = searchTerms[0];
+                valueSearch = searchTerms.slice(1).join(' ');
+
+            }
 
             console.log(titleSearch, "titleSearch ");
             console.log(valueSearch, "valueSearch");
