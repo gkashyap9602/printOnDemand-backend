@@ -197,6 +197,7 @@ module.exports = {
     order: {
         order_created: "Order Placed Successfully",
         order_updated: "Order Updated Successfully",
+        addToCart_failed: "Error while Add To Cart",
         order_update_error: "Order Placed Successfully",
         order_not_exist: "Order not exist",
         order_failed: "Error while Placing Order",

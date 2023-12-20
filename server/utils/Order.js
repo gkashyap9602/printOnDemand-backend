@@ -32,33 +32,58 @@ const orderUtil = {
             cartItems.map((value) => value.createdOn = helpers.getCurrentDate())
             cartItems.map((value) => value.userId = userId)
 
+            let updateItems = []
+            let newItems = []
+
             for (let item of cartItems) {
 
                 let find = await getSingleData(Cart, { productLibraryVariantId: item.productLibraryVariantId });
 
-                let updateItems
                 if (find.status) {
-                    console.log("iff cart side", item.productLibraryVariantId);
+                    let quantity = Number(find.data.quantity) + 1
+                    item.quantity = quantity
+                    updateItems.push(item)
 
-                    let quantity = Number(find.data.quantity)
-                    let updateItem = await updateSingleData(Cart, { quantity: quantity + 1 }, { productLibraryVariantId: item.productLibraryVariantId });
-                    if (updateItem.status) {
-                        return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
-                        // return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
-                    }
                 } else {
-                    console.log("else cart side");
-                    let cartRef = new Cart(item)
-                    let response = await postData(cartRef);
-                    if (response.status) {
-                        return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
-                        // return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
+                    newItems.push(item)
+
+                }
+            }
+
+            console.log(updateItems, "updateItems");
+            console.log(newItems, "newItems");
+
+            if (updateItems.length > 0) {
+
+                const bulkOperations = updateItems.map(({ productLibraryVariantId, quantity }) => ({
+                    updateOne: {
+                        filter: { productLibraryVariantId: productLibraryVariantId },
+                        update: { $set: { quantity: quantity } }
                     }
+                }));
+
+                //update items in bulk
+                const result = await Cart.bulkWrite(bulkOperations);
+
+                if (result.modifiedCount > 0) {
+                    return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
+                } else {
+                    return helpers.showResponse(false, ResponseMessages.order.addToCart_failed, null, null, 400);
+
                 }
 
 
             }
-            // return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
+            if (newItems.length > 0) {
+                let response = await insertMany(Cart, newItems);
+                // console.log(response, "responseresponse");
+                if (!response.status) {
+                    return helpers.showResponse(false, ResponseMessages.order.addToCart_failed, null, null, 400);
+                }
+
+                return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
+
+            }
 
         } catch (error) {
             return helpers.showResponse(false, error?.message, null, null, 400);
@@ -797,8 +822,8 @@ const orderUtil = {
                                 firstName: 1,
                                 lastName: 1,
                                 payTraceId: 1,
-                                email:1,
-                                phoneNumber:1
+                                email: 1,
+                                phoneNumber: 1
                                 // traceId:1,
 
                             }
