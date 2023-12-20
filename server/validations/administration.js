@@ -109,7 +109,7 @@ module.exports.createCustomer = {
             taxId: joi.string(),
             zipCode: joi.number().max(99999).message("Zip Code Must be 5 Digit"),
         },
-        payTraceId: joi.string().allow("")
+        payTraceId: joi.number().allow("")
 
 
     })

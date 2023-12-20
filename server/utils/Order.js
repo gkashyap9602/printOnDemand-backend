@@ -32,6 +32,7 @@ const orderUtil = {
             cartItems.map((value) => value.createdOn = helpers.getCurrentDate())
             cartItems.map((value) => value.userId = userId)
 
+            //
             let updateItems = []
             let newItems = []
 
@@ -40,23 +41,27 @@ const orderUtil = {
 
                 let find = await getSingleData(Cart, { userId: userId, productLibraryVariantId: item.productLibraryVariantId });
 
+                //if cart item already push into  updateItem array with quantity increase
                 if (find.status) {
                     let quantity = Number(find.data.quantity) + 1
                     item.quantity = quantity
                     updateItems.push(item)
 
+
+                    //if cart item not already exist push into  new ItemmArry
                 } else {
                     newItems.push(item)
 
                 }
             }
 
-            console.log(updateItems, "updateItems");
-            console.log(newItems, "newItems");
+            // console.log(updateItems, "updateItems");
+            // console.log(newItems, "newItems");
 
+            //if item already exist in cart then increase quantity and bulk update in database 
             if (updateItems.length > 0) {
 
-                console.log(updateItems, "if length updateItems");
+                // console.log(updateItems, "if length updateItems");
                 const bulkOperations = updateItems.map(({ productLibraryVariantId, quantity }) => ({
                     updateOne: {
                         filter: { productLibraryVariantId: productLibraryVariantId, userId: userId },
@@ -76,9 +81,10 @@ const orderUtil = {
 
 
             }
+            //if item not already exist in cart then insert items in database 
             if (newItems.length > 0) {
                 let response = await insertMany(Cart, newItems);
-                console.log(response, "responseresponse");
+                // console.log(response, "responseresponse");
                 if (!response.status) {
                     return helpers.showResponse(false, ResponseMessages.order.addToCart_failed, null, null, 400);
                 }
