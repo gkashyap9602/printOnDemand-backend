@@ -35,6 +35,7 @@ const orderUtil = {
             let updateItems = []
             let newItems = []
 
+
             for (let item of cartItems) {
 
                 let find = await getSingleData(Cart, { userId: userId, productLibraryVariantId: item.productLibraryVariantId });
@@ -58,7 +59,7 @@ const orderUtil = {
                 console.log(updateItems, "if length updateItems");
                 const bulkOperations = updateItems.map(({ productLibraryVariantId, quantity }) => ({
                     updateOne: {
-                        filter: { productLibraryVariantId: productLibraryVariantId },
+                        filter: { productLibraryVariantId: productLibraryVariantId, userId: userId },
                         update: { $set: { quantity: quantity } }
                     }
                 }));
