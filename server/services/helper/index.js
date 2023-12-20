@@ -47,30 +47,33 @@ const showOutput = (res, response, code) => {
     // delete response.code;
     res.status(code).json(response);
 };
-const generateRandom4DigitNumber = (prefix) => {
-    const min = 1000;
-    const max = 9999;
-    const random4DigitNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+// const generateRandom4DigitNumber = (prefix, count) => {
+//     const min = 1000;
+//     const max = 9999;
+//     const random4DigitNumber = Math.floor(Math.random() * (max - min + 1)) + min;
 
-    return prefix + random4DigitNumber;
-}
-// const showOutputNew = (res, response, code) => {
-//   // console.log(response,"response new output")
-//   if (!response.status) {
-//     res.status(code).json({
-//       Response: {
-//         Message: response?.Message,
-//         ValidationErrors: null,
-//         ValidationFailed: false,
-//       }, StatusCode: response.code
-//     });
+//     return prefix + random4DigitNumber;
+// }
+const generateOrderID = async (prefix, orderCount) => {
 
-//   } else {
-//     // console.log(response?.data,"else shownew")
-//     res.status(code).json({ message: response?.Message, response: response?.data, statusCode: response.code });
+    let padStart = 4
 
-//   }
-// };
+    const isAllNine = orderCount.toString().split('').every(digit => digit === '9');
+
+    if (isAllNine) {
+        padStart = padStart + 1
+    }
+    //make sure that order count should be 4 digits 
+    orderCount = orderCount.toString().padStart(4, 0)
+
+    console.log(orderCount, "orderCount");
+
+
+    const orderID = prefix + orderCount;
+
+    return orderID;
+};
+
 const mongoError = (err) => {
     if (err.code === 11000 && err.name === 'MongoServerError') {
         let errKey = Object.keys(err?.keyValue).pop()
@@ -1437,6 +1440,7 @@ module.exports = {
     generatePaytraceId,
     generatePayTraceToken,
     getFileType,
-    generateRandom4DigitNumber,
+    // generateRandom4DigitNumber,
+    generateOrderID,
     mongoError
 };

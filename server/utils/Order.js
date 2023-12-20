@@ -56,10 +56,19 @@ const orderUtil = {
         try {
             let { totalAmount, orderItems, submitImmediately, shippingMethodId, orderType, billingAddress, shippingAddress, cartItems, ioss, receipt, preship, shippingAccountNumber, } = data
 
-            const fixedPrefix = 'MWW1000';
-            const randomId = helpers.generateRandom4DigitNumber(fixedPrefix);
+            let findUser = await getSingleData(Users, { _id: customerId }, 'status')
 
-            // let populate = "productLibraryVariantId"
+            if (!findUser.status) {
+                return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
+            }
+            if (findUser?.data?.status === 3) {
+                return helpers.showResponse(false, ResponseMessages.users.account_not_active, null, null, 400);
+            }
+            const fixedPrefix = 'MWW1000';
+            let countOrders = await getCount(Orders, {})
+            const randomId = helpers.generateOrderID(fixedPrefix, countOrders.data);
+
+            console.log(randomId, "randomId");
             const cart = await Cart.findOne({ userId: customerId })
                 .populate({
                     path: "productLibraryVariantId",
@@ -124,15 +133,15 @@ const orderUtil = {
 
             let orderRef = new Order(obj)
 
-            let response = await postData(orderRef);
-            console.log(response, "responsee");
-            if (response.status) {
+            // let response = await postData(orderRef);
+            // console.log(response, "responsee");
+            // if (response.status) {
 
-                let removeItem = await deleteData(Cart, { userId: customerId })
+            //     let removeItem = await deleteData(Cart, { userId: customerId })
 
-                return helpers.showResponse(true, ResponseMessages.order.order_created, null, null, 200);
-            }
-            return helpers.showResponse(false, ResponseMessages.order.order_failed, response?.data, null, 400);
+            //     return helpers.showResponse(true, ResponseMessages.order.order_created, null, null, 200);
+            // }
+            return helpers.showResponse(false, ResponseMessages.order.order_failed, {}, null, 400);
         } catch (error) {
             console.log(error, "error side");
             return helpers.showResponse(false, error?.message, null, null, 400);
@@ -402,13 +411,15 @@ const orderUtil = {
             // },
             {
                 $addFields: {
-                    productNames: "$orderItems.productTitle"
+                    productNames: "$orderItems.productTitle",
                 }
             },
 
             {
                 $project: {
-                    amount: 1,
+                    amount: {
+                        $round: ["$amount", 2]
+                    },
                     customerName: "$userData.firstName",
                     displayId: 1,
                     isSubmitImmediately: 1,
@@ -644,7 +655,9 @@ const orderUtil = {
 
             {
                 $project: {
-                    amount: 1,
+                    amount: {
+                        $round: ["$amount", 2]
+                    },
                     customerName: "$userData.firstName",
                     displayId: 1,
                     isSubmitImmediately: 1,

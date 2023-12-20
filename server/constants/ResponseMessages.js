@@ -93,6 +93,7 @@ module.exports = {
         billing_info_not_available: "Customer billing Info is not available",
         shipping_info_not_available: "Customer shipping Info is not available",
         payment_info_not_available: "Customer payment Info is not available",
+        account_not_active: "your account Is not active Cannot add products to the cart.",
 
     },
     product: {
