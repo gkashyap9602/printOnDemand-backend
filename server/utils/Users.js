@@ -90,6 +90,7 @@ const UserUtils = {
             let result = await postData(userRef);
             if (result.status) {
                 delete result?.data?.password
+
                 let ObjProfile = {
                     userId: result.data._id,
                     completionStaus: {
@@ -587,9 +588,10 @@ const UserUtils = {
             paymentdetailsData.paymentDetails.creditCardData.ccNumber = masked_card_number
             paymentdetailsData.paymentDetails.customerId = customer_id
             paymentdetailsData.updatedOn = helpers.getCurrentDate();
+            let completionStaus = { 'completionStaus.paymentInfo': true }
 
             // console.log(paymentdetailsData, "dddsdsd");
-            let userProfile = await updateSingleData(UserProfile, paymentdetailsData, { userId })
+            let userProfile = await updateSingleData(UserProfile, { ...paymentdetailsData, ...completionStaus }, { userId })
 
             if (!userProfile.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);

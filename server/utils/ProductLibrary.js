@@ -292,16 +292,14 @@ const productLibrary = {
             let searchTerms
             let titleSearch
             let valueSearch
-            
+
             if (searchKey) {
                 searchTerms = searchKey.split(' ');
                 titleSearch = searchTerms[0];
                 valueSearch = searchTerms.slice(1).join(' ');
             }
 
-
-
-
+            console.log(searchTerms, "searchTerms ");
             console.log(titleSearch, "titleSearch ");
             console.log(valueSearch, "valueSearch");
 

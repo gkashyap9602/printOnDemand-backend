@@ -12,6 +12,8 @@ const UserProfile = require('../models/UserProfile')
 const WaitingList = require('../models/WaitingList')
 const Notification = require('../models/notification')
 const ShipMethod = require("../models/ShipMethod")
+const path = require('path')
+const ejs = require('ejs')
 const adminUtils = {
 
     // login: async (data) => {
@@ -375,6 +377,7 @@ const adminUtils = {
             if (existUser.status) {
                 return helpers.showResponse(false, ResponseMessages?.users.email_already, null, null, 400);
             }
+
             const usersCount = await getCount(Users, { userType: 3 })
             if (!usersCount.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
@@ -383,7 +386,7 @@ const adminUtils = {
 
             let adminData = await getSingleData(Users, { _id: adminId, userType: 1 })
             if (!adminData.status) {
-                return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
+                return helpers.showResponse(false, ResponseMessages?.admin.admin_account_error, null, null, 400);
             }
 
             let newObj = {
@@ -391,52 +394,232 @@ const adminUtils = {
                 lastName,
                 email: email,
                 userName: email,
-                id: idGenerated.idNumber,
-                // guid: randomUUID(),
-                customerId: idGenerated.customerID,
                 createdUser: `${adminData?.data?.firstName} ${adminData?.data?.lastName}`,
+                // id: idGenerated.idNumber,
+                // guid: randomUUID(),
+                // customerId: idGenerated.customerID,
                 // customerGuid: randomUUID(),
                 // password: md5(password),
-                payTraceId: payTraceId,
+                // payTraceId: payTraceId,
                 createdOn: helpers.getCurrentDate()
             }
 
+
+            if (payTraceId && !paymentDetails) {
+                newObj.payTraceId = payTraceId
+            }
+
+            //create new customer account
             let userRef = new Users(newObj)
             let result = await postData(userRef);
             console.log(result, "result user save");
+
+            //If User Register Successfullt then create its profile
             if (result.status) {
-                // delete data.password
+                delete result?.data?.password
 
                 let ObjProfile = {
                     userId: result.data._id,
                     completionStaus: {
                         basicInfo: true
                     },
+
                     createdOn: helpers.getCurrentDate()
                 }
-                if (billingAddress) {
-                    ObjProfile.billingAddress = billingAddress
-                    ObjProfile.completionStaus.billingInfo = true
 
-                }
-                if (shippingAddress) {
-                    ObjProfile.shippingAddress = shippingAddress
-                    ObjProfile.completionStaus.shippingInfo = true
-                }
-                if (paymentDetails) {
-                    ObjProfile.paymentDetails = paymentDetails,
-                        ObjProfile.completionStaus.paymentInfo = true
+                //if paytrace id added by admin then update customerID also
+                if (payTraceId && !paymentDetails) {
+                    console.log(payTraceId, "paytraceId");
+                    ObjProfile.paymentDetails = {}
+                    ObjProfile.paymentDetails.customerId = payTraceId
                 }
 
                 let userProfileRef = new UserProfile(ObjProfile)
                 let resultProfile = await postData(userProfileRef);
-
-                console.log(resultProfile, "resultProfile save");
+                console.log(resultProfile, "resultProfile");
                 if (!resultProfile.status) {
-                    //if userProfile save err then handle user is saved but throw error for profile update issue?
                     await deleteData(Users, { _id: userRef._id })
                     return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
                 }
+                //User And his Profile has been created now update additional feilds in user profile
+
+                if (billingAddress) {
+                    let obj = {
+                        billingAddress: billingAddress,
+                        'completionStaus.billingInfo': true
+                    }
+
+                    let userBillingAddress = await updateSingleData(UserProfile, obj, { userId: result?.data?._id })
+
+                }
+                if (shippingAddress) {
+
+                    let obj = {
+                        shippingAddress: shippingAddress,
+                        'completionStaus.shippingInfo': true
+                    }
+
+                    let userShippingAddress = await updateSingleData(UserProfile, obj, { userId: result?.data?._id })
+                }
+
+
+                if (paymentDetails && !payTraceId) {
+
+                    const payTraceToken = await helpers.generatePayTraceToken();
+
+                    if (!payTraceToken.status) {
+                        return helpers.showResponse(false, "PayTrace Token Not Generated", payTraceToken.data, null, 400)
+                    }
+                    //get total count of the users 
+                    let count = await getCount(Users, { userType: 3 })
+                    let idGenerated = helpers.generateIDs(count?.data)
+                    console.log(idGenerated, "id generateddd");
+
+                    //paytrace ID Data
+                    const dataPaytrace = {
+                        // customer_id: 77715522,
+                        customer_id: idGenerated.customerID,
+                        credit_card: {
+                            number: paymentDetails.creditCardData.ccNumber,
+                            expiration_month: paymentDetails.creditCardData.expirationMonth,
+                            expiration_year: paymentDetails.creditCardData.expirationYear,
+                        },
+                        integrator_id: consts.PAYTRACE_IntegratorID,
+                        billing_address: {
+                            name: paymentDetails?.billingAddressData?.name,
+                            street_address: paymentDetails?.billingAddressData?.streetAddress,
+                            city: paymentDetails?.billingAddressData?.city,
+                            state: paymentDetails?.billingAddressData?.stateName,
+                            zip: paymentDetails?.billingAddressData?.zipCode,
+                            country: paymentDetails?.billingAddressData?.country
+                        },
+                    };
+                    //generate Paytrace Id
+                    let getPaytraceId = await helpers.generatePaytraceId(dataPaytrace, payTraceToken.data.access_token)
+                    console.log(getPaytraceId, "getPaytraceId");
+                    if (!getPaytraceId.status) {
+                        return helpers.showResponse(false, getPaytraceId.data, getPaytraceId.message, null, 400)
+                    }
+                    //retrieve paytrace id and mask card number
+                    let { customer_id, masked_card_number } = getPaytraceId.data
+
+                    //assigning payment details object  to variable
+                    let paymentdetailsData = {
+                        paymentDetails: paymentDetails,
+                    }
+
+
+                    console.log(paymentdetailsData, "45455455");
+                    paymentdetailsData.paymentDetails.creditCardData.ccNumber = masked_card_number
+                    paymentdetailsData.paymentDetails.customerId = customer_id
+                    paymentdetailsData.createdOn = helpers.getCurrentDate();
+                    let completionStaus = { 'completionStaus.paymentInfo': true }
+                    // console.log(paymentdetailsData, "dddsdsd");
+                    let userProfile = await updateSingleData(UserProfile, { ...paymentdetailsData, ...completionStaus }, { userId: result?.data?._id })
+
+
+                    //update Payment details in user profile 
+                    if (!userProfile.status) {
+                        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+                    }
+
+                    //add paytrace id in user collection
+                    let addUserPaytraceId = await updateSingleData(Users, { payTraceId: Number(customer_id), updatedOn: helpers.getCurrentDate() }, { _id: result?.data?._id })
+
+                    if (!addUserPaytraceId.status) {
+                        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+                    }
+
+                    //---------------email send to admin that new user has been regsitered
+                    let basicInfo = userProfile?.data.completionStaus?.basicInfo
+                    let billingInfo = userProfile?.data.completionStaus?.billingInfo
+                    let paymentInfo = userProfile?.data.completionStaus?.paymentInfo
+                    let shippingInfo = userProfile?.data.completionStaus?.shippingInfo
+
+                    //if user complete its profile then send email to user and admin with details
+                    if (basicInfo && billingInfo && paymentInfo && shippingInfo) {
+                        console.log("under complete profile iff");
+
+                        //create excel 
+                        let newUserCsvData = [
+                            {
+                                cust_Id: userProfile?.data?.paymentDetails?.customerId,
+                                company_name: userProfile?.data?.shippingAddress?.companyName ?? "",
+                                customer_name: userProfile?.data?.shippingAddress?.companyName ?? "",
+                                address1: userProfile?.data?.shippingAddress?.address1 ?? "",
+                                address2: userProfile?.data?.shippingAddress?.address2 ?? "",
+                                city: userProfile?.data?.shippingAddress?.city ?? "",
+                                state: userProfile?.data?.shippingAddress?.stateName ?? "",
+                                country: userProfile?.data?.shippingAddress?.country ?? "",
+                                zip: userProfile?.data?.shippingAddress?.zipCode ?? "",
+                                email: userProfile?.data?.shippingAddress?.companyEmail ?? "",
+                                phone: userProfile.data?.shippingAddress?.companyPhone ?? "",
+                                tax_id: userProfile.data?.shippingAddress?.taxId ?? "",
+
+                                paytrace_token: payTraceToken?.data?.access_token ?? "",
+
+                                billing_name: userProfile?.data?.billingAddress?.contactName ?? "",
+                                billing_address1: userProfile?.data?.billingAddress?.address1 ?? "",
+                                billing_address2: "",
+                                billing_city: userProfile?.data?.billingAddress?.city ?? "",
+                                billing_state: userProfile?.data?.billingAddress?.stateName ?? "",
+                                billing_country: userProfile?.data?.billingAddress?.country ?? "",
+                                billing_zip: userProfile?.data?.billingAddress?.zipCode ?? "",
+
+                                credit_name: userProfile?.data?.paymentDetails?.billingAddressData?.name ?? "",
+                                credit_address1: userProfile?.data?.paymentDetails?.billingAddressData?.streetAddress ?? "",
+                                credit_city: userProfile?.data?.paymentDetails?.billingAddressData?.city ?? "",
+                                credit_state: userProfile?.data?.paymentDetails?.billingAddressData?.stateName ?? "",
+                                credit_country: userProfile?.data?.paymentDetails?.billingAddressData?.country ?? "",
+                                credit_zip: userProfile?.data?.paymentDetails?.billingAddressData?.zipCode ?? "",
+                            }
+
+                        ]
+
+
+                        const sheet = await helpers.sendExcelAttachement(newUserCsvData)
+
+                        let link = `${consts.BITBUCKET_URL}/${sheet.data}`
+                        const logoPath = path.join(__dirname, '../views', 'logo.png');
+
+                        const htmlAdmin = await ejs.renderFile(path.join(__dirname, '../views', 'newRegistration.ejs'), { link, cidLogo: 'unique@mwwLogo' });
+                        const htmlUser = await ejs.renderFile(path.join(__dirname, '../views', 'userProfileUpdated.ejs'), { cidLogo: 'unique@mwwLogo' });
+
+                        //send email of attachment to admin
+                        // let to = `checkkk@yopmail.com`
+                        let to = `${consts.ADMIN_EMAIL}`
+                        let subject = `New user registered`
+                        let attachments = [
+                            {
+                                filename: 'userDetail.xlsx',
+                                path: link,
+
+                            },
+                            {
+                                filename: 'logo.png',
+                                path: logoPath,
+                                cid: 'unique@mwwLogo',
+                            }
+                        ]
+                        //send email to user
+                        let toUser = result?.data?.email
+                        let subjectUser = `Profile Updated`
+                        let attachmentsUser = [
+
+                            {
+                                filename: 'logo.png',
+                                path: logoPath,
+                                cid: 'unique@mwwLogo',
+                            }
+                        ]
+
+                        let emailToAdmin = await helpers.sendEmailService(to, subject, htmlAdmin, attachments)
+                        let emailToUser = await helpers.sendEmailService(toUser, subjectUser, htmlUser, attachmentsUser)
+                        //----------
+                    }
+
+                }
+                //ends payment details if 
 
                 return helpers.showResponse(true, ResponseMessages?.users?.register_success, data, null, 200);
             }
@@ -450,36 +633,214 @@ const adminUtils = {
     },
     updateCustomer: async (data) => {
         try {
-            let { firstName, lastName, billingAddress, paymentDetails, shippingAddress, userId } = data;
+            let { firstName, lastName, billingAddress, paymentDetails, shippingAddress, payTraceId, userId } = data;
 
-            // let findUser = await getSingleData(Users, { _id: userId })
-            // if (!findUser.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.users.email_already, null, null, 400);
-            // }
+            let findUser = await getSingleData(Users, { _id: userId })
+            if (!findUser.status) {
+                return helpers.showResponse(false, ResponseMessages?.users.account_not_exist, null, null, 400);
+            }
 
             let newObj = {
-                firstName,
-                lastName,
                 updatedOn: helpers.getCurrentDate()
+            }
+            if (firstName) {
+                newObj.firstName = firstName
+            }
+            if (lastName) {
+                newObj.lastName = lastName
+            }
+
+            if (payTraceId && !paymentDetails) {
+                newObj.payTraceId = payTraceId
+                let result = await updateSingleData(UserProfile, { 'paymentDetails.customerId': payTraceId, updatedOn: helpers.getCurrentDate() }, { _id: userId });
             }
 
             let result = await updateSingleData(Users, newObj, { _id: userId });
 
-            let ObjUpdateProfile = {
-                updatedOn: helpers.getCurrentDate()
-            }
             if (billingAddress) {
-                ObjUpdateProfile.billingAddress = billingAddress
+                let obj = {
+                    billingAddress: billingAddress,
+                    'completionStaus.billingInfo': true,
+                    updatedOn: helpers.getCurrentDate()
+                }
+
+                let userBillingAddress = await updateSingleData(UserProfile, obj, { userId: userId })
 
             }
             if (shippingAddress) {
-                ObjUpdateProfile.shippingAddress = shippingAddress
-            }
-            if (paymentDetails) {
-                ObjUpdateProfile.paymentDetails = paymentDetails
+
+                let obj = {
+                    shippingAddress: shippingAddress,
+                    'completionStaus.shippingInfo': true,
+                    updatedOn: helpers.getCurrentDate()
+                }
+
+                let userShippingAddress = await updateSingleData(UserProfile, obj, { userId: userId })
             }
 
-            let updateUserProfile = await updateSingleData(UserProfile, ObjUpdateProfile, { userId: userId })
+
+            if (paymentDetails ) {
+
+                const payTraceToken = await helpers.generatePayTraceToken();
+
+                if (!payTraceToken.status) {
+                    return helpers.showResponse(false, "PayTrace Token Not Generated", payTraceToken.data, null, 400)
+                }
+                //get total count of the users 
+                let count = await getCount(Users, { userType: 3 })
+                let idGenerated = helpers.generateIDs(count?.data)
+                console.log(idGenerated, "id generateddd");
+
+                //paytrace ID Data
+                const dataPaytrace = {
+                    // customer_id: 77715522,
+                    customer_id: idGenerated.customerID,
+                    credit_card: {
+                        number: paymentDetails.creditCardData.ccNumber,
+                        expiration_month: paymentDetails.creditCardData.expirationMonth,
+                        expiration_year: paymentDetails.creditCardData.expirationYear,
+                    },
+                    integrator_id: consts.PAYTRACE_IntegratorID,
+                    billing_address: {
+                        name: paymentDetails?.billingAddressData?.name,
+                        street_address: paymentDetails?.billingAddressData?.streetAddress,
+                        city: paymentDetails?.billingAddressData?.city,
+                        state: paymentDetails?.billingAddressData?.stateName,
+                        zip: paymentDetails?.billingAddressData?.zipCode,
+                        country: paymentDetails?.billingAddressData?.country
+                    },
+                };
+                //generate Paytrace Id
+                let getPaytraceId = await helpers.generatePaytraceId(dataPaytrace, payTraceToken.data.access_token)
+                console.log(getPaytraceId, "getPaytraceId");
+                if (!getPaytraceId.status) {
+                    return helpers.showResponse(false, getPaytraceId.data, getPaytraceId.message, null, 400)
+                }
+                //retrieve paytrace id and mask card number
+                let { customer_id, masked_card_number } = getPaytraceId.data
+
+                //assigning payment details object  to variable
+                let paymentdetailsData = {
+                    paymentDetails: paymentDetails,
+                }
+
+
+                console.log(paymentdetailsData, "45455455");
+                paymentdetailsData.paymentDetails.creditCardData.ccNumber = masked_card_number
+                paymentdetailsData.paymentDetails.customerId = customer_id
+                paymentdetailsData.updatedOn = helpers.getCurrentDate();
+                let completionStaus = { 'completionStaus.paymentInfo': true }
+                // console.log(paymentdetailsData, "dddsdsd");
+                let userProfile = await updateSingleData(UserProfile, { ...paymentdetailsData, ...completionStaus }, { userId: userId })
+
+
+                //update Payment details in user profile 
+                if (!userProfile.status) {
+                    return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+                }
+
+                //add paytrace id in user collection
+                let addUserPaytraceId = await updateSingleData(Users, { payTraceId: Number(customer_id), updatedOn: helpers.getCurrentDate() }, { _id: result?.data?._id })
+
+                if (!addUserPaytraceId.status) {
+                    return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+                }
+
+                //---------------email send to admin that new user has been regsitered
+                let basicInfo = userProfile?.data.completionStaus?.basicInfo
+                let billingInfo = userProfile?.data.completionStaus?.billingInfo
+                let paymentInfo = userProfile?.data.completionStaus?.paymentInfo
+                let shippingInfo = userProfile?.data.completionStaus?.shippingInfo
+
+                //if user complete its profile then send email to user and admin with details
+                if (basicInfo && billingInfo && paymentInfo && shippingInfo) {
+                    console.log("under complete profile iff");
+
+                    //create excel 
+                    let newUserCsvData = [
+                        {
+                            cust_Id: userProfile?.data?.paymentDetails?.customerId,
+                            company_name: userProfile?.data?.shippingAddress?.companyName ?? "",
+                            customer_name: userProfile?.data?.shippingAddress?.companyName ?? "",
+                            address1: userProfile?.data?.shippingAddress?.address1 ?? "",
+                            address2: userProfile?.data?.shippingAddress?.address2 ?? "",
+                            city: userProfile?.data?.shippingAddress?.city ?? "",
+                            state: userProfile?.data?.shippingAddress?.stateName ?? "",
+                            country: userProfile?.data?.shippingAddress?.country ?? "",
+                            zip: userProfile?.data?.shippingAddress?.zipCode ?? "",
+                            email: userProfile?.data?.shippingAddress?.companyEmail ?? "",
+                            phone: userProfile.data?.shippingAddress?.companyPhone ?? "",
+                            tax_id: userProfile.data?.shippingAddress?.taxId ?? "",
+
+                            paytrace_token: payTraceToken?.data?.access_token ?? "",
+
+                            billing_name: userProfile?.data?.billingAddress?.contactName ?? "",
+                            billing_address1: userProfile?.data?.billingAddress?.address1 ?? "",
+                            billing_address2: "",
+                            billing_city: userProfile?.data?.billingAddress?.city ?? "",
+                            billing_state: userProfile?.data?.billingAddress?.stateName ?? "",
+                            billing_country: userProfile?.data?.billingAddress?.country ?? "",
+                            billing_zip: userProfile?.data?.billingAddress?.zipCode ?? "",
+
+                            credit_name: userProfile?.data?.paymentDetails?.billingAddressData?.name ?? "",
+                            credit_address1: userProfile?.data?.paymentDetails?.billingAddressData?.streetAddress ?? "",
+                            credit_city: userProfile?.data?.paymentDetails?.billingAddressData?.city ?? "",
+                            credit_state: userProfile?.data?.paymentDetails?.billingAddressData?.stateName ?? "",
+                            credit_country: userProfile?.data?.paymentDetails?.billingAddressData?.country ?? "",
+                            credit_zip: userProfile?.data?.paymentDetails?.billingAddressData?.zipCode ?? "",
+                        }
+
+                    ]
+
+
+                    const sheet = await helpers.sendExcelAttachement(newUserCsvData)
+
+                    let link = `${consts.BITBUCKET_URL}/${sheet.data}`
+                    const logoPath = path.join(__dirname, '../views', 'logo.png');
+
+                    const htmlAdmin = await ejs.renderFile(path.join(__dirname, '../views', 'newRegistration.ejs'), { link, cidLogo: 'unique@mwwLogo' });
+                    const htmlUser = await ejs.renderFile(path.join(__dirname, '../views', 'userProfileUpdated.ejs'), { cidLogo: 'unique@mwwLogo' });
+
+                    //send email of attachment to admin
+                    // let to = `checkkk@yopmail.com`
+                    let to = `${consts.ADMIN_EMAIL}`
+                    let subject = `New user registered`
+                    let attachments = [
+                        {
+                            filename: 'userDetail.xlsx',
+                            path: link,
+
+                        },
+                        {
+                            filename: 'logo.png',
+                            path: logoPath,
+                            cid: 'unique@mwwLogo',
+                        }
+                    ]
+                    //send email to user
+                    let toUser = result?.data?.email
+                    let subjectUser = `Profile Updated`
+                    let attachmentsUser = [
+
+                        {
+                            filename: 'logo.png',
+                            path: logoPath,
+                            cid: 'unique@mwwLogo',
+                        }
+                    ]
+
+                    let emailToAdmin = await helpers.sendEmailService(to, subject, htmlAdmin, attachments)
+                    let emailToUser = await helpers.sendEmailService(toUser, subjectUser, htmlUser, attachmentsUser)
+                    //----------
+                }
+
+            }
+            //ends payment details if 
+
+
+
+
+            // let updateUserProfile = await updateSingleData(UserProfile, ObjUpdateProfile, { userId: userId })
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
 
         } catch (err) {

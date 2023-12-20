@@ -184,12 +184,11 @@ var UserProfile = new Schema({
     phone: {
       type: String,
       default: "",
-      maxLength: 10,
       // validate:''
     },
     customerId: {
-      type: String,
-      default: "",
+      type: Number,
+      default: null,
     },
 
   },

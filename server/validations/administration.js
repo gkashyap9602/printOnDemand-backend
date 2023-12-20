@@ -120,6 +120,7 @@ module.exports.updateCustomer = {
         userId: joi.string().length(24).message("Invalid Id please check").required(),
         firstName: joi.string().required(),
         lastName: joi.string(),
+        payTraceId: joi.number().allow(''),
         // password: joi.string().required(),
         paymentDetails: {
             billingAddressData: {
