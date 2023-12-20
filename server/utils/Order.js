@@ -35,11 +35,13 @@ const orderUtil = {
             for (let item of cartItems) {
 
                 let find = await getSingleData(Cart, { productLibraryVariantId: item.productLibraryVariantId });
-                if (find.status) {
-                    console.log("iff cart side");
 
-                    let quantity = find.data.quantity
-                    let updateItem = await updateSingleData(Cart, { quantity: quantity + 1 });
+                let updateItems
+                if (find.status) {
+                    console.log("iff cart side", item.productLibraryVariantId);
+
+                    let quantity = Number(find.data.quantity)
+                    let updateItem = await updateSingleData(Cart, { quantity: quantity + 1 }, { productLibraryVariantId: item.productLibraryVariantId });
                     if (updateItem.status) {
                         return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
                         // return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
@@ -730,6 +732,8 @@ const orderUtil = {
                                 firstName: 1,
                                 lastName: 1,
                                 payTraceId: 1,
+                                email: 1,
+                                phoneNumber: 1
                                 // traceId:1,
 
                             }
@@ -743,6 +747,8 @@ const orderUtil = {
             {
                 $addFields: {
                     customerName: "$userData.firstName",
+                    customerEmail: "$userData.email",
+                    phoneNumber: "$userData.phoneNumber",
                     shipMethodName: "$ShipMethodData.name"
                 }
             },
@@ -791,6 +797,8 @@ const orderUtil = {
                                 firstName: 1,
                                 lastName: 1,
                                 payTraceId: 1,
+                                email:1,
+                                phoneNumber:1
                                 // traceId:1,
 
                             }
@@ -804,6 +812,8 @@ const orderUtil = {
             {
                 $addFields: {
                     customerName: "$userData.firstName",
+                    customerEmail: "$userData.email",
+                    phoneNumber: "$userData.phoneNumber",
                     shipMethodName: "$ShipMethodData.name"
                 }
             },
