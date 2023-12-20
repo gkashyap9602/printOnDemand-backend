@@ -17,6 +17,16 @@ const orderUtil = {
         try {
             let { cartItems } = data
 
+            let findUser = await getSingleData(Users, { _id: userId }, 'status')
+
+            if (!findUser.status) {
+                return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
+            }
+            //If user is not activated then he cannot place orders
+            if (findUser?.data?.status === 3) {
+                return helpers.showResponse(false, ResponseMessages.users.account_not_active, null, null, 400);
+            }
+
             console.log(cartItems, "cartItemsss");
             //default cart item quantity is 1
             cartItems.map((value) => value.createdOn = helpers.getCurrentDate())
@@ -53,15 +63,15 @@ const orderUtil = {
         try {
             let { totalAmount, orderItems, submitImmediately, shippingMethodId, orderType, billingAddress, shippingAddress, cartItems, ioss, receipt, preship, shippingAccountNumber, } = data
 
-            let findUser = await getSingleData(Users, { _id: customerId }, 'status')
+            // let findUser = await getSingleData(Users, { _id: customerId }, 'status')
 
-            if (!findUser.status) {
-                return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
-            }
-            //If user is not activated then he cannot place orders
-            if (findUser?.data?.status === 3) {
-                return helpers.showResponse(false, ResponseMessages.users.account_not_active, null, null, 400);
-            }
+            // if (!findUser.status) {
+            //     return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
+            // }
+            // //If user is not activated then he cannot place orders
+            // if (findUser?.data?.status === 3) {
+            //     return helpers.showResponse(false, ResponseMessages.users.account_not_active, null, null, 400);
+            // }
             const fixedPrefix = 'MWW1000';
             let countOrders = await getCount(Orders, {})
             const randomId = await helpers.generateOrderID(fixedPrefix, countOrders.data);
@@ -331,6 +341,7 @@ const orderUtil = {
                 $or: [
                     { displayId: { $regex: searchKey, $options: 'i' } },
                     { mwwOrderId: { $regex: searchKey, $options: 'i' } },
+                    // { "userData.firstName": { $regex: searchKey, $options: 'i' } }
                 ]
             }
 
@@ -383,7 +394,7 @@ const orderUtil = {
                     pipeline: [
                         // {
                         //     $match: {
-                                
+
                         //         // $or: [{ firstName: { $regex: searchKey, $options: 'i' } }]
                         //         firstName: { $regex: searchKey, $options: 'i'}
                         //     }
