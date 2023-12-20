@@ -83,11 +83,6 @@ var Orders = new Schema({
         type: Number,
         default: null
     },
-    image: {
-        type: String,
-        default: null,
-        Comment:"image url of main product which ProductVerient ordered "
-    },
     receipt: {
         type: String,
         default: ""
@@ -225,33 +220,7 @@ var Orders = new Schema({
         type: String,
         default: null,
     },
-    // statusSummary: {
-    //     cancelled: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     error: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     inProduction: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     new: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     received: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     shipped: {
-    //         type: Number,
-    //         default: 0
-    //     },
 
-    // },
 });
 
 

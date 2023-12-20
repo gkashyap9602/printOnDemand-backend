@@ -42,11 +42,7 @@ const orderUtil = {
 
             }
             return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
-            // let response = await insertMany(Cart, cartItems);
-            // if (response.status) {
-            //     return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
-            // }
-            // return helpers.showResponse(false, ResponseMessages.common.save_failed, null, null, 400);
+
         } catch (error) {
             return helpers.showResponse(false, error?.message, null, null, 400);
 
@@ -61,14 +57,14 @@ const orderUtil = {
 
             if (!findUser.status) {
                 return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
-            } 
-            console.log(findUser.data,"dayyyyy");
+            }
+            //If user is not activated then he cannot place orders
             if (findUser?.data?.status === 3) {
                 return helpers.showResponse(false, ResponseMessages.users.account_not_active, null, null, 400);
             }
             const fixedPrefix = 'MWW1000';
             let countOrders = await getCount(Orders, {})
-            const randomId = helpers.generateOrderID(fixedPrefix, countOrders.data);
+            const randomId = await helpers.generateOrderID(fixedPrefix, countOrders.data);
 
             console.log(randomId, "randomId");
             const cart = await Cart.findOne({ userId: customerId })
@@ -78,13 +74,12 @@ const orderUtil = {
                     //     path: 'productLibraryId', // Replace 'nestedField1' with the actual nested field
                     // }
                 })
-            console.log(cart, "carttt");
+            // console.log(cart, "carttt");
 
             if (!cart) {
                 return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
             }
 
-            let image = cart?.productLibraryVariantId?.productLibraryVarientImages[0]?.imageUrl ?? ""
 
             // const findCart = await getDataArray(Cart, { userId: customerId }, "", null, null, null)
             // if (!findCart.status) {
@@ -128,7 +123,6 @@ const orderUtil = {
                 ioss,
                 receipt,
                 preship,
-                image: image,
                 shippingAccountNumber,
                 orderDate: helpers.getCurrentDate()
             }
@@ -158,7 +152,7 @@ const orderUtil = {
 
             const findOrder = await getSingleData(Orders, { _id: orderId, customerId: customerId })
             if (!findOrder.status) {
-                return helpers.showResponse(false, "Order Not Exist", {}, null, 400);
+                return helpers.showResponse(false, ResponseMessages.order.order_not_exist, {}, null, 400);
             }
 
             let updatedData = {
@@ -176,7 +170,6 @@ const orderUtil = {
             }
 
             let response = await updateSingleData(Orders, updatedData, { _id: orderId, customerId: customerId });
-            // console.log(response, "responsee");
 
             if (response.status) {
                 return helpers.showResponse(true, ResponseMessages.order.order_updated, null, null, 200);
@@ -321,7 +314,7 @@ const orderUtil = {
 
         }
 
-        console.log(status,"statuss");
+        console.log(status, "statuss");
         if (status) {
             status = Number(status)
             matchObj.status = status
@@ -390,7 +383,9 @@ const orderUtil = {
                     pipeline: [
                         // {
                         //     $match: {
-                        //         $or: [{ firstName: { $regex: searchKey, $options: 'i' } }]
+                                
+                        //         // $or: [{ firstName: { $regex: searchKey, $options: 'i' } }]
+                        //         firstName: { $regex: searchKey, $options: 'i'}
                         //     }
                         // },
                         {
@@ -408,6 +403,7 @@ const orderUtil = {
             {
                 $unwind: "$userData"
             },
+            //regex on name
             // {
             //     $match: {
             //         $or: [{ "userData.firstName": { $regex: searchKey, $options: 'i' } }]
