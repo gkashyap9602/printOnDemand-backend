@@ -698,6 +698,41 @@ const generatePaytraceId = async (dataPayTrace, access_token,) => {
     }
 
 }
+
+const addToStoreShopify = async (endpointData, productData,) => {
+    try {
+        let { apiKey, shop, secret, currentVersion } = endpointData
+
+        let addToStoreUrl = `https://${apiKey}:${secret}@${shop}.myshopify.com/${consts.SHOPIFY_ROUTES.SHOPIFY_CREATE_PRODUCT(currentVersion)}`
+
+        const result = await axios.post(`${addToStoreUrl}`, productData, {
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${access_token}`,
+            },
+        })
+        console.log(result, "result==Generateside");
+        if (result?.data?.response_code === 160) {
+            return showResponse(true, "payTrace Id generated Successfully", result.data, null, 200)
+        }
+        return showResponse(false, result?.data?.message ? result?.data?.message : "PaytraceId Token Not Generated", null, null, 400);
+
+    } catch (error) {
+        if (error.response.data.success == false) {
+            let errorPayTrace = error.response.data.errors
+
+            const firstErrorKey = Object.keys(errorPayTrace)[0];
+            const firstErrorMessage = errorPayTrace[firstErrorKey].join(", ")
+            console.log(firstErrorKey, "firstErrorKey");
+            console.log(firstErrorMessage, "firstErrorMessage");
+
+            return showResponse(false, `PayTrace Error Code ${firstErrorKey}`, firstErrorMessage, null, 400)
+
+        }
+        return showResponse(false, error?.message, null, null, 400)
+    }
+
+}
 const updatePaytraceInfo = async (dataPayTrace, access_token,) => {
     try {
 
@@ -1474,5 +1509,6 @@ module.exports = {
     updatePaytraceInfo,
     // generateRandom4DigitNumber,
     generateOrderID,
+    addToStoreShopify,
     mongoError
 };

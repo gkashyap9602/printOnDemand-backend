@@ -10,6 +10,10 @@ module.exports = {
     PAYTRACE_USERNAME: "mwwfingent",
     PAYTRACE_PASSWORD: "yfC#q9@k4A",
     PAYTRACE_IntegratorID: "9Y2303E37E8U",
+    SHOPIFY_ROUTES: {
+        SHOPIFY_CREATE_PRODUCT: (VERSION) => `/admin/api/${VERSION}/products.json`,
+
+    },
 
     ZENDESK_AUTH: "YWRtaW5pc3RyYXRvckBtd3dvbmRlbWFuZC5jb206YmZOQWhFYUM0cEVtM1ljIQ==",
     ZENDESK_BASE_URL: "https://mwwondemand.zendesk.com/api/v2",

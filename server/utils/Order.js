@@ -547,20 +547,20 @@ const orderUtil = {
                 }
             }
         ])
-        let receivedOrder = await Order.aggregate([
-            {
-                $match: {
-                    customerId: userId,
-                    status: 6
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    receivedOrder: { $sum: 1 }
-                }
-            }
-        ])
+        // let receivedOrder = await Order.aggregate([
+        //     {
+        //         $match: {
+        //             customerId: userId,
+        //             status: 6
+        //         }
+        //     },
+        //     {
+        //         $group: {
+        //             _id: null,
+        //             receivedOrder: { $sum: 1 }
+        //         }
+        //     }
+        // ])
         let shippedOrder = await Order.aggregate([
             {
                 $match: {
@@ -595,7 +595,7 @@ const orderUtil = {
             error: errorOrder.length > 0 ? errorOrder[0].errorOrder : 0,
             inProduction: inProductionOrder.length > 0 ? inProductionOrder[0].inProductionOrder : 0,
             new: newOrder.length > 0 ? newOrder[0].newOrder : 0,
-            received: receivedOrder.length > 0 ? receivedOrder[0].receivedOrder : 0,
+            // received: receivedOrder.length > 0 ? receivedOrder[0].receivedOrder : 0,
             shipped: shippedOrder.length > 0 ? shippedOrder[0].shippedOrder : 0,
             totalOrders: totalOrder.length > 0 ? totalOrder[0].totalOrder : 0,
         }

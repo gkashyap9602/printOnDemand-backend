@@ -5,7 +5,10 @@ const { default: mongoose } = require('mongoose');
 let ObjectId = require('mongodb').ObjectId
 const LibraryImages = require('../models/LibraryImages');
 const ProductLibrary = require('../models/ProductLibrary');
-const ProductLibraryVarient = require("../models/ProductLibraryVarient")
+const ProductLibraryVarient = require("../models/ProductLibraryVarient");
+const { default: axios } = require('axios');
+const consts = require('../constants/const')
+
 const productLibrary = {
 
     saveLibraryImage: async (data, file) => {
@@ -150,6 +153,43 @@ const productLibrary = {
         }
         catch (err) {
             console.log(err, "errorrr");
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+    },
+    addProductToShopify: async (data, userId) => {
+        try {
+            let { apiKey, shop, secret, currentVersion } = data
+
+            console.log(data, "dataaa");
+
+            currentVersion = "2023-10"
+            secret = "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"
+            shop = "@sunil-mww"
+            apiKey = "f479e5e97f4ab23bde3f74df1c21e23a"
+
+            let addToStoreApi = await helpers.addToStoreShopify()
+
+            console.log(addToStoreUrl, "addToStoreUrl");
+
+            let productData = {
+                title: "Testing",
+                body_html: "<strong>mww Test!</strong>",
+                vendor: "Burton",
+                product_type: "Snowboard",
+                status: "draft"
+            }
+
+
+            let addToStore = await axios.post(addToStoreUrl, productData)
+
+            console.log(addToStore, "addToStoreaddToStore");
+
+            return helpers.showResponse(true, ResponseMessages?.product.product_created, result?.data, null, 200);
+        }
+        catch (err) {
+            // console.log(err, "errorrr");
+            console.log(err.response, "errorrrResponse");
+
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },

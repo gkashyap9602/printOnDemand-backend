@@ -20,6 +20,8 @@ router.delete('/deleteProductLibrary', validateCSRFToken, verifyTokenUser, valid
 router.post('/getLibrary', verifyTokenUser, productLibraryController.getProductLibrary);
 router.get('/getLibraryDetails', verifyTokenUser, validate(ProductLibraryDetails), productLibraryController.getProductLibraryDetails);
 
+//store routes
+router.post('/addProductToStore', verifyTokenUser, productLibraryController.addProductToShopify);
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
 router.post('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Post Request" }) });
