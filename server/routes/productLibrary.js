@@ -5,7 +5,7 @@ var productLibraryController = require('../controllers/ProductLibrary');
 var { verifyTokenUser, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
 const { addToMulter } = require('../services/helper/index')
-const { updateProductLibrary, updateLibraryVarient, ProductLibraryDetails, deleteProductLibrary } = require('../validations/productLibrary')
+const { addToStore,updateProductLibrary, updateLibraryVarient, ProductLibraryDetails, deleteProductLibrary } = require('../validations/productLibrary')
 
 //user token routes
 router.post('/saveLibraryImage', validateCSRFToken, verifyTokenUser, addToMulter.single('libraryImage'), productLibraryController.saveLibraryImage);
@@ -21,7 +21,7 @@ router.post('/getLibrary', verifyTokenUser, productLibraryController.getProductL
 router.get('/getLibraryDetails', verifyTokenUser, validate(ProductLibraryDetails), productLibraryController.getProductLibraryDetails);
 
 //store routes
-router.post('/addProductToStore', verifyTokenUser, productLibraryController.addProductToShopify);
+router.post('/addProductToStore', verifyTokenUser, validate(addToStore), productLibraryController.addProductToShopify);
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });
 router.post('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Post Request" }) });

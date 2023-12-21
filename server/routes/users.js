@@ -3,7 +3,7 @@ var router = express.Router();
 var authController = require('../controllers/Users');
 var { verifyTokenUser, verifyTokenBoth, validateCSRFToken } = require("../middleware/authentication");
 var validate = require('../middleware/validation')
-const { registrationSchema, loginSchema, forgotSchema, resetPasswordSchema, changePasswordSchema, profileSchema, updateSubmissionDelay } = require('../validations/user')
+const { registrationSchema,updateBasicDetails, loginSchema, forgotSchema, resetPasswordSchema, changePasswordSchema, profileSchema, updateSubmissionDelay } = require('../validations/user')
 const { addToMulter } = require('../services/helper')
 
 
@@ -35,7 +35,7 @@ router.post('/refreshCsrfToken', authController.refreshCsrfToken);
 
 
 //shopify routes
-router.post('/updateStoreDetails', verifyTokenUser, validate(profileSchema), authController.updateBasicDetails);
+router.post('/updateStoreDetails', verifyTokenUser, validate(updateBasicDetails), authController.updateStoreDetails);
 
 // router.get('/generateStoreToken', authController.generateStoreToken);
 // router.post('/shopifyAccess', authController.shopifyAccess);

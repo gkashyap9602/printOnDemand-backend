@@ -25,6 +25,13 @@ module.exports.updateProductLibrary = {
     })
 
 };
+module.exports.addToStore = {
+    body: joi.object({
+        productLibraryItems: joi.array().required(),
+        storeId: joi.number().required(),
+    })
+
+};
 module.exports.updateLibraryVarient = {
     body: joi.object({
         productLibraryVariantId: joi.string().length(24).message("Invalid Id please check").required(),

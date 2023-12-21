@@ -189,12 +189,6 @@ const adminUtils = {
                             [sortColumn]: sortDirection == 'asc' ? 1 : -1
                         }
                     },
-                    // {
-                    //     $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-                    // },
-                    // {
-                    //     $limit: pageSize // Limit the number of records per page
-                    // },
                     {
                         $lookup: {
                             from: "userProfile",
@@ -963,6 +957,12 @@ const adminUtils = {
                         ]
                     }
                 },
+
+                {
+                    $sort: {
+                        [sortColumn]: sortDirection == 'asc' ? 1 : -1
+                    }
+                },
                 {
                     $skip: (pageIndex - 1) * pageSize
 
@@ -970,11 +970,6 @@ const adminUtils = {
                 {
                     $limit: pageSize
 
-                },
-                {
-                    $sort: {
-                        [sortColumn]: sortDirection == 'asc' ? 1 : -1
-                    }
                 },
 
             ])
@@ -1113,13 +1108,6 @@ const adminUtils = {
                         ...matchObj
                     },
                 },
-
-                {
-                    $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-                },
-                {
-                    $limit: pageSize // Limit the number of records per page
-                },
                 {
                     $sort: { createdOn: -1 } // Sort by a timestamp field in descending order (latest first)
                 },
@@ -1169,6 +1157,15 @@ const adminUtils = {
                 );
                 matchObj.type = type
             }
+
+            aggregationPipeline.push(
+                {
+                    $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+                },
+                {
+                    $limit: pageSize // Limit the number of records per page
+                },
+            )
             let totalCount = await getCount(Notification, matchObj)
             const result = await Notification.aggregate(aggregationPipeline)
 

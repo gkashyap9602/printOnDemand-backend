@@ -7,7 +7,8 @@ const LibraryImages = require('../models/LibraryImages');
 const ProductLibrary = require('../models/ProductLibrary');
 const ProductLibraryVarient = require("../models/ProductLibraryVarient");
 const { default: axios } = require('axios');
-const consts = require('../constants/const')
+const consts = require('../constants/const');
+const UserProfile = require('../models/UserProfile');
 
 const productLibrary = {
 
@@ -158,14 +159,15 @@ const productLibrary = {
     },
     addProductToShopify: async (data, userId) => {
         try {
-            let { apiKey, shop, secret, currentVersion } = data
-
+            let { productLibraryItems, storeId } = data
             console.log(data, "dataaa");
 
-            currentVersion = "2023-10"
-            secret = "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"
-            shop = "@sunil-mww"
-            apiKey = "f479e5e97f4ab23bde3f74df1c21e23a"
+            let userProfileData = await getSingleData(UserProfile, { userId }, 'storeDetails')
+
+            if (!userProfileData.status) {
+                return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 400);
+            }
+            let { apiKey, shop, secret, currentVersion } = userProfileData?.data?.storeDetails
 
             let endPointData = {
                 apiKey,
@@ -173,6 +175,62 @@ const productLibrary = {
                 secret,
                 currentVersion
             }
+
+            let productLibraryIds = productLibraryItems?.map((id) => mongoose.Types.ObjectId(id))
+
+            let result = await ProductLibrary.aggregate([
+                {
+                    $match: {
+                        _id: { $in: productLibraryIds }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'productLibraryVarient',
+                        localField: '_id',
+                        foreignField: 'productLibraryId',
+                        as: 'varientData',
+
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'productVarient',
+                        localField: 'varientData.productVarientId',
+                        foreignField: '_id',
+                        as: 'productVarientData',
+                        pipeline: [
+                            {
+                                $match: {
+                                    status: { $ne: 2 }
+                                }
+                            },
+
+                        ]
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'variableOptions',
+                        localField: 'productVarientData.varientOptions.variableOptionId',
+                        foreignField: '_id',
+                        as: 'variableOptionData',
+                    }
+                },
+                {
+                    $addFields: {
+                        priceStartsFrom: { $min: "$varientData.price" }
+                    }
+                },
+
+                {
+                    $sort: {
+                        [sortColumn]: sortDirection === "asc" ? 1 : -1
+                    }
+                },
+            ])
+
+            console.log(result, "resulttt=====");
 
             let productData = {
                 title: "Testing",
@@ -367,12 +425,6 @@ const productLibrary = {
                     }
                 },
                 {
-                    $skip: (page - 1) * pageSize // Skip records based on the page number
-                },
-                {
-                    $limit: pageSize // Limit the number of records per page
-                },
-                {
                     $lookup: {
                         from: 'productLibraryVarient',
                         localField: '_id',
@@ -417,6 +469,8 @@ const productLibrary = {
                     }
                 },
             ]
+
+
 
 
             if (materialFilter) {
@@ -477,6 +531,15 @@ const productLibrary = {
             // aggregate.push(project)
 
             console.log(aggregate, "aggregate");
+
+            aggregate.push(
+                {
+                    $skip: (page - 1) * pageSize // Skip records based on the page number
+                },
+                {
+                    $limit: pageSize // Limit the number of records per page
+                },
+            )
 
             const result = await ProductLibrary.aggregate(aggregate);
 

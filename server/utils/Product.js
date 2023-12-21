@@ -398,12 +398,6 @@ const productUtils = {
                     }
                 },
                 {
-                    $skip: (page - 1) * pageSize // Skip records based on the page number
-                },
-                {
-                    $limit: pageSize // Limit the number of records per page
-                },
-                {
                     $lookup: {
                         from: "productVarient",
                         localField: "_id",
@@ -481,7 +475,14 @@ const productUtils = {
             }
 
 
-
+            aggregate.push(
+                {
+                    $skip: (page - 1) * pageSize // Skip records based on the page number
+                },
+                {
+                    $limit: pageSize // Limit the number of records per page
+                },
+            )
 
             const result = await Product.aggregate(aggregate);
 

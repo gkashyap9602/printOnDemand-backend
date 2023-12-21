@@ -401,13 +401,6 @@ const orderUtil = {
 
                 }
             },
-
-            {
-                $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-            },
-            {
-                $limit: pageSize // Limit the number of records per page
-            },
             {
                 $sort: {
                     [sortColumn]: sortDirection === "asc" ? 1 : -1
@@ -464,6 +457,12 @@ const orderUtil = {
                 $addFields: {
                     productNames: "$orderItems.productTitle",
                 }
+            },
+            {
+                $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+            },
+            {
+                $limit: pageSize // Limit the number of records per page
             },
 
             {
@@ -642,13 +641,6 @@ const orderUtil = {
 
                 }
             },
-
-            {
-                $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-            },
-            {
-                $limit: pageSize // Limit the number of records per page
-            },
             {
                 $sort: {
                     [sortColumn]: sortDirection === "asc" ? 1 : -1
@@ -703,7 +695,12 @@ const orderUtil = {
                     productNames: "$orderItems.productTitle"
                 }
             },
-
+            {
+                $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
+            },
+            {
+                $limit: pageSize // Limit the number of records per page
+            },
             {
                 $project: {
                     amount: {

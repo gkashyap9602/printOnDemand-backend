@@ -478,6 +478,13 @@ const UserUtils = {
 
         let { apiKey, shop, secret, storeVersion } = data
 
+        //add current static version of shopify
+        storeVersion = "2023-10"
+
+        // secret = "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"
+        // shop = "@sunil-mww"
+        // apiKey = "f479e5e97f4ab23bde3f74df1c21e23a"
+
         let updateData = {
             updatedOn: helpers.getCurrentDate(),
             storeDetails: {
@@ -490,7 +497,7 @@ const UserUtils = {
 
         let result = await updateSingleData(UserProfile, updateData, { user_id: user_id })
         if (result.status) {
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result?.data, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
     },

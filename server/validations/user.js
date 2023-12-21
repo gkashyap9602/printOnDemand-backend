@@ -74,6 +74,15 @@ module.exports.registrationSchema = {
 
     })
 };
+module.exports.updateBasicDetails = {
+    body: joi.object({
+        apiKey: joi.string().required(),
+        shop: joi.string().required(),
+        secret: joi.string().required(),
+        storeVersion: joi.string().allow(''),
+
+    })
+};
 
 module.exports.updateSubmissionDelay = {
     body: joi.object({
