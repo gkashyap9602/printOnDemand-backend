@@ -650,14 +650,16 @@ const adminUtils = {
                 newObj.lastName = lastName
             }
 
+            //if paytrace id exist then update user profile and paytrace is in user collection 
             if (payTraceId && !paymentDetails) {
                 newObj.payTraceId = payTraceId
-                let result = await updateSingleData(UserProfile, { 'paymentDetails.customerId': payTraceId, updatedOn: helpers.getCurrentDate() }, { _id: userId });
+                await updateSingleData(UserProfile, { 'paymentDetails.customerId': payTraceId, updatedOn: helpers.getCurrentDate() }, { userId });
             }
 
             let result = await updateSingleData(Users, newObj, { _id: userId });
 
             if (billingAddress) {
+
                 let obj = {
                     billingAddress: billingAddress,
                     'completionStaus.billingInfo': true,
@@ -678,23 +680,34 @@ const adminUtils = {
                 let userShippingAddress = await updateSingleData(UserProfile, obj, { userId: userId })
             }
 
-
-            if (paymentDetails ) {
+            if (paymentDetails) {
 
                 const payTraceToken = await helpers.generatePayTraceToken();
 
                 if (!payTraceToken.status) {
                     return helpers.showResponse(false, "PayTrace Token Not Generated", payTraceToken.data, null, 400)
                 }
-                //get total count of the users 
-                let count = await getCount(Users, { userType: 3 })
-                let idGenerated = helpers.generateIDs(count?.data)
-                console.log(idGenerated, "id generateddd");
+
+
+                let customerId
+
+                if (payTraceId) {
+                    console.log("under ifffe");
+
+                    customerId = payTraceId
+                } else {
+                    console.log("under elseef");
+                    //get total count of the users 
+                    let count = await getCount(Users, { userType: 3 })
+                    let idGenerated = helpers.generateIDs(count?.data)
+                    // console.log(idGenerated, "id generateddd");
+                    customerId = idGenerated.customerID
+                }
 
                 //paytrace ID Data
                 const dataPaytrace = {
                     // customer_id: 77715522,
-                    customer_id: idGenerated.customerID,
+                    customer_id: customerId,
                     credit_card: {
                         number: paymentDetails.creditCardData.ccNumber,
                         expiration_month: paymentDetails.creditCardData.expirationMonth,
@@ -710,14 +723,30 @@ const adminUtils = {
                         country: paymentDetails?.billingAddressData?.country
                     },
                 };
-                //generate Paytrace Id
-                let getPaytraceId = await helpers.generatePaytraceId(dataPaytrace, payTraceToken.data.access_token)
-                console.log(getPaytraceId, "getPaytraceId");
-                if (!getPaytraceId.status) {
-                    return helpers.showResponse(false, getPaytraceId.data, getPaytraceId.message, null, 400)
+
+                let payTrace
+
+                //if cutomer id is present then update paytrace details
+                if (payTraceId) {
+                    console.log("update side paytrace");
+                    payTrace = await helpers.updatePaytraceInfo(dataPaytrace, payTraceToken.data.access_token)
+
+                    //else create paytrace id for user with payment details
+
+                } else {
+                    console.log("create side paytrace");
+
+                    payTrace = await helpers.generatePaytraceId(dataPaytrace, payTraceToken.data.access_token)
+
                 }
+                // console.log(getPaytraceId, "getPaytraceId");
+                if (!payTrace.status) {
+                    console.log(payTrace, "payTracepayTrace");
+                    return helpers.showResponse(false, payTrace.data, payTrace.message, null, 400)
+                }
+
                 //retrieve paytrace id and mask card number
-                let { customer_id, masked_card_number } = getPaytraceId.data
+                let { customer_id, masked_card_number } = payTrace.data
 
                 //assigning payment details object  to variable
                 let paymentdetailsData = {
@@ -740,7 +769,7 @@ const adminUtils = {
                 }
 
                 //add paytrace id in user collection
-                let addUserPaytraceId = await updateSingleData(Users, { payTraceId: Number(customer_id), updatedOn: helpers.getCurrentDate() }, { _id: result?.data?._id })
+                let addUserPaytraceId = await updateSingleData(Users, { payTraceId: Number(customer_id), updatedOn: helpers.getCurrentDate() }, { _id: userId })
 
                 if (!addUserPaytraceId.status) {
                     return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
@@ -833,14 +862,10 @@ const adminUtils = {
                     let emailToUser = await helpers.sendEmailService(toUser, subjectUser, htmlUser, attachmentsUser)
                     //----------
                 }
-
             }
             //ends payment details if 
 
-
-
-
-            // let updateUserProfile = await updateSingleData(UserProfile, ObjUpdateProfile, { userId: userId })
+            //if every thing is right response message of succesful updation
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
 
         } catch (err) {

@@ -698,6 +698,37 @@ const generatePaytraceId = async (dataPayTrace, access_token,) => {
     }
 
 }
+const updatePaytraceInfo = async (dataPayTrace, access_token,) => {
+    try {
+
+        const result = await axios.post(`${consts.PAYTRACE_URL}/v1/customer/update`, dataPayTrace, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${access_token}`,
+            },
+        })
+        console.log(result, "result==paytraceUpdate Side");
+        if (result?.data?.response_code === 161) {
+            return showResponse(true, "payTrace Profile update Successfully", result.data, null, 200)
+        }
+        return showResponse(false, result?.data?.message ? result?.data?.message : "Error While Updating Paytrace Info", null, null, 400);
+
+    } catch (error) {
+        if (error.response.data.success == false) {
+            let errorPayTrace = error.response.data.errors
+
+            const firstErrorKey = Object.keys(errorPayTrace)[0];
+            const firstErrorMessage = errorPayTrace[firstErrorKey].join(", ")
+            console.log(firstErrorKey, "firstErrorKey");
+            console.log(firstErrorMessage, "firstErrorMessage");
+
+            return showResponse(false, `PayTrace Error Code ${firstErrorKey}`, firstErrorMessage, null, 400)
+
+        }
+        return showResponse(false, error?.message, null, null, 400)
+    }
+
+}
 
 const sendEmailService = async (to, subject, body, attachments = null) => {
     return new Promise(async (resolve, reject) => {
@@ -1440,6 +1471,7 @@ module.exports = {
     generatePaytraceId,
     generatePayTraceToken,
     getFileType,
+    updatePaytraceInfo,
     // generateRandom4DigitNumber,
     generateOrderID,
     mongoError

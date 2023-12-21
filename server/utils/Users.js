@@ -548,13 +548,27 @@ const UserUtils = {
             if (!payTraceToken.status) {
                 return helpers.showResponse(false, "PayTrace Token Not Generated", payTraceToken.data, null, 400)
             }
-            let count = await getCount(Users, { userType: 3 })
-            let idGenerated = helpers.generateIDs(count?.data)
-            console.log(idGenerated, "id generateddd");
+
+            let customerId
+
+            //if user has customer id then update card details 
+            if (paymentDetails?.customerId) {
+                console.log("under ifffe");
+
+                customerId = paymentDetails?.customerId
+            } else {
+                console.log("under elseef");
+                let count = await getCount(Users, { userType: 3 })
+                let idGenerated = helpers.generateIDs(count?.data)
+                console.log(idGenerated, "id generateddd");
+                customerId = idGenerated.customerID
+            }
+
+            console.log(customerId, "customeridd");
 
             const dataPaytrace = {
                 // customer_id: 89861252,
-                customer_id: idGenerated.customerID,
+                customer_id: customerId,
                 credit_card: {
                     number: paymentDetails.creditCardData.ccNumber,
                     expiration_month: paymentDetails.creditCardData.expirationMonth,
@@ -571,15 +585,30 @@ const UserUtils = {
                 },
             };
 
-            let getPaytraceId = await helpers.generatePaytraceId(dataPaytrace, payTraceToken.data.access_token)
+
+            let payTrace
+
+            //if cutomer id is present then update paytrace details
+            if (paymentDetails?.customerId) {
+                console.log("update side paytrace");
+                payTrace = await helpers.updatePaytraceInfo(dataPaytrace, payTraceToken.data.access_token)
+
+                //else create paytrace id for user with payment details
+
+            } else {
+                console.log("create side paytrace");
+
+                payTrace = await helpers.generatePaytraceId(dataPaytrace, payTraceToken.data.access_token)
+
+            }
+
 
             // console.log(getPaytraceId, "getPaytraceId");
-            if (!getPaytraceId.status) {
-
-                console.log(getPaytraceId, "getPaytraceId");
-                return helpers.showResponse(false, getPaytraceId.data, getPaytraceId.message, null, 400)
+            if (!payTrace.status) {
+                console.log(payTrace, "payTracepayTrace");
+                return helpers.showResponse(false, payTrace.data, payTrace.message, null, 400)
             }
-            let { customer_id, masked_card_number } = getPaytraceId.data
+            let { customer_id, masked_card_number } = payTrace.data
 
             //assign payload data to variable 
             let paymentdetailsData = data

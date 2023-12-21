@@ -19,7 +19,7 @@ module.exports.profileSchema = {
                 expirationMonth: joi.string(),
                 expirationYear: joi.string(),
             },
-            customerId: joi.string().allow(''),
+            customerId: joi.number().allow(''),
             phone: joi.string().required().length(10).message('Number must be 10 digits '),
         },
         billingAddress: {
