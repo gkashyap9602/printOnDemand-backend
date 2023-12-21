@@ -161,27 +161,38 @@ const productLibrary = {
         try {
             let { productLibraryItems, storeId } = data
             console.log(data, "dataaa");
+            console.log(userId, "userId");
 
             let userProfileData = await getSingleData(UserProfile, { userId }, 'storeDetails')
 
             if (!userProfileData.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 400);
             }
-            let { apiKey, shop, secret, currentVersion } = userProfileData?.data?.storeDetails
+            console.log(userProfileData, "userProfileData");
+            let { apiKey, shop, secret, storeVersion } = userProfileData?.data?.storeDetails
 
             let endPointData = {
                 apiKey,
                 shop,
                 secret,
-                currentVersion
+                storeVersion
             }
 
-            let productLibraryIds = productLibraryItems?.map((id) => mongoose.Types.ObjectId(id))
+            let productLibraryIds = productLibraryItems?.map(({ productLibraryId }) => mongoose.Types.ObjectId(productLibraryId))
 
+            let matchObj = {
+                userId: mongoose.Types.ObjectId(userId),
+                status: { $ne: 2 },
+                _id: { $in: productLibraryIds },
+
+            }
+            console.log(matchObj, "matchObjj");
+
+            //aggregate on ProductLibrary collection
             let result = await ProductLibrary.aggregate([
                 {
                     $match: {
-                        _id: { $in: productLibraryIds }
+                        ...matchObj
                     }
                 },
                 {
@@ -223,14 +234,11 @@ const productLibrary = {
                     }
                 },
 
-                {
-                    $sort: {
-                        [sortColumn]: sortDirection === "asc" ? 1 : -1
-                    }
-                },
+
             ])
 
             console.log(result, "resulttt=====");
+
 
             let productData = {
                 title: "Testing",
@@ -242,7 +250,7 @@ const productLibrary = {
 
             let addToStoreApi = await helpers.addToStoreShopify(endPointData, productData)
 
-            console.log(addToStoreApi, "addToStoreApi");
+            // console.log(addToStoreApi, "addToStoreApi");
 
             if (!addToStoreApi.status) {
                 return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message, null, 400)
@@ -257,6 +265,114 @@ const productLibrary = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
+    // getProductShopify: async (data, userId) => {
+    //     try {
+    //         let { productLibraryItems, storeId } = data
+    //         console.log(data, "dataaa");
+    //         console.log(userId, "userId");
+
+    //         let userProfileData = await getSingleData(UserProfile, { userId }, 'storeDetails')
+
+    //         if (!userProfileData.status) {
+    //             return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 400);
+    //         }
+    //         console.log(userProfileData, "userProfileData");
+    //         let { apiKey, shop, secret, storeVersion } = userProfileData?.data?.storeDetails
+
+    //         let endPointData = {
+    //             apiKey,
+    //             shop,
+    //             secret,
+    //             storeVersion
+    //         }
+
+    //         let productLibraryIds = productLibraryItems?.map(({ productLibraryId }) => mongoose.Types.ObjectId(productLibraryId))
+
+    //         let matchObj = {
+    //             userId: mongoose.Types.ObjectId(userId),
+    //             status: { $ne: 2 },
+    //             _id: { $in: productLibraryIds },
+
+    //         }
+    //         console.log(matchObj, "matchObjj");
+
+    //         //aggregate on ProductLibrary collection
+    //         let result = await ProductLibrary.aggregate([
+    //             {
+    //                 $match: {
+    //                     ...matchObj
+    //                 }
+    //             },
+    //             // {
+    //             //     $lookup: {
+    //             //         from: 'productLibraryVarient',
+    //             //         localField: '_id',
+    //             //         foreignField: 'productLibraryId',
+    //             //         as: 'varientData',
+
+    //             //     }
+    //             // },
+    //             // {
+    //             //     $lookup: {
+    //             //         from: 'productVarient',
+    //             //         localField: 'varientData.productVarientId',
+    //             //         foreignField: '_id',
+    //             //         as: 'productVarientData',
+    //             //         pipeline: [
+    //             //             {
+    //             //                 $match: {
+    //             //                     status: { $ne: 2 }
+    //             //                 }
+    //             //             },
+
+    //             //         ]
+    //             //     }
+    //             // },
+    //             // {
+    //             //     $lookup: {
+    //             //         from: 'variableOptions',
+    //             //         localField: 'productVarientData.varientOptions.variableOptionId',
+    //             //         foreignField: '_id',
+    //             //         as: 'variableOptionData',
+    //             //     }
+    //             // },
+    //             // {
+    //             //     $addFields: {
+    //             //         priceStartsFrom: { $min: "$varientData.price" }
+    //             //     }
+    //             // },
+
+
+    //         ])
+
+    //         console.log(result, "resulttt=====");
+
+
+    //         let productData = {
+    //             title: "Testing",
+    //             body_html: "<strong>mww Test!</strong>",
+    //             vendor: "Burton",
+    //             product_type: "Snowboard",
+    //             status: "draft"
+    //         }
+
+    //         let addToStoreApi = await helpers.addToStoreShopify(endPointData, productData)
+
+    //         // console.log(addToStoreApi, "addToStoreApi");
+
+    //         if (!addToStoreApi.status) {
+    //             return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message, null, 400)
+    //         }
+
+    //         return helpers.showResponse(false, ResponseMessages?.product.add_to_store_fail, null, null, 400);
+
+    //         // return helpers.showResponse(true, ResponseMessages?.product.add_to_store_sucess, {}, null, 200);
+    //     }
+    //     catch (err) {
+    //         // console.log(err, "errorrr");
+    //         return helpers.showResponse(false, err?.message, null, null, 400);
+    //     }
+    // },
     updateProductLibrary: async (data) => {
         try {
             let { productLibraryId, description, title } = data

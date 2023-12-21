@@ -11,7 +11,7 @@ module.exports = {
     PAYTRACE_PASSWORD: "yfC#q9@k4A",
     PAYTRACE_IntegratorID: "9Y2303E37E8U",
     SHOPIFY_ROUTES: {
-        SHOPIFY_CREATE_PRODUCT: (VERSION) => `/admin/api/${VERSION}/products.json`,
+        SHOPIFY_CREATE_PRODUCT: (VERSION) => `admin/api/${VERSION}/products.json`,
 
     },
 

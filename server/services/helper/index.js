@@ -701,9 +701,9 @@ const generatePaytraceId = async (dataPayTrace, access_token,) => {
 
 const addToStoreShopify = async (endpointData, productData,) => {
     try {
-        let { apiKey, shop, secret, currentVersion } = endpointData
+        let { apiKey, shop, secret, storeVersion } = endpointData
 
-        let addToStoreUrl = `https://${apiKey}:${secret}@${shop}.myshopify.com/${consts.SHOPIFY_ROUTES.SHOPIFY_CREATE_PRODUCT(currentVersion)}`
+        let addToStoreUrl = `https://${apiKey}:${secret}@${shop}.myshopify.com/${consts.SHOPIFY_ROUTES.SHOPIFY_CREATE_PRODUCT(storeVersion)}`
 
         console.log(addToStoreUrl, "addToStoreUrl");
         //add to store shopify api to create product 
@@ -725,7 +725,7 @@ const addToStoreShopify = async (endpointData, productData,) => {
         // console.log(error?.response?.data, "error.responsedata");
 
         if (error?.response?.data?.errors) {
-            let errorShopifyMessage = error?.response?.data?.errors
+            let errorShopifyMessage = error?.response?.data?.errors.replace('[API]', '')
             let statusCode = error?.response?.status
             let statusText = error?.response?.statusText
 

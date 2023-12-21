@@ -474,7 +474,7 @@ const UserUtils = {
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
     },
-    updateStoreDetails: async (data, user_id) => {
+    updateStoreDetails: async (data, userId) => {
 
         let { apiKey, shop, secret, storeVersion } = data
 
@@ -485,6 +485,7 @@ const UserUtils = {
         // shop = "@sunil-mww"
         // apiKey = "f479e5e97f4ab23bde3f74df1c21e23a"
 
+        console.log(data,"dataaaa");
         let updateData = {
             updatedOn: helpers.getCurrentDate(),
             storeDetails: {
@@ -495,7 +496,8 @@ const UserUtils = {
             }
         }
 
-        let result = await updateSingleData(UserProfile, updateData, { user_id: user_id })
+        let result = await updateSingleData(UserProfile, updateData, { userId: userId })
+        // console.log(result,"resulttt");
         if (result.status) {
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
         }
