@@ -167,9 +167,12 @@ const productLibrary = {
             shop = "@sunil-mww"
             apiKey = "f479e5e97f4ab23bde3f74df1c21e23a"
 
-            let addToStoreApi = await helpers.addToStoreShopify()
-
-            console.log(addToStoreUrl, "addToStoreUrl");
+            let endPointData = {
+                apiKey,
+                shop,
+                secret,
+                currentVersion
+            }
 
             let productData = {
                 title: "Testing",
@@ -179,17 +182,20 @@ const productLibrary = {
                 status: "draft"
             }
 
+            let addToStoreApi = await helpers.addToStoreShopify(endPointData, productData)
 
-            let addToStore = await axios.post(addToStoreUrl, productData)
+            console.log(addToStoreApi, "addToStoreApi");
 
-            console.log(addToStore, "addToStoreaddToStore");
+            if (!addToStoreApi.status) {
+                return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message, null, 400)
+            }
 
-            return helpers.showResponse(true, ResponseMessages?.product.product_created, result?.data, null, 200);
+            return helpers.showResponse(false, ResponseMessages?.product.add_to_store_fail, null, null, 400);
+
+            // return helpers.showResponse(true, ResponseMessages?.product.add_to_store_sucess, {}, null, 200);
         }
         catch (err) {
             // console.log(err, "errorrr");
-            console.log(err.response, "errorrrResponse");
-
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },

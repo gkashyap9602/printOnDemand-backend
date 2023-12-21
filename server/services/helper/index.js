@@ -705,28 +705,31 @@ const addToStoreShopify = async (endpointData, productData,) => {
 
         let addToStoreUrl = `https://${apiKey}:${secret}@${shop}.myshopify.com/${consts.SHOPIFY_ROUTES.SHOPIFY_CREATE_PRODUCT(currentVersion)}`
 
+        console.log(addToStoreUrl, "addToStoreUrl");
+        //add to store shopify api to create product 
         const result = await axios.post(`${addToStoreUrl}`, productData, {
             headers: {
                 'Content-Type': 'application/json',
                 // 'Authorization': `Bearer ${access_token}`,
             },
         })
-        console.log(result, "result==Generateside");
-        if (result?.data?.response_code === 160) {
-            return showResponse(true, "payTrace Id generated Successfully", result.data, null, 200)
-        }
-        return showResponse(false, result?.data?.message ? result?.data?.message : "PaytraceId Token Not Generated", null, null, 400);
+
+        console.log(result, "result==Store side");
+        // if (result?.data?.response_code === 160) {
+        //     return showResponse(true, "payTrace Id generated Successfully", result.data, null, 200)
+        // }
+        return showResponse(false, "Add To Store Not Success", null, null, 400);
 
     } catch (error) {
-        if (error.response.data.success == false) {
-            let errorPayTrace = error.response.data.errors
+        // console.log(error?.response, "error.response");
+        // console.log(error?.response?.data, "error.responsedata");
 
-            const firstErrorKey = Object.keys(errorPayTrace)[0];
-            const firstErrorMessage = errorPayTrace[firstErrorKey].join(", ")
-            console.log(firstErrorKey, "firstErrorKey");
-            console.log(firstErrorMessage, "firstErrorMessage");
+        if (error?.response?.data?.errors) {
+            let errorShopifyMessage = error?.response?.data?.errors
+            let statusCode = error?.response?.status
+            let statusText = error?.response?.statusText
 
-            return showResponse(false, `PayTrace Error Code ${firstErrorKey}`, firstErrorMessage, null, 400)
+            return showResponse(false, `Shopify Error ${statusText} Code ${statusCode}`, errorShopifyMessage, null, 400)
 
         }
         return showResponse(false, error?.message, null, null, 400)

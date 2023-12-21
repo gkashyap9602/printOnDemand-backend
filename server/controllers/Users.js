@@ -61,6 +61,14 @@ const authController = {
         let result = await Users.updateBasicDetails(req.body, user_id, req?.file);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    updateStoreDetails: async (req, res) => {
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Users.updateStoreDetails(req.body, user_id);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
     updateOrderSubmissionDelay: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
@@ -103,26 +111,26 @@ const authController = {
         let result = await Users.updatePaymentDetails(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    generateStoreToken: async (req, res) => {
-        // let user_id = req.decoded.user_id;
-        // if (!user_id) {
-        //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
-        // }
-        let result = await Users.generateStoreToken(req.query,res);
-        // return helpers.showOutput(res, result, result.statusCode);
-    },
-    shopifyAccess: async (req, res) => {
-        // let user_id = req.decoded.user_id;
-        // if (!user_id) {
-        //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
-        // }
-        let result = await Users.shopifyAccess(req.body,res);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
-    redirectShopify: async (req, res) => {
-        let result = await Users.redirectShopify(req.query);
-        return helpers.showOutput(res, result, result.statusCode);
-    },
+    // generateStoreToken: async (req, res) => {
+    //     // let user_id = req.decoded.user_id;
+    //     // if (!user_id) {
+    //     //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+    //     // }
+    //     let result = await Users.generateStoreToken(req.query,res);
+    //     // return helpers.showOutput(res, result, result.statusCode);
+    // },
+    // shopifyAccess: async (req, res) => {
+    //     // let user_id = req.decoded.user_id;
+    //     // if (!user_id) {
+    //     //     return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+    //     // }
+    //     let result = await Users.shopifyAccess(req.body,res);
+    //     return helpers.showOutput(res, result, result.statusCode);
+    // },
+    // redirectShopify: async (req, res) => {
+    //     let result = await Users.redirectShopify(req.query);
+    //     return helpers.showOutput(res, result, result.statusCode);
+    // },
 
     getUserDetail: async (req, res) => {
         let result = await Users.getUserDetail(req?.params);

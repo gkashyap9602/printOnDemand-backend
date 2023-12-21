@@ -368,7 +368,14 @@ const UserUtils = {
                     from: "userProfile",
                     localField: "_id",
                     foreignField: "userId",
-                    as: "userProfileData"
+                    as: "userProfileData",
+                    pipeline: [
+                        {
+                            $project: {
+                                storeDetails: 0
+                            }
+                        }
+                    ]
                 }
             },
             {
@@ -462,6 +469,26 @@ const UserUtils = {
         }
 
         let result = await updateSingleData(Users, data, { _id: user_id })
+        if (result.status) {
+            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result?.data, null, 200);
+        }
+        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+    },
+    updateStoreDetails: async (data, user_id) => {
+
+        let { apiKey, shop, secret, storeVersion } = data
+
+        let updateData = {
+            updatedOn: helpers.getCurrentDate(),
+            storeDetails: {
+                apiKey: apiKey,
+                shop: shop,
+                secret: secret,
+                storeVersion: storeVersion
+            }
+        }
+
+        let result = await updateSingleData(UserProfile, updateData, { user_id: user_id })
         if (result.status) {
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, result?.data, null, 200);
         }
@@ -737,119 +764,119 @@ const UserUtils = {
         }
 
     },
-    generateStoreToken: async (data, res) => {
-        try {
-            let { shop, code } = data
-            console.log(shop, "shop-------");
+    // generateStoreToken: async (data, res) => {
+    //     try {
+    //         let { shop, code } = data
+    //         console.log(shop, "shop-------");
 
-            res.redirect(`https://${shop}.myshopify.com/admin/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=${process.env.SHOPIFY_SCOPES}&redirect_uri=${process.env.SHOPIFY_REDIRECT}`);
+    //         res.redirect(`https://${shop}.myshopify.com/admin/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=${process.env.SHOPIFY_SCOPES}&redirect_uri=${process.env.SHOPIFY_REDIRECT}`);
 
-            // const response = await axios.get(`https://${shop}.myshopify.com/admin/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=${process.env.SHOPIFY_SCOPES}&redirect_uri=${process.env.SHOPIFY_REDIRECT}`);
+    //         // const response = await axios.get(`https://${shop}.myshopify.com/admin/oauth/authorize?client_id=${process.env.SHOPIFY_CLIENT_ID}&scope=${process.env.SHOPIFY_SCOPES}&redirect_uri=${process.env.SHOPIFY_REDIRECT}`);
 
-            // console.log(response, "responseresponse");
-            // Store the access token
-            // const accessToken = response.data.access_token;
-            // // let accessToken = "e"
-            // console.log('Access Token:', accessToken);
-            // if (!accessToken) {
-            //     return helpers.showResponse(false, "Token Generation Failed", {}, null, 400);
-            // }
-            // let updateData = {
-            //     storeAccessToken: accessToken,
-            //     updatedOn: helpers.getCurrentDate()
-            // }
-            // let result = await updateSingleData(Users, updateData, { _id: userId })
+    //         // console.log(response, "responseresponse");
+    //         // Store the access token
+    //         // const accessToken = response.data.access_token;
+    //         // // let accessToken = "e"
+    //         // console.log('Access Token:', accessToken);
+    //         // if (!accessToken) {
+    //         //     return helpers.showResponse(false, "Token Generation Failed", {}, null, 400);
+    //         // }
+    //         // let updateData = {
+    //         //     storeAccessToken: accessToken,
+    //         //     updatedOn: helpers.getCurrentDate()
+    //         // }
+    //         // let result = await updateSingleData(Users, updateData, { _id: userId })
 
-            // if (!result.status) {
-            //     return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
-            // }
-            // return helpers.showResponse(true, "Generate Successfully", null, null, 200);
+    //         // if (!result.status) {
+    //         //     return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
+    //         // }
+    //         // return helpers.showResponse(true, "Generate Successfully", null, null, 200);
 
-        } catch (error) {
-            console.log(error, "errorrrr");
-            return helpers.showResponse(false, error.message, null, null, 400);
+    //     } catch (error) {
+    //         console.log(error, "errorrrr");
+    //         return helpers.showResponse(false, error.message, null, null, 400);
 
-        }
-    },
-    shopifyAccess: async (data, res) => {
-        try {
-            let { shop, code } = data
-            console.log(shop, "shop-------");
+    //     }
+    // },
+    // shopifyAccess: async (data, res) => {
+    //     try {
+    //         let { shop, code } = data
+    //         console.log(shop, "shop-------");
 
-            const query = {
-                client_id: "ef6a3b54af0bd843a040ccdabc47edae", // Your API key
-                client_secret: "279508be83ce3b4bc0323e399685bbe8", // Your app credentials (secret key)
-                code: code // Grab the access key from the URL
-            };
+    //         const query = {
+    //             client_id: "ef6a3b54af0bd843a040ccdabc47edae", // Your API key
+    //             client_secret: "279508be83ce3b4bc0323e399685bbe8", // Your app credentials (secret key)
+    //             code: code // Grab the access key from the URL
+    //         };
 
-            const access_token_url = `https://${shop}/admin/oauth/access_token?client_id=${query.client_id}&client_secret=${query.client_secret}&code=${query.code}`;
-            let response = await axios.post(access_token_url,
-                {
-                    headers: { "Content-Type": "application/json" }
-                })
-
-
-            console.log(response, "responseresponse");
-            // Store the access token
-            // const accessToken = response.data
-            // console.log(accessToken, "accessToken");
-            // // let accessToken = "e"
-            // console.log('Access Token:', accessToken);
-            // if (!accessToken) {
-            //     return helpers.showResponse(false, "Token Generation Failed", {}, null, 400);
-            // }
-            // let updateData = {
-            //     storeAccessToken: accessToken,
-            //     updatedOn: helpers.getCurrentDate()
-            // }
-            // let result = await updateSingleData(Users, updateData, { _id: userId })
-
-            // if (!result.status) {
-            //     return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
-            // }
-            return helpers.showResponse(true, "Generate Successfully", null, null, 200);
-
-        } catch (error) {
-            console.log(error, "errorrrr");
-            return helpers.showResponse(false, error.message, null, null, 400);
-
-        }
-    },
-    redirectShopify: async (data, userId) => {
-        try {
-            let { shop, code } = data
-            console.log(code, shop, "code- shop------redirect");
-
-            let query = {
-                client_id: "ef6a3b54af0bd843a040ccdabc47edae",
-                client_secret: "279508be83ce3b4bc0323e399685bbe8",
-                code: "ac6c881e2f3d6e744ee9c4592e0e9839"
-                //   scope:process.env.SHOPIFY_SCOPES,
-            }
-            // let query = {
-            //     client_id: process.env.SHOPIFY_CLIENT_ID,
-            //     client_secret: process.env.SHOPIFY_SECRET,
-            //     //   scope:process.env.SHOPIFY_SCOPES,
-            // }
-
-            const access_token_url = `https://${shop}/admin/oauth/access_token`;
-            const response = await axios.post(access_token_url, null, {
-                params: query,
-                headers: { "Content-Type": "application/json" },
-            });
-
-            console.log(response, "responseresponse redirectShopify");
+    //         const access_token_url = `https://${shop}/admin/oauth/access_token?client_id=${query.client_id}&client_secret=${query.client_secret}&code=${query.code}`;
+    //         let response = await axios.post(access_token_url,
+    //             {
+    //                 headers: { "Content-Type": "application/json" }
+    //             })
 
 
+    //         console.log(response, "responseresponse");
+    //         // Store the access token
+    //         // const accessToken = response.data
+    //         // console.log(accessToken, "accessToken");
+    //         // // let accessToken = "e"
+    //         // console.log('Access Token:', accessToken);
+    //         // if (!accessToken) {
+    //         //     return helpers.showResponse(false, "Token Generation Failed", {}, null, 400);
+    //         // }
+    //         // let updateData = {
+    //         //     storeAccessToken: accessToken,
+    //         //     updatedOn: helpers.getCurrentDate()
+    //         // }
+    //         // let result = await updateSingleData(Users, updateData, { _id: userId })
 
-            return helpers.showResponse(true, "redirect Successfully", null, null, 200);
+    //         // if (!result.status) {
+    //         //     return helpers.showResponse(false, ResponseMessages.common.update_failed, {}, null, 400);
+    //         // }
+    //         return helpers.showResponse(true, "Generate Successfully", null, null, 200);
 
-        } catch (error) {
-            console.log(error, "errorrrr");
-            return helpers.showResponse(false, error.message, null, null, 400);
+    //     } catch (error) {
+    //         console.log(error, "errorrrr");
+    //         return helpers.showResponse(false, error.message, null, null, 400);
 
-        }
-    },
+    //     }
+    // },
+    // redirectShopify: async (data, userId) => {
+    //     try {
+    //         let { shop, code } = data
+    //         console.log(code, shop, "code- shop------redirect");
+
+    //         let query = {
+    //             client_id: "ef6a3b54af0bd843a040ccdabc47edae",
+    //             client_secret: "279508be83ce3b4bc0323e399685bbe8",
+    //             code: "ac6c881e2f3d6e744ee9c4592e0e9839"
+    //             //   scope:process.env.SHOPIFY_SCOPES,
+    //         }
+    //         // let query = {
+    //         //     client_id: process.env.SHOPIFY_CLIENT_ID,
+    //         //     client_secret: process.env.SHOPIFY_SECRET,
+    //         //     //   scope:process.env.SHOPIFY_SCOPES,
+    //         // }
+
+    //         const access_token_url = `https://${shop}/admin/oauth/access_token`;
+    //         const response = await axios.post(access_token_url, null, {
+    //             params: query,
+    //             headers: { "Content-Type": "application/json" },
+    //         });
+
+    //         console.log(response, "responseresponse redirectShopify");
+
+
+
+    //         return helpers.showResponse(true, "redirect Successfully", null, null, 200);
+
+    //     } catch (error) {
+    //         console.log(error, "errorrrr");
+    //         return helpers.showResponse(false, error.message, null, null, 400);
+
+    //     }
+    // },
 
 }
 

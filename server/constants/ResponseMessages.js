@@ -113,7 +113,9 @@ module.exports = {
         product_code_already: "Product Code Already Exist",
         product_title_already: "Product Title Already Exist",
         library_img_save_err: "Error occured while saving Library Image",
-        active_product: "There Are Active Products in Subcategory Delete Product First"
+        active_product: "There Are Active Products in Subcategory Delete Product First",
+        add_to_store_sucess: "Add To Store Successfully",
+        add_to_store_fail: "Error While Adding Product To Store",
 
     },
     category: {
