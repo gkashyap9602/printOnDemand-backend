@@ -207,13 +207,8 @@ module.exports = {
         no_transaction: "no transaction",
     },
     store: {
-        save_shop_info_success: "Shop Info Saved  Placed Successfully",
-        order_updated: "Order Updated Successfully",
-        addToCart_failed: "Error while Add To Cart",
-        order_update_error: "Order Placed Successfully",
-        order_not_exist: "Order not exist",
-        order_failed: "Error while Placing Order",
-        transactions: "transaction list",
-        no_transaction: "no transaction",
+        save_shop_info_success: "Shop Info Saved Successfully",
+        save_shop_info_fail: "Error While Saveing Shop Info",
+    
     },
 }

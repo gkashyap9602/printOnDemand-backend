@@ -19,11 +19,12 @@ const productUtils = {
             let { careInstructions, longDescription, subCategoryIds, materialIds, variableTypesIds,
                 construction, features, productionDuration, shortDescription, title, process } = data
 
-            const findProduct = await getSingleData(Product, { title: title, status: { $ne: 2 } })
+            subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
+            const findProduct = await getSingleData(Product, { title: title, status: { $ne: 2 }, subCategoryId: { $in: subCategoryIds } })
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 400);
             }
-            subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
+
             variableTypesIds = variableTypesIds.map((id) => mongoose.Types.ObjectId(id))
             materialIds = materialIds.map((id) => mongoose.Types.ObjectId(id))
 

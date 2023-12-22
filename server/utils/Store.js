@@ -23,8 +23,8 @@ const store = {
         let storeUrl = "https://" + shop + "/";
         let storeName = shop.split(".")[0];
 
-        console.log(subdomain);
         let newObj = {
+            userId, userId,//as a reference
             apiKey,
             shop,
             secret,
@@ -40,13 +40,34 @@ const store = {
 
         let storeRef = new Store(newObj)
         let result = await postData(storeRef);
-
         // console.log(result,"resulttt");
         if (result.status) {
 
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.store.save_shop_info_success, {}, null, 200);
         }
-        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
+        return helpers.showResponse(false, ResponseMessages?.store.save_shop_info_fail, null, null, 400);
+    },
+    getAllStores: async (data) => {
+        let { userId, storeType } = data
+        //add current static version of shopify
+
+        console.log(userId, "useriddd");
+        let result = await Store.aggregate([
+            {
+                $match: {
+                    userId: mongoose.Types.ObjectId(userId),
+                    // storeType: storeType
+                }
+            }
+        ])
+
+        console.log(result, "resulttt");
+
+        // if (result.status) {
+
+        //     return helpers.showResponse(true, ResponseMessages?.store.save_shop_info_success, {}, null, 200);
+        // }
+        return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, result.length > 0 ? result : result, null, 200);
     },
     updateStoreDetails: async (data, userId) => {
 

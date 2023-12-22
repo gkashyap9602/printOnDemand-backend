@@ -34,7 +34,7 @@ var Store = new Schema({
         type: String,
         default: null,
     },
-    storeURL: {
+    storeUrl: {
         type: String,
         default: null,
     },
