@@ -699,9 +699,11 @@ const generatePaytraceId = async (dataPayTrace, access_token,) => {
 
 }
 
-const addToStoreShopify = async (endpointData, productData,) => {
+const addProductToShopify = async (endpointData, productData,) => {
     try {
         let { apiKey, shop, secret, storeVersion } = endpointData
+
+        console.log(productData, "ProductData");
 
         let addToStoreUrl = `https://${apiKey}:${secret}@${shop}/${consts.SHOPIFY_ROUTES.SHOPIFY_CREATE_PRODUCT(storeVersion)}`
 
@@ -714,18 +716,69 @@ const addToStoreShopify = async (endpointData, productData,) => {
             },
         })
 
-        console.log(result, "result==Store side");
-        // if (result?.data?.response_code === 160) {
-        //     return showResponse(true, "payTrace Id generated Successfully", result.data, null, 200)
-        // }
-        return showResponse(false, "Add To Store Not Success", null, null, 400);
+        // console.log(result, "result==Store side");
+        // console.log(result?.data, "result Dataa");
+        console.log(result?.status, "result status");
+
+        if (result?.status == 201) {
+            return showResponse(true, "Product Added to Store Successfully", result?.data, null, 200)
+        } else {
+
+            return showResponse(false, "Error While Adding Product To Store!", null, null, 400);
+        }
 
     } catch (error) {
         // console.log(error?.response, "error.response");
         // console.log(error?.response?.data, "error.responsedata");
 
         if (error?.response?.data?.errors) {
-            let errorShopifyMessage = error?.response?.data?.errors.replace('[API]', '')
+            let errorShopifyMessage = error?.response?.data?.errors
+            // .replace('[API]', '')
+            let statusCode = error?.response?.status
+            let statusText = error?.response?.statusText
+
+            return showResponse(false, `Shopify Error ${statusText} Code ${statusCode}`, errorShopifyMessage, null, 400)
+
+        }
+        return showResponse(false, error?.message, null, null, 400)
+    }
+
+}
+const addProductVarientToShopify = async (endpointData, productVariantData, productId) => {
+    try {
+        let { apiKey, shop, secret, storeVersion } = endpointData
+
+        console.log(productVariantData, "productVariantData");
+
+        let addProductVariantUrl = `https://${apiKey}:${secret}@${shop}/${consts.SHOPIFY_ROUTES.CREATE_PRODUCT_VARIENT(storeVersion, productId)}`
+
+        console.log(addProductVariantUrl, "addProductVariantUrl");
+        //add to store shopify api to create product 
+        const result = await axios.post(`${addProductVariantUrl}`, productVariantData, {
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${access_token}`,
+            },
+        })
+
+        // console.log(result, "result==Store side");
+        // console.log(result?.data, "result Dataa");
+        console.log(result?.status, "result status");
+
+        if (result?.status == 201) {
+            return showResponse(true, "Product Variant Added Successfully", result?.data, null, 200)
+        } else {
+
+            return showResponse(false, "Error While Adding Product Variant!", null, null, 400);
+        }
+
+    } catch (error) {
+        // console.log(error?.response, "error.response");
+        // console.log(error?.response?.data, "error.responsedata");
+
+        if (error?.response?.data?.errors) {
+            let errorShopifyMessage = error?.response?.data?.errors
+            // .replace('[API]', '')
             let statusCode = error?.response?.status
             let statusText = error?.response?.statusText
 
@@ -1512,6 +1565,7 @@ module.exports = {
     updatePaytraceInfo,
     // generateRandom4DigitNumber,
     generateOrderID,
-    addToStoreShopify,
+    addProductToShopify,
+    addProductVarientToShopify,
     mongoError
 };

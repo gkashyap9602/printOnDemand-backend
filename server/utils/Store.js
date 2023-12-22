@@ -159,6 +159,48 @@ const store = {
                 },
                 {
                     $lookup: {
+                        from: 'product',
+                        localField: 'productId',
+                        foreignField: '_id',
+                        as: 'productData',
+                        pipeline: [
+                            {
+                                $lookup: {
+                                    from: 'subCategory',
+                                    localField: 'subCategoryId',
+                                    foreignField: '_id',
+                                    as: 'subCategoryData',
+
+                                }
+                            },
+                            {
+                                $lookup: {
+                                    from: 'category',
+                                    localField: 'subCategoryData.categoryId',
+                                    foreignField: '_id',
+                                    as: 'categoryData',
+
+                                }
+                            },
+                            {
+                                $unwind: "$categoryData"
+                            },
+                            {
+                                $project: {
+                                    subCategoryData: 0,
+                                    // categoryData: 1
+                                }
+                            }
+                        ]
+
+                    }
+                },
+                {
+                    $unwind: "$productData"
+
+                },
+                {
+                    $lookup: {
                         from: 'productLibraryVarient',
                         localField: '_id',
                         foreignField: 'productLibraryId',
@@ -201,26 +243,87 @@ const store = {
 
             console.log(result, "resulttt=====");
 
+            let libData = result[0]
+
+
+            // let varientData = libData?.varientData?.map((itm, index) => {
+            //     let newObj = {
+            //         title: libData?.title + index,
+            //         price: itm?.price,
+
+            //     }
+            //     return newObj
+            // })
+            let productImages = libData?.productLibraryImages?.map((itm) => {
+                return {
+                    src: `${consts.BITBUCKET_URL_DEV}/${itm.imageUrl}`
+                }
+            })
+
+            // console.log(productImages, "productImages");
+            // console.log(varientData, "varientData");
 
             let productData = {
-                title: "Testing",
-                body_html: "<strong>mww Test!</strong>",
-                vendor: "Burton",
-                product_type: "Snowboard",
-                status: "draft"
+                product: {
+                    title: libData.title,
+                    body_html: `<strong>${libData?.description}</strong>`,
+                    vendor: "BurtonGk",
+                    product_type: libData?.productData?.categoryData?.name,
+                    status: "active",
+                    images: productImages,
+                    // variants: varientData[0],
+
+                }
+
             }
 
-            let addToStoreApi = await helpers.addToStoreShopify(endPointData, productData)
+            console.log(productData, "productDataa");
 
-            // console.log(addToStoreApi, "addToStoreApi");
+            let addToStoreApi = await helpers.addProductToShopify(endPointData, productData)
 
-            if (!addToStoreApi.status) {
-                return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message, null, 400)
+            console.log(addToStoreApi, "addToStoreApi");
+
+            //if product add then add varient
+            if (addToStoreApi.status) {
+
+                // let productId = addToStoreApi?.data?.product?.id
+
+                // console.log(productId, "productId");
+
+                // let varientData = libData?.varientData?.map((itm, index) => {
+                //     let newObj = {
+                //         product_id: productId,
+                //         // title: libData?.title + index,
+                //         price: itm?.price,
+                //         option1: "Yellow",
+                //         // sku: libData?.productData?.productCode
+                //         // sku: 
+
+                //     }
+                //     return newObj
+                // })
+
+                // console.log(varientData, "varientdataa");
+
+                // //add varient api 
+                // let addVarientApi = await helpers.addProductVarientToShopify(endPointData, varientData, productId)
+
+                // console.log(addVarientApi, "addVarientApi");
+                // //if success then return 
+                // if (addVarientApi.status) {
+
+                //     return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
+                // } else {
+
+                //     return helpers.showResponse(false, "errr varient", {}, null, 400);
+
+                // }
+
+
+                return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
             }
-
-            return helpers.showResponse(false, ResponseMessages?.product.add_to_store_fail, null, null, 400);
-
-            // return helpers.showResponse(true, ResponseMessages?.product.add_to_store_sucess, {}, null, 200);
+            return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message ? productData : ResponseMessages?.product.add_to_store_fail, null, 400);
+            // result.length > 0 ? result[0] : result
         }
         catch (err) {
             // console.log(err, "errorrr");
