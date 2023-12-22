@@ -241,7 +241,6 @@ const store = {
 
             ])
 
-            console.log(result, "resulttt=====");
 
             let libData = result[0]
 
@@ -260,9 +259,6 @@ const store = {
                 }
             })
 
-            // console.log(productImages, "productImages");
-            // console.log(varientData, "varientData");
-
             let productData = {
                 product: {
                     title: libData.title,
@@ -277,47 +273,38 @@ const store = {
 
             }
 
-            console.log(productData, "productDataa");
-
             let addToStoreApi = await helpers.addProductToShopify(endPointData, productData)
-
-            console.log(addToStoreApi, "addToStoreApi");
 
             //if product add then add varient
             if (addToStoreApi.status) {
 
-                // let productId = addToStoreApi?.data?.product?.id
+                let productId = addToStoreApi?.data?.product?.id
 
-                // console.log(productId, "productId");
+                let varientData = libData?.varientData?.map((itm, index) => {
+                    console.log(itm,"===================itm")
 
-                // let varientData = libData?.varientData?.map((itm, index) => {
-                //     let newObj = {
-                //         product_id: productId,
-                //         // title: libData?.title + index,
-                //         price: itm?.price,
-                //         option1: "Yellow",
-                //         // sku: libData?.productData?.productCode
-                //         // sku: 
+                    let newObj = {
+                        variant: {
+                            price: itm?.price,
+                            option1: "Yellow",
+                        }
+                    }
+                    
+                    return newObj
+                })
 
-                //     }
-                //     return newObj
-                // })
+                //add varient api 
+                let addVarientApi = await helpers.addProductVarientToShopify(endPointData, varientData, productId)
 
-                // console.log(varientData, "varientdataa");
+                //if success then return 
+                if (addVarientApi.status) {
 
-                // //add varient api 
-                // let addVarientApi = await helpers.addProductVarientToShopify(endPointData, varientData, productId)
+                    return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
+                } else {
 
-                // console.log(addVarientApi, "addVarientApi");
-                // //if success then return 
-                // if (addVarientApi.status) {
+                    return helpers.showResponse(false, "errr varient", {}, null, 400);
 
-                //     return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
-                // } else {
-
-                //     return helpers.showResponse(false, "errr varient", {}, null, 400);
-
-                // }
+                }
 
 
                 return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)

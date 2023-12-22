@@ -748,22 +748,29 @@ const addProductVarientToShopify = async (endpointData, productVariantData, prod
     try {
         let { apiKey, shop, secret, storeVersion } = endpointData
 
-        console.log(productVariantData, "productVariantData");
+        // let addProductVariantUrl = `https://${apiKey}:${secret}@${shop}/${consts.SHOPIFY_ROUTES.CREATE_PRODUCT_VARIENT(storeVersion, productId)}`
+        
+        const addProductVariantUrl = `https://${apiKey}:${secret}@${shop}/admin/api/2023-10/products/${productId}/variants.json`
 
-        let addProductVariantUrl = `https://${apiKey}:${secret}@${shop}/${consts.SHOPIFY_ROUTES.CREATE_PRODUCT_VARIENT(storeVersion, productId)}`
+        // //add to store shopify api to create product 
+        let veriant = {
+            "variant": {              
+              "option1": "Yellow",
+              "price": "1.00"
+            }
+          }
 
-        console.log(addProductVariantUrl, "addProductVariantUrl");
-        //add to store shopify api to create product 
-        const result = await axios.post(`${addProductVariantUrl}`, productVariantData, {
+          console.log(veriant , "=============veriant")
+          console.log(productVariantData[0] , "=============productVariantData")
+
+          
+
+        const result = await axios.post(`${addProductVariantUrl}`, productVariantData[0], {
             headers: {
                 'Content-Type': 'application/json',
                 // 'Authorization': `Bearer ${access_token}`,
             },
         })
-
-        // console.log(result, "result==Store side");
-        // console.log(result?.data, "result Dataa");
-        console.log(result?.status, "result status");
 
         if (result?.status == 201) {
             return showResponse(true, "Product Variant Added Successfully", result?.data, null, 200)

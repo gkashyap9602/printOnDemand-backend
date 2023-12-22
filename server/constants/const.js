@@ -12,9 +12,10 @@ module.exports = {
     PAYTRACE_IntegratorID: "9Y2303E37E8U",
     SHOPIFY_ROUTES: {
         SHOPIFY_CREATE_PRODUCT: (VERSION) => `admin/api/${VERSION}/products.json`,
-        CREATE_PRODUCT_VARIENT: (VERSION, PRODUCT_ID) => `admin/api/${VERSION}/products/${Number(PRODUCT_ID)}/variants.json`,
+        CREATE_PRODUCT_VARIENT: (VERSION, PRODUCT_ID) => `admin/api/2023-10/products/${Number(PRODUCT_ID)}/variants.json`,
 
     },
+   
 
     ZENDESK_AUTH: "YWRtaW5pc3RyYXRvckBtd3dvbmRlbWFuZC5jb206YmZOQWhFYUM0cEVtM1ljIQ==",
     ZENDESK_BASE_URL: "https://mwwondemand.zendesk.com/api/v2",

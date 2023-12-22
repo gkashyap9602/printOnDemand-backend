@@ -160,9 +160,7 @@ const productLibrary = {
     addProductToShopify: async (data, userId) => {
         try {
             let { productLibraryItems, storeId } = data
-            console.log(data, "dataaa");
-            console.log(userId, "userId");
-
+           
             let userProfileData = await getSingleData(UserProfile, { userId }, 'storeDetails')
 
             if (!userProfileData.status) {
