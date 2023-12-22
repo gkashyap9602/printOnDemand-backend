@@ -17,5 +17,18 @@ module.exports.getAllStores = {
     })
 
 };
+module.exports.updateStoreStatus = {
+    body: joi.object({
+        storeId: joi.string().required(),
+        status: joi.number().required(),
+    })
+
+};
+module.exports.removeStore = {
+    body: joi.object({
+        storeId: joi.string().required(),
+    })
+
+};
 
 

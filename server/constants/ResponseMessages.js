@@ -209,6 +209,12 @@ module.exports = {
     store: {
         save_shop_info_success: "Shop Info Saved Successfully",
         save_shop_info_fail: "Error While Saveing Shop Info",
-    
+        store_status_update: "Store Status Update Successfully",
+        store_update_fail: "Error While Updating Store ",
+        store_update_success: "Store Update Successfully",
+        store_delete_success: "Store remove Successfully",
+        store_delete_fail: "Error While Deleting Store",
+        store_already: "Store Already Exist",
+
     },
 }

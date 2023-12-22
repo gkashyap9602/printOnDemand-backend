@@ -20,12 +20,20 @@ const shopController = {
         let result = await Store.getAllStores(req.body);
         return helpers.showOutput(res, result, result.statusCode);
     },
-    updateStoreDetails: async (req, res) => {
+    updateStoreStatus: async (req, res) => {
         let user_id = req.decoded.user_id;
         if (!user_id) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
-        let result = await Store.updateStoreDetails(req.body, user_id);
+        let result = await Store.updateStoreStatus(req.body, user_id);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
+    removeStore: async (req, res) => {
+        let user_id = req.decoded.user_id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Store.removeStore(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
 
