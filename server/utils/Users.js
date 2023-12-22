@@ -474,37 +474,7 @@ const UserUtils = {
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
     },
-    updateStoreDetails: async (data, userId) => {
-
-        let { apiKey, shop, secret, storeVersion } = data
-
-        //add current static version of shopify
-        storeVersion = "2023-10"
-
-        // secret = "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"
-        // shop = "@sunil-mww"
-        // apiKey = "f479e5e97f4ab23bde3f74df1c21e23a"
-
-        console.log(data, "dataaaa");
-        let updateData = {
-            updatedOn: helpers.getCurrentDate(),
-            storeDetails: {
-                apiKey: apiKey,
-                shop: shop,
-                secret: secret,
-                storeVersion: storeVersion
-            }
-        }
-
-        let result = await updateSingleData(UserProfile, updateData, { userId: userId })
-        // console.log(result,"resulttt");
-        if (result.status) {
-            await updateSingleData(Users, { isLoginFromShopify: true }, { _id: userId })
-
-            return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
-        }
-        return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
-    },
+   
     updateOrderSubmissionDelay: async (data, user_id) => {
 
         let { orderSubmissionDelay } = data
