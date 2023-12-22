@@ -369,13 +369,6 @@ const UserUtils = {
                     localField: "_id",
                     foreignField: "userId",
                     as: "userProfileData",
-                    pipeline: [
-                        {
-                            $project: {
-                                storeDetails: 0
-                            }
-                        }
-                    ]
                 }
             },
             {
@@ -474,7 +467,7 @@ const UserUtils = {
         }
         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
     },
-   
+
     updateOrderSubmissionDelay: async (data, user_id) => {
 
         let { orderSubmissionDelay } = data

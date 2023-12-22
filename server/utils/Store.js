@@ -19,6 +19,12 @@ const store = {
         storeVersion = "2023-10"
         console.log(data, "dataaaa");
 
+
+        let findStore = await getSingleData(Store, { shop: shop, userId: userId })
+
+        if (findStore.status) {
+            return helpers.showResponse(false, ResponseMessages?.store.store_already, null, null, 400);
+        }
         let storeId = "https://" + shop + "/";
         let storeUrl = "https://" + shop + "/";
         let storeName = shop.split(".")[0];
@@ -48,15 +54,24 @@ const store = {
         return helpers.showResponse(false, ResponseMessages?.store.save_shop_info_fail, null, null, 400);
     },
     getAllStores: async (data) => {
-        let { userId, storeType } = data
+        let { userId, storeType, status } = data
         //add current static version of shopify
+
+
+        let matchObj = {
+            userId: mongoose.Types.ObjectId(userId),
+            // storeType: storeType,
+        }
+
+        if (status) {
+            matchObj.status = Number(status)
+        }
 
         console.log(userId, "useriddd");
         let result = await Store.aggregate([
             {
                 $match: {
-                    userId: mongoose.Types.ObjectId(userId),
-                    // storeType: storeType
+                    ...matchObj
                 }
             }
         ])
@@ -101,15 +116,15 @@ const store = {
         try {
             let { productLibraryItems, storeId } = data
             console.log(data, "dataaa");
-            console.log(userId, "userId");
 
-            let userProfileData = await getSingleData(UserProfile, { userId }, 'storeDetails')
+            let findStore = await getSingleData(Store, { _id: storeId, userId: userId })
 
-            if (!userProfileData.status) {
-                return helpers.showResponse(false, ResponseMessages?.users?.account_not_exist, null, null, 400);
+            if (!findStore.status) {
+                return helpers.showResponse(false, ResponseMessages?.store.store_not_exist, null, null, 400);
             }
-            console.log(userProfileData, "userProfileData");
-            let { apiKey, shop, secret, storeVersion } = userProfileData?.data?.storeDetails
+
+            console.log(findStore, "findStore");
+            let { apiKey, shop, secret, storeVersion } = findStore?.data
 
             let endPointData = {
                 apiKey,
@@ -119,6 +134,13 @@ const store = {
             }
 
             let productLibraryIds = productLibraryItems?.map(({ productLibraryId }) => mongoose.Types.ObjectId(productLibraryId))
+
+            //check all product library exist or not 
+            const findProductLibraryIds = await getDataArray(ProductLibrary, { _id: { $in: productLibraryIds }, status: { $ne: 2 } })
+
+            if (findProductLibraryIds?.data?.length !== productLibraryIds?.length) {
+                return helpers.showResponse(false, ResponseMessages?.product.invalid_product_library_id, {}, null, 400);
+            }
 
             let matchObj = {
                 userId: mongoose.Types.ObjectId(userId),

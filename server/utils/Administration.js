@@ -305,13 +305,6 @@ const adminUtils = {
                     localField: "_id",
                     foreignField: "userId",
                     as: "userProfileData",
-                    pipeline: [
-                        {
-                            $project: {
-                                storeDetails: 0
-                            }
-                        }
-                    ]
                 }
             },
             {

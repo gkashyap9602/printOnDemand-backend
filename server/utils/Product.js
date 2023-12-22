@@ -28,7 +28,7 @@ const productUtils = {
             variableTypesIds = variableTypesIds.map((id) => mongoose.Types.ObjectId(id))
             materialIds = materialIds.map((id) => mongoose.Types.ObjectId(id))
 
-            const findVariableTypes = await getDataArray(VariableTypes, { _id: { $in: variableTypesIds } })
+            const findVariableTypes = await getDataArray(VariableTypes, { _id: { $in: variableTypesIds },status: { $ne: 2 } })
 
             if (findVariableTypes?.data?.length !== variableTypesIds?.length) {
                 return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 400);

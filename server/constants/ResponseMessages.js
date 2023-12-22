@@ -105,6 +105,7 @@ module.exports = {
         product_varient_save: "Product Varient Created Successfully",
         product_save_failed: "Error occured while adding new Product",
         invalid_product_id: "Invalid Product Id",
+        invalid_product_library_id: "Invalid Product Library Id",
         product_image_save_err: "Error while saving product image",
         product_image_saved: "Product Image Uploaded Successfully",
         varient_template_update_err: "Error while saving product template",
@@ -215,6 +216,7 @@ module.exports = {
         store_delete_success: "Store remove Successfully",
         store_delete_fail: "Error While Deleting Store",
         store_already: "Store Already Exist",
+        store_not_exist: "Store Not Exist",
 
     },
 }

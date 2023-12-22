@@ -703,7 +703,7 @@ const addToStoreShopify = async (endpointData, productData,) => {
     try {
         let { apiKey, shop, secret, storeVersion } = endpointData
 
-        let addToStoreUrl = `https://${apiKey}:${secret}@${shop}.myshopify.com/${consts.SHOPIFY_ROUTES.SHOPIFY_CREATE_PRODUCT(storeVersion)}`
+        let addToStoreUrl = `https://${apiKey}:${secret}@${shop}/${consts.SHOPIFY_ROUTES.SHOPIFY_CREATE_PRODUCT(storeVersion)}`
 
         console.log(addToStoreUrl, "addToStoreUrl");
         //add to store shopify api to create product 

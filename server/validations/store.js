@@ -14,6 +14,7 @@ module.exports.getAllStores = {
     body: joi.object({
         userId: joi.string().required(),
         storeType: joi.number().allow(''),
+        status: joi.number(),
     })
 
 };
@@ -21,6 +22,7 @@ module.exports.updateStoreStatus = {
     body: joi.object({
         storeId: joi.string().required(),
         status: joi.number().required(),
+        
     })
 
 };

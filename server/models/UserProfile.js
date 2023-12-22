@@ -211,25 +211,6 @@ var UserProfile = new Schema({
     },
 
   },
-  storeDetails: {
-    apiKey: {
-      type: String,
-      default: null,
-    },
-    shop: {
-      type: String,
-      default: null,
-    },
-    secret: {
-      type: String,
-      default: null,
-    },
-    storeVersion: {
-      type: String,
-      default: null,
-    },
-
-  },
   createdOn: {
     type: String,
     default: null,
