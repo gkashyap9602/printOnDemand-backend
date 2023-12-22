@@ -13,20 +13,20 @@ router.get('/getProductDetails', verifyTokenBoth, productController.getProductDe
 router.post('/getAllProducts', verifyTokenBoth, productController.getAllProduct);
 
 // with admin token routes
-router.post('/addProduct', validateCSRFToken, verifyTokenAdmin, validate(addProduct), productController.addProduct);
-router.post('/addProductVarient', validateCSRFToken, verifyTokenAdmin, addToMulter.array('productVarientTemplates'), validate(addProductVarient), productController.addProductVarient);
-router.post('/saveProductImage', validateCSRFToken, verifyTokenAdmin, addToMulter.single('productImage'), validate(addProductImage), productController.saveProductImage);
-router.post('/updateProduct', validateCSRFToken, verifyTokenAdmin, addToMulter.single('productImage'), validate(updateProduct), productController.updateProduct);
-router.post('/updateProductVarient', validateCSRFToken, verifyTokenAdmin, validate(updateProductVarient), productController.updateProductVarient);
-router.post('/updateVarientTemplate', validateCSRFToken, verifyTokenAdmin, addToMulter.single('productVarientTemplates'), validate(updateVarientTemplate), productController.updateVarientTemplate);
-router.delete('/deleteProduct/:productId', validateCSRFToken, verifyTokenAdmin, productController.deleteProduct);
-router.delete('/deleteProductVarient', validateCSRFToken, verifyTokenAdmin, productController.deleteProductVarient);
-router.delete('/deleteProductImage', validateCSRFToken, verifyTokenAdmin, productController.deleteProductImage);
-router.delete('/deleteVarientTemplate', validateCSRFToken, verifyTokenAdmin, validate(deleteVarientTemplate), productController.deleteVarientTemplate);
-router.post('/addVariableTypes', validateCSRFToken, verifyTokenAdmin, validate(addVariableType), productController.addVariableTypes);
-router.post('/addVariableOptions', validateCSRFToken, verifyTokenAdmin, validate(addVariableOption), productController.addVariableOptions);
-router.delete('/deleteVariable', validateCSRFToken, verifyTokenAdmin, validate(deleteVariable), productController.deleteVariable);
-router.post('/updateVariable', validateCSRFToken, verifyTokenAdmin, validate(updateVariable), productController.updateVariable);
+router.post('/addProduct', verifyTokenAdmin, validate(addProduct), productController.addProduct);
+router.post('/addProductVarient', verifyTokenAdmin, addToMulter.array('productVarientTemplates'), validate(addProductVarient), productController.addProductVarient);
+router.post('/saveProductImage', verifyTokenAdmin, addToMulter.single('productImage'), validate(addProductImage), productController.saveProductImage);
+router.post('/updateProduct', verifyTokenAdmin, addToMulter.single('productImage'), validate(updateProduct), productController.updateProduct);
+router.post('/updateProductVarient', verifyTokenAdmin, validate(updateProductVarient), productController.updateProductVarient);
+router.post('/updateVarientTemplate', verifyTokenAdmin, addToMulter.single('productVarientTemplates'), validate(updateVarientTemplate), productController.updateVarientTemplate);
+router.delete('/deleteProduct/:productId', verifyTokenAdmin, productController.deleteProduct);
+router.delete('/deleteProductVarient', verifyTokenAdmin, productController.deleteProductVarient);
+router.delete('/deleteProductImage', verifyTokenAdmin, productController.deleteProductImage);
+router.delete('/deleteVarientTemplate', verifyTokenAdmin, validate(deleteVarientTemplate), productController.deleteVarientTemplate);
+router.post('/addVariableTypes', verifyTokenAdmin, validate(addVariableType), productController.addVariableTypes);
+router.post('/addVariableOptions', verifyTokenAdmin, validate(addVariableOption), productController.addVariableOptions);
+router.delete('/deleteVariable', verifyTokenAdmin, validate(deleteVariable), productController.deleteVariable);
+router.post('/updateVariable', verifyTokenAdmin, validate(updateVariable), productController.updateVariable);
 router.get('/getAllVariableTypes', verifyTokenAdmin, productController.getAllVariableTypes);
 
 

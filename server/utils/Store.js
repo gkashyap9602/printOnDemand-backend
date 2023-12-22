@@ -32,7 +32,8 @@ const store = {
             storeId: storeId,
             storeUrl: storeUrl,
             storeName: storeName,
-            storeType: 1,
+            storeType: 1,//1 for shopify
+            status: 1,
             createdOn: helpers.getCurrentDate(),
 
         }
@@ -42,7 +43,6 @@ const store = {
 
         // console.log(result,"resulttt");
         if (result.status) {
-            await updateSingleData(Users, { isLoginFromShopify: true }, { _id: userId })
 
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
         }
