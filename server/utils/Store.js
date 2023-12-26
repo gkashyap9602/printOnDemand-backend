@@ -281,7 +281,7 @@ const store = {
                 let productId = addToStoreApi?.data?.product?.id
 
                 let varientData = libData?.varientData?.map((itm, index) => {
-                    console.log(itm,"===================itm")
+                    console.log(itm, "===================itm")
 
                     let newObj = {
                         variant: {
@@ -289,7 +289,7 @@ const store = {
                             option1: "Yellow",
                         }
                     }
-                    
+
                     return newObj
                 })
 
