@@ -28,7 +28,7 @@ const productUtils = {
             variableTypesIds = variableTypesIds.map((id) => mongoose.Types.ObjectId(id))
             materialIds = materialIds.map((id) => mongoose.Types.ObjectId(id))
 
-            const findVariableTypes = await getDataArray(VariableTypes, { _id: { $in: variableTypesIds },status: { $ne: 2 } })
+            const findVariableTypes = await getDataArray(VariableTypes, { _id: { $in: variableTypesIds }, status: { $ne: 2 } })
 
             if (findVariableTypes?.data?.length !== variableTypesIds?.length) {
                 return helpers.showResponse(false, ResponseMessages?.variable.invalid_variable_type, {}, null, 400);
@@ -286,6 +286,11 @@ const productUtils = {
                         foreignField: "productId",
                         as: "productVarient",
                         pipeline: [
+                            {
+                                $match: {
+                                    status: { $ne: 2 }
+                                }
+                            },
                             {
                                 $lookup: {
                                     from: "variableOptions",

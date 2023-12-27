@@ -124,7 +124,7 @@ const store = {
             }
 
             console.log(findStore, "findStore");
-            let { apiKey, shop, secret, storeVersion } = findStore?.data
+            let { apiKey, shop, secret, storeVersion, storeName } = findStore?.data
 
             let endPointData = {
                 apiKey,
@@ -187,15 +187,6 @@ const store = {
 
                                 }
                             },
-                            // {
-                            //     $lookup: {
-                            //         from: 'category',
-                            //         localField: 'subCategoryData.categoryId',
-                            //         foreignField: '_id',
-                            //         as: 'categoryData',
-
-                            //     }
-                            // },
                             {
                                 $unwind: "$subCategoryData"
                             },
@@ -271,7 +262,7 @@ const store = {
                                             $project: {
                                                 _id: 1,
                                                 productId: 1,
-                                                price: 1,
+                                                // price: 1,
                                                 productCode: 1,
                                                 // varientOptions: 1,
                                                 variableOptionData: 1
@@ -307,15 +298,14 @@ const store = {
                                         sku: "$productVarientData.productCode"
                                     },
                                     options: {
-                                        // name: "$productVarientData.variableOptionData.typeName",
                                         name: {
                                             $reduce: {
                                                 input: "$productVarientData.variableOptionData",
                                                 initialValue: "",
                                                 in: {
                                                     $concat: [
-                                                        "$$typeName",
-                                                        { $cond: [{ $eq: ["$$typeName", ""] }, "", ", "] },
+                                                        "$$value",
+                                                        { $cond: [{ $eq: ["$$value", ""] }, "", ", "] },
                                                         "$$this.typeName"
                                                     ]
                                                 }
@@ -325,6 +315,7 @@ const store = {
                                     }
                                 }
                             },
+                            //in varient data only project Variant Data And Options
                             {
                                 $project: {
                                     _id: 1,
@@ -334,7 +325,7 @@ const store = {
                                     profit: 1,
                                     //    productLibraryVarientImages:1,
                                     status: 1,
-                                    productVarientData: 1,
+                                    // productVarientData: 1,
                                     variant: 1,
                                     options: 1
 
@@ -345,20 +336,25 @@ const store = {
 
                     }
                 },
-
-                // {
-                //     $addFields: {
-                //         variantData: {
-                //             options1: "",
-                //             price: "",
-                //             sku: "",
-                //         },
-                //         options: {
-                //             name: "",
-                //             values: []
-                //         }
-                //     }
-                // },
+                //find unique name and return it for shopify payload
+                {
+                    $addFields: {
+                        optionsForVarient: {
+                            $map: {
+                                input: { $setUnion: "$varientData.options.name" },
+                                as: "name",
+                                in: { name: "$$name" }
+                            }
+                        },
+                        productLibraryImages: {
+                            $map: {
+                                input: "$productLibraryImages",
+                                as: "image",
+                                in: { src: { $concat: [consts.BITBUCKET_URL_DEV, "/", "$$image.imageUrl"] } }
+                            }
+                        }
+                    }
+                },
                 {
                     $project: {
                         _id: 1,
@@ -368,10 +364,11 @@ const store = {
                         status: 1,
                         addToStore: 1,
                         productLibraryImages: 1,
-                        productData: 1,
-                        varientData: 1,
-                        // variant: 1,
-                        // options: 1
+                        subCategoryName: "$productData.subCategoryData.name",
+                        // productData: 1,
+                        // varientData: 1, //variants canbe multiple 
+                        optionsForVarient: 1,
+                        variantDataForShopify: "$varientData.variant" // One Product Has Multiple variant
                     }
                 }
 
@@ -379,107 +376,62 @@ const store = {
             ])
             //ends of aggregation
 
-
             let libData = result[0]
-
             console.log(libData, "libData");
-
-
-            let varientData = libData?.varientData?.map((itm, index) => {
-                let newObj = {
-
-                    option1: libData?.title + index, //varient title name
-                    price: itm?.price, //varient price
-                    sku: "" //product code 
-
-                }
-                return newObj
-            })
-
-
-            console.log(varientData, "varientDataaa");
-
-            let productImages = libData?.productLibraryImages?.map((itm) => {
-                return {
-                    src: `${consts.BITBUCKET_URL_DEV}/${itm.imageUrl}`
-                }
-            })
-
-
 
 
             let productData = {
                 product: {
-                    title: libData.title,
+                    title: libData?.title,
                     body_html: `<strong>${libData?.description}</strong>`,
-                    vendor: "BurtonGk",
-                    product_type: libData?.productData?.categoryData?.name,
-                    status: "active",
-                    images: productImages,
-                    // variants: varientData[0],
-                    options: [
-                        {
-                            // "id": 11307358847298,
-                            // "product_id": 9007266758978,
-                            "name": "Size",
-                            "position": 1,
-                            // "values": [
-                            //     "XL", "M"
-                            // ]
-                        }
-                    ],
-                    variants: [
-                        {
-                            "option1": "XL",
-                            "price": "25.99",
-                            "sku": "PP85123",
-                            "inventory_quantity": 50,
-                        },
-                    ]
-
+                    vendor: storeName,
+                    product_type: libData?.subCategoryName,
+                    status: "draft", //default status of a product is draft 
+                    images: libData?.productLibraryImages,
+                    options: libData?.optionsForVarient,
+                    variants: libData?.variantDataForShopify
                 }
 
             }
 
-            // let addToStoreApi = await helpers.addProductToShopify(endPointData, productData)
 
-            //if product add then add varient
-            // if (addToStoreApi.status) {
+            let addToStoreApi = await helpers.addProductToShopify(endPointData, productData)
 
-            //     // let productId = addToStoreApi?.data?.product?.id
+            // product add then add varient
+            if (addToStoreApi.status) {
 
-            //     // let varientData = libData?.varientData?.map((itm, index) => {
-            //     //     console.log(itm, "===================itm")
+                // let productId = addToStoreApi?.data?.product?.id
 
-            //     //     let newObj = {
-            //     //         variant: {
-            //     //             price: itm?.price,
-            //     //             option1: "Yellow",
-            //     //         }
-            //     //     }
+                // let varientData = libData?.varientData?.map((itm, index) => {
+                //     console.log(itm, "===================itm")
 
-            //     //     return newObj
-            //     // })
+                //     let newObj = {
+                //         variant: {
+                //             price: itm?.price,
+                //             option1: "Yellow",
+                //         }
+                //     }
 
-            //     //add varient api 
-            //     // let addVarientApi = await helpers.addProductVarientToShopify(endPointData, varientData, productId)
+                //     return newObj
+                // })
 
-            //     // //if success then return 
-            //     // if (addVarientApi.status) {
+                //add varient api 
+                // let addVarientApi = await helpers.addProductVarientToShopify(endPointData, varientData, productId)
 
-            //     //     return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
-            //     // } else {
+                // //if success then return 
+                // if (addVarientApi.status) {
 
-            //     //     return helpers.showResponse(false, "errr varient", {}, null, 400);
+                //     return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
+                // } else {
 
-            //     // }
+                //     return helpers.showResponse(false, "errr varient", {}, null, 400);
+
+                // }
 
 
-            //     return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
-            // }
-            // return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message ? productData : ResponseMessages?.product.add_to_store_fail, null, 400);
-            return helpers.showResponse(false, "dataa", result[0], null, 400);
-            // result.length > 0 ? result[0] : result
+                return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
+            }
+            return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message ? productData : ResponseMessages?.product.add_to_store_fail, null, 400);
         }
         catch (err) {
             // console.log(err, "errorrr");
