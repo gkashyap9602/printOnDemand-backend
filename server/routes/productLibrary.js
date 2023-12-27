@@ -13,10 +13,10 @@ router.get('/getLibraryImages', verifyTokenUser, productLibraryController.getLib
 
 ////check
 //product library routes
-router.post('/create', validateCSRFToken, verifyTokenUser, addToMulter.array('productLibraryImg'), productLibraryController.createProductLibrary);
-router.post('/update', validateCSRFToken, verifyTokenUser, validate(updateProductLibrary), productLibraryController.updateProductLibrary);
-router.post('/updateVarient', validateCSRFToken, verifyTokenUser, validate(updateLibraryVarient), productLibraryController.updateProductLibraryVarient);
-router.delete('/deleteProductLibrary', validateCSRFToken, verifyTokenUser, validate(deleteProductLibrary), productLibraryController.deleteProductLibrary);
+router.post('/create', verifyTokenUser, addToMulter.array('productLibraryImg'), productLibraryController.createProductLibrary);
+router.post('/update', verifyTokenUser, validate(updateProductLibrary), productLibraryController.updateProductLibrary);
+router.post('/updateVarient', verifyTokenUser, validate(updateLibraryVarient), productLibraryController.updateProductLibraryVarient);
+router.delete('/deleteProductLibrary', verifyTokenUser, validate(deleteProductLibrary), productLibraryController.deleteProductLibrary);
 router.post('/getLibrary', verifyTokenUser, productLibraryController.getProductLibrary);
 router.get('/getLibraryDetails', verifyTokenUser, validate(ProductLibraryDetails), productLibraryController.getProductLibraryDetails);
 

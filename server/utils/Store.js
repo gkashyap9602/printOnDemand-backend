@@ -218,7 +218,7 @@ const store = {
                         from: 'productLibraryVarient',
                         localField: '_id',
                         foreignField: 'productLibraryId',
-                        as: 'varientData', //it canbe multiple items
+                        as: 'varientData', //it canbe multiple items product has multiple variants
                         pipeline: [
                             {
                                 $lookup: {
@@ -290,12 +290,37 @@ const store = {
                             {
                                 $addFields: {
                                     variant: {
-                                        ['option1']: "$productVarientData.variableOptionData.value",
+                                        option1: {
+                                            $reduce: {
+                                                input: "$productVarientData.variableOptionData",
+                                                initialValue: "",
+                                                in: {
+                                                    $concat: [
+                                                        "$$value",
+                                                        { $cond: [{ $eq: ["$$value", ""] }, "", ", "] },
+                                                        "$$this.value"
+                                                    ]
+                                                }
+                                            }
+                                        },
                                         price: "$price",
                                         sku: "$productVarientData.productCode"
                                     },
                                     options: {
-                                        name: "$productVarientData.variableOptionData.typeName",
+                                        // name: "$productVarientData.variableOptionData.typeName",
+                                        name: {
+                                            $reduce: {
+                                                input: "$productVarientData.variableOptionData",
+                                                initialValue: "",
+                                                in: {
+                                                    $concat: [
+                                                        "$$typeName",
+                                                        { $cond: [{ $eq: ["$$typeName", ""] }, "", ", "] },
+                                                        "$$this.typeName"
+                                                    ]
+                                                }
+                                            }
+                                        },
                                         position: 1
                                     }
                                 }
