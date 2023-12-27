@@ -100,10 +100,10 @@ const productLibrary = {
 
             }
 
-            const findProduct = await getSingleData(ProductLibrary, { title: title, status: { $ne: 2 } })
-            if (findProduct.status) {
-                return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 400);
-            }
+            // const findProduct = await getSingleData(ProductLibrary, { title: title, status: { $ne: 2 } })
+            // if (findProduct.status) {
+            //     return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 400);
+            // }
 
 
             console.log(productlibImages, "productlibImages");

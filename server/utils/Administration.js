@@ -981,38 +981,82 @@ const adminUtils = {
             let { status, userId } = data
             status = Number(status)
 
-            let findUser = await getSingleData(UserProfile, { userId: userId })
+            let find = await getSingleData(Users, { _id: userId })
 
-            if (!findUser.status) {
+            if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
             }
 
-            console.log(findUser.data, "userData");
-            let basicInfo = findUser?.data?.completionStaus?.basicInfo
-            let billingInfo = findUser?.data?.completionStaus?.billingInfo
-            let paymentInfo = findUser?.data?.completionStaus?.paymentInfo
-            let shippingInfo = findUser?.data?.completionStaus?.shippingInfo
+            if (status == 1) { //1 for activate 
+
+                let findUser = await getSingleData(UserProfile, { userId: userId })
+
+                if (!findUser.status) {
+                    return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
+                }
+
+                console.log(findUser.data, "userData");
+
+                let basicInfo = findUser?.data?.completionStaus?.basicInfo
+                let billingInfo = findUser?.data?.completionStaus?.billingInfo
+                let paymentInfo = findUser?.data?.completionStaus?.paymentInfo
+                let shippingInfo = findUser?.data?.completionStaus?.shippingInfo
 
 
-            if (!basicInfo) {
-                return helpers.showResponse(false, ResponseMessages?.users.basic_info_not_available, null, null, 400);
+                if (!basicInfo) {
+                    return helpers.showResponse(false, ResponseMessages?.users.basic_info_not_available, null, null, 400);
+                }
+                if (!billingInfo) {
+                    return helpers.showResponse(false, ResponseMessages?.users.billing_info_not_available, null, null, 400);
+                }
+                if (!paymentInfo) {
+                    return helpers.showResponse(false, ResponseMessages?.users.payment_info_not_available, null, null, 400);
+                }
+                if (!shippingInfo) {
+                    return helpers.showResponse(false, ResponseMessages?.users.shipping_info_not_available, null, null, 400);
+                }
+
+
             }
-            if (!billingInfo) {
-                return helpers.showResponse(false, ResponseMessages?.users.billing_info_not_available, null, null, 400);
-            }
-            if (!paymentInfo) {
-                return helpers.showResponse(false, ResponseMessages?.users.payment_info_not_available, null, null, 400);
-            }
-            if (!shippingInfo) {
-                return helpers.showResponse(false, ResponseMessages?.users.shipping_info_not_available, null, null, 400);
-            }
+
 
             let result = await updateSingleData(Users, { status }, { _id: userId })
             if (result.status) {
+                //after updated status send email to user 
+
+                if (status == 4 || status == 1) {
+
+
+                    const logoPath = path.join(__dirname, '../views', 'logo.png');
+                    let updateMessage = status == 1 ? "Account Activated" : "Account Deactivated"
+                    let template = status == 1 ? "ActivateUser.ejs" : "DeactivateUser.ejs"
+                    let userName = find?.data?.firstName + ' ' + find?.data?.lastName
+
+                    let to = find?.data?.email
+                    let subject = updateMessage
+                    let attachments = [
+
+                        {
+                            filename: 'logo.png',
+                            path: logoPath,
+                            cid: 'unique@mwwLogo',
+                        }
+                    ]
+
+
+                    const html = await ejs.renderFile(path.join(__dirname, '../views', template), { user: userName, cidLogo: 'unique@mwwLogo' });
+
+                    let email = await helpers.sendEmailService(to, subject, html, attachments)
+
+                }
+
+
+
                 return helpers.showResponse(true, ResponseMessages?.common.update_sucess, null, null, 200);
             }
 
         } catch (err) {
+            console.log(err, "errrrrrrr");
             return helpers.showResponse(false, ResponseMessages?.common.update_failed, err, null, 400);
         }
 

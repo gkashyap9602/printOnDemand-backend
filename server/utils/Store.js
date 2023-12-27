@@ -170,25 +170,38 @@ const store = {
                                     localField: 'subCategoryId',
                                     foreignField: '_id',
                                     as: 'subCategoryData',
+                                    pipeline: [
+                                        // {
+                                        //     $match: {
+                                        //         status: { $ne: 2 }
+                                        //     }
+
+                                        // },
+                                        {
+                                            $project: {
+                                                _id: 1,
+                                                name: 1
+                                            }
+                                        }
+                                    ]
 
                                 }
                             },
-                            {
-                                $lookup: {
-                                    from: 'category',
-                                    localField: 'subCategoryData.categoryId',
-                                    foreignField: '_id',
-                                    as: 'categoryData',
+                            // {
+                            //     $lookup: {
+                            //         from: 'category',
+                            //         localField: 'subCategoryData.categoryId',
+                            //         foreignField: '_id',
+                            //         as: 'categoryData',
 
-                                }
-                            },
+                            //     }
+                            // },
                             {
-                                $unwind: "$categoryData"
+                                $unwind: "$subCategoryData"
                             },
                             {
                                 $project: {
-                                    subCategoryData: 0,
-                                    // categoryData: 1
+                                    subCategoryData: 1,
                                 }
                             }
                         ]
@@ -196,68 +209,179 @@ const store = {
                     }
                 },
                 {
-                    $unwind: "$productData"
+                    $unwind: "$productData" //product is single document
 
                 },
+                //we add lookup for product library varient because it has product varient id for lookup 
                 {
                     $lookup: {
                         from: 'productLibraryVarient',
                         localField: '_id',
                         foreignField: 'productLibraryId',
-                        as: 'varientData',
-
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'productVarient',
-                        localField: 'varientData.productVarientId',
-                        foreignField: '_id',
-                        as: 'productVarientData',
+                        as: 'varientData', //it canbe multiple items
                         pipeline: [
                             {
-                                $match: {
-                                    status: { $ne: 2 }
+                                $lookup: {
+                                    from: 'productVarient',
+                                    localField: 'productVarientId',
+                                    foreignField: '_id',
+                                    as: 'productVarientData', //product vaarient data should be single document because we are fetching one item with id 
+                                    pipeline: [
+                                        // {
+                                        //     $match: {
+                                        //         status: { $ne: 2 }
+                                        //     }
+                                        // },
+                                        {
+                                            $lookup: {
+                                                from: 'variableOptions',
+                                                localField: 'varientOptions.variableOptionId',
+                                                foreignField: '_id',
+                                                as: 'variableOptionData',// it should be array of objects because it canbe multiple
+                                                pipeline: [
+                                                    {
+                                                        $lookup: {
+                                                            from: 'variableTypes',
+                                                            localField: 'variableTypeId',
+                                                            foreignField: '_id',
+                                                            as: 'variableTypesData',
+
+                                                        }
+                                                    },
+                                                    {
+                                                        $unwind: {
+                                                            path: "$variableTypesData"
+                                                        }
+                                                    },
+                                                    {
+                                                        $project: {
+                                                            _id: 1,
+                                                            value: 1,
+                                                            variableTypeId: 1,
+                                                            typeName: '$variableTypesData.typeName'
+
+                                                        }
+
+                                                    }
+
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            $project: {
+                                                _id: 1,
+                                                productId: 1,
+                                                price: 1,
+                                                productCode: 1,
+                                                // varientOptions: 1,
+                                                variableOptionData: 1
+                                            }
+                                        }
+
+                                    ]
                                 }
                             },
+                            {
+                                $unwind: {
+                                    path: "$productVarientData"
+                                }
+                            },
+                            //here we create varient data and options for product add in shopify
+                            {
+                                $addFields: {
+                                    variant: {
+                                        ['option1']: "$productVarientData.variableOptionData.value",
+                                        price: "$price",
+                                        sku: "$productVarientData.productCode"
+                                    },
+                                    options: {
+                                        name: "$productVarientData.variableOptionData.typeName",
+                                        position: 1
+                                    }
+                                }
+                            },
+                            {
+                                $project: {
+                                    _id: 1,
+                                    productLibraryId: 1,
+                                    productVarientId: 1,
+                                    price: 1,
+                                    profit: 1,
+                                    //    productLibraryVarientImages:1,
+                                    status: 1,
+                                    productVarientData: 1,
+                                    variant: 1,
+                                    options: 1
 
+
+                                }
+                            }
                         ]
+
                     }
                 },
+
+                // {
+                //     $addFields: {
+                //         variantData: {
+                //             options1: "",
+                //             price: "",
+                //             sku: "",
+                //         },
+                //         options: {
+                //             name: "",
+                //             values: []
+                //         }
+                //     }
+                // },
                 {
-                    $lookup: {
-                        from: 'variableOptions',
-                        localField: 'productVarientData.varientOptions.variableOptionId',
-                        foreignField: '_id',
-                        as: 'variableOptionData',
+                    $project: {
+                        _id: 1,
+                        productId: 1,
+                        title: 1,
+                        description: 1,
+                        status: 1,
+                        addToStore: 1,
+                        productLibraryImages: 1,
+                        productData: 1,
+                        varientData: 1,
+                        // variant: 1,
+                        // options: 1
                     }
-                },
-                {
-                    $addFields: {
-                        priceStartsFrom: { $min: "$varientData.price" }
-                    }
-                },
+                }
 
 
             ])
+            //ends of aggregation
 
 
             let libData = result[0]
 
+            console.log(libData, "libData");
 
-            // let varientData = libData?.varientData?.map((itm, index) => {
-            //     let newObj = {
-            //         title: libData?.title + index,
-            //         price: itm?.price,
 
-            //     }
-            //     return newObj
-            // })
+            let varientData = libData?.varientData?.map((itm, index) => {
+                let newObj = {
+
+                    option1: libData?.title + index, //varient title name
+                    price: itm?.price, //varient price
+                    sku: "" //product code 
+
+                }
+                return newObj
+            })
+
+
+            console.log(varientData, "varientDataaa");
+
             let productImages = libData?.productLibraryImages?.map((itm) => {
                 return {
                     src: `${consts.BITBUCKET_URL_DEV}/${itm.imageUrl}`
                 }
             })
+
+
+
 
             let productData = {
                 product: {
@@ -268,48 +392,68 @@ const store = {
                     status: "active",
                     images: productImages,
                     // variants: varientData[0],
+                    options: [
+                        {
+                            // "id": 11307358847298,
+                            // "product_id": 9007266758978,
+                            "name": "Size",
+                            "position": 1,
+                            // "values": [
+                            //     "XL", "M"
+                            // ]
+                        }
+                    ],
+                    variants: [
+                        {
+                            "option1": "XL",
+                            "price": "25.99",
+                            "sku": "PP85123",
+                            "inventory_quantity": 50,
+                        },
+                    ]
 
                 }
 
             }
 
-            let addToStoreApi = await helpers.addProductToShopify(endPointData, productData)
+            // let addToStoreApi = await helpers.addProductToShopify(endPointData, productData)
 
             //if product add then add varient
-            if (addToStoreApi.status) {
+            // if (addToStoreApi.status) {
 
-                let productId = addToStoreApi?.data?.product?.id
+            //     // let productId = addToStoreApi?.data?.product?.id
 
-                let varientData = libData?.varientData?.map((itm, index) => {
-                    console.log(itm, "===================itm")
+            //     // let varientData = libData?.varientData?.map((itm, index) => {
+            //     //     console.log(itm, "===================itm")
 
-                    let newObj = {
-                        variant: {
-                            price: itm?.price,
-                            option1: "Yellow",
-                        }
-                    }
+            //     //     let newObj = {
+            //     //         variant: {
+            //     //             price: itm?.price,
+            //     //             option1: "Yellow",
+            //     //         }
+            //     //     }
 
-                    return newObj
-                })
+            //     //     return newObj
+            //     // })
 
-                //add varient api 
-                let addVarientApi = await helpers.addProductVarientToShopify(endPointData, varientData, productId)
+            //     //add varient api 
+            //     // let addVarientApi = await helpers.addProductVarientToShopify(endPointData, varientData, productId)
 
-                //if success then return 
-                if (addVarientApi.status) {
+            //     // //if success then return 
+            //     // if (addVarientApi.status) {
 
-                    return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
-                } else {
+            //     //     return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
+            //     // } else {
 
-                    return helpers.showResponse(false, "errr varient", {}, null, 400);
+            //     //     return helpers.showResponse(false, "errr varient", {}, null, 400);
 
-                }
+            //     // }
 
 
-                return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
-            }
-            return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message ? productData : ResponseMessages?.product.add_to_store_fail, null, 400);
+            //     return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
+            // }
+            // return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message ? productData : ResponseMessages?.product.add_to_store_fail, null, 400);
+            return helpers.showResponse(false, "dataa", result[0], null, 400);
             // result.length > 0 ? result[0] : result
         }
         catch (err) {

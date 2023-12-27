@@ -707,7 +707,7 @@ const addProductToShopify = async (endpointData, productData,) => {
 
         let addToStoreUrl = `https://${apiKey}:${secret}@${shop}/${consts.SHOPIFY_ROUTES.SHOPIFY_CREATE_PRODUCT(storeVersion)}`
 
-        console.log(addToStoreUrl, "addToStoreUrl");
+        // console.log(addToStoreUrl, "addToStoreUrl");
         //add to store shopify api to create product 
         const result = await axios.post(`${addToStoreUrl}`, productData, {
             headers: {
@@ -748,22 +748,23 @@ const addProductVarientToShopify = async (endpointData, productVariantData, prod
     try {
         let { apiKey, shop, secret, storeVersion } = endpointData
 
-        // let addProductVariantUrl = `https://${apiKey}:${secret}@${shop}/${consts.SHOPIFY_ROUTES.CREATE_PRODUCT_VARIENT(storeVersion, productId)}`
-        
-        const addProductVariantUrl = `https://${apiKey}:${secret}@${shop}/admin/api/2023-10/products/${productId}/variants.json`
+        let addProductVariantUrl = `https://${apiKey}:${secret}@${shop}/${consts.SHOPIFY_ROUTES.CREATE_PRODUCT_VARIENT(storeVersion, productId)}`
+
+        console.log(addProductVariantUrl, "addProductVariantUrl");
+        // const addProductVariantUrl = `https://${apiKey}:${secret}@${shop}/admin/api/2023-10/products/${productId}/variants.json`
 
         // //add to store shopify api to create product 
-        let veriant = {
-            "variant": {              
-              "option1": "Yellow",
-              "price": "1.00"
-            }
-          }
+        // let veriant = {
+        //     "variant": {
+        //         "option1": "Yellow",
+        //         "price": "1.00"
+        //     }
+        // }
 
-          console.log(veriant , "=============veriant")
-          console.log(productVariantData[0] , "=============productVariantData")
+        // console.log(veriant, "=============veriant")
+        console.log(productVariantData, "=============productVariantData")
 
-          
+
 
         const result = await axios.post(`${addProductVariantUrl}`, productVariantData[0], {
             headers: {
