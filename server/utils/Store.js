@@ -101,7 +101,7 @@ const store = {
         }
         return helpers.showResponse(false, ResponseMessages?.store.store_update_fail, null, null, 400);
     },
-    removeStore: async (data, userId) => {
+    removeStore: async (data) => {
 
         let { storeId } = data
         console.log(storeId, "storeId");
@@ -112,6 +112,81 @@ const store = {
             return helpers.showResponse(true, ResponseMessages?.store.store_delete_success, {}, null, 200);
         }
         return helpers.showResponse(false, ResponseMessages?.store.store_delete_fail, null, null, 400);
+    },
+
+    getPushProductsToStore: async (data, userId) => {
+        try {
+            let { pageSize = 10, pageIndex = 1, sortDirection = "asc", sortColumn = "   ", storeIds = [],
+                searchKey = '', status, isFromShop, createdFrom, createdTill } = data;
+
+            pageSize = Number(pageSize)
+            pageIndex = Number(pageIndex)
+
+
+            let matchObj = {
+                userId: mongoose.Types.ObjectId(userId),
+
+            }
+
+            if (searchKey) {
+                matchObj.searchKey = searchKey
+
+            }
+            if (status) {
+                matchObj.status = Number(status)
+
+            }
+            if (createdFrom && createdTill) {
+                matchObj.createdOn = { $gte: createdFrom, $lte: createdTill }
+            }
+            if (storeIds?.length > 0) {
+                matchObj.storeIds = { $in: storeIds }
+            }
+
+            console.log(matchObj, "matchObj");
+
+            let aggregate = [
+                {
+                    $match: {
+                        ...matchObj,
+                    }
+                },
+                // {
+                //     $lookup: {
+                //         from: "productVarient",
+                //         localField: "_id",
+                //         foreignField: "productId",
+                //         as: "ProductVarient",
+
+                //     }
+                // },
+
+
+                {
+                    $sort: {
+                        [sortColumn]: sortDirection === "asc" ? 1 : -1
+                    }
+                },
+
+            ]
+
+
+
+            //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
+            let { totalCount, aggregation } = await helpers.getCountAndPagination(ProductQueue, aggregate, pageIndex, pageSize)
+            console.log(totalCount, "totalCounttotalCount");
+
+
+
+            const result = await ProductQueue.aggregate(aggregation);
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount }, null, 200);
+        }
+        catch (err) {
+            return helpers.showResponse(false, err?.message, null, null, 400);
+
+        }
+
     },
     addProductToShopify: async (data, userId) => {
         try {

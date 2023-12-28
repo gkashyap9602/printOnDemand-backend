@@ -393,10 +393,6 @@ const productUtils = {
 
             }
 
-
-
-            let totalCount = await getCount(Product, { ...matchObj })
-
             console.log(matchObj, "matchObj");
 
             let aggregate = [
@@ -482,18 +478,14 @@ const productUtils = {
 
             }
 
-            aggregate.push(
-                {
-                    $skip: (page - 1) * pageSize // Skip records based on the page number
-                },
-                {
-                    $limit: pageSize // Limit the number of records per page
-                },
-            )
+            //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
+            let { totalCount, aggregation } = await helpers.getCountAndPagination(Product, aggregate, page, pageSize)
+            console.log(totalCount, "totalCounttotalCount");
 
-            const result = await Product.aggregate(aggregate);
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
+            const result = await Product.aggregate(aggregation);
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount }, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);

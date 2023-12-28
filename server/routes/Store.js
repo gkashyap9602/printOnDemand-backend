@@ -14,6 +14,7 @@ router.post('/updateStoreStatus', verifyTokenUser, validate(updateStoreStatus), 
 router.delete('/removeStore', verifyTokenUser, validate(removeStore), storeController.removeStore);
 
 router.post('/addProductToStore', verifyTokenUser, validate(addProductToStore), storeController.addProductToShopify);
+router.post('/getPushProductsToStore', verifyTokenUser, storeController.getPushProductsToStore);
 
 // Common Routes
 router.get('*', (req, res) => { res.status(405).json({ status: false, message: "Invalid Get Request" }) });

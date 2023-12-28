@@ -36,6 +36,14 @@ const shopController = {
         let result = await Store.removeStore(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
+    getPushProductsToStore: async (req, res) => {
+        let user_id = req.decoded._id;
+        if (!user_id) {
+            return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
+        }
+        let result = await Store.getPushProductsToStore(req.body, user_id);
+        return helpers.showOutput(res, result, result.statusCode);
+    },
 
     addProductToShopify: async (req, res) => {
         let userId = req.decoded._id;

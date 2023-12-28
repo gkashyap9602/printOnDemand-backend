@@ -25,7 +25,7 @@ var ProductQueue = new Schema({
         index: true
     }],
 
-    pushStatus: {
+    status: {
         type: Number,
         default: 2,
         Comment: "1 for complete 2 for processing 3 for failed"
