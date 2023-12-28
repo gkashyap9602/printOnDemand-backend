@@ -12,6 +12,7 @@ const session = require('express-session')
 const MongoStore = require("connect-mongo");
 const helpers = require('./server/services/helper')
 const isProduction = process.env.ENV_MODE === 'PROD';
+require('./server/ProcessQueue/index')
 
 console.log(isProduction, "isProduction===");
 app.use(helmet())

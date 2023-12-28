@@ -20,6 +20,49 @@ const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
 const NodeCache = require("node-cache");
 const cache = new NodeCache();
+const Queue = require('bull')
+
+
+const generateQueue = (queueName) => {
+    const queue = new Queue(queueName, {
+        redis: {
+            port: consts.REDIS_CREDENTIAL.PORT,
+            host: consts.REDIS_CREDENTIAL.URI
+        }
+    })
+
+    return queue
+}
+
+//add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
+const getCountAndPagination = async (model, aggregate, pageIndex, pageSize) => {
+
+    //this aggregation is for aggregate Model and add pagination at the end of the query aggregation
+    let aggregation = aggregate
+
+    aggregation?.push(
+        {
+            $skip: (pageIndex - 1) * pageSize
+        },
+        {
+            $limit: pageSize
+        }
+    );
+    //ends 
+
+
+    //This Aggregation is for totalCount of aggregation query 
+    let pagePipelineCount = [...aggregate];
+
+    pagePipelineCount.push({ $count: 'totalEntries' })
+
+    let countResult = await model.aggregate(pagePipelineCount)
+
+    let totalCount = countResult?.[0]?.totalEntries || 0;
+
+    return { totalCount, aggregation }
+}
+
 
 const showResponse = (
     status,
@@ -753,17 +796,8 @@ const addProductVarientToShopify = async (endpointData, productVariantData, prod
         console.log(addProductVariantUrl, "addProductVariantUrl");
         // const addProductVariantUrl = `https://${apiKey}:${secret}@${shop}/admin/api/2023-10/products/${productId}/variants.json`
 
-        // //add to store shopify api to create product 
-        // let veriant = {
-        //     "variant": {
-        //         "option1": "Yellow",
-        //         "price": "1.00"
-        //     }
-        // }
-
         // console.log(veriant, "=============veriant")
         console.log(productVariantData, "=============productVariantData")
-
 
 
         const result = await axios.post(`${addProductVariantUrl}`, productVariantData[0], {
@@ -1575,5 +1609,7 @@ module.exports = {
     generateOrderID,
     addProductToShopify,
     addProductVarientToShopify,
-    mongoError
+    mongoError,
+    generateQueue,
+    getCountAndPagination
 };

@@ -19,8 +19,10 @@ const productUtils = {
             let { careInstructions, longDescription, subCategoryIds, materialIds, variableTypesIds,
                 construction, features, productionDuration, shortDescription, title, process } = data
 
+
             subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
             const findProduct = await getSingleData(Product, { title: title, status: { $ne: 2 }, subCategoryId: { $in: subCategoryIds } })
+            console.log(findProduct, "proddddd");
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 400);
             }
@@ -354,7 +356,7 @@ const productUtils = {
     },
     getAllProduct: async (data) => {
         try {
-            let { subCategoryId, pageSize = 5, page = 1, sortDirection = "asc", sortColumn = "title", materialFilter, searchKey = '' } = data;
+            let { subCategoryId, pageSize = 10, page = 1, sortDirection = "asc", sortColumn = "title", materialFilter, searchKey = '' } = data;
             let id = new ObjectId(subCategoryId)
             pageSize = Number(pageSize)
             page = Number(page)
@@ -479,7 +481,6 @@ const productUtils = {
                 aggregate.push(match)
 
             }
-
 
             aggregate.push(
                 {

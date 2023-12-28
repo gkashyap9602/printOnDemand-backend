@@ -31,6 +31,7 @@ var Product = new Schema({
     },
     title: {
         type: String,
+        index: true,
         default: ""
     },
     longDescription: {

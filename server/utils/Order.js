@@ -393,7 +393,8 @@ const orderUtil = {
 
         console.log(matchObj, "matchObjjj");
         console.log(searchObj, "searchObj");
-        const result = await Order.aggregate([
+
+        let aggregate = [
             {
                 $match: {
                     ...matchObj,
@@ -459,13 +460,6 @@ const orderUtil = {
                 }
             },
             {
-                $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-            },
-            {
-                $limit: pageSize // Limit the number of records per page
-            },
-
-            {
                 $project: {
                     amount: {
                         $round: ["$amount", 2]
@@ -486,8 +480,12 @@ const orderUtil = {
                 }
             }
         ]
-        );
 
+        //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
+        let { totalCount, aggregation } = await helpers.getCountAndPagination(Order, aggregate, pageIndex, pageSize)
+        console.log(totalCount, "totalCounttotalCount");
+
+        const result = await Order.aggregate(aggregation);
 
         //status summary aggregation starts
         let newOrder = await Order.aggregate([
@@ -598,8 +596,8 @@ const orderUtil = {
             shipped: shippedOrder.length > 0 ? shippedOrder[0].shippedOrder : 0,
             totalOrders: totalOrder.length > 0 ? totalOrder[0].totalOrder : 0,
         }
-        let total = await getCount(Order, matchObj)
-        let totalCount = total.data
+        // let total = await getCount(Order, matchObj)
+        // let totalCount = total.data
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, statusSummary, totalCount }, null, 200);
     },
@@ -633,7 +631,8 @@ const orderUtil = {
 
         console.log(matchObj, "matchObjjj");
         console.log(searchObj, "searchObj");
-        const result = await Order.aggregate([
+
+        let aggregate = [
             {
                 $match: {
                     ...matchObj,
@@ -696,12 +695,6 @@ const orderUtil = {
                 }
             },
             {
-                $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-            },
-            {
-                $limit: pageSize // Limit the number of records per page
-            },
-            {
                 $project: {
                     amount: {
                         $round: ["$amount", 2]
@@ -721,10 +714,14 @@ const orderUtil = {
                 }
             }
         ]
-        );
 
-        let total = await getCount(Order, matchObj)
-        let totalCount = total.data
+
+
+        //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
+        let { totalCount, aggregation } = await helpers.getCountAndPagination(Order, aggregate, pageIndex, pageSize)
+        console.log(totalCount, "totalCounttotalCount");
+
+        const result = await Order.aggregate(aggregation);
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, totalCount }, null, 200);
     },

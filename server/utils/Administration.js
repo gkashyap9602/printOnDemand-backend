@@ -251,25 +251,27 @@ const adminUtils = {
                         }
                     }
                 ]
+            //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
+            let { totalCount, aggregation } = await helpers.getCountAndPagination(Users, aggregate, pageIndex, pageSize)
+            console.log(totalCount, "totalCounttotalCount");
+            // let pagePipelineCount = [...aggregate];
 
-            let pagePipelineCount = [...aggregate];
+            // pagePipelineCount.push({ $count: 'totalEntries' })
 
-            pagePipelineCount.push({ $count: 'totalEntries' })
+            // let countResult = await Users.aggregate(pagePipelineCount)
 
-            let countResult = await Users.aggregate(pagePipelineCount)
+            // let totalCount = countResult?.[0]?.totalEntries || 0;
 
-            let totalCount = countResult?.[0]?.totalEntries || 0;
+            // aggregate.push(
+            //     {
+            //         $skip: (pageIndex - 1) * pageSize
+            //     },
+            //     {
+            //         $limit: pageSize
+            //     }
+            // );
 
-            aggregate.push(
-                {
-                    $skip: (pageIndex - 1) * pageSize
-                },
-                {
-                    $limit: pageSize
-                }
-            );
-
-            const result = await Users.aggregate(aggregate)
+            const result = await Users.aggregate(aggregation)
 
             const activeUsers = await getCount(Users, { status: 1, userType: 3 })
             const pendingUsers = await getCount(Users, { status: 3, userType: 3 })
@@ -927,7 +929,7 @@ const adminUtils = {
 
     getAllSubAdmins: async (data) => {
         try {
-            let { sortColumn = 'createdOn', sortDirection = 'asc', pageIndex = 1, pageSize = 5, searchKey = '', subAdminId } = data
+            let { sortColumn = 'createdOn', sortDirection = 'asc', pageIndex = 1, pageSize = 10, searchKey = '', subAdminId } = data
             pageIndex = Number(pageIndex)
             pageSize = Number(pageSize)
 
@@ -941,7 +943,8 @@ const adminUtils = {
                 matchObj._id = mongoose.Types.ObjectId(subAdminId)
             }
 
-            const result = await Users.aggregate([
+
+            let aggregate = [
                 {
                     $match: {
                         $or: [
@@ -956,20 +959,19 @@ const adminUtils = {
                         [sortColumn]: sortDirection == 'asc' ? 1 : -1
                     }
                 },
-                {
-                    $skip: (pageIndex - 1) * pageSize
 
-                },
-                {
-                    $limit: pageSize
+            ]
 
-                },
 
-            ])
+            //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
+            let { totalCount, aggregation } = await helpers.getCountAndPagination(Users, aggregate, pageIndex, pageSize)
+            console.log(totalCount, "totalCounttotalCount");
 
-            const totalUsers = await getCount(Users, { userType: 2, status: { $ne: 2 } })
+            const result = await Users.aggregate(aggregation)
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalUsers.data }, null, 200);
+
+
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount }, null, 200);
         } catch (err) {
             console.log(err, "err get side");
             return helpers.showResponse(false, ResponseMessages?.common.database_error, err, null, 400);
