@@ -27,7 +27,8 @@ const generateQueue = (queueName) => {
     const queue = new Queue(queueName, {
         redis: {
             port: consts.REDIS_CREDENTIAL.PORT,
-            host: consts.REDIS_CREDENTIAL.URI
+            host: consts.REDIS_CREDENTIAL.URI,
+            // db:
         }
     })
 
@@ -49,7 +50,6 @@ const getCountAndPagination = async (model, aggregate, pageIndex, pageSize) => {
         }
     );
     //ends 
-
 
     //This Aggregation is for totalCount of aggregation query 
     let pagePipelineCount = [...aggregate];

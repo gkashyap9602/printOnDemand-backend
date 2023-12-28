@@ -3,35 +3,36 @@ const ResponseMessages = require('../constants/ResponseMessages');
 const ProductQueue = require('../models/ProductQueue')
 require('../db_functions/index')
 
-const productQueueProcess = async (job, done) => {
-    console.log(job, "jobbbb2222222222222");
+// const productQueueProcess = async (job, done) => {
+//     console.log(job, "jobbbb2222222222222");
 
-    try {
-        let { productData } = job?.data?.productData
-        let { endPointData } = job?.data?.endPointData
-
-        let addToStoreApi = await helpers.addProductToShopify(endPointData, productData)
-
-        console.log(addToStoreApi, "addToStore222");
-        if (addToStoreApi.status) {
-
-            let updatePushStatus = await updateSingleData(ProductQueue, { pushStatus: 1 }, { userId, storeId, productLibraryId })
+//     try {
+//         let { productData, endPointData, productLibraryId, userId } = job?.data
 
 
+//         // console.log(productLibraryId, "productLibraryId");
 
-            console.log(updatePushStatus, "Sucess updatePushStatus");
+//         let addToStoreApi = await helpers.addProductToShopify(endPointData, productData)
 
-            // return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
-        }
-        // return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message ? productData : ResponseMessages?.product.add_to_store_fail, null, 400);
-    } catch (error) {
+//         console.log(addToStoreApi, "addToStore222");
+//         if (addToStoreApi.status) {
 
-        let updatePushStatus = await updateSingleData(ProductQueue, { pushStatus: 3 }, { userId, storeId, productLibraryId })
+//             let updatePushStatus = await updateSingleData(ProductQueue, { pushStatus: 1 }, { userId, productLibraryId })
 
-        console.log(error, "error Queueee");
-    }
-    done()
 
-}
+//             console.log(updatePushStatus, "Sucess updatePushStatus");
 
-module.exports = productQueueProcess
+//             // return helpers.showResponse(true, addToStoreApi.message, addToStoreApi.data, null, 200)
+//         }
+//         return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message ? productData : ResponseMessages?.product.add_to_store_fail, null, 400);
+//     } catch (error) {
+
+//         let updatePushStatus = await updateSingleData(ProductQueue, { pushStatus: 3 }, { userId, productLibraryId })
+
+//         console.log(error, "error Queueee");
+//     }
+//     done()
+
+// }
+
+// module.exports = productQueueProcess

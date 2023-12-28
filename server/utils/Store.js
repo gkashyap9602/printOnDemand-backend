@@ -446,13 +446,14 @@ const store = {
 
 
                 //add all productLibrary Products in a Products Queue for further operations 
-                let addToQueue = productQueue.add({ productData, endPointData },
+                let addToQueue = productQueue.add({ productData, endPointData, productLibraryId: product._id, userId },
                     {
-                        delay: 2000,
-                        attempts: 1
+                        delay: 10000, //queue process after 10 seconds delay 
+                        attempts: 1, //execute only one time
+                        removeOnComplete: true //remove queue  after complete 
                     })
                     .then((res) => {
-                        // console.log(res, "55responsee");
+                        // console.log(res, "888responsee");
                         return { success: true, message: "All Products Added To Queue" };
                     })
                     .catch((err) => {
