@@ -1006,13 +1006,15 @@ const orderUtil = {
 
 
             const response = await updateSingleData(Cart, updateDataObj, matchObj)
+
+            console.log(response,"responsee");
             if (!response.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }
             return helpers.showResponse(true, ResponseMessages?.common.update_sucess, {}, null, 200);
         }
         catch (err) {
-            console.log(err, "error sideeee");
+            console.log(err, "error sideeee00000");
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },

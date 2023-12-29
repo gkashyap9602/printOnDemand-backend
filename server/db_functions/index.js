@@ -96,7 +96,7 @@ module.export = updateData = (Model, DataObject, _id) => {
                 return resolve(response);
             }
 
-            console.log(updatedData,"updatedDataaw");
+            console.log(updatedData, "updatedDataaw");
             let response = helpers.showResponse(true, 'success', updatedData);
             return resolve(response);
         });
@@ -121,7 +121,7 @@ module.export = removeItemFromArray = (Model, mainIdObj, arrayKey, itemId) => {
 }
 module.export = updateSingleData = (Model, DataObject, matchObj) => {
     return new Promise((resolve, reject) => {
-        Model.findOneAndUpdate(matchObj, { $set: DataObject }, { new: true, explain: true, timeout: 30000 }, (err, updatedData) => {
+        Model.findOneAndUpdate(matchObj, { $set: DataObject }, { new: true }, (err, updatedData) => {
             console.log(updatedData, "updatedData");
             console.log(err, "errerrerr");
             if (err) {
