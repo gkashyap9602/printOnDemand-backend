@@ -128,10 +128,6 @@ const store = {
 
             }
 
-            if (searchKey) {
-                matchObj.searchKey = searchKey
-
-            }
             if (status) {
                 matchObj.status = Number(status)
 
@@ -140,7 +136,8 @@ const store = {
                 matchObj.createdOn = { $gte: createdFrom, $lte: createdTill }
             }
             if (storeIds?.length > 0) {
-                matchObj.storeIds = { $in: storeIds }
+                storeIds = storeIds.map((id) => mongoose.Types.ObjectId(id))
+                matchObj.storeId = { $in: storeIds }
             }
 
             console.log(matchObj, "matchObj");
@@ -149,6 +146,7 @@ const store = {
                 {
                     $match: {
                         ...matchObj,
+
                     }
                 },
                 {
@@ -158,11 +156,11 @@ const store = {
                         foreignField: "_id",
                         as: "ProductLibraryData",
                         pipeline: [
-                            {
-                                $match: {
-                                    status: { $ne: 2 }
-                                }
-                            },
+                            // {
+                            //     $match: {
+                            //         status: { $ne: 2 }
+                            //     }
+                            // },
                             {
                                 $project: {
                                     _id: 1,
@@ -202,10 +200,18 @@ const store = {
                     }
                 },
                 {
-                    $unwind: "$storeData"
+                    $unwind: {
+                        path: "$storeData",
+                        preserveNullAndEmptyArrays: true
+                    }
                 },
                 {
                     $unwind: "$ProductLibraryData"
+                },
+                {
+                    $match: {
+                        "ProductLibraryData.title": { $regex: searchKey, $options: 'i' },
+                    }
                 },
 
                 {
@@ -213,19 +219,20 @@ const store = {
                         [sortColumn]: sortDirection === "asc" ? 1 : -1
                     }
                 },
+
                 {
                     $project: {
-                      _id:1,
-                      productLibraryTitle:"$ProductLibraryData.title",
-                      pushStatus:"$status",
-                      storeName:"$storeData.storeName",
-                      uploadDate:"$uploadDate"
+                        _id: 1,
+                        productLibraryTitle: "$ProductLibraryData.title",
+                        pushStatus: "$status",
+                        // storeName: "$storeData.storeName",
+                        storeName: 1,
+                        uploadDate: "$uploadDate",
+                        createdOn: "$createdOn"
                     }
                 }
 
             ]
-
-
 
             //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
             let { totalCount, aggregation } = await helpers.getCountAndPagination(ProductQueue, aggregate, pageIndex, pageSize)
@@ -235,7 +242,7 @@ const store = {
 
             const result = await ProductQueue.aggregate(aggregation);
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount }, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount }, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
@@ -609,6 +616,7 @@ const store = {
                     let obj = {
                         userId,
                         storeId,
+                        storeName: storeName,
                         productLibraryId,
                         pushedDate: helpers.getCurrentDate(),
                         createdOn: helpers.getCurrentDate()

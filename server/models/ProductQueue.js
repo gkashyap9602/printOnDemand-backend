@@ -13,17 +13,22 @@ var ProductQueue = new Schema({
         ref: "Store",
         index: true
     },
+    storeName: {
+        type: String,
+        ref: "Store",
+        index: true
+    },
     productLibraryId: {
         type: mongoose.Types.ObjectId,
         ref: "ProductLibrary",
         index: true
     },
 
-    productLibraryVarientIds: [{
-        type: mongoose.Types.ObjectId,
-        ref: "ProductLibraryVarient",
-        index: true
-    }],
+    // productLibraryVarientIds: [{
+    //     type: mongoose.Types.ObjectId,
+    //     ref: "ProductLibraryVarient",
+    //     index: true
+    // }],
 
     status: {
         type: Number,

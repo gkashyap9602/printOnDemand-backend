@@ -420,6 +420,11 @@ const productUtils = {
 
                     }
                 },
+                // {
+                //     $match: {
+                //         "Variable.value": { $regex: valueSearch, $options: 'i' },
+                //     }
+                // },
                 {
                     $lookup: {
                         from: "variableTypes",
@@ -467,6 +472,7 @@ const productUtils = {
                 }
             ]
 
+
             // if (valueSearch) {
             //     console.log("under value search");
 
@@ -481,7 +487,7 @@ const productUtils = {
 
             console.log(aggregate, "aggregateee");
 
-       
+
             // add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
             let { totalCount, aggregation } = await helpers.getCountAndPagination(Product, aggregate, page, pageSize)
             console.log(totalCount, "totalCounttotalCount");
