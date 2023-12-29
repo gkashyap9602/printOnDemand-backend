@@ -226,7 +226,8 @@ const store = {
                         productLibraryTitle: "$ProductLibraryData.title",
                         pushStatus: "$status",
                         // storeName: "$storeData.storeName",
-                        storeName: 1,
+                        storeName: "$storeDetails.storeName",
+                        shop: "$storeDetails.shop",
                         uploadDate: "$uploadDate",
                         createdOn: "$createdOn"
                     }
@@ -250,7 +251,7 @@ const store = {
         }
 
     },
-    addProductToShopify: async (data, userId) => {
+    addProductToStore: async (data, userId) => {
         try {
             let { productLibraryItems, storeId } = data
             console.log(data, "dataaa");
@@ -278,8 +279,6 @@ const store = {
             if (findProductLibraryIds?.data?.length !== productLibraryIds?.length) {
                 return helpers.showResponse(false, ResponseMessages?.product.invalid_product_library_id, {}, null, 400);
             }
-
-
 
             //lets find all product that is exist in queue
             let findQueue = await getDataArray(ProductQueue, { userId, storeId, productLibraryId: { $in: productLibraryIds } }, 'productLibraryId')
@@ -564,6 +563,382 @@ const store = {
 
             //Add all products to queue and return promise 
             let addToQueuePromises = result?.map((product, index) => {
+
+                //Shopify product payload 
+                let productData = {
+                    product: {
+                        title: product?.title,
+                        body_html: `<strong>${product?.description}</strong>`,
+                        vendor: storeName,
+                        product_type: product?.subCategoryName,
+                        status: "draft", //default status of a product is draft 
+                        images: product?.productLibraryImages,
+                        options: product?.optionsForVarient,
+                        variants: product?.variantDataForShopify
+                    }
+
+                }
+                // ends I
+
+
+                //add all productLibrary Products in a Products Queue for further operations 
+                let addToQueue = productQueue.add({ productData, endPointData, productLibraryId: product._id, userId },
+                    {
+                        delay: 10000, //queue process after 10 seconds delay 
+                        attempts: 1, //execute only one time
+                        removeOnComplete: true //remove queue  after complete 
+                    })
+                    .then((res) => {
+                        // console.log(res, "888responsee");
+                        return { success: true, message: "All Products Added To Queue" };
+                    })
+                    .catch((err) => {
+                        // console.log(err, "error");
+                        return { success: false, message: "Error While Products Adding To Queue" };
+
+                    })
+
+                return addToQueue
+
+            })
+            //ends
+
+            const responses = await Promise.all(addToQueuePromises);//resolve promise
+
+            // Check if all responses are successful
+            const allSuccessfull = responses.every(response => response.success);
+
+            if (allSuccessfull) {
+
+                //create queue data payload for queue collection model to save queue
+                let items = productLibraryIds?.map((productLibraryId) => {
+                    let obj = {
+                        userId,
+                        storeId,
+                        storeDetails: {
+                            storeName: storeName,
+                            shop: shop,
+                        },
+
+                        productLibraryId,
+                        pushedDate: helpers.getCurrentDate(),
+                        createdOn: helpers.getCurrentDate()
+                    }
+
+                    return obj
+
+                })
+                let insertQueue = await insertMany(ProductQueue, items)
+                // console.log(insertQueue, "insertQueue");
+
+                //if items insert in queue model successfully then return  success response
+                if (insertQueue.status) {
+                    return helpers.showResponse(true, ResponseMessages.product.add_to_store_sucess, { isPartialPush }, null, 200);
+                }
+
+                return helpers.showResponse(false, ResponseMessages.product.add_to_store_fail, {}, null, 400);
+            } else {
+                return helpers.showResponse(false, ResponseMessages.product.add_to_store_fail, {}, null, 400);
+            }
+
+        }
+        catch (err) {
+            // console.log(err, "errorrr");
+            return helpers.showResponse(false, err?.message, null, null, 400);
+        }
+    },
+
+    retryPushProductToStore: async (data, userId) => {
+        try {
+            let { pushProductQueueIds } = data
+            console.log(data, "dataaa");
+
+            //create a product queue
+            const productQueue = helpers.generateQueue('productQueue')
+
+            //check all product library exist or not 
+            const findPushProducts = await getDataArray(ProductQueue, { _id: { $in: pushProductQueueIds }, status: { $eq: 3 } })
+
+            console.log(findPushProducts, "findPushProducts");
+
+            if (findPushProducts?.data?.length !== pushProductQueueIds?.length) {
+                return helpers.showResponse(false, ResponseMessages?.product.invalid_productQueue_id, {}, null, 400);
+            }
+
+            let productLibraryIds = findPushProducts.data.map(({ productLibraryId }) => productLibraryId)
+            let storeIds = findPushProducts.data.map(({ storeId }) => storeId)
+
+            //check all product library exist or not 
+            const findProductLibraryIds = await getDataArray(ProductLibrary, { _id: { $in: productLibraryIds }, status: { $ne: 2 } })
+
+            console.log(findProductLibraryIds, "findProductLibraryIds");
+
+            if (findProductLibraryIds?.data?.length !== productLibraryIds?.length) {
+                return helpers.showResponse(false, "Invalid Product Id or one or more Product Has been Deleted", {}, null, 400);
+            }
+
+            // let isPartialPush = false
+
+            let findStoreIds = await getDataArray(Store, { _id: { $in: storeIds }, userId: userId })
+            console.log(findStoreIds, "findStoreIds");
+
+            if (!findStoreIds.status) {
+                return helpers.showResponse(false, "Store Not Exist or Deleted", null, null, 400);
+            }
+
+            console.log(productLibraryIds, "productLibraryIds after ");
+
+
+            // console.log(findStore, "findStore");
+            let { apiKey, shop, secret, storeVersion, storeName } = findStore?.data
+
+            let endPointData = {
+                apiKey,
+                shop,
+                secret,
+                storeVersion
+            }
+
+
+            let matchObj = {
+                userId: mongoose.Types.ObjectId(userId),
+                status: { $ne: 2 },
+                _id: { $in: productLibraryIds }, //match productsLibrary ids that is not present in the queue
+
+            }
+            console.log(matchObj, "matchObjj");
+
+            //aggregate on ProductLibrary collection
+            let result = await ProductLibrary.aggregate([
+                {
+                    $match: {
+                        ...matchObj
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'product',
+                        localField: 'productId',
+                        foreignField: '_id',
+                        as: 'productData',
+                        pipeline: [
+                            {
+                                $lookup: {
+                                    from: 'subCategory',
+                                    localField: 'subCategoryId',
+                                    foreignField: '_id',
+                                    as: 'subCategoryData',
+                                    pipeline: [
+                                        // {
+                                        //     $match: {
+                                        //         status: { $ne: 2 }
+                                        //     }
+
+                                        // },
+                                        {
+                                            $project: {
+                                                _id: 1,
+                                                name: 1
+                                            }
+                                        }
+                                    ]
+
+                                }
+                            },
+                            {
+                                $unwind: "$subCategoryData"
+                            },
+                            {
+                                $project: {
+                                    subCategoryData: 1,
+                                }
+                            }
+                        ]
+
+                    }
+                },
+                {
+                    $unwind: "$productData" //product is single document
+
+                },
+                //we add lookup for product library varient because it has product varient id for lookup 
+                {
+                    $lookup: {
+                        from: 'productLibraryVarient',
+                        localField: '_id',
+                        foreignField: 'productLibraryId',
+                        as: 'varientData', //it canbe multiple items product has multiple variants
+                        pipeline: [
+                            {
+                                $lookup: {
+                                    from: 'productVarient',
+                                    localField: 'productVarientId',
+                                    foreignField: '_id',
+                                    as: 'productVarientData', //product vaarient data should be single document because we are fetching one item with id 
+                                    pipeline: [
+                                        // {
+                                        //     $match: {
+                                        //         status: { $ne: 2 }
+                                        //     }
+                                        // },
+                                        {
+                                            $lookup: {
+                                                from: 'variableOptions',
+                                                localField: 'varientOptions.variableOptionId',
+                                                foreignField: '_id',
+                                                as: 'variableOptionData',// it should be array of objects because it canbe multiple
+                                                pipeline: [
+                                                    {
+                                                        $lookup: {
+                                                            from: 'variableTypes',
+                                                            localField: 'variableTypeId',
+                                                            foreignField: '_id',
+                                                            as: 'variableTypesData',
+
+                                                        }
+                                                    },
+                                                    {
+                                                        $unwind: {
+                                                            path: "$variableTypesData"
+                                                        }
+                                                    },
+                                                    {
+                                                        $project: {
+                                                            _id: 1,
+                                                            value: 1,
+                                                            variableTypeId: 1,
+                                                            typeName: '$variableTypesData.typeName'
+
+                                                        }
+
+                                                    }
+
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            $project: {
+                                                _id: 1,
+                                                productId: 1,
+                                                // price: 1,
+                                                productCode: 1,
+                                                // varientOptions: 1,
+                                                variableOptionData: 1
+                                            }
+                                        }
+
+                                    ]
+                                }
+                            },
+                            {
+                                $unwind: {
+                                    path: "$productVarientData"
+                                }
+                            },
+                            //here we create varient data and options for product add in shopify
+                            {
+                                $addFields: {
+                                    variant: {
+                                        option1: {
+                                            $reduce: {
+                                                input: "$productVarientData.variableOptionData",
+                                                initialValue: "",
+                                                in: {
+                                                    $concat: [
+                                                        "$$value",
+                                                        { $cond: [{ $eq: ["$$value", ""] }, "", ", "] },
+                                                        "$$this.value"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        price: "$price",
+                                        sku: "$productVarientData.productCode"
+                                    },
+                                    options: {
+                                        name: {
+                                            $reduce: {
+                                                input: "$productVarientData.variableOptionData",
+                                                initialValue: "",
+                                                in: {
+                                                    $concat: [
+                                                        "$$value",
+                                                        { $cond: [{ $eq: ["$$value", ""] }, "", ", "] },
+                                                        "$$this.typeName"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        position: 1
+                                    }
+                                }
+                            },
+                            //in varient data only project Variant Data And Options
+                            {
+                                $project: {
+                                    _id: 1,
+                                    productLibraryId: 1,
+                                    productVarientId: 1,
+                                    price: 1,
+                                    profit: 1,
+                                    //    productLibraryVarientImages:1,
+                                    status: 1,
+                                    // productVarientData: 1,
+                                    variant: 1,
+                                    options: 1
+
+
+                                }
+                            }
+                        ]
+
+                    }
+                },
+                //find unique name and return it for shopify payload
+                {
+                    $addFields: {
+                        optionsForVarient: {
+                            $map: {
+                                input: { $setUnion: "$varientData.options.name" },
+                                as: "name",
+                                in: { name: "$$name" }
+                            }
+                        },
+                        productLibraryImages: {
+                            $map: {
+                                input: "$productLibraryImages",
+                                as: "image",
+                                in: { src: { $concat: [consts.BITBUCKET_URL_DEV, "/", "$$image.imageUrl"] } }
+                            }
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        productId: 1,
+                        title: 1,
+                        description: 1,
+                        status: 1,
+                        addToStore: 1,
+                        productLibraryImages: 1,
+                        subCategoryName: "$productData.subCategoryData.name",
+                        // productData: 1,
+                        // varientData: 1, //variants canbe multiple 
+                        optionsForVarient: 1,
+                        variantDataForShopify: "$varientData.variant" // One Product Has Multiple variant
+                    }
+                }
+
+            ])
+            //ends of aggregation
+
+            //Add all products to queue and return promise 
+            let addToQueuePromises = result?.map((product, index) => {
+
+                let storeDetails = findPushProducts.data.filter(({ productLibraryId }) => product._id == productLibraryId)
+
+                console.log(storeDetails, "storeDetails");
 
                 //Shopify product payload 
                 let productData = {

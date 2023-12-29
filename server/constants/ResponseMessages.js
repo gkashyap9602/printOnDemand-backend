@@ -105,6 +105,7 @@ module.exports = {
         product_varient_save: "Product Varient Created Successfully",
         product_save_failed: "Error occured while adding new Product",
         invalid_product_id: "Invalid Product Id",
+        invalid_productQueue_id: "Invalid Product Queue Id",
         invalid_product_library_id: "Invalid Product Library Id",
         product_image_save_err: "Error while saving product image",
         product_image_saved: "Product Image Uploaded Successfully",

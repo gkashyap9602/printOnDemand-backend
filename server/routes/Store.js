@@ -13,7 +13,7 @@ router.post('/getAllStores', verifyTokenUser, validate(getAllStores), storeContr
 router.post('/updateStoreStatus', verifyTokenUser, validate(updateStoreStatus), storeController.updateStoreStatus);
 router.delete('/removeStore', verifyTokenUser, validate(removeStore), storeController.removeStore);
 
-router.post('/addProductToStore', verifyTokenUser, validate(addProductToStore), storeController.addProductToShopify);
+router.post('/addProductToStore', verifyTokenUser, validate(addProductToStore), storeController.addProductToStore);
 router.post('/getPushProductsToStore', verifyTokenUser, storeController.getPushProductsToStore);
 
 // Common Routes
