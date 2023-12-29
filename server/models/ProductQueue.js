@@ -39,14 +39,18 @@ var ProductQueue = new Schema({
         type: String,
         default: null,
     },
+    uploadDate: {
+        type: String,
+        default: null,
+    },
     createdOn: {
         type: String,
         default: null,
     },
-    updatedOn: {
-        type: String,
-        default: null,
-    },
+    // updatedOn: {
+    //     type: String,
+    //     default: null,
+    // },
 });
 
 

@@ -116,7 +116,7 @@ const store = {
 
     getPushProductsToStore: async (data, userId) => {
         try {
-            let { pageSize = 10, pageIndex = 1, sortDirection = "asc", sortColumn = "   ", storeIds = [],
+            let { pageSize = 10, pageIndex = 1, sortDirection = "asc", sortColumn = "uploadDate", storeIds = [],
                 searchKey = '', status, isFromShop, createdFrom, createdTill } = data;
 
             pageSize = Number(pageSize)
@@ -151,22 +151,77 @@ const store = {
                         ...matchObj,
                     }
                 },
-                // {
-                //     $lookup: {
-                //         from: "productVarient",
-                //         localField: "_id",
-                //         foreignField: "productId",
-                //         as: "ProductVarient",
+                {
+                    $lookup: {
+                        from: "productLibrary",
+                        localField: "productLibraryId",
+                        foreignField: "_id",
+                        as: "ProductLibraryData",
+                        pipeline: [
+                            {
+                                $match: {
+                                    status: { $ne: 2 }
+                                }
+                            },
+                            {
+                                $project: {
+                                    _id: 1,
+                                    productId: 1,
+                                    title: 1,
+                                    description: 1,
+                                    status: 1
+                                }
+                            }
+                        ]
 
-                //     }
-                // },
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "store",
+                        localField: "storeId",
+                        foreignField: "_id",
+                        as: "storeData",
+                        pipeline: [
+                            {
+                                $match: {
+                                    status: { $ne: 2 }
+                                }
+                            },
+                            {
+                                $project: {
+                                    _id: 1,
+                                    storeType: 1,
+                                    storeId: 1,
+                                    storeName: 1,
+                                    status: 1
+                                }
+                            }
+                        ]
 
+                    }
+                },
+                {
+                    $unwind: "$storeData"
+                },
+                {
+                    $unwind: "$ProductLibraryData"
+                },
 
                 {
                     $sort: {
                         [sortColumn]: sortDirection === "asc" ? 1 : -1
                     }
                 },
+                {
+                    $project: {
+                      _id:1,
+                      productLibraryTitle:"$ProductLibraryData.title",
+                      pushStatus:"$status",
+                      storeName:"$storeData.storeName",
+                      uploadDate:"$uploadDate"
+                    }
+                }
 
             ]
 

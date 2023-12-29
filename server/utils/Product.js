@@ -383,7 +383,7 @@ const productUtils = {
 
             }
             if (titleSearch) {
-                matchObj.title = { $regex: titleSearch, $options: 'i' }
+                matchObj.title = { $regex: searchKey, $options: 'i' }
             }
 
             if (materialFilter && materialFilter !== 'null') {
@@ -467,17 +467,17 @@ const productUtils = {
                 }
             ]
 
-            if (valueSearch) {
-                console.log("under value search");
+            // if (valueSearch) {
+            //     console.log("under value search");
 
-                let match = {
-                    $match: {
-                        "Variable.value": { $regex: valueSearch, $options: 'i' },
-                    }
-                }
-                aggregate.push(match)
+            //     let match = {
+            //         $match: {
+            //             "Variable.value": { $regex: valueSearch, $options: 'i' },
+            //         }
+            //     }
+            //     aggregate.push(match)
 
-            }
+            // }
 
             console.log(aggregate, "aggregateee");
 

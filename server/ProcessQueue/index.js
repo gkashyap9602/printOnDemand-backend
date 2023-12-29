@@ -18,7 +18,7 @@ productQueue.process(async (job, done) => {
         // console.log(addToStoreApi, "addToStore222");
         if (addToStoreApi.status) {
 
-            let update = await ProductQueue.updateOne({ productLibraryId }, { $set: { status: 1 } })
+            let update = await ProductQueue.updateOne({ productLibraryId }, { $set: { status: 1, uploadDate: helpers.getCurrentDate() } })
             console.log(update, "update");
 
             // let updatePushStatus = await updateSingleData(ProductQueue, { pushStatus: 1 }, {productLibraryId})
@@ -27,7 +27,7 @@ productQueue.process(async (job, done) => {
 
             done()
         } else {
-            let update = await ProductQueue.updateOne({ productLibraryId }, { $set: { status: 3 } })
+            let update = await ProductQueue.updateOne({ productLibraryId }, { $set: { status: 3, uploadDate: helpers.getCurrentDate() } })
             done()
         }
         // return helpers.showResponse(false, addToStoreApi.data, addToStoreApi.message ? productData : ResponseMessages?.product.add_to_store_fail, null, 400);
