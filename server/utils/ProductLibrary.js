@@ -342,6 +342,15 @@ const productLibrary = {
                 },
                 {
                     $lookup: {
+                        from: 'storeProducts',
+                        localField: '_id',
+                        foreignField: 'productLibraryId',
+                        as: 'storeProductsData',
+
+                    }
+                },
+                {
+                    $lookup: {
                         from: 'productLibraryVarient',
                         localField: '_id',
                         foreignField: 'productLibraryId',

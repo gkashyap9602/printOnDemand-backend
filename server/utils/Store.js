@@ -288,7 +288,7 @@ const store = {
             console.log(productLibraryIds, "ffff");
 
             if (findProductLibraryIds?.data?.length !== productLibraryIds?.length) {
-                return helpers.showResponse(false, ResponseMessages?.product.invalid_product_library_id, {}, null, 400);
+                return helpers.showResponse(false, `${ResponseMessages?.product.invalid_product_library_id} or one or more product has been deleted`, {}, null, 400);
             }
 
             //lets find all product that is exist in queue
@@ -298,7 +298,6 @@ const store = {
             // let findQueueFilter = findQueue.data.filter((itm) => itm.productLibraryId)
 
             console.log(findQueue, "findQueeuee");
-
 
             //if products exist in queue atleast 1 document  
             if (findQueue?.status && findQueue?.data?.length > 0) {
@@ -329,13 +328,17 @@ const store = {
 
 
             // console.log(findStore, "findStore");
-            let { apiKey, shop, secret, storeVersion, storeName } = findStore?.data
+            let { apiKey, shop, secret, storeVersion, storeName, _id, storeType } = findStore?.data
 
+            //pass data to queue
             let endPointData = {
                 apiKey,
                 shop,
                 secret,
-                storeVersion
+                storeVersion,
+                _id,
+                storeName,
+                storeType
             }
 
 
@@ -594,7 +597,7 @@ const store = {
                 //add all productLibrary Products in a Products Queue for further operations 
                 let addToQueue = productQueue.add({ productData, endPointData, productLibraryId: product._id, userId },
                     {
-                        delay: 180000, //queue process after 3 minutes delay 
+                        delay: 60000, //queue process after 3 minutes delay 
                         attempts: 1, //execute only one time
                         removeOnComplete: true //remove queue  after complete 
                     })
@@ -959,13 +962,17 @@ const store = {
                 console.log(storeData, "storeData");
 
                 //retrieve important feilds from shop or store to pass in a endpoint of queue shopify api 
-                let { apiKey, shop, secret, storeVersion, storeName } = storeData[0]
+                let { apiKey, shop, secret, storeVersion, storeName, _id, storeType } = storeData[0]
 
+                //pass data to queue
                 let endPointData = {
                     apiKey,
                     shop,
                     secret,
-                    storeVersion
+                    storeVersion,
+                    _id,
+                    storeName,
+                    storeType
                 }
 
 
@@ -989,7 +996,7 @@ const store = {
                 //add all productLibrary Products in a Products Queue for further operations 
                 let addToQueue = productQueue.add({ productData, endPointData, productLibraryId: product._id, userId },
                     {
-                        delay: 180000, //queue process after 3 minutes delay 
+                        delay: 60000, //queue process after 3 minutes delay 
                         attempts: 1, //execute only one time
                         removeOnComplete: true //remove queue  after complete 
                     })
