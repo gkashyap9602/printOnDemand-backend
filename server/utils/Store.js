@@ -584,7 +584,7 @@ const store = {
                 //add all productLibrary Products in a Products Queue for further operations 
                 let addToQueue = productQueue.add({ productData, endPointData, productLibraryId: product._id, userId },
                     {
-                        delay: 10000, //queue process after 10 seconds delay 
+                        delay: 90000, //queue process after 10 seconds delay 
                         attempts: 1, //execute only one time
                         removeOnComplete: true //remove queue  after complete 
                     })
@@ -979,7 +979,7 @@ const store = {
                 //add all productLibrary Products in a Products Queue for further operations 
                 let addToQueue = productQueue.add({ productData, endPointData, productLibraryId: product._id, userId },
                     {
-                        delay: 10000, //queue process after 10 seconds delay 
+                        delay: 90000, //queue process after 10 seconds delay 
                         attempts: 1, //execute only one time
                         removeOnComplete: true //remove queue  after complete 
                     })
