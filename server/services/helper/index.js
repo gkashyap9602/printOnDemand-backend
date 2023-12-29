@@ -39,8 +39,16 @@ const generateQueue = (queueName) => {
 const getCountAndPagination = async (model, aggregate, pageIndex, pageSize) => {
 
     //this aggregation is for aggregate Model and add pagination at the end of the query aggregation
-    let aggregation = aggregate
+    let aggregation = [...aggregate]
 
+    //This Aggregation is for totalCount of aggregation query 
+    let pagePipelineCount = [...aggregate]
+
+    pagePipelineCount.push({ $count: 'totalEntries' })
+    let countResult = await model.aggregate(pagePipelineCount)
+    let totalCount = countResult?.[0]?.totalEntries || 0;
+
+    //add pagination at the end of the queuries
     aggregation?.push(
         {
             $skip: (pageIndex - 1) * pageSize
@@ -51,14 +59,6 @@ const getCountAndPagination = async (model, aggregate, pageIndex, pageSize) => {
     );
     //ends 
 
-    //This Aggregation is for totalCount of aggregation query 
-    let pagePipelineCount = [...aggregate];
-
-    pagePipelineCount.push({ $count: 'totalEntries' })
-
-    let countResult = await model.aggregate(pagePipelineCount)
-
-    let totalCount = countResult?.[0]?.totalEntries || 0;
 
     return { totalCount, aggregation }
 }

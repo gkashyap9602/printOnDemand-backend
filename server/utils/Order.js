@@ -1007,7 +1007,7 @@ const orderUtil = {
 
             const response = await updateSingleData(Cart, updateDataObj, matchObj)
 
-            console.log(response,"responsee");
+            console.log(response, "responsee");
             if (!response.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.update_failed, {}, null, 400);
             }
