@@ -657,12 +657,18 @@ const store = {
             const productQueue = helpers.generateQueue('productQueue')
 
             //check all product library exist or not 
-            const findPushProducts = await getDataArray(ProductQueue, { _id: { $in: pushProductQueueIds }, status: { $eq: 3 } })
+            const findPushProducts = await getDataArray(ProductQueue, { _id: { $in: pushProductQueueIds } })
 
             console.log(findPushProducts, "findPushProducts");
+            let allPushStatusFail = findPushProducts?.data?.every(data => data?.status == 3) //3 for failed status
+
+            console.log(allPushStatusFail, "allPushStatusFail");
+            if (!allPushStatusFail) {
+                return helpers.showResponse(false, ResponseMessages.product.push_status_should_be_failed, null, null, 400);
+            }
 
             if (findPushProducts?.data?.length !== pushProductQueueIds?.length) {
-                return helpers.showResponse(false, ResponseMessages?.product.invalid_productQueue_id, {}, null, 400);
+                return helpers.showResponse(false, `${ResponseMessages?.product.invalid_productQueue_id}`, {}, null, 400);
             }
 
             let productLibraryIds = findPushProducts.data.map(({ productLibraryId }) => productLibraryId)
@@ -927,7 +933,8 @@ const store = {
             let addToQueuePromises = result?.map((product, index) => {
 
                 //get single push product from all document with match product library id 
-                let pushProduct = findPushProducts.data.filter(({ productLibraryId }) => product._id == productLibraryId)
+                console.log(product._id, "productid");
+                let pushProduct = findPushProducts.data?.filter(({ productLibraryId }) => productLibraryId.toString() == product._id.toString())
 
                 console.log(pushProduct[0], "pushProduct");
 
@@ -1001,10 +1008,10 @@ const store = {
             if (allSuccessfull) {
 
                 //create bulk operation for update 
-                const bulkOperations = findPushProducts?.data?.map(({ _id }) => ({
+                const bulkOperations = findPushProducts?.data?.map(({ _id, retryCount }) => ({
                     updateOne: {
                         filter: { _id: _id, userId: userId },
-                        update: { $set: { status: 2 } }  //update status 2 for processing
+                        update: { $set: { status: 2, retryCount: retryCount + 1, pushedDate: helpers.getCurrentDate() } }  //update status 2 for processing
                     }
                 }));
 
@@ -1013,7 +1020,7 @@ const store = {
 
                 //if items insert in queue model successfully then return  success response
                 if (result.modifiedCount > 0) {
-                    return helpers.showResponse(true, ResponseMessages.product.retry_push_to_store_sucess, null, 200);
+                    return helpers.showResponse(true, ResponseMessages.product.retry_push_to_store_sucess, {}, null, 200);
                 }
 
                 return helpers.showResponse(false, ResponseMessages.product.retry_push_to_store_fail, {}, null, 400);

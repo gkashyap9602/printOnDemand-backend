@@ -39,5 +39,11 @@ module.exports.removeStore = {
     })
 
 };
+module.exports.retryProductPush = {
+    body: joi.object({
+        pushProductQueueIds: joi.array().required(),
+    })
+
+};
 
 

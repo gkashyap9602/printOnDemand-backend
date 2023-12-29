@@ -119,6 +119,7 @@ module.exports = {
         add_to_store_sucess: "All Products Added To Queue",
         add_to_store_fail: "Error While adding products to queue",
         retry_push_to_store_sucess: "Retry Push To Store Sucessfully",
+        push_status_should_be_failed: "Push Product You Provided Status Should Be Failed",
         retry_push_to_store_fail: "Retry Push To Store Failed",
 
     },
