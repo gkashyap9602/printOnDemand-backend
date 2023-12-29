@@ -689,16 +689,6 @@ const store = {
             console.log(productLibraryIds, "productLibraryIds after ");
 
 
-            // console.log(findStore, "findStore");
-            let { apiKey, shop, secret, storeVersion, storeName } = findStore?.data
-
-            let endPointData = {
-                apiKey,
-                shop,
-                secret,
-                storeVersion
-            }
-
 
             let matchObj = {
                 userId: mongoose.Types.ObjectId(userId),
@@ -936,9 +926,31 @@ const store = {
             //Add all products to queue and return promise 
             let addToQueuePromises = result?.map((product, index) => {
 
-                let storeDetails = findPushProducts.data.filter(({ productLibraryId }) => product._id == productLibraryId)
+                //get single push product from all document with match product library id 
+                let pushProduct = findPushProducts.data.filter(({ productLibraryId }) => product._id == productLibraryId)
 
-                console.log(storeDetails, "storeDetails");
+                console.log(pushProduct[0], "pushProduct");
+
+                //after finding push product get unique shopName to get store api key and other details 
+                let shopName = pushProduct[0]?.storeDetails?.shop
+
+                console.log(shopName, "shopName");
+
+                //filter store data and get particuler store details like apikey shop name etc 
+                let storeData = findStoreIds?.data?.filter(({ shop }) => shop == shopName)
+
+                console.log(storeData, "storeData");
+
+                //retrieve important feilds from shop or store to pass in a endpoint of queue shopify api 
+                let { apiKey, shop, secret, storeVersion, storeName } = storeData[0]
+
+                let endPointData = {
+                    apiKey,
+                    shop,
+                    secret,
+                    storeVersion
+                }
+
 
                 //Shopify product payload 
                 let productData = {
@@ -966,6 +978,7 @@ const store = {
                     })
                     .then((res) => {
                         // console.log(res, "888responsee");
+
                         return { success: true, message: "All Products Added To Queue" };
                     })
                     .catch((err) => {
@@ -981,36 +994,31 @@ const store = {
 
             const responses = await Promise.all(addToQueuePromises);//resolve promise
 
+
             // Check if all responses are successful
             const allSuccessfull = responses.every(response => response.success);
 
             if (allSuccessfull) {
 
-                //create queue data payload for queue collection model to save queue
-                let items = productLibraryIds?.map((productLibraryId) => {
-                    let obj = {
-                        userId,
-                        storeId,
-                        storeName: storeName,
-                        productLibraryId,
-                        pushedDate: helpers.getCurrentDate(),
-                        createdOn: helpers.getCurrentDate()
+                //create bulk operation for update 
+                const bulkOperations = findPushProducts?.data?.map(({ _id }) => ({
+                    updateOne: {
+                        filter: { _id: _id, userId: userId },
+                        update: { $set: { status: 2 } }  //update status 2 for processing
                     }
+                }));
 
-                    return obj
-
-                })
-                let insertQueue = await insertMany(ProductQueue, items)
-                // console.log(insertQueue, "insertQueue");
+                //update items in bulk
+                const result = await ProductQueue.bulkWrite(bulkOperations);
 
                 //if items insert in queue model successfully then return  success response
-                if (insertQueue.status) {
-                    return helpers.showResponse(true, ResponseMessages.product.add_to_store_sucess, { isPartialPush }, null, 200);
+                if (result.modifiedCount > 0) {
+                    return helpers.showResponse(true, ResponseMessages.product.retry_push_to_store_sucess, null, 200);
                 }
 
-                return helpers.showResponse(false, ResponseMessages.product.add_to_store_fail, {}, null, 400);
+                return helpers.showResponse(false, ResponseMessages.product.retry_push_to_store_fail, {}, null, 400);
             } else {
-                return helpers.showResponse(false, ResponseMessages.product.add_to_store_fail, {}, null, 400);
+                return helpers.showResponse(false, ResponseMessages.product.retry_push_to_store_fail, {}, null, 400);
             }
 
         }
@@ -1019,6 +1027,7 @@ const store = {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
     },
+    //ends
     // addProductToShopify: async (data, userId) => {
     //     try {
     //         let { productLibraryItems, storeId } = data

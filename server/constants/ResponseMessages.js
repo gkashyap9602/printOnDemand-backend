@@ -118,6 +118,8 @@ module.exports = {
         active_product: "There Are Active Products in Subcategory Delete Product First",
         add_to_store_sucess: "All Products Added To Queue",
         add_to_store_fail: "Error While adding products to queue",
+        retry_push_to_store_sucess: "Retry Push To Store Sucessfully",
+        retry_push_to_store_fail: "Retry Push To Store Failed",
 
     },
     category: {
