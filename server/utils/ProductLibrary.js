@@ -116,7 +116,8 @@ const productLibrary = {
                 retailPrice: Number(price) * 2,
                 createdOn: helpers.getCurrentDate(),
                 productLibraryImages: productlibImages,
-                productLibraryVarients
+                varientCount: productLibraryVarients?.length, //count of total varients
+                // productLibraryVarients
             }
             const prodRef = new ProductLibrary(obj)
             const result = await postData(prodRef)
@@ -126,7 +127,7 @@ const productLibrary = {
                 return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
             }
             // if (productLibraryVarients) {
-            productLibraryVarients = productLibraryVarients.map((value) => {
+            productLibraryVarients = productLibraryVarients?.map((value) => {
                 let obj = {
                     productLibraryId: result?.data?._id,
                     productVarientId: value.productVarientId,
@@ -236,6 +237,7 @@ const productLibrary = {
                 status: 2
             }
 
+            //if both ids are present then delete vareint of product library  else whole productLibrary with varients
             if (productLibraryId && productLibraryVariantId) {
 
                 let matchObjVarient = {
@@ -244,18 +246,29 @@ const productLibrary = {
                     status: { $ne: 2 }
                 }
 
+
+                //find library varient exist or not 
+                const findProductLibrary = await getSingleData(ProductLibrary, { _id: productLibraryId, status: { $ne: 2 } })
+                if (!findProductLibrary.status) {
+                    return helpers.showResponse(false, ResponseMessages?.product.invalid_product_library_id, {}, null, 400);
+                }
+
+                //find library varient exist or not 
                 const findVarient = await getSingleData(ProductLibraryVarient, matchObjVarient)
                 if (!findVarient.status) {
                     return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
                 }
 
+                //soft delete the varient  with match object 
                 const resultVarient = await updateSingleData(ProductLibraryVarient, updateData, matchObjVarient)
                 if (!resultVarient.status) {
                     return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
                 }
 
+                //check how many varient are present in product library if zero vareints then delete product library as well as varient
                 let findAllVarient = await getCount(ProductLibraryVarient, { productLibraryId, status: { $ne: 2 } })
                 if (findAllVarient.data === 0) {
+                    //here we delete the whole product library 
                     const deleteProductLibrary = await updateSingleData(ProductLibrary, updateData, { _id: productLibraryId })
                     if (!deleteProductLibrary.status) {
                         return helpers.showResponse(false, ResponseMessages?.common.delete_failed, {}, null, 400);
@@ -263,6 +276,8 @@ const productLibrary = {
                     return helpers.showResponse(true, "Product Library Deleted", {}, null, 200);
 
                 }
+                const updateVarientCount = await updateSingleData(ProductLibrary, { varientCount: findProductLibrary?.data?.varientCount + 1 }, { _id: productLibraryId })
+
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
 
             } else if (productLibraryId) {
@@ -370,8 +385,6 @@ const productLibrary = {
                     }
                 },
             ]
-
-
 
 
             if (materialFilter) {

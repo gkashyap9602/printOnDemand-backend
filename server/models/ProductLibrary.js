@@ -37,6 +37,10 @@ var ProductLibrary = new Schema({
         type: String,
         default: null
     },
+    varientCount: {
+        type: Number,
+        default: 0
+    },
     productLibraryImages: [{
         _id: {
             type: mongoose.Types.ObjectId,

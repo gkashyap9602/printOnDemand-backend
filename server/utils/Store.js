@@ -239,11 +239,22 @@ const store = {
             let { totalCount, aggregation } = await helpers.getCountAndPagination(ProductQueue, aggregate, pageIndex, pageSize)
             console.log(totalCount, "totalCounttotalCount");
 
+            let completed = await getCount(ProductQueue, { status: 1 })
+            let failed = await getCount(ProductQueue, { status: 3 })
+            let processing = await getCount(ProductQueue, { status: 2 })
+            let total = await getCount(ProductQueue, {})
 
+
+            let statusSummary = {
+                completed: completed?.data,
+                failed: failed?.data,
+                processing: processing?.data,
+                totalUploads: total?.data
+            }
 
             const result = await ProductQueue.aggregate(aggregation);
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount }, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount, statusSummary }, null, 200);
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
@@ -578,13 +589,12 @@ const store = {
                     }
 
                 }
-                // ends I
-
+                // ends 
 
                 //add all productLibrary Products in a Products Queue for further operations 
                 let addToQueue = productQueue.add({ productData, endPointData, productLibraryId: product._id, userId },
                     {
-                        delay: 90000, //queue process after 10 seconds delay 
+                        delay: 180000, //queue process after 3 minutes delay 
                         attempts: 1, //execute only one time
                         removeOnComplete: true //remove queue  after complete 
                     })
@@ -979,7 +989,7 @@ const store = {
                 //add all productLibrary Products in a Products Queue for further operations 
                 let addToQueue = productQueue.add({ productData, endPointData, productLibraryId: product._id, userId },
                     {
-                        delay: 90000, //queue process after 10 seconds delay 
+                        delay: 180000, //queue process after 3 minutes delay 
                         attempts: 1, //execute only one time
                         removeOnComplete: true //remove queue  after complete 
                     })
