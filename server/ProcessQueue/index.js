@@ -28,7 +28,7 @@ productQueue.process(async (job, done) => {
             let updateAddToStore = await ProductLibrary.updateOne({ _id: productLibraryId }, { $set: { addToStore: 1, updatedOn: helpers.getCurrentDate() } })
             //save store Products when product uploaded to store 
             if (update.modifiedCount > 0) {
-
+ //
                 //create store product save payload 
                 let obj = {
                     userId,
