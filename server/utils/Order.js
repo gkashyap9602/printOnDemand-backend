@@ -130,7 +130,6 @@ const orderUtil = {
                 return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
             }
 
-
             // const findCart = await getDataArray(Cart, { userId: customerId }, "", null, null, null)
             // if (!findCart.status) {
             //     return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
