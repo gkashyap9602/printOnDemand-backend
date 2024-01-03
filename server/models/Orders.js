@@ -12,59 +12,30 @@ var Orders = new Schema({
         ref: "ShipMethod",
         index: true
     },
+    bulkImportRequestId: {
+        type: mongoose.Types.ObjectId,
+        ref: "BulkImportRequest",
+        Comment: "excel file id ",
+        index: true
+    },
+    // customerOrderId: {
+    //     type: String,
+    //     index: true,
+    //     Comment: "OrderId from Excel Bulk import"
+    // },
+    // shippedOn: {
+    //     type: String,
+    //     default: null
+    // },
+    // isProcessing: {
+    //     type: Boolean,
+    //     default: false
+    // },
     shippingAccountNumber: {
         type: String,
-        default: ''
+        default: '',
+        Comment: "Third Party Shipping Accounts number"
     },
-    orderItems: [{
-        productLibraryVarientId: {
-            type: mongoose.Types.ObjectId,
-            ref: "ProductLibraryVarient",
-            index: true
-        },
-        hsCode: {
-            type: String,
-            default: null
-        },
-        declaredValue: {
-            type: String,
-            default: null
-        },
-        quantity: {
-            type: Number,
-        },
-        productCode: {
-            type: String,
-        },
-        productTitle: {
-            type: String,
-        },
-        productImages: {
-            type: String,
-        },
-        orderedPrice: {
-            type: String,
-        },
-        productVarientOptions: [
-            {
-                productVariableOptionId: {
-                    type: mongoose.Types.ObjectId,
-                    ref: "variableOptions",
-                    index: true
-                },
-                optionValue: {
-                    type: String,
-                },
-                productVariableTypeId: {
-                    type: mongoose.Types.ObjectId,
-                    ref: "variableTypes",
-                    index: true
-                },
-                typeName: {
-                    type: String,
-                }
-            }],
-    }],
     displayId: {
         type: String,
         index: true,
@@ -81,7 +52,8 @@ var Orders = new Schema({
     },
     source: {
         type: Number,
-        default: null
+        default: 1,
+        Comment: "default is 1 for order created by user library and 5 for order by excel upload"
     },
     receipt: {
         type: String,
@@ -91,16 +63,13 @@ var Orders = new Schema({
         type: String,
         default: null
     },
-    // hsCode: {
-    //     type: String,
-    //     default: null
-    // },
     preship: {
         type: String,
         default: null
     },
     amount: {
         type: Number,
+        Comment: "total amount of a order"
     },
     status: {
         type: Number,
@@ -206,7 +175,6 @@ var Orders = new Schema({
         // },
 
     },
-
     orderType: {
         type: Number,
         default: 1,

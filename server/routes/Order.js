@@ -11,7 +11,7 @@ router.post('/addToCart', verifyTokenUser, validate(addToCart), orderController.
 router.post('/placeOrder', verifyTokenUser, validate(placeOrder), orderController.placeOrder);
 router.post('/updateOrderStatus', verifyTokenBoth, validate(updateOrderStatus), orderController.updateOrderStatus);
 router.post('/updateOrder', verifyTokenBoth, validate(updateOrder), orderController.updateOrder);
-router.post('/ordersBulkImport', verifyTokenBoth, addToMulter.single('bulkImport'), orderController.ordersBulkImport);
+router.post('/bulkImportOrders', verifyTokenBoth, addToMulter.single('bulkImport'), orderController.bulkImportOrders);
 
 router.post('/getAllOrders', verifyTokenUser, orderController.getAllOrders);
 router.get('/getOrderDetails', verifyTokenUser, orderController.getOrderDetails);

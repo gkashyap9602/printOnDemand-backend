@@ -88,6 +88,12 @@ const store = {
 
         let { storeId, status } = data
 
+        let findStore = await getSingleData(Store, { _id: storeId, userId })
+
+        if (!findStore.status) {
+            return helpers.showResponse(false, ResponseMessages?.store.store_not_exist, null, null, 203);
+        }
+
         console.log(data, "dataaaa");
 
         let updateData = {
@@ -1033,10 +1039,11 @@ const store = {
                 }));
 
                 //update items in bulk
-                const result = await ProductQueue.bulkWrite(bulkOperations);
+                // const result = await ProductQueue.bulkWrite(bulkOperations);
+                let result = await bulkOperationQuery(ProductQueue, bulkOperations)
 
                 //if items insert in queue model successfully then return  success response
-                if (result.modifiedCount > 0) {
+                if (result.status) {
                     return helpers.showResponse(true, ResponseMessages.product.retry_push_to_store_sucess, {}, null, 200);
                 }
 

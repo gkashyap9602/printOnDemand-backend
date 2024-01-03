@@ -33,9 +33,9 @@ var ProductLibrary = new Schema({
 
     },
 
-    designDetails: {
-        type: String,
-        default: null
+    designType: {
+        type: Number,
+        default: 0
     },
     varientCount: {
         type: Number,
