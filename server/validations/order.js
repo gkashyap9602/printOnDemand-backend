@@ -84,7 +84,7 @@ module.exports.getAllOrders = {
 module.exports.placeOrder = {
     body: joi.object({
         totalAmount: joi.number().required(),
-        orderItems: joi.array().required(),
+        orderItems: joi.array(),
         // customerId: joi.string().length(24).message("invalid id").required(),
         orderType: joi.number().valid(1, 2).required(),//1 for live order 2 for testOrder
         cartItems: joi.array().allow(null),

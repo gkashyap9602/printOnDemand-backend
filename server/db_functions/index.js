@@ -96,7 +96,7 @@ module.export = updateData = (Model, DataObject, _id) => {
                 return resolve(response);
             }
 
-            console.log(updatedData, "updatedDataaw");
+            // console.log(updatedData, "updatedDataaw");
             let response = helpers.showResponse(true, 'success', updatedData);
             return resolve(response);
         });
@@ -122,8 +122,8 @@ module.export = removeItemFromArray = (Model, mainIdObj, arrayKey, itemId) => {
 module.export = updateSingleData = (Model, DataObject, matchObj) => {
     return new Promise((resolve, reject) => {
         Model.findOneAndUpdate(matchObj, { $set: DataObject }, { new: true }, (err, updatedData) => {
-            console.log(updatedData, "updatedData");
-            console.log(err, "errerrerr");
+            // console.log(updatedData, "updatedData");
+            // console.log(err, "errerrerr");
             if (err) {
                 let response = helpers.showResponse(false, err);
                 return resolve(response);
@@ -150,6 +150,30 @@ module.export = updateByQuery = (Model, DataObject, filter) => {
         });
     });
 }
+
+module.exports = bulkOperationQuery = async (Model, bulkOperations) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            //execute bulk operation 
+            const result = await Model.bulkWrite(bulkOperations);
+
+            // console.log(result, "resultresult");
+
+            if (result?.ok == 1) {
+                let response = helpers.showResponse(true, 'success', result);
+                return resolve(response);
+            }
+
+            let response = helpers.showResponse(false, 'failed', result);
+            return resolve(response);
+        } catch (err) {
+            let response = helpers.showResponse(false, err);
+            reject(response);
+        }
+    });
+};
+
 
 module.export = deleteData = (Model, query) => {
     return new Promise((resolve, reject) => {
