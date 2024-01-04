@@ -25,6 +25,21 @@ module.exports.getAllStores = {
     })
 
 };
+module.exports.getPushProduct = {
+    body: joi.object({
+        pageIndex: joi.number().required(),
+        pageSize: joi.number().required(),
+        sortDirection: joi.string(),
+        sortColumn: joi.string(),
+        storeIds: joi.array(),
+        searchKey: joi.string().allow(''),
+        status: joi.number().allow(''),
+        createdFrom: joi.string().allow(''),
+        createdTill: joi.string().allow(''),
+        isFromShop: joi.boolean().allow('')
+    })
+
+};
 module.exports.updateStoreStatus = {
     body: joi.object({
         storeId: joi.string().required(),

@@ -656,7 +656,7 @@ const orderUtil = {
                 return obj
             })
             //uu
-
+            console.log(findProductCodes.data, "ddddaaaa");
             console.log(finalOrderItems, "finalOrderItems");
 
             let totalAmount = finalOrderItems.map((itm) => itm?.orderedPrice * itm?.quantity).reduce((acc, curr) => acc + curr).toFixed(2)
@@ -1558,7 +1558,7 @@ const orderUtil = {
                     preserveNullAndEmptyArrays: true
                 }
             },
-
+            //fetching order items data
             {
                 $lookup: {
                     from: 'orderItems',
@@ -1721,35 +1721,27 @@ const orderUtil = {
                     ]//orderitem pipeline ends
                 }
 
-            },
+            },//ehehehehewait
+
             {
                 $addFields: {
-                    images: {
-                        $cond: {
-                            if: { $eq: ["$source", 1] },
-                            then: { $arrayElemAt: ["$orderItems.userProductLibraryData.productImages.imageUrl", 0] },
-                            else: { $arrayElemAt: ["$orderItems.adminProductData.productImages.imageUrl", 0] },
+                    orderItems: {
+                        $map: {
+                            input: "$orderItems",
+                            as: "orderItem",
+                            in: {
+                                $mergeObjects: [
+                                    "$$orderItem",
+                                    {
+                                        // Create productTitle and productImages from adminProductData for each orderItem
+                                        "productTitle": "$$orderItem.adminProductData.productTitle",
+                                        "productImages": { $arrayElemAt: ["$$orderItem.adminProductData.productImages.imageUrl", 0] },
+                                        // Add other fields as needed
+                                    }
+                                ]
+                            }
                         }
                     }
-                }
-            },
-            {
-                $unwind: {
-                    path: '$images',
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-
-            {  //add product Title and Images to orderItems if source 1 for user library order  5 is for excel upload
-                $addFields: {
-                    "orderItems.productTitle": {
-                        $cond: {
-                            if: { $eq: ["$source", 1] },
-                            then: { $arrayElemAt: ["$orderItems.userProductLibraryData.productTitle", 0] },
-                            else: { $arrayElemAt: ["$orderItems.adminProductData.productTitle", 0] },
-                        }
-                    },
-                    "orderItems.productImages": "$images"
                 }
             },
 
@@ -1832,7 +1824,7 @@ const orderUtil = {
                     preserveNullAndEmptyArrays: true
                 }
             },
-
+            //fetching order items data
             {
                 $lookup: {
                     from: 'orderItems',
@@ -1995,35 +1987,27 @@ const orderUtil = {
                     ]//orderitem pipeline ends
                 }
 
-            },
+            },//ehehehehewait
+
             {
                 $addFields: {
-                    images: {
-                        $cond: {
-                            if: { $eq: ["$source", 1] },
-                            then: { $arrayElemAt: ["$orderItems.userProductLibraryData.productImages.imageUrl", 0] },
-                            else: { $arrayElemAt: ["$orderItems.adminProductData.productImages.imageUrl", 0] },
+                    orderItems: {
+                        $map: {
+                            input: "$orderItems",
+                            as: "orderItem",
+                            in: {
+                                $mergeObjects: [
+                                    "$$orderItem",
+                                    {
+                                        // Create productTitle and productImages from adminProductData for each orderItem
+                                        "productTitle": "$$orderItem.adminProductData.productTitle",
+                                        "productImages": { $arrayElemAt: ["$$orderItem.adminProductData.productImages.imageUrl", 0] },
+                                        // Add other fields as needed
+                                    }
+                                ]
+                            }
                         }
                     }
-                }
-            },
-            {
-                $unwind: {
-                    path: '$images',
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-
-            {  //add product Title and Images to orderItems if source 1 for user library order  5 is for excel upload
-                $addFields: {
-                    "orderItems.productTitle": {
-                        $cond: {
-                            if: { $eq: ["$source", 1] },
-                            then: { $arrayElemAt: ["$orderItems.userProductLibraryData.productTitle", 0] },
-                            else: { $arrayElemAt: ["$orderItems.adminProductData.productTitle", 0] },
-                        }
-                    },
-                    "orderItems.productImages": "$images"
                 }
             },
 
