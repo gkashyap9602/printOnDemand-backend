@@ -15,8 +15,9 @@ var Orders = new Schema({
     bulkImportRequestId: {
         type: mongoose.Types.ObjectId,
         ref: "BulkImportRequest",
-        Comment: "excel file id ",
-        index: true
+        Comment: "excel file id it can be null in case of order by user ",
+        index: true,
+        default: null
     },
     // customerOrderId: {
     //     type: String,
