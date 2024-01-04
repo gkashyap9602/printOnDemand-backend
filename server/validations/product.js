@@ -24,7 +24,7 @@ module.exports.updateProduct = {
         title: joi.string().required(),
         longDescription: joi.string().required(),
         careInstructions: joi.string(),
-        productionDuration: joi.string(),
+        productionDuration: joi.any(),
         shortDescription: joi.string(),
         construction: joi.string(),
         features: joi.string(),
