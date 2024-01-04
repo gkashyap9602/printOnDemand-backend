@@ -1811,7 +1811,7 @@ const orderUtil = {
                                 preserveNullAndEmptyArrays: true
                             }
                         },
-                         //lookup for varient options fetching
+                        //lookup for varient options fetching
                         {
                             $lookup: {
                                 from: "productVarient",
@@ -1894,6 +1894,23 @@ const orderUtil = {
                 }
 
             },
+            {
+                $addFields: {
+                    images: {
+                        $cond: {
+                            if: { $eq: ["$source", 1] },
+                            then: { $arrayElemAt: ["$orderItems.userProductLibraryData.productImages.imageUrl", 0] },
+                            else: { $arrayElemAt: ["$orderItems.adminProductData.productImages.imageUrl", 0] },
+                        }
+                    }
+                }
+            },
+            {
+                $unwind: {
+                    path: '$images',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
 
             {  //add product Title and Images to orderItems if source 1 for user library order  5 is for excel upload
                 $addFields: {
@@ -1904,15 +1921,10 @@ const orderUtil = {
                             else: { $arrayElemAt: ["$orderItems.adminProductData.productTitle", 0] },
                         }
                     },
-                    "orderItems.productImages": {
-                        $cond: {
-                            if: { $eq: ["$source", 1] },
-                            then: { $arrayElemAt: ["$orderItems.userProductLibraryData.productImages", 0] },
-                            else: { $arrayElemAt: ["$orderItems.adminProductData.productImages", 0] },
-                        }
-                    }
+                    "orderItems.productImages": "$images"
                 }
             },
+
             {
                 $unset: "orderItems.userProductLibraryData" //remove extra feilds from product Items
             },
