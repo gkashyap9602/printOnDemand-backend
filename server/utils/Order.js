@@ -1440,71 +1440,6 @@ const orderUtil = {
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, { orders: result, totalCount }, null, 200);
     },
-    getOrderDetails: async (data, userId) => {
-        let { orderId } = data
-
-        const result = await Order.aggregate([
-            {
-                $match: {
-                    customerId: mongoose.Types.ObjectId(userId),
-                    _id: mongoose.Types.ObjectId(orderId),
-                }
-            },
-            {
-                $lookup: {
-                    from: 'shipMethod',
-                    localField: 'shippingMethodId',
-                    foreignField: '_id',
-                    as: 'ShipMethodData',
-                }
-
-            },
-            {
-                $unwind: "$ShipMethodData"
-            },
-            {
-                $lookup: {
-                    from: 'users',
-                    localField: 'customerId',
-                    foreignField: '_id',
-                    as: 'userData',
-                    pipeline: [
-                        {
-                            $project: {
-                                firstName: 1,
-                                lastName: 1,
-                                payTraceId: 1,
-                                email: 1,
-                                phoneNumber: 1
-                                // traceId:1,
-
-                            }
-                        }
-                    ]
-                }
-            },
-            {
-                $unwind: "$userData"
-            },
-            {
-                $addFields: {
-                    customerName: "$userData.firstName",
-                    customerEmail: "$userData.email",
-                    phoneNumber: "$userData.phoneNumber",
-                    shipMethodName: "$ShipMethodData.name"
-                }
-            },
-            {
-                $project: {
-                    userData: 0, // Exclude the userData array from the result
-                    ShipMethodData: 0 // Exclude the ShipMethodData array from the result
-                }
-            }
-        ]
-        );
-
-        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result[0] : result, null, 200);
-    },
     // getOrderDetails: async (data, userId) => {
     //     let { orderId } = data
 
@@ -1525,11 +1460,7 @@ const orderUtil = {
 
     //         },
     //         {
-    //             $unwind: {
-    //                 path: "$ShipMethodData",
-    //                 preserveNullAndEmptyArrays: true
-    //             },
-
+    //             $unwind: "$ShipMethodData"
     //         },
     //         {
     //             $lookup: {
@@ -1553,103 +1484,8 @@ const orderUtil = {
     //             }
     //         },
     //         {
-    //             $unwind: {
-    //                 path: "$userData",
-    //                 preserveNullAndEmptyArrays: true
-    //             }
+    //             $unwind: "$userData"
     //         },
-    //         {
-    //             $lookup: {
-    //                 from: 'orderItems',
-    //                 localField: '_id',
-    //                 foreignField: 'orderId',
-    //                 as: 'orderItems',
-    //                 pipeline: [
-    //                     {
-    //                         $lookup: {
-    //                             from: "productVarient",
-    //                             localField: "productCode",
-    //                             foreignField: "productCode",
-    //                             as: "productVarientData",
-    //                             pipeline: [
-    //                                 {
-    //                                     $match: {
-    //                                         status: { $ne: 2 }
-    //                                     }
-    //                                 }, //what if product soft deleted
-    //                                 {
-    //                                     $lookup: {
-    //                                         from: "variableOptions",
-    //                                         localField: "varientOptions.variableOptionId",
-    //                                         foreignField: "_id",
-    //                                         as: "variableOptionData",
-    //                                         pipeline: [
-    //                                             {
-    //                                                 $lookup: {
-    //                                                     from: "variableTypes",
-    //                                                     localField: "variableTypeId",
-    //                                                     foreignField: "_id",
-    //                                                     as: "variableTypeData",
-    //                                                 }
-    //                                             },
-    //                                             {
-    //                                                 $unwind: "$variableTypeData"
-    //                                             },
-    //                                             {
-
-    //                                                 $project: {
-    //                                                     productVariableOptionId: "$_id",
-    //                                                     productVariableTypeId: "$variableTypeId",
-    //                                                     optionValue: "$value",
-    //                                                     // Add other fields you want to include in the result
-    //                                                     typeName: '$variableTypeData.typeName' // Example of creating a new field
-    //                                                 }
-
-    //                                             }
-
-    //                                         ]
-    //                                     }
-    //                                 },
-    //                                 {
-    //                                     $unwind: {
-    //                                         path: "$variableOptionData"
-    //                                     }
-    //                                 },
-    //                                 {
-    //                                     $project: {
-    //                                         _id: 1,
-    //                                         // costPrice: "$price",
-    //                                         // productCode: 1,
-    //                                         variableOptionData: 1
-    //                                         // varientOptions: 1,
-    //                                     }
-    //                                 }
-    //                             ]
-    //                         }
-    //                     },
-    //                     {
-    //                         $addFields: {
-    //                             productVarientOptions: "$productVarientData.variableOptionData",
-    //                             productTitle:"dummy",
-    //                             productImages:"dummyImage"
-    //                         }
-    //                     },
-    //                     //
-    //                     {
-    //                         $project: {
-    //                             productVarientData: 0,
-    //                             // costPrice: "$price",
-    //                             // productCode: 1,
-    //                             // variableOptionData: 1
-    //                             // varientOptions: 1,
-    //                         }
-    //                     }
-
-
-    //                 ]//orderitem pipeline ends
-    //             }
-
-    //         },////hwhwhwhhwhw
     //         {
     //             $addFields: {
     //                 customerName: "$userData.firstName",
@@ -1669,6 +1505,237 @@ const orderUtil = {
 
     //     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result[0] : result, null, 200);
     // },
+    getOrderDetails: async (data, userId) => {
+        let { orderId } = data
+
+        const result = await Order.aggregate([
+            {
+                $match: {
+                    customerId: mongoose.Types.ObjectId(userId),
+                    _id: mongoose.Types.ObjectId(orderId),
+                }
+            },
+            {
+                $lookup: {
+                    from: 'shipMethod',
+                    localField: 'shippingMethodId',
+                    foreignField: '_id',
+                    as: 'ShipMethodData',
+                }
+
+            },
+            {
+                $unwind: {
+                    path: "$ShipMethodData",
+                    preserveNullAndEmptyArrays: true
+                },
+
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'customerId',
+                    foreignField: '_id',
+                    as: 'userData',
+                    pipeline: [
+                        {
+                            $project: {
+                                firstName: 1,
+                                lastName: 1,
+                                payTraceId: 1,
+                                email: 1,
+                                phoneNumber: 1
+                                // traceId:1,
+
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $unwind: {
+                    path: "$userData",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'orderItems',
+                    localField: '_id',
+                    foreignField: 'orderId',
+                    as: 'orderItems',
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "productLibraryVarient",
+                                localField: 'productLibraryVarientId',
+                                foreignField: '_id',
+                                as: 'userProductLibraryData',
+                                pipeline: [
+                                    {
+                                        $lookup: {
+                                            from: "productLibrary",
+                                            localField: 'productLibraryId',
+                                            foreignField: '_id',
+                                            as: 'productConditionData',
+                                        }
+                                    },
+                                    {
+                                        $unwind: {
+                                            path: "$productConditionData",
+                                            preserveNullAndEmptyArrays: true
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "productVarient",
+                                localField: 'productVarientId',
+                                foreignField: '_id',
+                                as: 'adminProductData',
+                                pipeline: [
+                                    {
+                                        $lookup: {
+                                            from: "product",
+                                            localField: 'productId',
+                                            foreignField: '_id',
+                                            as: 'productConditionData',
+
+                                        }
+                                    },
+                                    {
+                                        $unwind: {
+                                            path: "$productConditionData",
+                                            preserveNullAndEmptyArrays: true
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {//create new variable that matches source condition 1 means order from user Library else admin side order  product 
+                            $addFields: {
+                                productData: {
+                                    $cond: {
+                                        if: { $eq: ["$source", 1] },
+                                        then: "$userProductLibraryData",
+                                        else: "$adminProductData"
+                                    }
+                                }
+                            }
+                        },
+                        { //unwind product data because product is one and variants are multiple
+                            $unwind: {
+                                path: "$productData",
+                                preserveNullAndEmptyArrays: true
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "productVarient",
+                                localField: "productCode",
+                                foreignField: "productCode",
+                                as: "productVarientData",
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            status: { $ne: 2 }
+                                        }
+                                    }, //what if product soft deleted
+                                    {
+                                        $lookup: {
+                                            from: "variableOptions",
+                                            localField: "varientOptions.variableOptionId",
+                                            foreignField: "_id",
+                                            as: "variableOptionData",
+                                            pipeline: [
+                                                {
+                                                    $lookup: {
+                                                        from: "variableTypes",
+                                                        localField: "variableTypeId",
+                                                        foreignField: "_id",
+                                                        as: "variableTypeData",
+                                                    }
+                                                },
+                                                {
+                                                    $unwind: "$variableTypeData"
+                                                },
+                                                {
+
+                                                    $project: {
+                                                        productVariableOptionId: "$_id",
+                                                        productVariableTypeId: "$variableTypeId",
+                                                        optionValue: "$value",
+                                                        // Add other fields you want to include in the result
+                                                        typeName: '$variableTypeData.typeName' // Example of creating a new field
+                                                    }
+
+                                                }
+
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        $unwind: {
+                                            path: "$variableOptionData"
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            _id: 1,
+                                            // costPrice: "$price",
+                                            // productCode: 1,
+                                            variableOptionData: 1
+                                            // varientOptions: 1,
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {//create a new variable for title and images of product  
+                            $addFields: {
+                                productVarientOptions: "$productVarientData.variableOptionData",
+                                productTitle: "$productData.productConditionData.title",
+                                productImages: {
+                                    $arrayElemAt: ["$productData.productConditionData.productImages.imageUrl", 0]
+                                }
+                                // productImages: "$productData.productConditionData.productImages"
+                            }
+                        },
+                        {
+                            $project: {
+                                productData: 0,
+                                userProductLibraryData: 0,
+                                adminProductData: 0,
+                                productVarientData: 0,
+                            }
+                        }
+
+
+                    ]//orderitem pipeline ends
+                }
+
+            },////hwhwhwhhwhw
+            {
+                $addFields: {
+                    customerName: "$userData.firstName",
+                    customerEmail: "$userData.email",
+                    phoneNumber: "$userData.phoneNumber",
+                    shipMethodName: "$ShipMethodData.name"
+                }
+            },
+            {
+                $project: {
+                    userData: 0, // Exclude the userData array from the result
+                    ShipMethodData: 0 // Exclude the ShipMethodData array from the result
+                }
+            }
+        ]
+        );
+
+        return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result[0] : result, null, 200);
+    },
     getUserOrderDetails: async (data, userId) => {
         let { orderId } = data
 
