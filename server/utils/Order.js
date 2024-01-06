@@ -1266,8 +1266,7 @@ const orderUtil = {
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result[0] : result, null, 200);
     },
-
-    getUserOrderDetails: async (data, userId) => {
+    getUserOrderDetails: async (data) => {
         let { orderId } = data
 
         const result = await Order.aggregate([
@@ -1457,6 +1456,7 @@ const orderUtil = {
                                             // costPrice: "$price",
                                             // productCode: 1,
                                             variableOptionData: 1
+                                            // varientOptions: 1,
                                         }
                                     }
                                 ]
@@ -1478,7 +1478,6 @@ const orderUtil = {
                 }
 
             },
-
             {
                 $addFields: {
                     orderItems: {
@@ -1489,10 +1488,22 @@ const orderUtil = {
                                 $mergeObjects: [
                                     "$$orderItem",
                                     {
+
                                         // Create productTitle and productImages from adminProductData for each orderItem
-                                        "productTitle": "$$orderItem.adminProductData.productTitle",
-                                        "productImages": { $arrayElemAt: ["$$orderItem.adminProductData.productImages.imageUrl", 0] },
-                                        // Add other fields as needed
+                                        "productTitle": {
+                                            $cond: {
+                                                if: { $eq: ["$source", 1] },
+                                                then: "$$orderItem.userProductLibraryData.productTitle",
+                                                else: "$$orderItem.adminProductData.productTitle",
+                                            }
+                                        },
+                                        "productImages": {
+                                            $cond: {
+                                                if: { $eq: ["$source", 1] },
+                                                then: { $arrayElemAt: ["$$orderItem.userProductLibraryData.productImages.imageUrl", 0] },
+                                                else: { $arrayElemAt: ["$$orderItem.adminProductData.productImages.imageUrl", 0] },
+                                            }
+                                        }
                                     }
                                 ]
                             }
@@ -1500,7 +1511,6 @@ const orderUtil = {
                     }
                 }
             },
-
             {
                 $unset: "orderItems.userProductLibraryData" //remove extra feilds from product Items
             },
@@ -1526,6 +1536,8 @@ const orderUtil = {
 
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result[0] : result, null, 200);
     },
+
+
     getCartItems: async (data, userId) => {
         let { pageIndex = 1, pageSize = 5 } = data
         pageIndex = Number(pageIndex)
