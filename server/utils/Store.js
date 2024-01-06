@@ -288,13 +288,14 @@ const store = {
                 }
             }
             //ends
-            let { apiKey, shop, secret, storeName } = findStore?.data
+            let { apiKey, shop, secret, storeName,storeVersion } = findStore?.data
 
             //pass data to queue
             let endPointData = {
                 apiKey,
                 shop,
                 secret,
+                storeVersion
             }
             let matchObj = {
                 userId: mongoose.Types.ObjectId(userId),
@@ -500,7 +501,7 @@ const store = {
                             $map: {
                                 input: "$productLibraryImages",
                                 as: "image",
-                                in: { src: { $concat: [consts.BITBUCKET_URL_DEV, "/", "$$image.imageUrl"] } }
+                                in: { src: { $concat: [consts.BITBUCKET_URL, "/", "$$image.imageUrl"] } }
                             }
                         }
                     }
@@ -841,7 +842,7 @@ const store = {
                             $map: {
                                 input: "$productLibraryImages",
                                 as: "image",
-                                in: { src: { $concat: [consts.BITBUCKET_URL_DEV, "/", "$$image.imageUrl"] } }
+                                in: { src: { $concat: [consts.BITBUCKET_URL, "/", "$$image.imageUrl"] } }
                             }
                         }
                     }
@@ -879,13 +880,14 @@ const store = {
                 console.log(storeData, "storeData");
 
                 //retrieve important feilds from shop or store to pass in a endpoint of queue shopify api 
-                let { apiKey, shop, secret, storeName } = storeData
+                let { apiKey, shop, secret, storeName ,storeVersion} = storeData
 
                 //pass data to queue
                 let endPointData = {
                     apiKey,
                     shop,
                     secret,
+                    storeVersion
                 }
 
                 //Shopify product payload 

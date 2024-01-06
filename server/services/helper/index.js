@@ -746,7 +746,7 @@ const addProductToShopify = async (endpointData, productData,) => {
     try {
         let { apiKey, shop, secret, storeVersion } = endpointData
 
-        console.log(productData, "ProductData");
+        console.log(productData, "ProductData===");
 
         let addToStoreUrl = `https://${apiKey}:${secret}@${shop}/${consts.SHOPIFY_ROUTES.SHOPIFY_CREATE_PRODUCT(storeVersion)}`
 
@@ -759,7 +759,7 @@ const addProductToShopify = async (endpointData, productData,) => {
             },
         })
 
-        // console.log(result, "result==Store side");
+        console.log(result, "result==Storeside");
         // console.log(result?.data, "result Dataa");
         console.log(result?.status, "result status");
 
@@ -771,7 +771,7 @@ const addProductToShopify = async (endpointData, productData,) => {
         }
 
     } catch (error) {
-        // console.log(error?.response, "error.response");
+        console.log(error, "errorResponse");
         // console.log(error?.response?.data, "error.responsedata");
 
         if (error?.response?.data?.errors) {

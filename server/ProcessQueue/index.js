@@ -13,6 +13,8 @@ productQueue.process(async (job, done) => {
 
         //endPointdata has store details 
         let addToStoreApi = await helpers.addProductToShopify(endPointData, productData)
+
+        // console.log(addToStoreApi, "addToStoreApi");
         if (addToStoreApi.status) {
 
             let update = await ProductQueue.updateOne({ productLibraryId }, { $set: { status: 1, uploadDate: helpers.getCurrentDate() } })
