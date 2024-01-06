@@ -21,24 +21,6 @@ var StoreProducts = new Schema({
         type: Number,
         index: true
     },
-    // storeDetails: {
-    //     storeName: {
-    //         type: String,
-    //         ref: 'Store',
-    //         default: null
-    //     },
-    //     shop: {
-    //         type: String,
-    //         ref: 'Store',
-    //         default: null
-    //     },
-    //     storeType: {
-    //         type: Number,
-    //         ref: 'Store',
-    //         default: null
-    //     }
-    // },
-
     isEnabled: {
         type: Boolean,
         default: false,

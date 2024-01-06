@@ -288,7 +288,7 @@ const store = {
                 }
             }
             //ends
-            let { apiKey, shop, secret, storeName,storeVersion } = findStore?.data
+            let { apiKey, shop, secret, storeName, storeVersion } = findStore?.data
 
             //pass data to queue
             let endPointData = {
@@ -880,7 +880,7 @@ const store = {
                 console.log(storeData, "storeData");
 
                 //retrieve important feilds from shop or store to pass in a endpoint of queue shopify api 
-                let { apiKey, shop, secret, storeName ,storeVersion} = storeData
+                let { apiKey, shop, secret, storeName, storeVersion } = storeData
 
                 //pass data to queue
                 let endPointData = {

@@ -283,8 +283,8 @@ const productLibrary = {
             page = Number(page)
 
             let searchTerms
-            let titleSearch
-            let valueSearch
+            let titleSearch = ''
+            let valueSearch = ''  //default value is blank string
 
             if (searchKey) {
                 searchTerms = searchKey.split(' ');
@@ -304,12 +304,28 @@ const productLibrary = {
                 matchObj.title = { $regex: titleSearch, $options: 'i' }
             }
 
-            console.log(matchObj, "matchObj");
+            if (materialFilter) {
+
+                if (typeof materialFilter == 'string') {
+                    materialFilter = JSON.parse(materialFilter)
+                }
+                materialFilter = materialFilter.map((id) => new ObjectId(id))
+
+            }
 
             let aggregate = [
                 {
                     $match: {
                         ...matchObj,
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'product',
+                        localField: 'productId',
+                        foreignField: '_id',
+                        as: 'productData',
+
                     }
                 },
                 {
@@ -351,32 +367,95 @@ const productLibrary = {
                         from: 'productLibraryVarient',
                         localField: '_id',
                         foreignField: 'productLibraryId',
-                        as: 'varientData',
-
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'productVarient',
-                        localField: 'varientData.productVarientId',
-                        foreignField: '_id',
-                        as: 'productVarientData',
+                        as: 'varientData', //it canbe multiple items product has multiple variants
+                        //this pipiline is for searching 
                         pipeline: [
                             {
-                                $match: {
-                                    status: { $ne: 2 }
+                                $lookup: {
+                                    from: 'productVarient',
+                                    localField: 'productVarientId',
+                                    foreignField: '_id',
+                                    as: 'productVarientData', //product vaarient data should be single document because we are fetching one item with id 
+                                    pipeline: [
+                                        {
+                                            $match: {
+                                                status: { $ne: 2 }
+                                            }
+                                        },
+                                        {
+                                            $lookup: {
+                                                from: 'variableOptions',
+                                                localField: 'varientOptions.variableOptionId',
+                                                foreignField: '_id',
+                                                as: 'variableOptionData',// it should be array of objects because it canbe multiple
+                                                pipeline: [
+                                                    // {
+                                                    //     $match: {
+                                                    //         "value": { $regex: valueSearch, $options: 'i' },
+                                                    //     }
+                                                    // },
+                                                    {
+                                                        $lookup: {
+                                                            from: 'variableTypes',
+                                                            localField: 'variableTypeId',
+                                                            foreignField: '_id',
+                                                            as: 'variableTypesData',
+
+                                                        }
+                                                    },
+                                                    {
+                                                        $unwind: {
+                                                            path: "$variableTypesData"
+                                                        }
+                                                    },
+                                                    {
+                                                        $project: {
+                                                            _id: 1,
+                                                            value: 1,
+                                                            variableTypeId: 1,
+                                                            typeName: '$variableTypesData.typeName'
+
+                                                        }
+
+                                                    }
+
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            $project: {
+                                                _id: 1,
+                                                productId: 1,
+                                                // price: 1,
+                                                productCode: 1,
+                                                variableOptionData: 1
+                                            }
+                                        }
+
+                                    ]
                                 }
                             },
+                            {
+                                $unwind: {
+                                    path: "$productVarientData"
+                                }
+                            },
+                            {
+                                $project: {
+                                    _id: 1,
+                                    price: 1,
+                                    variableOptionData: "$productVarientData.variableOptionData"
+                                }
+                            }
+
 
                         ]
                     }
                 },
                 {
-                    $lookup: {
-                        from: 'variableOptions',
-                        localField: 'productVarientData.varientOptions.variableOptionId',
-                        foreignField: '_id',
-                        as: 'variableOptionData',
+                    $match: {
+                        "varientData.variableOptionData.value": { $regex: valueSearch, $options: 'i' },
+                        "productData.materialId": { $in: materialFilter }
                     }
                 },
                 {
@@ -390,50 +469,14 @@ const productLibrary = {
                         [sortColumn]: sortDirection === "asc" ? 1 : -1
                     }
                 },
-            ]
+                {
+                    $project: {
+                        varientData: 0,
+                        productData: 0
 
-
-            if (materialFilter) {
-
-                if (typeof materialFilter == 'string') {
-                    materialFilter = JSON.parse(materialFilter)
-                }
-
-                materialFilter = materialFilter.map((id) => new ObjectId(id))
-
-                console.log(materialFilter, "materialFilter after");
-                //add aggregation for material filter match 
-                aggregate.push(
-                    {
-                        $lookup: {
-                            from: 'product',
-                            localField: 'productId',
-                            foreignField: '_id',
-                            as: 'productData',
-
-                        }
-                    },
-                    {
-                        $match: {
-                            "productData.materialId": { $in: materialFilter }
-                        }
-                    },
-                )
-
-            }
-            if (valueSearch) {
-                //search in vareint option value deep search 
-                console.log(valueSearch, "valueSearch value search");
-
-                let match = {
-                    $match: {
-                        "variableOptionData.value": { $regex: valueSearch, $options: 'i' },
                     }
-                }
-
-                aggregate.push(match)
-
-            }
+                },
+            ]
 
             //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
             let { totalCount, aggregation } = await helpers.getCountAndPagination(ProductLibrary, aggregate, page, pageSize)

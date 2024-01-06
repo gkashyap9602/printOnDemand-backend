@@ -857,7 +857,7 @@ const adminUtils = {
 
             //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
             let { totalCount, aggregation } = await helpers.getCountAndPagination(Users, aggregate, pageIndex, pageSize)
-            
+
             //finally aggregate on above pipeline in Users collection
             const result = await Users.aggregate(aggregation)
 
@@ -1013,12 +1013,16 @@ const adminUtils = {
     },
     getNotifications: async (data) => {
         try {
-            let { type, title, pageIndex = 1, pageSize = 10 } = data
+            let { type, pageIndex = 1, pageSize = 10 } = data
             pageIndex = Number(pageIndex)
             pageSize = Number(pageSize)
 
             let matchObj = {
                 status: { $ne: 2 }
+            }
+
+            if (type) {
+                matchObj.type = type
             }
 
             let aggregationPipeline = [
@@ -1066,29 +1070,12 @@ const adminUtils = {
                 }
             ]
 
-            if (type) {
-                aggregationPipeline.push(
-                    {
-                        $match: {
-                            type: type,
-                        },
-                    }
-                );
-                matchObj.type = type
-            }
+            // add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
+            let { totalCount, aggregation } = await helpers.getCountAndPagination(Notification, aggregationPipeline, pageIndex, pageSize)
 
-            aggregationPipeline.push(
-                {
-                    $skip: (pageIndex - 1) * pageSize // Skip records based on the page number
-                },
-                {
-                    $limit: pageSize // Limit the number of records per page
-                },
-            )
-            let totalCount = await getCount(Notification, matchObj)
-            const result = await Notification.aggregate(aggregationPipeline)
+            const result = await Notification.aggregate(aggregation)
 
-            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount: totalCount.data }, null, 200);
+            return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount }, null, 200);
 
         }
         catch (err) {

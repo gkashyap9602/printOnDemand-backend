@@ -615,18 +615,6 @@ const orderUtil = {
             orderType = Number(orderType)
             matchObj.orderType = orderType
         }
-        let searchObj = {}
-        if (searchKey) {
-            searchKey = searchKey.toString()
-            searchObj = {
-                $or: [
-                    { displayId: { $regex: searchKey, $options: 'i' } },
-                    { mwwOrderId: { $regex: searchKey, $options: 'i' } },
-                    // { "userData.firstName": { $regex: searchKey, $options: 'i' } }
-                ]
-            }
-
-        }
 
         if (createdFrom && createdTill) {
             matchObj.orderDate = { $gte: createdFrom, $lte: createdTill }
@@ -636,8 +624,6 @@ const orderUtil = {
             {
                 $match: {
                     ...matchObj,
-                    ...searchObj
-
                 }
             },
             {
@@ -667,19 +653,11 @@ const orderUtil = {
                     foreignField: '_id',
                     as: 'userData',
                     pipeline: [
-                        // {
-                        //     $match: {
-
-                        //         // $or: [{ firstName: { $regex: searchKey, $options: 'i' } }]
-                        //         firstName: { $regex: searchKey, $options: 'i'}
-                        //     }
-                        // },
                         {
                             $project: {
                                 firstName: 1,
                                 lastName: 1,
                                 payTraceId: 1,
-                                // traceId:1,
 
                             }
                         }
@@ -692,12 +670,16 @@ const orderUtil = {
                     preserveNullAndEmptyArrays: true
                 }
             },
-            //regex on name
-            // {
-            //     $match: {
-            //         $or: [{ "userData.firstName": { $regex: searchKey, $options: 'i' } }]
-            //     }
-            // },
+            //regex 
+            {
+                $match: {
+                    $or: [
+                        { displayId: { $regex: searchKey, $options: 'i' } },
+                        { mwwOrderId: { $regex: searchKey, $options: 'i' } },
+                        { "userData.firstName": { $regex: searchKey, $options: 'i' } }
+                    ]
+                }
+            },
             {
                 $lookup: {
                     from: 'orderItems',
@@ -909,17 +891,7 @@ const orderUtil = {
             orderType = Number(orderType)
             matchObj.orderType = orderType
         }
-        let searchObj = {}
-        if (searchKey) {
-            searchKey = searchKey.toString()
-            searchObj = {
-                $or: [
-                    { displayId: { $regex: searchKey, $options: 'i' } },
-                    { mwwOrderId: { $regex: searchKey, $options: 'i' } },
-                ]
-            }
 
-        }
 
         if (createdFrom && createdTill) {
             matchObj.orderDate = { $gte: createdFrom, $lte: createdTill }
@@ -957,31 +929,32 @@ const orderUtil = {
                     foreignField: '_id',
                     as: 'userData',
                     pipeline: [
-                        // {
-                        //     $match: {
-                        //         $or: [{ firstName: { $regex: searchKey, $options: 'i' } }]
-                        //     }
-                        // },
                         {
                             $project: {
                                 firstName: 1,
                                 lastName: 1,
                                 payTraceId: 1,
-                                // traceId:1,
-
                             }
                         }
                     ]
                 }
             },
             {
-                $unwind: "$userData"
+                $unwind: {
+                    path: "$userData",
+                    preserveNullAndEmptyArrays: true
+                }
             },
-            // {
-            //     $match: {
-            //         $or: [{ "userData.firstName": { $regex: searchKey, $options: 'i' } }]
-            //     }
-            // },
+            //regex 
+            {
+                $match: {
+                    $or: [
+                        { displayId: { $regex: searchKey, $options: 'i' } },
+                        { mwwOrderId: { $regex: searchKey, $options: 'i' } },
+                        { "userData.firstName": { $regex: searchKey, $options: 'i' } }
+                    ]
+                }
+            },
             {
                 $addFields: {
                     productNames: "$orderItems.productTitle"

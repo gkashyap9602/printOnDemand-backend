@@ -43,7 +43,7 @@ const productUtils = {
             if (findMaterials?.data?.length !== materialIds?.length) {
                 return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
             }
-       
+
             let obj = {
                 careInstructions,
                 longDescription,
@@ -341,8 +341,8 @@ const productUtils = {
             page = Number(page)
 
             let searchTerms
-            let titleSearch
-            let valueSearch
+            let titleSearch = ''
+            let valueSearch = ''
 
             if (searchKey) {
                 searchKey = searchKey.trim()
@@ -352,15 +352,13 @@ const productUtils = {
 
             }
 
-            console.log(titleSearch, "titleSearch ");
-            console.log(valueSearch, "valueSearch");
             let matchObj = {
                 subCategoryId: { $in: [id] },
                 status: { $ne: 2 },
 
             }
             if (titleSearch) {
-                matchObj.title = { $regex: searchKey, $options: 'i' }
+                matchObj.title = { $regex: titleSearch, $options: 'i' }
             }
 
             if (materialFilter && materialFilter !== 'null') {
@@ -394,29 +392,17 @@ const productUtils = {
 
                     }
                 },
-                // {
-                //     $match: {
-                //         "Variable.value": { $regex: valueSearch, $options: 'i' },
-                //     }
-                // },
                 {
-                    $lookup: {
-                        from: "variableTypes",
-                        localField: "Variable.variableTypeId",
-                        foreignField: "_id",
-                        as: "VariableTypes",
+                    $match: {
+                        "Variable.value": { $regex: valueSearch, $options: 'i' },
                     }
                 },
-
                 {
                     $addFields: {
                         priceStartsFrom: { $min: "$ProductVarient.price" },
 
                     }
                 },
-                // {
-                //     $unwind: "$Variable" // Unwind the "Variable" array
-                // },
                 {
                     $sort: {
                         [sortColumn]: sortDirection === "asc" ? 1 : -1
@@ -437,26 +423,11 @@ const productUtils = {
                         title: 1,
                         variantCount: 1,
                         priceStartsFrom: 1,
-                        Variable: 1,
-                        VariableTypes: 1,
-
+                        Variable: 0,
 
                     }
                 }
             ]
-
-
-            // if (valueSearch) {
-            //     console.log("under value search");
-
-            //     let match = {
-            //         $match: {
-            //             "Variable.value": { $regex: valueSearch, $options: 'i' },
-            //         }
-            //     }
-            //     aggregate.push(match)
-
-            // }
 
             // add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
             let { totalCount, aggregation } = await helpers.getCountAndPagination(Product, aggregate, page, pageSize)
@@ -467,7 +438,6 @@ const productUtils = {
         }
         catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
-
         }
 
     },
