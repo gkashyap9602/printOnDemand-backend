@@ -22,6 +22,7 @@ const orderUtil = {
         try {
             let { cartItems } = data
 
+            //check user exist or not 
             let findUser = await getSingleData(Users, { _id: userId }, 'status')
 
             if (!findUser.status) {
@@ -49,7 +50,6 @@ const orderUtil = {
                     let quantity = Number(find.data.quantity) + 1
                     item.quantity = quantity
                     updateItems.push(item)
-
                     //if cart item not already exist push into  new ItemmArry
                 } else {
                     newItems.push(item)
@@ -74,7 +74,6 @@ const orderUtil = {
                     return helpers.showResponse(false, ResponseMessages.order.addToCart_failed, null, null, 400);
 
                 }
-
             }
             //if item not already exist in cart then insert items in database 
             if (newItems.length > 0) {
@@ -82,11 +81,8 @@ const orderUtil = {
                 if (!response.status) {
                     return helpers.showResponse(false, ResponseMessages.order.addToCart_failed, null, null, 400);
                 }
-
                 return helpers.showResponse(true, ResponseMessages.common.added_success, null, null, 200);
-
             }
-
         } catch (error) {
             return helpers.showResponse(false, error?.message, null, null, 400);
 
@@ -106,7 +102,6 @@ const orderUtil = {
             if (!allCartItems.status || allCartItems?.data?.length === 0) {
                 return helpers.showResponse(false, "Cart Is Empty", {}, null, 400);
             }
-
             //order payload
             let obj = {
                 customerId: customerId,
@@ -123,7 +118,6 @@ const orderUtil = {
                 shippingAccountNumber,
                 orderDate: helpers.getCurrentDate()
             }
-
             let orderRef = new Order(obj)
 
             let response = await postData(orderRef);
