@@ -318,7 +318,32 @@ const productLibrary = {
                         localField: '_id',
                         foreignField: 'productLibraryId',
                         as: 'storeProductsData',
-
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'store',
+                        localField: 'storeProductsData.storeId',
+                        foreignField: '_id',
+                        as: 'storeData',
+                        pipeline: [
+                            {
+                                $project: {
+                                    storeName: 1
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    $unwind: {
+                        path: "$storeData",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $addFields: {
+                        'storeProductsData.storeName': "$storeData.storeName"
                     }
                 },
                 {
