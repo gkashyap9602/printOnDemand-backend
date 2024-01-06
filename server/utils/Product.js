@@ -409,6 +409,9 @@ const productUtils = {
                     }
                 },
                 {
+                    $unset: "Variable"
+                },
+                {
                     $project: {
                         _id: 1,
                         careInstructions: 1,
@@ -423,7 +426,6 @@ const productUtils = {
                         title: 1,
                         variantCount: 1,
                         priceStartsFrom: 1,
-                        Variable: 0,
 
                     }
                 }

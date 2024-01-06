@@ -460,7 +460,6 @@ const productLibrary = {
                     $match: {
                         "varientData.variableOptionData.value": { $regex: valueSearch, $options: 'i' },
                         ...materialSearch
-                        // "productData.materialId": { $in: materialFilter }
                     }
                 },
                 {
