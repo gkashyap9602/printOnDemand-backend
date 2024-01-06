@@ -304,12 +304,16 @@ const productLibrary = {
                 matchObj.title = { $regex: titleSearch, $options: 'i' }
             }
 
-            if (materialFilter) {
+            let materialSearch = {}
+
+            if (materialFilter && materialFilter?.length > 0) {
 
                 if (typeof materialFilter == 'string') {
                     materialFilter = JSON.parse(materialFilter)
                 }
                 materialFilter = materialFilter.map((id) => new ObjectId(id))
+
+                materialSearch["productData.materialId"] = { $in: materialFilter }
 
             }
 
@@ -455,7 +459,8 @@ const productLibrary = {
                 {
                     $match: {
                         "varientData.variableOptionData.value": { $regex: valueSearch, $options: 'i' },
-                        "productData.materialId": { $in: materialFilter }
+                        ...materialSearch
+                        // "productData.materialId": { $in: materialFilter }
                     }
                 },
                 {
