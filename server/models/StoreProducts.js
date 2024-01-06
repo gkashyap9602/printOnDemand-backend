@@ -9,7 +9,7 @@ var StoreProducts = new Schema({
     },
     storeId: {
         type: mongoose.Types.ObjectId,
-        ref: 'Users',
+        ref: 'Store',
         index: true
     },
     productLibraryId: {
@@ -21,23 +21,23 @@ var StoreProducts = new Schema({
         type: Number,
         index: true
     },
-    storeDetails: {
-        storeName: {
-            type: String,
-            ref: 'Store',
-            default: null
-        },
-        shop: {
-            type: String,
-            ref: 'Store',
-            default: null
-        },
-        storeType: {
-            type: Number,
-            ref: 'Store',
-            default: null
-        }
-    },
+    // storeDetails: {
+    //     storeName: {
+    //         type: String,
+    //         ref: 'Store',
+    //         default: null
+    //     },
+    //     shop: {
+    //         type: String,
+    //         ref: 'Store',
+    //         default: null
+    //     },
+    //     storeType: {
+    //         type: Number,
+    //         ref: 'Store',
+    //         default: null
+    //     }
+    // },
 
     isEnabled: {
         type: Boolean,

@@ -14,7 +14,7 @@ const productQueue = helpers.generateQueue('productQueue')
 productQueue.process(async (job, done) => {
     console.log(job, "queue job000000");
     try {
-        let { productData, endPointData, productLibraryId, userId } = job?.data
+        let { productData, endPointData, productLibraryId, userId ,storeId} = job?.data
 
         //endPointdata has store details 
         let addToStoreApi = await helpers.addProductToShopify(endPointData, productData)
@@ -33,12 +33,12 @@ productQueue.process(async (job, done) => {
                 let obj = {
                     userId,
                     productLibraryId,
-                    storeId: endPointData?._id,
-                    storeDetails: {
-                        storeName: endPointData?.storeName,
-                        shop: endPointData?.shop,
-                        storeType: Number(endPointData?.storeType)
-                    },
+                    storeId,
+                    // storeDetails: {
+                    //     storeName: endPointData?.storeName,
+                    //     shop: endPointData?.shop,
+                    //     storeType: Number(endPointData?.storeType)
+                    // },
                     storeProductId: addToStoreApi?.data?.product?.id, //store product id after upload
                     createdOn: helpers.getCurrentDate()
 

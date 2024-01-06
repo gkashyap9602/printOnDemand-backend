@@ -25,7 +25,7 @@ const shopController = {
         if (!user_id) {
             return helpers.showOutput(res, helpers.showResponse(false, ResponseMessages?.middleware?.invalid_access_token), 401);
         }
-        let result = await Store.updateStoreStatus(req.body, user_id);
+        let result = await Store.   updateStoreStatus(req.body, user_id);
         return helpers.showOutput(res, result, result.statusCode);
     },
     removeStore: async (req, res) => {

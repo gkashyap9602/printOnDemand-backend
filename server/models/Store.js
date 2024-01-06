@@ -61,7 +61,7 @@ var Store = new Schema({
     status: {
         type: Number,
         default: 1,
-        Comment: "1 for active store means conencted 2 for disconnect"
+        Comment: "1 for active store means conencted 2 for disconnect 3 for deleted"
     },
     createdOn: {
         type: String,

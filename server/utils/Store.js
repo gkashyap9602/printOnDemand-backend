@@ -21,7 +21,7 @@ const store = {
         console.log(data, "dataaaa");
 
 
-        let findStore = await getSingleData(Store, { shop: shop, userId: userId })
+        let findStore = await getSingleData(Store, { shop: shop, userId: userId, status: { $ne: 3 } })
 
         if (findStore.status) {
             return helpers.showResponse(false, ResponseMessages?.store.store_already, null, null, 400);
@@ -62,6 +62,7 @@ const store = {
         let matchObj = {
             userId: mongoose.Types.ObjectId(userId),
             // storeType: storeType,
+            status: { $ne: 3 } //3 for soft delete 
         }
 
         if (status) {
@@ -88,7 +89,7 @@ const store = {
 
         let { storeId, status } = data
 
-        let findStore = await getSingleData(Store, { _id: storeId, userId })
+        let findStore = await getSingleData(Store, { _id: storeId, userId, status: { $ne: 3 } })
 
         if (!findStore.status) {
             return helpers.showResponse(false, ResponseMessages?.store.store_not_exist, null, null, 203);
@@ -112,7 +113,7 @@ const store = {
         let { storeId } = data
         console.log(storeId, "storeId");
 
-        let result = await deleteById(Store, storeId)
+        let result = await updateSingleData(Store, { status: 3 }, { _id: storeId, status: { $ne: 3 } })
         console.log(result, "resulttt");
         if (result.status) {
             return helpers.showResponse(true, ResponseMessages?.store.store_delete_success, {}, null, 200);
@@ -189,18 +190,10 @@ const store = {
                         pipeline: [
                             {
                                 $match: {
-                                    status: { $ne: 2 }
+                                    status: { $ne: 3 } //check if store not deleted
                                 }
                             },
-                            {
-                                $project: {
-                                    _id: 1,
-                                    storeType: 1,
-                                    storeId: 1,
-                                    storeName: 1,
-                                    status: 1
-                                }
-                            }
+
                         ]
 
                     }
@@ -231,9 +224,8 @@ const store = {
                         _id: 1,
                         productLibraryTitle: "$ProductLibraryData.title",
                         pushStatus: "$status",
-                        // storeName: "$storeData.storeName",
-                        storeName: "$storeDetails.storeName",
-                        shop: "$storeDetails.shop",
+                        storeName: "$storeData.storeName",
+                        shop: "$storeData.shop",
                         uploadDate: "$uploadDate",
                         createdOn: "$createdOn"
                     }
@@ -276,9 +268,9 @@ const store = {
             //create a product queue
             const productQueue = helpers.generateQueue('productQueue')
 
-            let isPartialPush = false
+            let isPartialPush = false //key for add product partially if some products already exists
 
-            let findStore = await getSingleData(Store, { _id: storeId, userId: userId })
+            let findStore = await getSingleData(Store, { _id: storeId, userId: userId, status: { $ne: 3 } })
 
             if (!findStore.status) {
                 return helpers.showResponse(false, ResponseMessages?.store.store_not_exist, null, null, 400);
@@ -334,17 +326,17 @@ const store = {
 
 
             // console.log(findStore, "findStore");
-            let { apiKey, shop, secret, storeVersion, storeName, _id, storeType } = findStore?.data
+            let { apiKey, shop, secret, storeName } = findStore?.data
 
             //pass data to queue
             let endPointData = {
                 apiKey,
                 shop,
                 secret,
-                storeVersion,
-                _id,
-                storeName,
-                storeType
+                // storeVersion,
+                // _id,
+                // storeName,
+                // storeType
             }
 
 
@@ -600,8 +592,8 @@ const store = {
                 }
                 // ends 
 
-                //add all productLibrary Products in a Products Queue for further operations 
-                let addToQueue = productQueue.add({ productData, endPointData, productLibraryId: product._id, userId },
+                //add all productLibrary Products in a Products Queue for further operations with important arguments
+                let addToQueue = productQueue.add({ productData, endPointData, productLibraryId: product._id, userId, storeId },
                     {
                         delay: 60000, //queue process after 3 minutes delay 
                         attempts: 1, //execute only one time
@@ -634,10 +626,10 @@ const store = {
                     let obj = {
                         userId,
                         storeId,
-                        storeDetails: {
-                            storeName: storeName,
-                            shop: shop,
-                        },
+                        // storeDetails: {
+                        //     storeName: storeName,
+                        //     shop: shop,
+                        // },
 
                         productLibraryId,
                         pushedDate: helpers.getCurrentDate(),
