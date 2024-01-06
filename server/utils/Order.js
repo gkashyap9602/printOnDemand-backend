@@ -1305,7 +1305,6 @@ const orderUtil = {
                                 payTraceId: 1,
                                 email: 1,
                                 phoneNumber: 1
-                                // traceId:1,
 
                             }
                         }
@@ -1537,7 +1536,6 @@ const orderUtil = {
         return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result.length > 0 ? result[0] : result, null, 200);
     },
 
-
     getCartItems: async (data, userId) => {
         let { pageIndex = 1, pageSize = 5 } = data
         pageIndex = Number(pageIndex)
@@ -1674,7 +1672,6 @@ const orderUtil = {
         return helpers.showResponse(false, ResponseMessages.common.database_error, {}, null, 400);
     },
 
-
     updateCartItem: async (data) => {
         try {
             let { cartId, quantity } = data
@@ -1682,7 +1679,6 @@ const orderUtil = {
                 quantity,
                 updatedOn: helpers.getCurrentDate()
             }
-
             let matchObj = {
                 _id: cartId,
             }
