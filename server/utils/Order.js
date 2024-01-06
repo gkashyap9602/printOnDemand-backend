@@ -233,7 +233,7 @@ const orderUtil = {
                             quantity: 1,
                             productCode: "$productLibraryVarientData.productVarientData.productCode",
                             // productTitle: "$productLibraryVarientData.productLibraryData.title",
-                            productImages: { $arrayElemAt: ["$productLibraryVarientData.productLibraryVarientImages.imageUrl", 0] },
+                            // productImages: { $arrayElemAt: ["$productLibraryVarientData.productLibraryVarientImages.imageUrl", 0] },
                             orderedPrice: "$productLibraryVarientData.price",
                             createdOn: helpers.getCurrentDate()
                         }
@@ -1208,7 +1208,6 @@ const orderUtil = {
                 }
 
             },
-
             {
                 $addFields: {
                     orderItems: {
@@ -1219,10 +1218,22 @@ const orderUtil = {
                                 $mergeObjects: [
                                     "$$orderItem",
                                     {
+
                                         // Create productTitle and productImages from adminProductData for each orderItem
-                                        "productTitle": "$$orderItem.adminProductData.productTitle",
-                                        "productImages": { $arrayElemAt: ["$$orderItem.adminProductData.productImages.imageUrl", 0] },
-                                        // Add other fields as needed
+                                        "productTitle": {
+                                            $cond: {
+                                                if: { $eq: ["$source", 1] },
+                                                then: "$$orderItem.userProductLibraryData.productTitle",
+                                                else: "$$orderItem.adminProductData.productTitle",
+                                            }
+                                        },
+                                        "productImages": {
+                                            $cond: {
+                                                if: { $eq: ["$source", 1] },
+                                                then: { $arrayElemAt: ["$$orderItem.userProductLibraryData.productImages.imageUrl", 0] },
+                                                else: { $arrayElemAt: ["$$orderItem.adminProductData.productImages.imageUrl", 0] },
+                                            }
+                                        }
                                     }
                                 ]
                             }
@@ -1230,7 +1241,6 @@ const orderUtil = {
                     }
                 }
             },
-
             {
                 $unset: "orderItems.userProductLibraryData" //remove extra feilds from product Items
             },
