@@ -278,7 +278,7 @@ const productLibrary = {
     },
     getProductLibrary: async (data) => {
         try {
-            let { pageSize = 10, page = 1, sortDirection = "asc", sortColumn = "title", materialFilter, searchKey = '' } = data;
+            let { pageSize = 10, page = 1, sortDirection = "asc", sortColumn = "title", materialFilter = [], searchKey = '' } = data;
             pageSize = Number(pageSize)
             page = Number(page)
 
