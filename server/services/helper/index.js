@@ -90,14 +90,9 @@ const showOutput = (res, response, code) => {
     // delete response.code;
     res.status(code).json(response);
 };
-// const generateRandom4DigitNumber = (prefix, count) => {
-//     const min = 1000;
-//     const max = 9999;
-//     const random4DigitNumber = Math.floor(Math.random() * (max - min + 1)) + min;
 
-//     return prefix + random4DigitNumber;
-// }
 const generateOrderID = async (prefix, orderCount) => {
+    orderCount += 1
 
     let padStart = 4
 

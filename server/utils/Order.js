@@ -95,6 +95,9 @@ const orderUtil = {
 
             const fixedPrefix = 'MWW1000';
             let countOrders = await getCount(Orders, {})
+
+            console.log(countOrders, "countOrder");
+
             const randomId = await helpers.generateOrderID(fixedPrefix, countOrders.data);
 
             const allCartItems = await getDataArray(Cart, { userId: customerId })
@@ -105,7 +108,7 @@ const orderUtil = {
             //order payload
             let obj = {
                 customerId: customerId,
-                amount: totalAmount,
+                amount: Number(totalAmount).toFixed(2),
                 displayId: randomId,
                 isSubmitImmediately: submitImmediately,
                 shippingMethodId,
@@ -230,7 +233,7 @@ const orderUtil = {
                             quantity: 1,
                             productCode: "$productLibraryVarientData.productVarientData.productCode",
                             // productTitle: "$productLibraryVarientData.productLibraryData.title",
-                            // productImages: "$productLibraryVarientData.productLibraryVarientImages",
+                            productImages: { $arrayElemAt: ["$productLibraryVarientData.productLibraryVarientImages.imageUrl", 0] },
                             orderedPrice: "$productLibraryVarientData.price",
                             createdOn: helpers.getCurrentDate()
                         }
