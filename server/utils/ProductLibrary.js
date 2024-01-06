@@ -318,32 +318,32 @@ const productLibrary = {
                         localField: '_id',
                         foreignField: 'productLibraryId',
                         as: 'storeProductsData',
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'store',
-                        localField: 'storeProductsData.storeId',
-                        foreignField: '_id',
-                        as: 'storeData',
                         pipeline: [
                             {
-                                $project: {
-                                    storeName: 1
+                                $lookup: {
+                                    from: 'store',
+                                    localField: 'storeId',
+                                    foreignField: '_id',
+                                    as: 'storeDetails',
+                                    pipeline: [
+                                        {
+                                            $project: {
+                                                storeName: 1,
+                                                shop: 1,
+                                                storeType: 1
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                $unwind: {
+                                    path: "$storeDetails",
+                                    preserveNullAndEmptyArrays: true
                                 }
                             }
                         ]
-                    }
-                },
-                {
-                    $unwind: {
-                        path: "$storeData",
-                        preserveNullAndEmptyArrays: true
-                    }
-                },
-                {
-                    $addFields: {
-                        'storeProductsData.storeName': "$storeData.storeName"
+
                     }
                 },
                 {
