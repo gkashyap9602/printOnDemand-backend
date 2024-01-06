@@ -124,33 +124,18 @@ const adminUtils = {
             pageSize = Number(pageSize)
 
             let matchObj = {
-                userType: 3,
+                userType: 3, //3 for users/customers
 
             }
             if (status) {
                 matchObj.status = Number(status)
             }
-            console.log({ ...matchObj }, "matchhhh");
+
             let aggregate =
                 [
                     {
                         $match: {
                             ...matchObj,
-
-                            $or: [
-                                {
-                                    email: { $regex: searchKey, $options: 'i' },
-                                },
-                                // {
-                                //     firstName: { $regex: searchKey, $options: 'i' }
-                                // },
-
-                            ]
-                        }
-                    },
-                    {
-                        $sort: {
-                            [sortColumn]: sortDirection == 'asc' ? 1 : -1
                         }
                     },
                     {
@@ -195,17 +180,25 @@ const adminUtils = {
                     },
                     {
                         $addFields: {
-                            shippingAddress: '$userProfileData.shippingAddress'
+                            shippingAddress: '$userProfileData.shippingAddress',
+                            customerId: '$userProfileData.paymentDetails.customerId',
+                            numberOfOrders: {
+                                $ifNull: ["$ordersData.totalOrder", 0] // Default to 0 if totalOrder is null or missing
+                            }
                         }
                     },
                     {
-                        $addFields: {
-                            customerId: '$userProfileData.paymentDetails.customerId'
+                        $match: {
+                            $or: [
+                                { email: { $regex: searchKey, $options: 'i' } },
+                                { 'shippingAddress.contactName': { $regex: searchKey, $options: 'i' } },
+                                { 'shippingAddress.companyName': { $regex: searchKey, $options: 'i' } },
+                            ]
                         }
                     },
                     {
-                        $addFields: {
-                            numberOfOrders: "$ordersData.totalOrder"
+                        $sort: {
+                            [sortColumn]: sortDirection == 'asc' ? 1 : -1
                         }
                     },
                     {
@@ -828,9 +821,12 @@ const adminUtils = {
             pageSize = Number(pageSize)
 
             let matchObj = {
-                email: { $regex: searchKey, $options: 'i' },
-                userType: 2,
-                status: { $ne: 2 }
+                $or: [
+                    { email: { $regex: searchKey, $options: 'i' }, },
+                    { firstName: { $regex: searchKey, $options: 'i' } }
+                ],
+                userType: 2, //2 for subadmin
+                status: { $ne: 2 } //for soft delete
             }
 
             if (subAdminId) {
