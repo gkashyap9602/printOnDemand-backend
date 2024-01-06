@@ -6,9 +6,6 @@ let ObjectId = require('mongodb').ObjectId
 const LibraryImages = require('../models/LibraryImages');
 const ProductLibrary = require('../models/ProductLibrary');
 const ProductLibraryVarient = require("../models/ProductLibraryVarient");
-const { default: axios } = require('axios');
-const consts = require('../constants/const');
-const UserProfile = require('../models/UserProfile');
 
 const productLibrary = {
 
@@ -56,9 +53,6 @@ const productLibrary = {
         try {
             let { productId, title, description, productLibraryImages = [], productLibraryVarients, price } = data
 
-            console.log(productLibraryImages, "productLibraryImages");
-            console.log(productLibraryVarients, "productLibraryVarients");
-
             if (typeof productLibraryImages == 'string') {
                 productLibraryImages = JSON.parse(productLibraryImages)
 
@@ -71,12 +65,10 @@ const productLibrary = {
             let productlibImages
 
             if (files?.length > 0 && productLibraryImages.length === 0) {
-                console.log("under multer iff");
                 const s3Upload = await helpers.uploadFileToS3(files)
                 if (!s3Upload.status) {
                     return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
                 }
-                console.log(s3Upload.data, "s3uploaddd");
                 productlibImages = s3Upload.data.map((img) => {
                     let obj = {}
                     obj._id = mongoose.Types.ObjectId()
@@ -88,7 +80,6 @@ const productLibrary = {
             }
 
             if (productLibraryImages.length > 0 && files?.length === 0) {
-                console.log("under image Static url iff");
                 console.log(productLibraryImages, "-------------");
 
                 productlibImages = productLibraryImages.map((value) => {
@@ -100,14 +91,6 @@ const productLibrary = {
 
             }
 
-            // const findProduct = await getSingleData(ProductLibrary, { title: title, status: { $ne: 2 } })
-            // if (findProduct.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 400);
-            // }
-
-
-            console.log(productlibImages, "productlibImages");
-
             let obj = {
                 userId,
                 productId,
@@ -117,21 +100,17 @@ const productLibrary = {
                 createdOn: helpers.getCurrentDate(),
                 productLibraryImages: productlibImages,
                 varientCount: productLibraryVarients?.length, //count of total varients
-                // productLibraryVarients
             }
             const prodRef = new ProductLibrary(obj)
             const result = await postData(prodRef)
 
-
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
             }
-            // if (productLibraryVarients) {
             productLibraryVarients = productLibraryVarients?.map((value) => {
                 let obj = {
                     productLibraryId: result?.data?._id,
                     productVarientId: value.productVarientId,
-                    // retailPrice: value.price,
                     profit: Number(Number(value.price) * 2 - Number(value.price)),
                     price: Number(value.price) * 2,
                     productLibraryVarientImages: productlibImages,
@@ -142,14 +121,11 @@ const productLibrary = {
 
             const libraryVareintSaved = await insertMany(ProductLibraryVarient, productLibraryVarients)
 
-            console.log(libraryVareintSaved, "libraryVareintSaved");
             if (!libraryVareintSaved.status) {
                 //delete productlibrary if failed 
                 await deleteById(ProductLibrary, result.data._id)
                 return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
             }
-
-            // }
 
             return helpers.showResponse(true, ResponseMessages?.product.product_created, result?.data, null, 200);
         }
@@ -165,7 +141,6 @@ const productLibrary = {
             let updateDataObj = {
                 updatedOn: helpers.getCurrentDate()
             }
-
             let matchObj = {
                 _id: productLibraryId,
                 status: { $ne: 2 }
@@ -236,7 +211,6 @@ const productLibrary = {
             let updateData = {
                 status: 2
             }
-
             //if both ids are present then delete vareint of product library  else whole productLibrary with varients
             if (productLibraryId && productLibraryVariantId) {
 
@@ -245,7 +219,6 @@ const productLibrary = {
                     productLibraryId: productLibraryId,
                     status: { $ne: 2 }
                 }
-
 
                 //find library varient exist or not 
                 const findProductLibrary = await getSingleData(ProductLibrary, { _id: productLibraryId, status: { $ne: 2 } })
@@ -330,7 +303,6 @@ const productLibrary = {
             if (titleSearch) {
                 matchObj.title = { $regex: titleSearch, $options: 'i' }
             }
-
 
             console.log(matchObj, "matchObj");
 
@@ -421,11 +393,6 @@ const productLibrary = {
                             "productData.materialId": { $in: materialFilter }
                         }
                     },
-                    // {
-                    //     $project: {
-                    //         productData: 0
-                    //     }
-                    // }
                 )
 
             }
@@ -443,23 +410,8 @@ const productLibrary = {
 
             }
 
-            //remove extra feilds that is get after lookup
-            let project = {
-                $project: {
-                    varientData: 0,
-                    variableOptionData: 0,
-                    productVarientData: 0
-                }
-            }
-            // aggregate.push(project)
-
-            // console.log(aggregate, "aggregate");
-
-
             //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
             let { totalCount, aggregation } = await helpers.getCountAndPagination(ProductLibrary, aggregate, page, pageSize)
-            console.log(totalCount, "totalCounttotalCount");
-
 
             const result = await ProductLibrary.aggregate(aggregation);
 
@@ -477,7 +429,6 @@ const productLibrary = {
         try {
             const { productLibraryId } = data;
 
-            console.log(productLibraryId, "productLibraryId");
             const result = await ProductLibrary.aggregate([
                 {
                     $match: {

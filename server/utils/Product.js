@@ -10,7 +10,6 @@ const VariableTypes = require('../models/VariableTypes')
 const VariableOptions = require('../models/VariableOptions')
 const ProductVarient = require('../models/ProductVarient')
 const { getFileType } = require('../services/helper/index')
-const mime = require('mime-types')
 
 const productUtils = {
 
@@ -22,7 +21,6 @@ const productUtils = {
 
             subCategoryIds = subCategoryIds.map((id) => mongoose.Types.ObjectId(id))
             const findProduct = await getSingleData(Product, { title: title, status: { $ne: 2 }, subCategoryId: { $in: subCategoryIds } })
-            console.log(findProduct, "proddddd");
             if (findProduct.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_already_existed, {}, null, 400);
             }
@@ -42,14 +40,10 @@ const productUtils = {
             }
 
             const findMaterials = await getDataArray(Material, { _id: { $in: materialIds } })
-            // const findMaterial = await getSingleData(Material, { _id: materialId })
             if (findMaterials?.data?.length !== materialIds?.length) {
                 return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
             }
-            // if (!findMaterial.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
-            // }
-            ///
+       
             let obj = {
                 careInstructions,
                 longDescription,
@@ -67,7 +61,6 @@ const productUtils = {
             const prodRef = new Product(obj)
             const result = await postData(prodRef)
 
-            console.log(result, "resultProductt");
             if (!result.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_save_failed, {}, null, 400);
             }
@@ -100,12 +93,6 @@ const productUtils = {
                 return helpers.showResponse(false, ResponseMessages?.category.invalid_subcategory_id, {}, null, 400);
             }
 
-
-            // const findMaterial = await getSingleData(Material, { _id: materialId })
-
-            // if (!findMaterial.status) {
-            //     return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
-            // }
             const findMaterials = await getDataArray(Material, { _id: { $in: materialIds }, status: { $ne: 2 } })
             if (findMaterials?.data?.length !== materialIds.length) {
                 return helpers.showResponse(false, ResponseMessages?.material.invalid_material_id, {}, null, 400);
@@ -278,9 +265,6 @@ const productUtils = {
                         as: "material"
                     }
                 },
-                // {
-                //     $unwind: '$material'
-                // },
                 {
                     $lookup: {
                         from: "productVarient",
@@ -323,11 +307,6 @@ const productUtils = {
                                     ]
                                 }
                             },
-                            //  {
-                            //     $project:{
-                            //         // varientOptions:0
-                            //     }
-                            //   }
 
                         ]
                     }
@@ -367,7 +346,6 @@ const productUtils = {
 
             if (searchKey) {
                 searchKey = searchKey.trim()
-
                 searchTerms = searchKey.split(' ');
                 titleSearch = searchTerms[0];
                 valueSearch = searchTerms.slice(1).join(' ');
@@ -379,7 +357,6 @@ const productUtils = {
             let matchObj = {
                 subCategoryId: { $in: [id] },
                 status: { $ne: 2 },
-                // title: { $regex: titleSearch, $options: 'i' },
 
             }
             if (titleSearch) {
@@ -392,9 +369,6 @@ const productUtils = {
                 matchObj.materialId = { $in: materialFilter }
 
             }
-
-
-            console.log(matchObj, "matchObj");
 
             let aggregate = [
                 {
@@ -463,7 +437,6 @@ const productUtils = {
                         title: 1,
                         variantCount: 1,
                         priceStartsFrom: 1,
-                        // ProductVarient: 1,
                         Variable: 1,
                         VariableTypes: 1,
 
@@ -485,12 +458,8 @@ const productUtils = {
 
             // }
 
-            console.log(aggregate, "aggregateee");
-
-
             // add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
             let { totalCount, aggregation } = await helpers.getCountAndPagination(Product, aggregate, page, pageSize)
-            console.log(totalCount, "totalCounttotalCount");
 
             const result = await Product.aggregate(aggregation);
 
@@ -660,7 +629,6 @@ const productUtils = {
             const result = await updateSingleData(Product, { status: 2 }, { _id: productId })
 
             if (result.status) {
-
                 //varient Options are not deleted from collection?
                 // await deleteData(ProductVarient, { productId: productId })
                 await updateByQuery(ProductVarient, { status: 2 }, { productId: productId })
@@ -683,8 +651,6 @@ const productUtils = {
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.product.product_varient_not_exist, {}, null, 400);
             }
-
-            // const result = await deleteById(ProductVarient, productVarientId)
             const result = await updateSingleData(ProductVarient, { status: 2 }, { _id: productVarientId, productId })
             if (result.status) {
                 //varient Options are not deleted from collection?

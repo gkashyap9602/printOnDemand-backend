@@ -4,7 +4,7 @@ module.exports = {
     API_V1: "/api/v1/",
     FRONTEND_URL: "https://dev.mwwondemand.com",
     BASE_URL: "http://localhost:3000/api/v1",
-    BITBUCKET_URL_DEV: "https://d35sh5431xvp8v.cloudfront.net",
+    BITBUCKET_URL: "https://d35sh5431xvp8v.cloudfront.net",
 
     ADMIN_EMAIL: "modportal@manualww.com",
 

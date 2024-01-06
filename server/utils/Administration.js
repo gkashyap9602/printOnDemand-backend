@@ -1,7 +1,6 @@
 require('../db_functions');
 let Administration = require('../models/Administration');
 let helpers = require('../services/helper');
-let jwt = require('jsonwebtoken');
 let md5 = require('md5');
 const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require('../constants/const');
@@ -15,40 +14,6 @@ const ShipMethod = require("../models/ShipMethod")
 const path = require('path')
 const ejs = require('ejs')
 const adminUtils = {
-
-    // login: async (data) => {
-    //     let { email, password } = data;
-    //     let where = {
-    //         email: email,
-    //         password: md5(password),
-    //         status: { $eq: 1 }
-    //     }
-    //     let result = await getSingleData(Administration, where, '');
-    //     if (result.status) {
-    //         let adminData = result?.data
-    //         let API_SECRET = await helpers.getParameterFromAWS({ name: "API_SECRET" })
-    //         let access_token = jwt.sign({ user_type: "admin", type: "access", _id: adminData?._id }, API_SECRET, {
-    //             expiresIn: consts.ACCESS_EXPIRY
-    //         });
-    //         // let refresh_token = jwt.sign({ user_type: "admin", type: "refresh" }, API_SECRET, {
-    //         //     expiresIn: consts.REFRESH_EXPIRY
-    //         // });
-    //         delete adminData?._doc?.password
-    //         adminData = { ...adminData?._doc, token: access_token }
-
-    //         return helpers.showResponse(true, ResponseMessages?.admin?.login_success, adminData, null, 200);
-    //     }
-    //     return helpers.showResponse(false, ResponseMessages?.admin?.invalid_login, null, null, 400);
-    // },
-    // logout: async (adminId) => {
-    //     let queryObject = { _id: adminId }
-    //     let result = await getSingleData(Administration, queryObject, 'traceId');
-    //     if (!result.status) {
-    //         return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
-    //     }
-    //     let adminData = result?.data
-    //     return helpers.showResponse(true, ResponseMessages?.users?.logout_success, adminData, null, 200);
-    // },
 
     addMaterial: async (data) => {
         try {
@@ -162,7 +127,6 @@ const adminUtils = {
                 userType: 3,
 
             }
-
             if (status) {
                 matchObj.status = Number(status)
             }
@@ -253,23 +217,6 @@ const adminUtils = {
                 ]
             //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
             let { totalCount, aggregation } = await helpers.getCountAndPagination(Users, aggregate, pageIndex, pageSize)
-            console.log(totalCount, "totalCounttotalCount");
-            // let pagePipelineCount = [...aggregate];
-
-            // pagePipelineCount.push({ $count: 'totalEntries' })
-
-            // let countResult = await Users.aggregate(pagePipelineCount)
-
-            // let totalCount = countResult?.[0]?.totalEntries || 0;
-
-            // aggregate.push(
-            //     {
-            //         $skip: (pageIndex - 1) * pageSize
-            //     },
-            //     {
-            //         $limit: pageSize
-            //     }
-            // );
 
             const result = await Users.aggregate(aggregation)
 
@@ -297,7 +244,6 @@ const adminUtils = {
 
     getCustomerDetails: async (data) => {
         let { customerId } = data;
-        console.log(customerId, "useridd");
         let result = await Users.aggregate([
             { $match: { _id: mongoose.Types.ObjectId(customerId) } },  // Match the specific user by _id and status
 
@@ -331,19 +277,11 @@ const adminUtils = {
                 $replaceRoot: {
                     newRoot: {
                         $mergeObjects: [
-                            // {
-                            //     _id: '$_id',
-                            //     firstName: '$firstName',
-                            //     lastName: '$lastName',
-                            //     email: '$email',
-                            //     // Add other fields from the Users collection that you want to include
-                            // },
                             "$$ROOT",
                             {
                                 fullName: {
                                     $concat: ['$firstName', ' ', '$lastName']
                                 },
-                                storeAccessToken: "$storeAccessToken",
                                 ncResaleInfo: {
                                     isExemptionEligible: "$userProfileData.isExemptionEligible",
                                     ncResaleCertificate: "$userProfileData.ncResaleCertificate"
@@ -354,9 +292,6 @@ const adminUtils = {
                     }
                 }
             },
-            // {
-            //     $unset: "userProfileData" // Exclude the 'password' field
-            // },
         ]);
 
         if (result.length === 0) {
@@ -378,7 +313,6 @@ const adminUtils = {
             if (!usersCount.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
             }
-            const idGenerated = helpers.generateIDs(usersCount?.data)
 
             let adminData = await getSingleData(Users, { _id: adminId, userType: 1 })
             if (!adminData.status) {
@@ -391,15 +325,8 @@ const adminUtils = {
                 email: email,
                 userName: email,
                 createdUser: `${adminData?.data?.firstName} ${adminData?.data?.lastName}`,
-                // id: idGenerated.idNumber,
-                // guid: randomUUID(),
-                // customerId: idGenerated.customerID,
-                // customerGuid: randomUUID(),
-                // password: md5(password),
-                // payTraceId: payTraceId,
                 createdOn: helpers.getCurrentDate()
             }
-
 
             if (payTraceId && !paymentDetails) {
                 newObj.payTraceId = payTraceId
@@ -408,7 +335,6 @@ const adminUtils = {
             //create new customer account
             let userRef = new Users(newObj)
             let result = await postData(userRef);
-            console.log(result, "result user save");
 
             //If User Register Successfullt then create its profile
             if (result.status) {
@@ -425,14 +351,13 @@ const adminUtils = {
 
                 //if paytrace id added by admin then update customerID also
                 if (payTraceId && !paymentDetails) {
-                    console.log(payTraceId, "paytraceId");
                     ObjProfile.paymentDetails = {}
                     ObjProfile.paymentDetails.customerId = payTraceId
                 }
 
                 let userProfileRef = new UserProfile(ObjProfile)
                 let resultProfile = await postData(userProfileRef);
-                console.log(resultProfile, "resultProfile");
+
                 if (!resultProfile.status) {
                     await deleteData(Users, { _id: userRef._id })
                     return helpers.showResponse(false, ResponseMessages?.users?.register_error, null, null, 400);
@@ -469,11 +394,9 @@ const adminUtils = {
                     //get total count of the users 
                     let count = await getCount(Users, { userType: 3 })
                     let idGenerated = helpers.generateIDs(count?.data)
-                    console.log(idGenerated, "id generateddd");
 
                     //paytrace ID Data
                     const dataPaytrace = {
-                        // customer_id: 77715522,
                         customer_id: idGenerated.customerID,
                         credit_card: {
                             number: paymentDetails.creditCardData.ccNumber,
@@ -492,7 +415,7 @@ const adminUtils = {
                     };
                     //generate Paytrace Id
                     let getPaytraceId = await helpers.generatePaytraceId(dataPaytrace, payTraceToken.data.access_token)
-                    console.log(getPaytraceId, "getPaytraceId");
+
                     if (!getPaytraceId.status) {
                         return helpers.showResponse(false, getPaytraceId.data, getPaytraceId.message, null, 400)
                     }
@@ -504,15 +427,12 @@ const adminUtils = {
                         paymentDetails: paymentDetails,
                     }
 
-
-                    console.log(paymentdetailsData, "45455455");
                     paymentdetailsData.paymentDetails.creditCardData.ccNumber = masked_card_number
                     paymentdetailsData.paymentDetails.customerId = customer_id
                     paymentdetailsData.createdOn = helpers.getCurrentDate();
-                    let completionStaus = { 'completionStaus.paymentInfo': true }
-                    // console.log(paymentdetailsData, "dddsdsd");
-                    let userProfile = await updateSingleData(UserProfile, { ...paymentdetailsData, ...completionStaus }, { userId: result?.data?._id })
 
+                    let completionStaus = { 'completionStaus.paymentInfo': true }
+                    let userProfile = await updateSingleData(UserProfile, { ...paymentdetailsData, ...completionStaus }, { userId: result?.data?._id })
 
                     //update Payment details in user profile 
                     if (!userProfile.status) {
@@ -525,7 +445,6 @@ const adminUtils = {
                     if (!addUserPaytraceId.status) {
                         return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
                     }
-
                     //---------------email send to admin that new user has been regsitered
                     let basicInfo = userProfile?.data.completionStaus?.basicInfo
                     let billingInfo = userProfile?.data.completionStaus?.billingInfo
@@ -534,7 +453,6 @@ const adminUtils = {
 
                     //if user complete its profile then send email to user and admin with details
                     if (basicInfo && billingInfo && paymentInfo && shippingInfo) {
-                        console.log("under complete profile iff");
 
                         //create excel 
                         let newUserCsvData = [
@@ -572,7 +490,6 @@ const adminUtils = {
 
                         ]
 
-
                         const sheet = await helpers.sendExcelAttachement(newUserCsvData)
 
                         let link = `${consts.BITBUCKET_URL}/${sheet.data}`
@@ -601,7 +518,6 @@ const adminUtils = {
                         let toUser = result?.data?.email
                         let subjectUser = `Profile Updated`
                         let attachmentsUser = [
-
                             {
                                 filename: 'logo.png',
                                 path: logoPath,
@@ -613,7 +529,6 @@ const adminUtils = {
                         let emailToUser = await helpers.sendEmailService(toUser, subjectUser, htmlUser, attachmentsUser)
                         //----------
                     }
-
                 }
                 //ends payment details if 
 
@@ -684,19 +599,15 @@ const adminUtils = {
                     return helpers.showResponse(false, "PayTrace Token Not Generated", payTraceToken.data, null, 400)
                 }
 
-
                 let customerId
 
                 if (payTraceId) {
-                    console.log("under ifffe");
 
                     customerId = payTraceId
                 } else {
-                    console.log("under elseef");
                     //get total count of the users 
                     let count = await getCount(Users, { userType: 3 })
                     let idGenerated = helpers.generateIDs(count?.data)
-                    // console.log(idGenerated, "id generateddd");
                     customerId = idGenerated.customerID
                 }
 
@@ -724,23 +635,15 @@ const adminUtils = {
 
                 //if cutomer id is present then update paytrace details
                 if (payTraceId) {
-                    console.log("update side paytrace");
                     payTrace = await helpers.updatePaytraceInfo(dataPaytrace, payTraceToken.data.access_token)
 
-                    //else create paytrace id for user with payment details
-
-                } else {
-                    console.log("create side paytrace");
-
+                } else {//else create paytrace id for user with payment details
                     payTrace = await helpers.generatePaytraceId(dataPaytrace, payTraceToken.data.access_token)
 
                 }
-                // console.log(getPaytraceId, "getPaytraceId");
                 if (!payTrace.status) {
-                    console.log(payTrace, "payTracepayTrace");
                     return helpers.showResponse(false, payTrace.data, payTrace.message, null, 400)
                 }
-
                 //retrieve paytrace id and mask card number
                 let { customer_id, masked_card_number } = payTrace.data
 
@@ -749,21 +652,18 @@ const adminUtils = {
                     paymentDetails: paymentDetails,
                 }
 
-
-                console.log(paymentdetailsData, "45455455");
                 paymentdetailsData.paymentDetails.creditCardData.ccNumber = masked_card_number
                 paymentdetailsData.paymentDetails.customerId = customer_id
                 paymentdetailsData.updatedOn = helpers.getCurrentDate();
+
                 let completionStaus = { 'completionStaus.paymentInfo': true }
                 // console.log(paymentdetailsData, "dddsdsd");
                 let userProfile = await updateSingleData(UserProfile, { ...paymentdetailsData, ...completionStaus }, { userId: userId })
-
 
                 //update Payment details in user profile 
                 if (!userProfile.status) {
                     return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
                 }
-
                 //add paytrace id in user collection
                 let addUserPaytraceId = await updateSingleData(Users, { payTraceId: Number(customer_id), updatedOn: helpers.getCurrentDate() }, { _id: userId })
 
@@ -779,7 +679,6 @@ const adminUtils = {
 
                 //if user complete its profile then send email to user and admin with details
                 if (basicInfo && billingInfo && paymentInfo && shippingInfo) {
-                    console.log("under complete profile iff");
 
                     //create excel 
                     let newUserCsvData = [
@@ -816,7 +715,6 @@ const adminUtils = {
                         }
 
                     ]
-
 
                     const sheet = await helpers.sendExcelAttachement(newUserCsvData)
 
@@ -856,11 +754,9 @@ const adminUtils = {
 
                     let emailToAdmin = await helpers.sendEmailService(to, subject, htmlAdmin, attachments)
                     let emailToUser = await helpers.sendEmailService(toUser, subjectUser, htmlUser, attachmentsUser)
-                    //----------
                 }
             }
             //ends payment details if 
-
             //if every thing is right response message of succesful updation
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, {}, null, 200);
 
@@ -895,8 +791,6 @@ const adminUtils = {
                 } else {
                     return helpers.showResponse(false, ResponseMessages?.admin.email_already, null, null, 400);
                 }
-
-                // return helpers.showResponse(false, ResponseMessages?.admin.email_already, null, null, 400);
             } else {
 
                 let newObj = {
@@ -943,7 +837,6 @@ const adminUtils = {
                 matchObj._id = mongoose.Types.ObjectId(subAdminId)
             }
 
-
             let aggregate = [
                 {
                     $match: {
@@ -962,14 +855,11 @@ const adminUtils = {
 
             ]
 
-
             //add this function where we cannot add query to get count of document example searchKey and add pagination at the end of query
             let { totalCount, aggregation } = await helpers.getCountAndPagination(Users, aggregate, pageIndex, pageSize)
-            console.log(totalCount, "totalCounttotalCount");
-
+            
+            //finally aggregate on above pipeline in Users collection
             const result = await Users.aggregate(aggregation)
-
-
 
             return helpers.showResponse(true, ResponseMessages?.common.data_retreive_sucess, { items: result, totalCount }, null, 200);
         } catch (err) {
@@ -997,8 +887,6 @@ const adminUtils = {
                     return helpers.showResponse(false, ResponseMessages.users.account_not_exist, null, null, 400);
                 }
 
-                console.log(findUser.data, "userData");
-
                 let basicInfo = findUser?.data?.completionStaus?.basicInfo
                 let billingInfo = findUser?.data?.completionStaus?.billingInfo
                 let paymentInfo = findUser?.data?.completionStaus?.paymentInfo
@@ -1018,14 +906,11 @@ const adminUtils = {
                     return helpers.showResponse(false, ResponseMessages?.users.shipping_info_not_available, null, null, 400);
                 }
 
-
             }
-
 
             let result = await updateSingleData(Users, { status }, { _id: userId })
             if (result.status) {
                 //after updated status send email to user 
-
                 if (status == 4 || status == 1) {
 
 
@@ -1037,7 +922,6 @@ const adminUtils = {
                     let to = find?.data?.email
                     let subject = updateMessage
                     let attachments = [
-
                         {
                             filename: 'logo.png',
                             path: logoPath,
@@ -1045,14 +929,11 @@ const adminUtils = {
                         }
                     ]
 
-
                     const html = await ejs.renderFile(path.join(__dirname, '../views', template), { user: userName, cidLogo: 'unique@mwwLogo' });
 
                     let email = await helpers.sendEmailService(to, subject, html, attachments)
 
                 }
-
-
 
                 return helpers.showResponse(true, ResponseMessages?.common.update_sucess, null, null, 200);
             }
@@ -1103,7 +984,6 @@ const adminUtils = {
         } catch (err) {
             return helpers.showResponse(false, err?.message, null, null, 400);
         }
-
     },
     saveNotification: async (data) => {
         try {
@@ -1215,7 +1095,6 @@ const adminUtils = {
             return helpers.showResponse(false, err?.message, null, null, 400);
 
         }
-
     },
     deleteNotification: async (data) => {
         try {
@@ -1239,157 +1118,6 @@ const adminUtils = {
         }
 
     },
-    // forgotPasswordMail: async (data) => {
-    //     try {
-    //         let { email } = data;
-    //         let queryObject = { email: { $eq: email } }
-    //         let result = await getSingleData(Administration, queryObject, '');
-    //         if (result.status) {
-    //             let otp = helpers.randomStr(4, "1234567890");
-    //             let editObj = {
-    //                 otp,
-    //                 updated_on: moment().unix()
-    //             }
-    //             let response = await updateData(Administration, editObj, ObjectId(result.data._id))
-    //             if (response.status) {
-    //                 let to = email
-    //                 let subject = `Reset Password Code`
-    //                 let body = `
-    //                     <div style="background-color: #f2f2f2; padding: 20px;">
-    //                         <h2 style="color: #333333;">Forgot Password</h2>
-    //                         <p style="color: #333333;">Hello Administrator,</p>
-    //                         <p style="color: #333333;">We have received a request to reset your password. If you did not initiate this request, please ignore this email.</p>
-    //                         <p style="color: #333333;">To reset your password, please use this OTP (One Time Password):</p>
-    //                         <h3 style="color: #333333; text-align: center">${otp}</h3>
-    //                         <p style="color: #333333;">Thank you,</p>
-    //                         <p style="color: #333333;">Rico Support Team</p>
-    //                     </div>
-    //                 `
-    //                 let emailResponse = await helpers.sendEmailService(to, subject, body)
-    //                 if (emailResponse?.status) {
-    //                     return helpers.showResponse(true, ResponseMessages?.admin?.forgot_password_email_sent, null, null, 200);
-    //                 }
-    //                 return helpers.showResponse(false, ResponseMessages?.admin?.forgot_password_email_error, null, null, 200);
-    //             }
-    //             return helpers.showResponse(false, ResponseMessages?.admin?.admin_account_error, null, null, 200);
-    //         }
-    //         return helpers.showResponse(false, ResponseMessages?.admin?.invalid_email, null, null, 200);
-    //     } catch (err) {
-    //         console.log("admin in catch", err)
-    //         return helpers.showResponse(false, ResponseMessages?.admin?.forgot_password_email_error, null, null, 200);
-    //     }
-    // },
-    // forgotChangePassword: async (data) => {
-    //     let { otp, email, password } = data;
-    //     let queryObject = { email, otp, status: { $ne: 2 } }
-    //     let result = await getSingleData(Administration, queryObject, '');
-    //     if (result.status) {
-    //         let editObj = {
-    //             otp: '',
-    //             password: md5(password),
-    //             updated_at: moment().unix()
-    //         }
-    //         let response = await updateData(Administration, editObj, ObjectId(result.data._id));
-    //         if (response.status) {
-    //             return helpers.showResponse(true, ResponseMessages?.admin?.admin_password_reset, null, null, 200);
-    //         }
-    //         return helpers.showResponse(false, ResponseMessages?.admin?.admin_password_reset_error, null, null, 200);
-    //     }
-    //     return helpers.showResponse(false, ResponseMessages?.admin?.invalid_otp, null, null, 200);
-    // },
-    // getDetails: async (admin_id) => {
-    //     let queryObject = { _id: ObjectId(admin_id), status: { $ne: 2 } }
-    //     let resordWithOld: async (data, admin_id) => {
-    //     let { old_password, new_password } = data
-    //     let queryObject = { _id: ObjectId(admin_id), password: md5(old_password), status: { $ne: 2 } }
-    //     let result = await getSingleData(Administration, queryObject, '');
-    //     if (!result.status) {
-    //         return helpers.showResponse(false, ResponseMessages?.admin?.invalid_old_password, null, null, 200);
-    //     }
-    //     let editObj = {
-    //         password: md5(new_password),
-    //         updated_on: moment().unix()
-    //     }
-    //     let response = await updateData(Administration, editObj, ObjectId(admin_id));
-    //     if (response.status) {
-    //         return helpers.showResponse(true, ResponseMessages?.admin?.password_changed, null, null, 200);
-    //     }
-    //     return helpers.showResponse(false, ResponseMessages?.admin?.password_change_error, null, 200);
-    // },
-    // update: async (data, admin_id) => {
-    //     if ("email" in data && data.email != "") {
-    //         let queryObject = { _id: { $ne: ObjectId(admin_id) }, email: data.email, status: { $ne: 2 } }
-    //         let result = await getSingleData(Administration, queryObject, '');
-    //         if (result.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.admin?.email_already, null, null, 200);
-    //         }
-    //     }
-    //     data.updated_on = moment().unix();
-    //     let response = await updateData(Administration, data, ObjectId(admin_id));
-    //     if (response.status) {
-    //         return helpers.showResponse(true, ResponseMessages?.admin?.admin_details_updated, null, null, 200);
-    //     }
-    //     return helpers.showResponse(false, ResponseMessages?.admin?.admin_details_update_error, null, null, 200);
-    // },
-    // getAdminData: async (data) => {
-    //     try {
-    //         let result = await CommonContent.findOne({})
-    //         if (result) {
-    //             return helpers.showResponse(true, ResponseMessages.common.data, result, null, 200);
-    //         }
-    //         return helpers.showResponse(true, ResponseMessages.report.not_found, null, null, 200);
-
-    //     } catch (error) {
-    //         return helpers.showResponse(false, error?.message, null, null, 200);
-    //     }
-    // },turn helpers.showResponse(true, ResponseMessages?.admin?.admin_details, result.data, null, 200);
-    //     }
-    //     return helpers.showResponse(false, ResponseMessages?.admin?.invalid_admin, null, null, 200);
-    // },
-    // changePasswordWithOld: async (data, admin_id) => {
-    //     let { old_password, new_password } = data
-    //     let queryObject = { _id: ObjectId(admin_id), password: md5(old_password), status: { $ne: 2 } }
-    //     let result = await getSingleData(Administration, queryObject, '');
-    //     if (!result.status) {
-    //         return helpers.showResponse(false, ResponseMessages?.admin?.invalid_old_password, null, null, 200);
-    //     }
-    //     let editObj = {
-    //         password: md5(new_password),
-    //         updated_on: moment().unix()
-    //     }
-    //     let response = await updateData(Administration, editObj, ObjectId(admin_id));
-    //     if (response.status) {
-    //         return helpers.showResponse(true, ResponseMessages?.admin?.password_changed, null, null, 200);
-    //     }
-    //     return helpers.showResponse(false, ResponseMessages?.admin?.password_change_error, null, 200);
-    // },
-    // update: async (data, admin_id) => {
-    //     if ("email" in data && data.email != "") {
-    //         let queryObject = { _id: { $ne: ObjectId(admin_id) }, email: data.email, status: { $ne: 2 } }
-    //         let result = await getSingleData(Administration, queryObject, '');
-    //         if (result.status) {
-    //             return helpers.showResponse(false, ResponseMessages?.admin?.email_already, null, null, 200);
-    //         }
-    //     }
-    //     data.updated_on = moment().unix();
-    //     let response = await updateData(Administration, data, ObjectId(admin_id));
-    //     if (response.status) {
-    //         return helpers.showResponse(true, ResponseMessages?.admin?.admin_details_updated, null, null, 200);
-    //     }
-    //     return helpers.showResponse(false, ResponseMessages?.admin?.admin_details_update_error, null, null, 200);
-    // },
-    // getAdminData: async (data) => {
-    //     try {
-    //         let result = await CommonContent.findOne({})
-    //         if (result) {
-    //             return helpers.showResponse(true, ResponseMessages.common.data, result, null, 200);
-    //         }
-    //         return helpers.showResponse(true, ResponseMessages.report.not_found, null, null, 200);
-
-    //     } catch (error) {
-    //         return helpers.showResponse(false, error?.message, null, null, 200);
-    //     }
-    // },
 
 }
 

@@ -9,13 +9,7 @@ const path = require('path')
 const ResponseMessages = require('../constants/ResponseMessages');
 const consts = require("../constants/const");
 const { default: mongoose } = require('mongoose');
-const { randomUUID } = require('crypto')
 const middleware = require('../middleware/authentication');
-const Orders = require('../models/Orders')
-const Material = require("../models/Material")
-const axios = require("axios");
-const { urlencoded } = require('express');
-const { Parser } = require('json2csv')
 const ejs = require('ejs');
 
 const UserUtils = {
@@ -51,23 +45,15 @@ const UserUtils = {
             if (!emailExistanceResponse?.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.email_already, null, null, 403);
             }
-            // let count = await getCount(Users, { userType: 3 })
-            // let idGenerated = helpers.generateIDs(count?.data)
-            // console.log(idGenerated, "id generateddd");
             let newObj = {
                 firstName,
                 lastName,
                 email: email,
                 userName: email,
                 phoneNumber,
-                // id: idGenerated.idNumber,
-                // guid: randomUUID(),
-                // customerId: idGenerated.customerID,
-                // customerGuid: randomUUID(),
                 password: md5(password),
                 createdOn: helpers.getCurrentDate()
             }
-
 
             if (profileImg) {
                 //upload image to aws s3 bucket
@@ -75,7 +61,6 @@ const UserUtils = {
                 if (!s3Upload.status) {
                     return helpers.showResponse(false, ResponseMessages?.common.file_upload_error, result?.data, null, 203);
                 }
-
                 newObj.profileImagePath = s3Upload?.data[0]
             }
             const usersCount = await getCount(Users, { userType: 3 })
@@ -83,8 +68,6 @@ const UserUtils = {
             if (!usersCount.status) {
                 return helpers.showResponse(false, ResponseMessages?.common.database_error, null, null, 400);
             }
-            // const idGenerated = helpers.generateIDs(usersCount?.data)
-
 
             let userRef = new Users(newObj)
             let result = await postData(userRef);
@@ -222,25 +205,17 @@ const UserUtils = {
             return helpers.showResponse(false, ResponseMessages?.users?.invalid_user, null, null, 400);
         }
 
-        // await updateSingleData(Users, { csrfToken: null }, { _id: userId, status: { $ne: 3 } })
-
         let userData = result?.data
         return helpers.showResponse(true, ResponseMessages?.users?.logout_success, userData, null, 200);
     },
     refreshCsrfToken: async (request, userId) => {
         try {
-            // let data = await getSingleData(Users, { _id: userId, status: { $ne: 2 } })
-            // let userData = data.data
             if (request?.session?._csrfToken) {
-                // let newCsrfToken = helpers.generateCsrfToken();
-                // request.session._csrfToken = newCsrfToken;
-
                 return helpers.showResponse(true, 'Token Generated Successfully', { csrfToken: request?.session?._csrfToken }, null, 200);
             } else {
                 let newCsrfToken = helpers.generateCsrfToken();
                 request.session._csrfToken = newCsrfToken;
                 return helpers.showResponse(true, 'Token Generated Successfully', { csrfToken: newCsrfToken }, null, 200);
-                // return helpers.showResponse(false, 'Session not available', null, null, 500);
             }
         } catch (error) {
             console.error('Error refreshing CSRF token:', error);
@@ -355,7 +330,6 @@ const UserUtils = {
         }
         return helpers.showResponse(false, ResponseMessages.users.password_change_failed, null, null, 400);
     },
-
     // // with token 
     getUserDetail: async (data) => {
         let { user_id } = data;
@@ -396,13 +370,6 @@ const UserUtils = {
                 $replaceRoot: {
                     newRoot: {
                         $mergeObjects: [
-                            // {
-                            //     _id: '$_id',
-                            //     firstName: '$firstName',
-                            //     lastName: '$lastName',
-                            //     email: '$email',
-                            //     // Add other fields from the Users collection that you want to include
-                            // },
                             "$$ROOT",
                             {
                                 fullName: {
@@ -419,11 +386,7 @@ const UserUtils = {
                     }
                 }
             },
-            // {
-            //     $unset: "userProfileData" // Exclude the 'password' field
-            // },
         ]);
-        console.log(result, "resulttttuser");
         if (result.length === 0) {
             return helpers.showResponse(false, 'User Not found ', null, null, 400);
         }
@@ -501,7 +464,6 @@ const UserUtils = {
     updateShippingDetails: async (data, userId) => {
         let queryObject = { _id: userId }
 
-        console.log(data, "dataaaShip");
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
@@ -520,7 +482,6 @@ const UserUtils = {
     updateBillingAddress: async (data, userId) => {
         let queryObject = { _id: userId }
 
-        console.log(data, "databill");
         let checkUser = await getSingleData(Users, queryObject, '');
         if (!checkUser?.status) {
             return helpers.showResponse(false, ResponseMessages.users.invalid_user, checkUser?.data, null, 400);
@@ -538,7 +499,6 @@ const UserUtils = {
     updatePaymentDetails: async (data, userId) => {
         try {
             let { paymentDetails } = data
-            // data.updatedOn = helpers.getCurrentDate();
 
             const findUser = await getSingleData(Users, { _id: userId })
             if (!findUser.status) {
@@ -554,18 +514,12 @@ const UserUtils = {
 
             //if user has customer id then update card details 
             if (paymentDetails?.customerId) {
-                console.log("under ifffe");
-
                 customerId = paymentDetails?.customerId
             } else {
-                console.log("under elseef");
                 let count = await getCount(Users, { userType: 3 })
                 let idGenerated = helpers.generateIDs(count?.data)
-                console.log(idGenerated, "id generateddd");
                 customerId = idGenerated.customerID
             }
-
-            console.log(customerId, "customeridd");
 
             const dataPaytrace = {
                 // customer_id: 89861252,
@@ -591,55 +545,39 @@ const UserUtils = {
 
             //if cutomer id is present then update paytrace details
             if (paymentDetails?.customerId) {
-                console.log("update side paytrace");
                 payTrace = await helpers.updatePaytraceInfo(dataPaytrace, payTraceToken.data.access_token)
 
-                //else create paytrace id for user with payment details
-
-            } else {
-                console.log("create side paytrace");
-
+            } else {//else create paytrace id for user with payment details
                 payTrace = await helpers.generatePaytraceId(dataPaytrace, payTraceToken.data.access_token)
-
             }
 
-
-            // console.log(getPaytraceId, "getPaytraceId");
             if (!payTrace.status) {
-                console.log(payTrace, "payTracepayTrace");
                 return helpers.showResponse(false, payTrace.data, payTrace.message, null, 400)
             }
             let { customer_id, masked_card_number } = payTrace.data
-
             //assign payload data to variable 
             let paymentdetailsData = data
-
             // console.log(paymentdetailsData, "45455455");
             paymentdetailsData.paymentDetails.creditCardData.ccNumber = masked_card_number
             paymentdetailsData.paymentDetails.customerId = customer_id
             paymentdetailsData.updatedOn = helpers.getCurrentDate();
-            let completionStaus = { 'completionStaus.paymentInfo': true }
 
-            // console.log(paymentdetailsData, "dddsdsd");
+            let completionStaus = { 'completionStaus.paymentInfo': true }
             let userProfile = await updateSingleData(UserProfile, { ...paymentdetailsData, ...completionStaus }, { userId })
 
             if (!userProfile.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
             }
-
             let addUserPaytraceId = await updateSingleData(Users, { payTraceId: Number(customer_id), updatedOn: helpers.getCurrentDate() }, { _id: userId })
 
             if (!addUserPaytraceId.status) {
                 return helpers.showResponse(false, ResponseMessages?.users?.user_account_update_error, null, null, 400);
             }
-            // console.log(userProfile, "userProfile");
-
             //---------------email send to admin that new user has been regsitered
             let basicInfo = userProfile?.data.completionStaus?.basicInfo
             let billingInfo = userProfile?.data.completionStaus?.billingInfo
             let paymentInfo = userProfile?.data.completionStaus?.paymentInfo
             let shippingInfo = userProfile?.data.completionStaus?.shippingInfo
-
 
             //if user complete its profile then send email to user and admin with details
             if (basicInfo && billingInfo && paymentInfo && shippingInfo) {
@@ -728,7 +666,6 @@ const UserUtils = {
                 let emailToUser = await helpers.sendEmailService(toUser, subjectUser, htmlUser, attachmentsUser)
                 //----------
             }
-
 
             return helpers.showResponse(true, ResponseMessages?.users?.user_account_updated, null, null, 200);
         } catch (error) {

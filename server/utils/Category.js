@@ -11,10 +11,6 @@ const categoryUtil = {
     getCategories: async (data) => {
         const { includeSubCategory = false, searchKey = '', parentCategoryId } = data
 
-
-        console.log(searchKey, "searchKey===");
-        console.log(includeSubCategory, "includeSubCategory===");
-        console.log(parentCategoryId, "parentCategoryId===");
         const aggregationPipeline = [
 
             {
@@ -271,8 +267,6 @@ const categoryUtil = {
             const result = await updateSingleData(Category, { status: 2 }, { _id: id })
 
             if (result.status) {
-                // await deleteData(SubCategory, { categoryId: id })
-
                 return helpers.showResponse(true, ResponseMessages?.common.delete_sucess, {}, null, 200);
             }
 
@@ -292,13 +286,10 @@ const categoryUtil = {
             if (!find.status) {
                 return helpers.showResponse(false, ResponseMessages?.category.subcategory_not_exist, {}, null, 400);
             }
-
             const findProduct = await Product.find({ status: { $ne: 2 }, subCategoryId: { $in: [id] } })
             if (findProduct.length > 0) {
                 return helpers.showResponse(false, ResponseMessages?.product.active_product, {}, null, 400);
             }
-
-            // const result = await deleteById(SubCategory, id)
             const result = await updateSingleData(SubCategory, { status: 2 }, { _id: id })
 
             if (result.status) {

@@ -107,22 +107,8 @@ const commonUtil = {
   },
   getAllShippingMethods: async () => {
     let result = await getDataArray(ShipMethod, {});
-    // if (!result.status) {
-    //   return helpers.showResponse(true, ResponseMessages?.common.database_error, {}, null, 400);
-    // }
-    console.log(result, "reulttt");
     return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result?.data, null, 200);
   },
-  // saveCurrentLanguage: async (data) => {
-  //  let {currentLanguage} = data
-
-  //   let saveLang = await updateSingleData(Users, { currentLanguage },{});
-  //   // if (!result.status) {
-  //   //   return helpers.showResponse(true, ResponseMessages?.common.database_error, {}, null, 400);
-  //   // }
-  //   console.log(result, "reulttt");
-  //   return helpers.showResponse(true, ResponseMessages.common.data_retreive_sucess, result?.data, null, 200);
-  // },
 
   storeParameterToAWS: async (data) => {
     let response = await helpers.postParameterToAWS({
@@ -155,56 +141,6 @@ const commonUtil = {
     return helpers.showResponse(false, "Common details Update failed", response, null, 400);
   },
 
-  // addNewQuestion: async (data) => {
-  //   let { question, answer } = data
-  //   let newObj = {
-  //     question,
-  //     answer,
-  //     createdOn: helpers.getCurrentDate()
-  //   }
-
-  //   let quesRef = new FAQ(newObj)
-  //   let response = await postData(quesRef);
-  //   if (response.status) {
-  //     return helpers.showResponse(true, "New Question Added Successfully", null, null, 200);
-  //   }
-  //   return helpers.showResponse(false, "Unable to add new question at the moment", response, null, 400);
-  // },
-
-  // updateQuestion: async (data) => {
-  //   let { quesId } = data
-  //   const findQues = await getSingleData(FAQ, { _id: quesId, status: { $ne: 2 } })
-  //   if (!findQues.status) {
-  //     return helpers.showResponse(false, ResponseMessages?.common.not_exist, {}, null, 400);
-  //   }
-
-  //   data.updatedOn = helpers.getCurrentDate();
-  //   let response = await updateData(FAQ, data, new ObjectId(quesId));
-  //   if (response.status) {
-  //     return helpers.showResponse(true, "Question has been updated", null, null, 200);
-  //   }
-  //   return helpers.showResponse(false, "Question Update failed", null, null, 400);
-  // },
-
-  //   getQuestions: async (data) => {
-  //     let { pageIndex = 1, pageSize = 10 } = data
-  //     pageIndex = Number(pageIndex)
-  //     pageSize = Number(pageSize)
-
-  //     let pagination = {
-  //       skip: (pageIndex - 1) * pageSize, // Calculate the number of documents to skip
-  //       limit: pageSize, // Specify the number of documents to return
-  //     }
-  //     let totalCount = await getCount(FAQ, { status: { $ne: 2 } })
-
-  //     let response = await getDataArray(FAQ, { status: { $ne: 2 } }, '', pagination, { createdOn: -1 });
-
-  //     if (response.status) {
-  //       return helpers.showResponse(true, "Here is a list of questions", { data: response.data, totalCount: totalCount.data }, null, 200);
-  //     }
-  //     return helpers.showResponse(false, 'No data found', null, null, 400);
-  //   },
-
   getCommonContent: async () => {
     let response = await getSingleData(commonContent, {}, '');
     if (response.status) {
@@ -214,7 +150,6 @@ const commonUtil = {
   },
   getFaqCategories: async (data) => {
     try {
-
 
       let { pageIndex = 1, pageSize = 10 } = data
       pageIndex = Number(pageIndex)
@@ -226,8 +161,6 @@ const commonUtil = {
           "Content-Type": "application/json",
         }
       })
-
-      console.log(response.data, "responsee");
 
       if (response.data) {
         return helpers.showResponse(true, "Here is a Categories of faq", response.data, null, 200);
@@ -241,7 +174,6 @@ const commonUtil = {
   getCategoriesArticle: async (data) => {
     try {
 
-
       let { pageIndex = 1, pageSize = 10 } = data
       pageIndex = Number(pageIndex)
       pageSize = Number(pageSize)
@@ -253,8 +185,6 @@ const commonUtil = {
         }
       })
 
-      console.log(response.data, "responsee");
-
       if (response.data) {
         return helpers.showResponse(true, "Here is Articles of  Categories ", response.data, null, 200);
       }
@@ -265,9 +195,7 @@ const commonUtil = {
     }
   },
   getSingleCategoryArticle: async (data) => {
-
     try {
-
       let { pageIndex = 1, pageSize = 10, categoryId } = data
       pageIndex = Number(pageIndex)
       pageSize = Number(pageSize)
@@ -278,8 +206,6 @@ const commonUtil = {
           "Content-Type": "application/json",
         }
       })
-
-      console.log(response.data, "responsee");
 
       if (response.data) {
         return helpers.showResponse(true, "Here is Articles of  Category ", response.data, null, 200);
@@ -292,9 +218,7 @@ const commonUtil = {
     }
   },
   getSearchArticle: async (data) => {
-
     try {
-
       let { pageIndex = 1, pageSize = 10, query } = data
       pageIndex = Number(pageIndex)
       pageSize = Number(pageSize)
@@ -305,8 +229,6 @@ const commonUtil = {
           "Content-Type": "application/json",
         }
       })
-
-      console.log(response.data, "responsee");
 
       if (response.data) {
         return helpers.showResponse(true, "Here is result in Articles  ", response.data, null, 200);
@@ -346,17 +268,12 @@ const commonUtil = {
         }
       }
 
-      console.log(body, "boddyyyyy");
-
-
       let response = await axios.post(`${ZENDESK_BASE_URL}/requests`, body, {
         headers: {
           Authorization: `Basic ${ZENDESK_AUTH}`,
           "Content-Type": "application/json",
         }
       })
-
-      console.log(response.data, "responsee");
 
       if (response.data) {
         return helpers.showResponse(true, "Ticket Raise Successfully", response.data, null, 200);
